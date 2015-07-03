@@ -1,0 +1,76 @@
+<collection version="1">
+  <name>Example module collection</name>
+  <defaultdll>example.dll</defaultdll>
+  
+  <module id="mix2">
+    <name>2-channel Mixer</name>
+    <category>Mixers</category>
+    <parrams>
+      <parram id="in1" type="inlet"/>
+      <parram id="in2" type="inlet"/>
+      <parram id="gain1" type="float" min="0.0" max="4.0" default="1.0"/>
+      <parram id="gain2" type="float" min="0.0" max="10.0" default="1.0"/>
+      <parram id="out1" type="outlet"/>
+    </parrams>
+    <sc>
+arg in1, in2, out1, gain1, gain2;
+var i1 = In.ar(inbus1);
+var i2 = In.ar(inbus2);
+var res = Mix.new([i1*gain1, i2*gain2]);
+Out.ar(outbus,res);
+    </sc>
+    <gui>
+      <standardbox>
+        <inlet id="in1"/>
+        <inlet id="in2"/>
+        <slider id="gain1" name="Gain 1" type="lin"/>
+        <slider id="gain2" name="Gain 2" type="lin"/>
+        <outlet id="out1"/>
+      </standardbox>
+    </gui>
+  </module>
+  
+  <module id="echo">
+    <name>Simple Echo</name>
+    <category>Delays</category>
+    <parrams>
+      <parram id="in1" type="inlet"/>
+      <parram id="delay" type="float" min="0.0" max="4.0" default="1.0"/>
+      <parram id="decay" type="float" min="0.0" max="10.0" default="1.0"/>
+      <parram id="out1" type="outlet"/>
+    </parrams>
+    <sc>
+arg in1, out1, delay = 0.2, decay = 4;
+var input = In.ar(in1);
+Out.ar(in1, CombN.ar(input, 0.5, delay, decay, 1, input));
+    </sc>
+    <gui>
+      <standardbox>
+        <inlet id="in1"/>
+        <slider id="delay" name="Delay time" type="lin"/>
+        <slider id="decay" name="Decay to -60dB" type="lin"/>
+        <outlet id="out1"/>
+      </standardbox>
+    </gui>
+  </module>
+  
+  <module id="display">
+    <name>Display data</name>
+    <category>Debug</category>
+    <class name="DisplayModule"/>
+    <parrams>
+      <parram id="in1" type="datainlet"/>
+      <parram id="enabled" type="bool" default="false">
+        <reactfunc type="custom"/>
+      </parram>
+    </parrams>
+    <gui>
+      <standardbox>
+        <inlet id="in1"/>
+        <toggle id="enabled"/>
+        <placeholder id="drawarea" width="50" height="50"/>
+      </standardbox>
+    </gui>
+  </module>
+  
+</collection>
