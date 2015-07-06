@@ -2,7 +2,7 @@
 #include <cstring>
 #include <iostream>
 
-class Base1 : public Module{
+class Base1 : public AlgAudio::Module{
 public:
   Base1(){};
   void on_init() override;

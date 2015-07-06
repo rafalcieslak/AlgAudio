@@ -1,6 +1,8 @@
 #include "LibLoader.hpp"
 #include <iostream>
 
+using namespace AlgAudio;
+
 int main(){
   try{
     LibLoader ll("modules_base.aa.dll");

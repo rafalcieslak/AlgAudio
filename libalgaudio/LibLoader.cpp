@@ -1,5 +1,7 @@
 #include "LibLoader.hpp"
 
+namespace AlgAudio{
+
 LibLoader::LibLoader(std::string filename) : path(filename){
    hLib = LoadLibrary(filename.c_str());
    if(hLib == NULL) throw LibLoadingException(filename, "Failed to open library");
@@ -14,4 +16,6 @@ LibLoader::~LibLoader(){
 
 Module* LibLoader::AskForInstance(std::string name){
   return reinterpret_cast<Module*>(create_instance_func(name.c_str()));
+}
+
 }

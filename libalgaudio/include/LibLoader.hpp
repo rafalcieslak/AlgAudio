@@ -5,6 +5,8 @@
 #include <string>
 #include <windows.h>
 
+namespace AlgAudio{
+
 typedef void* (create_instance_func_t)(const char *);
 
 struct LibLoadingException{
@@ -24,4 +26,5 @@ private:
     create_instance_func_t* create_instance_func;
 };
 
+}
 #endif // LIBLOADER_HPP
