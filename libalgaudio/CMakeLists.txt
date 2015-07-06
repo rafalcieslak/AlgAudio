@@ -9,6 +9,7 @@ file(GLOB LIBALGAUDIO_SOURCES ./*.cpp)
 file(GLOB LIBALGAUDIO_INCLUDES ./include/*.hpp)
 
 include_directories("./include")
+include_directories("${CMAKE_SOURCE_DIR}/libs")
 
 add_library(
 	libalgaudio SHARED
