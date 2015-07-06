@@ -1,10 +1,16 @@
+<!-- This is a draft of how, possibly, a module description could look like.
+  This is by no means a speification nor a design guideline, and should be
+  treated exclusivelly as an idea. -->
+
 <collection version="1" id="example">
   <name>Example module collection</name>
-  <defaultdll>example.dll</defaultdll>
-  
+  <!-- By default, look for classes in examle.aa.so on POSIX systems, and
+    for example.aa.dll on Windows -->
+  <defaultlib file="example.aa"/>
+
   <!-- A basic module that has some SC code, and basic controls -->
   <module id="mix2" name="2-channel Mixer">
-    <category>Mixers</category>
+    <categories>Mixers</categories>
     <parrams>
       <parram id="in1" type="inlet"/>
       <parram id="in2" type="inlet"/>
@@ -17,7 +23,7 @@ arg in1, in2, out1, gain1, gain2;
 var i1 = In.ar(inbus1);
 var i2 = In.ar(inbus2);
 var res = Mix.new([i1*gain1, i2*gain2]);
-Out.ar(outbus,res);
+Out.ar(out1,res);
     </sc>
     <!-- The `type` argument to the gui parram specifies which top-level module
       container element to use. This may vary if we implement different module
@@ -30,13 +36,13 @@ Out.ar(outbus,res);
         <outlet id="out1"/>
     </gui>
   </module>
-  
+
   <!-- Another very simple module. This time the GUI is build automatically
     basing on the parrams list. Note additional data in parram nodes. This
-    is only a shorter form that can be used if the GUI is based only on the 
+    is only a shorter form that can be used if the GUI is based only on the
     parrams.-->
   <module id="echo" name="Simple echo">
-    <category>Delays</category>
+    <categories>Delays</categories>
     <parrams>
       <parram id="in1" type="inlet"/>
       <!-- Slider type could be omitted, as lin is the default value.-->
@@ -47,15 +53,15 @@ Out.ar(outbus,res);
     <sc>
 arg in1, out1, delay = 0.2, decay = 4;
 var input = In.ar(in1);
-Out.ar(in1, CombN.ar(input, 0.5, delay, decay, 1, input));
+Out.ar(out1, CombN.ar(input, 0.5, delay, decay, 1, input));
     </sc>
     <gui type="standard" mode="auto"/>
   </module>
-  
+
   <!-- This module has a class associated; it will be loaded from the shared
     library, so that arbitrary binary code may be executed -->
   <module id="display" name="Data display">
-    <category>Debug</category>
+    <categories>Debug</categories>
     <class name="DisplayModule"/>
     <parrams>
       <!-- Standard inlets pass audio signals, data inlets pass control
@@ -70,11 +76,11 @@ Out.ar(in1, CombN.ar(input, 0.5, delay, decay, 1, input));
     <gui type="standard">
       <inlet id="in1"/>
       <toggle id="enabled"/>
-      <!-- The placeholder GUI element does not display anything, but can be 
+      <!-- The placeholder GUI element does not display anything, but can be
         accessed by the module code and have a custom element embedded. This
         way modules may perform custom drawing. -->
       <placeholder id="drawarea" width="50" height="50"/>
     </gui>
   </module>
-  
+
 </collection>
