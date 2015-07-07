@@ -1,6 +1,7 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
+#include <windows.h>
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
@@ -77,6 +78,7 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetByID(std::string id){
 }
 
 std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string filepath){
+  std::cout << "Loading collection from file '" << filepath << "'..." << std::endl;
   std::ifstream file(filepath);
   if(!file)
     throw CollectionLoadingException(filepath,"File does not exist or is not readable");
@@ -89,6 +91,16 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string 
   }catch(CollectionParseException ex){
     throw CollectionLoadingException(filepath, "Collection file parsing failed: " + ex.what());
   }
+}
+
+void ModuleCollectionBase::InstallDir(std::string dirpath){
+  std::cout << "Loading all collections from '" << dirpath << "' directory..." << std::endl;
+  WIN32_FIND_DATA fileData;
+  std::string glob = dirpath + "/*.xml";
+  HANDLE hFind = FindFirstFile(glob.c_str(), &fileData);
+  do{
+    InstallFile( dirpath + "/" + fileData.cFileName);
+  }while(FindNextFile(hFind, &fileData) != 0);
 }
 
 std::string ModuleCollectionBase::ListInstalledTemplates(){

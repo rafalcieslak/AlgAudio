@@ -44,6 +44,7 @@ private:
 public:
   static std::shared_ptr<ModuleCollection> GetByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
+  static void InstallDir(std::string dirpath);
   static std::string ListInstalledTemplates();
 };
 
