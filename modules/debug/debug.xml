@@ -1,0 +1,14 @@
+<collection version="1" id="debug">
+  <name>Debug utilities</name>
+  <defaultlib file="debug.aa"/>
+  <module id="pipe" name="Pipe">
+    <sc>
+arg inbus, outbus;
+var in = In.ar(inbus);
+Out.ar(outbus,in);
+    </sc>
+  </module>
+  <module id="helloworld" name="Hello World!">
+    <class name="HelloWorld"/>
+  </module>
+</collection>

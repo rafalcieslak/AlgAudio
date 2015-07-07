@@ -55,7 +55,7 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
       try{
         templates.push_back(std::make_shared<ModuleTemplate>(*this,module_node));
       }catch(ModuleParseException ex){
-        std::cerr << "Exception: " + ex.what();
+        std::cerr << "Exception: " + ex.what() << std::endl;
         std::cerr << "An invalid module in collection " + id + ", ignoring." << std::endl;
       }
     }

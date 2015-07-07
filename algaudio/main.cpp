@@ -7,7 +7,8 @@ using namespace AlgAudio;
 int main(){
   try{
     ModuleCollectionBase::InstallFile("modules/example.xml");
-    std::cout << ModuleCollectionBase::GetByID("example")->name << std::endl;
+    ModuleCollectionBase::InstallFile("modules/debug.xml");
+    std::cout << ModuleCollectionBase::GetByID("debug")->name << std::endl;
   }catch(CollectionParseException ex){
     std::cout << "Exception while loading the library: " << ex.what() << std::endl;
   }
