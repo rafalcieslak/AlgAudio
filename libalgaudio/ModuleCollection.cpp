@@ -53,7 +53,10 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
 
     for(xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module")){
       try{
-        templates.push_back(std::make_shared<ModuleTemplate>(*this,module_node));
+        auto templ = std::make_shared<ModuleTemplate>(*this,module_node);
+        if(templates_by_id.find(templ->id) != templates_by_id.end())
+          throw CollectionParseException(id, "Collection has duplicate module ids: '" + templ->id + "'");
+        templates_by_id[templ->id] = templ;
       }catch(ModuleParseException ex){
         std::cerr << "Exception: " + ex.what() << std::endl;
         std::cerr << "An invalid module in collection " + id + ", ignoring." << std::endl;
@@ -86,6 +89,18 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string 
   }catch(CollectionParseException ex){
     throw CollectionLoadingException(filepath, "Collection file parsing failed: " + ex.what());
   }
+}
+
+std::string ModuleCollectionBase::ListInstalledTemplates(){
+  std::string result = "Installed module templates list:\n";
+  for(const auto& it1 : collections_by_id){
+    result += it1.first + " \t :" + it1.second->name + "\n";
+    if(it1.second->templates_by_id.empty()) result += "  (collection is empty)\n";
+    for(const auto& it2 : it1.second->templates_by_id){
+      result += "  " + it2.first + " \t |" + it2.second->name + "\n";
+    }
+  }
+  return result;
 }
 
 } // namespace AlgAudio

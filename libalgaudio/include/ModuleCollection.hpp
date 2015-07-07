@@ -1,7 +1,6 @@
 #ifndef MODULE_CONNECTION
 #define MODULE_CONNECTION
 #include <fstream>
-#include <list>
 #include <memory>
 #include <map>
 
@@ -30,7 +29,7 @@ struct CollectionLoadingException : public Exception{
 class ModuleCollection{
 public:
   ModuleCollection(std::ifstream& file);
-  std::list<std::shared_ptr<ModuleTemplate>> templates;
+  std::map<std::string, std::shared_ptr<ModuleTemplate>> templates_by_id;
   std::string id;
   std::string name;
   bool has_defaultlib;
@@ -45,6 +44,7 @@ private:
 public:
   static std::shared_ptr<ModuleCollection> GetByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
+  static std::string ListInstalledTemplates();
 };
 
 } // namespace AlgAudio
