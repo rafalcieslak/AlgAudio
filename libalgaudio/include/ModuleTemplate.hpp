@@ -1,6 +1,7 @@
 #ifndef MODULE_TEMPLATE
 #define MODULE_TEMPLATE
 #include <string>
+#include <memory>
 
 #include "Utilities.hpp"
 
@@ -13,6 +14,7 @@ namespace rapidxml{
 namespace AlgAudio{
 
 class ModuleCollection;
+class Module;
 
 struct ModuleParseException : public Exception{
   ModuleParseException(std::string i, std::string t) : Exception(t), id(i) {};
@@ -24,8 +26,7 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
-class ModuleTemplate{
-public:
+struct ModuleTemplate{
   ModuleTemplate(ModuleCollection& collection);
   ModuleTemplate(ModuleCollection& collection, rapidxml::xml_node<char>* node);
   std::string id;
@@ -35,7 +36,6 @@ public:
   bool has_class = false;
   std::string class_name;
   ModuleCollection& collection;
-
 };
 
 } // namespace AlgAudio

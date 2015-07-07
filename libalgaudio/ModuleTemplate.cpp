@@ -1,6 +1,7 @@
 #include "ModuleTemplate.hpp"
 #include "rapidxml/rapidxml.hpp"
 using namespace rapidxml;
+#include "Module.hpp"
 
 namespace AlgAudio{
 

@@ -7,6 +7,7 @@
 #include "rapidxml/rapidxml_utils.hpp"
 
 #include "ModuleCollection.hpp"
+#include "LibLoader.hpp"
 
 using namespace rapidxml;
 
@@ -15,7 +16,9 @@ namespace AlgAudio{
 std::map<std::string, std::shared_ptr<ModuleCollection>>
   ModuleCollectionBase::collections_by_id;
 
-ModuleCollection::ModuleCollection(std::ifstream& file){
+ModuleCollection::ModuleCollection(std::ifstream& file, std::string b) :
+  basedir(b)
+{
   xml_document<> document;
   xml_node<>* root = nullptr;
   try{
@@ -46,10 +49,12 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
     xml_node<>* defaultlib_node = root->first_node("defaultlib");
     if(!defaultlib_node){
       has_defaultlib = false;
-      defaultlib = "";
+      defaultlib_path = "";
     }else{
       has_defaultlib = true;
-      defaultlib = defaultlib_node->value();
+      xml_attribute<>* libfile_node = defaultlib_node->first_attribute("file");
+      if(!libfile_node) throw CollectionParseException(id, "Missing file attribute in defaultlib node");
+      defaultlib_path = libfile_node->value();
     }
 
     for(xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module")){
@@ -69,9 +74,19 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
   }catch(std::runtime_error ex){
     throw CollectionParseException(std::string("XML file error: ") + ex.what());
   }
+
+  if(has_defaultlib){
+    defaultlib = LibLoader::GetByPath(basedir + Utilities::OSDirSeparator + defaultlib_path + Utilities::OSLibSuffix);
+  }
 }
 
-std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetByID(std::string id){
+std::shared_ptr<ModuleTemplate> ModuleCollection::GetTemplateByID(std::string id){
+  auto it = templates_by_id.find(id);
+  if(it == templates_by_id.end()) return nullptr;
+  else return it->second;
+}
+
+std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetCollectionByID(std::string id){
   auto it = collections_by_id.find(id);
   if(it == collections_by_id.end()) return nullptr;
   else return it->second;
@@ -83,7 +98,9 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string 
   if(!file)
     throw CollectionLoadingException(filepath,"File does not exist or is not readable");
   try{
-    auto collection = std::make_shared<ModuleCollection>(file);
+    std::string directory = Utilities::ConvertUnipathToOSPath(filepath);
+    directory = Utilities::GetDir(directory);
+    auto collection = std::make_shared<ModuleCollection>(file, directory);
     if(collections_by_id.find(collection->id) != collections_by_id.end())
       throw CollectionLoadingException(filepath, "The collection has a duplicate id");
     collections_by_id[collection->id] = collection;

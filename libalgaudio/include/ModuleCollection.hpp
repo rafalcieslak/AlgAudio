@@ -9,6 +9,8 @@
 
 namespace AlgAudio{
 
+class LibLoader;
+
 struct CollectionParseException : public Exception{
   CollectionParseException(std::string t) : Exception(t) {};
   CollectionParseException(std::string i, std::string t) : Exception(t), id(i) {};
@@ -28,12 +30,15 @@ struct CollectionLoadingException : public Exception{
 
 class ModuleCollection{
 public:
-  ModuleCollection(std::ifstream& file);
+  ModuleCollection(std::ifstream& file, std::string basedir);
+  std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string id);
   std::map<std::string, std::shared_ptr<ModuleTemplate>> templates_by_id;
   std::string id;
   std::string name;
+  std::string basedir;
   bool has_defaultlib;
-  std::string defaultlib;
+  std::string defaultlib_path;
+  std::shared_ptr<LibLoader> defaultlib;
 };
 
 class ModuleCollectionBase{
@@ -42,7 +47,7 @@ private:
 
   static std::map<std::string, std::shared_ptr<ModuleCollection>> collections_by_id;
 public:
-  static std::shared_ptr<ModuleCollection> GetByID(std::string id);
+  static std::shared_ptr<ModuleCollection> GetCollectionByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
   static void InstallDir(std::string dirpath);
   static std::string ListInstalledTemplates();

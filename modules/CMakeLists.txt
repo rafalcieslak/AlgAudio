@@ -8,7 +8,3 @@ include_directories(../libalgaudio/include)
 
 add_subdirectory(base)
 add_subdirectory(debug)
-
-add_custom_target(example.aa ALL
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/example.xml ${CMAKE_BINARY_DIR}/modules/.
-)

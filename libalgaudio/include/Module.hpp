@@ -1,13 +1,21 @@
 #ifndef MODULE_HPP
 #define MODULE_HPP
 
+#include <memory>
+#include "DynamicallyLoadableClass.hpp"
+
 namespace AlgAudio{
 
-class Module{
+class ModuleTemplate;
+
+class Module : public DynamicallyLoadableClass{
 public:
-  Module() {};
+  Module(){};
+  Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
+  Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
   virtual ~Module() {};
   virtual void on_init() {};
+  std::shared_ptr<ModuleTemplate> templ;
 };
 
 } // namespace AlgAudio

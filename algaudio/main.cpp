@@ -2,6 +2,8 @@
 #include "LibLoader.hpp"
 #include "ModuleCollection.hpp"
 #include "SDLHandle.hpp"
+#include "ModuleFactory.hpp"
+#include "ModuleTemplate.hpp"
 
 using namespace AlgAudio;
 
@@ -10,7 +12,9 @@ int main(){
     SDLHandle sdlhandle;
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
-  }catch(CollectionParseException ex){
-    std::cout << "Exception while loading the library: " << ex.what() << std::endl;
+    auto module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
+    auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
+  }catch(Exception ex){
+    std::cout << "An unhandled exception occured: " << ex.what() << std::endl;
   }
 }
