@@ -1,10 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 
 project(
-  algaudio
+  AlgAudio
   VERSION 0.1
-  LANGUAGES CXX
+  LANGUAGES CXX C
 )
+
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+
+# Global config
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
 #	set(EXTRA_SYS_LIBS wsock32 Ws2_32 comdlg32)

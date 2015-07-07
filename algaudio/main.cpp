@@ -1,11 +1,13 @@
+#include <iostream>
 #include "LibLoader.hpp"
 #include "ModuleCollection.hpp"
-#include <iostream>
+#include "SDLHandle.hpp"
 
 using namespace AlgAudio;
 
 int main(){
   try{
+    SDLHandle sdlhandle;
     ModuleCollectionBase::InstallFile("modules/example.xml");
     ModuleCollectionBase::InstallFile("modules/debug.xml");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();

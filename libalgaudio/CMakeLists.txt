@@ -1,3 +1,6 @@
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+
 add_definitions(
 	--std=c++14
 	-Wall
@@ -8,8 +11,17 @@ add_definitions(
 file(GLOB LIBALGAUDIO_SOURCES ./*.cpp)
 file(GLOB LIBALGAUDIO_INCLUDES ./include/*.hpp)
 
-include_directories("./include")
-include_directories("${CMAKE_SOURCE_DIR}/libs")
+include_directories(
+	"./include"
+	"${CMAKE_SOURCE_DIR}/libs"
+	${SDL2_INCLUDE_DIR}
+	${SDL2_TTF_INCLUDE_DIR}
+)
+
+link_directories(
+	${SDL2_LIBRARY_DIR}
+	${SDL2_TTF_LIBRARY_DIR}
+)
 
 add_library(
 	libalgaudio SHARED
@@ -21,8 +33,14 @@ SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
 
 target_link_libraries(
 	libalgaudio
+	${SDL2_LIBRARY}
+	${SDL2_TTF_LIBRARY}
 	${EXTRA_SYS_LIBS}
 )
+# The following command will clear transitive dependencies of libalgaudio.
+# This way plugins (which depend on libalgaudio) will not be linked agains
+# libSDL
+SET_TARGET_PROPERTIES(libalgaudio PROPERTIES INTERFACE_LINK_LIBRARIES "")
 
 add_custom_command(
 	TARGET libalgaudio POST_BUILD
