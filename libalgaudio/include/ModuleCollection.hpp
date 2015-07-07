@@ -5,12 +5,18 @@
 #include <memory>
 
 #include "ModuleTemplate.hpp"
+#include "Utilities.hpp"
 
 namespace AlgAudio{
 
-struct CollectionParseException{
-  CollectionParseException(std::string t) : text(t) {};
-  std::string text;
+struct CollectionParseException : public Exception{
+  CollectionParseException(std::string t) : Exception(t) {};
+  CollectionParseException(std::string i, std::string t) : Exception(t), id(i) {};
+  virtual std::string what() override {
+    if(id == "") return "While loading an unknown collection: " + text;
+    else return "While loading collection '" + id + "': " + text;
+  };
+  std::string id = "";
 };
 
 class ModuleCollection{
@@ -23,5 +29,5 @@ public:
   std::string defaultlib;
 };
 
-}
+} // namespace AlgAudio
 #endif //MODULE_CONNECTION

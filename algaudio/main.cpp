@@ -20,6 +20,6 @@ int main(){
     ModuleCollection col(file);
     std::cout << col.name << std::endl;
   }catch(CollectionParseException ex){
-    std::cout << "Exception while loading the library: " << ex.text << std::endl;
+    std::cout << "Exception while loading the library: " << ex.what() << std::endl;
   }
 }

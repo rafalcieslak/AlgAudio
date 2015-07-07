@@ -35,9 +35,9 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
     // TODO: Testing for collection id uniqueness
 
     xml_node<>* name_node = root->first_node("name");
-    if(!name_node) throw CollectionParseException("Mising collection name");
+    if(!name_node) throw CollectionParseException(id, "Mising collection name");
     name = name_node->value();
-    if(name == "") throw CollectionParseException("Collection name is empty");
+    if(name == "") throw CollectionParseException(id, "Collection name is empty");
 
     xml_node<>* defaultlib_node = root->first_node("defaultlib");
     if(!defaultlib_node){
@@ -52,7 +52,8 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
       try{
         templates.push_back(std::make_shared<ModuleTemplate>(*this,module_node));
       }catch(ModuleParseException ex){
-        std::cerr << "An invalid module in collection, ignoring." << std::endl;
+        std::cerr << "Exception: " + ex.what();
+        std::cerr << "An invalid module in collection " + id + ", ignoring." << std::endl;
       }
     }
 
@@ -63,4 +64,4 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
 
 
 
-}
+} // namespace AlgAudio

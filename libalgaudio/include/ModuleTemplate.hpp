@@ -2,21 +2,26 @@
 #define MODULE_TEMPLATE
 #include <string>
 
+#include "Utilities.hpp"
+
 // Forward declaration, to aviod rapidxml becoming a dependency for
 // external modules
 namespace rapidxml{
   template <class T> class xml_node;
 }
 
-
 namespace AlgAudio{
 
 class ModuleCollection;
 
-struct ModuleParseException{
-  ModuleParseException(std::string i, std::string t) : id(i), text(t) {};
-  std::string id;
-  std::string text;
+struct ModuleParseException : public Exception{
+  ModuleParseException(std::string i, std::string t) : Exception(t), id(i) {};
+  ModuleParseException(std::string t) : Exception(t) {};
+  virtual std::string what() override {
+    if(id == "") return "While loading an unknown module: " + text;
+    else return "While loading module '" + id + "': " + text;
+  };
+  std::string id = "";
 };
 
 class ModuleTemplate{
@@ -33,5 +38,5 @@ public:
 
 };
 
-}
+} // namespace AlgAudio
 #endif //MODULE_TEMPLATE

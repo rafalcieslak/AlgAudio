@@ -10,6 +10,6 @@ public:
   virtual void on_init() {};
 };
 
-}
+} // namespace AlgAudio
 
 #endif //MODULE_HPP

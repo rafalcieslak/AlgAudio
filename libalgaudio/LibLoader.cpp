@@ -18,4 +18,4 @@ Module* LibLoader::AskForInstance(std::string name){
   return reinterpret_cast<Module*>(create_instance_func(name.c_str()));
 }
 
-}
+} // namespace AlgAudio

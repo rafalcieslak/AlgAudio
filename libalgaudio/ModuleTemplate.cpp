@@ -19,4 +19,4 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
   if(name == "") throw ModuleParseException(id, "Module name is empty");
 }
 
-}
+} // namespace AlgAudio

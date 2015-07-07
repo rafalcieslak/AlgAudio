@@ -1,18 +1,20 @@
 #ifndef LIBLOADER_HPP
 #define LIBLOADER_HPP
 
-#include "Module.hpp"
 #include <string>
 #include <windows.h>
+
+#include "Module.hpp"
+#include "Utilities.hpp"
 
 namespace AlgAudio{
 
 typedef void* (create_instance_func_t)(const char *);
 
-struct LibLoadingException{
-  LibLoadingException(std::string p, std::string t) : path(p), text(t) {};
+struct LibLoadingException : public Exception{
+  LibLoadingException(std::string p, std::string t) : Exception(t), path(p) {};
+  virtual std::string what() override {return "When loading file '" + path + "': " + text;}
   std::string path;
-  std::string text;
 };
 
 class LibLoader{
@@ -26,5 +28,5 @@ private:
     create_instance_func_t* create_instance_func;
 };
 
-}
+} // namespace AlgAudio
 #endif // LIBLOADER_HPP
