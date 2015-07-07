@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml_utils.hpp"
 
 #include "ModuleCollection.hpp"
 
@@ -10,14 +11,16 @@ using namespace rapidxml;
 
 namespace AlgAudio{
 
+std::map<std::string, std::shared_ptr<ModuleCollection>>
+  ModuleCollectionBase::collections_by_id;
+
 ModuleCollection::ModuleCollection(std::ifstream& file){
   xml_document<> document;
   xml_node<>* root = nullptr;
-  std::vector<char> file_buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-  file_buffer.push_back('\0');
-  if(file_buffer.size() < 10) throw CollectionParseException("The collection file is apparently too short");
   try{
-    document.parse<0>(&(file_buffer[0]));
+    rapidxml::file<> file_buffer(file);
+    if(file_buffer.size() < 10) throw CollectionParseException("The collection file is apparently too short");
+    document.parse<0>(file_buffer.data());
     root = document.first_node("collection");
     if(!root) throw CollectionParseException("Missing `collection` node");
     xml_attribute<>* version_attr = root->first_attribute("version");
@@ -59,9 +62,30 @@ ModuleCollection::ModuleCollection(std::ifstream& file){
 
   }catch(rapidxml::parse_error ex){
     throw CollectionParseException(std::string("XML parse error: ") + ex.what());
+  }catch(std::runtime_error ex){
+    throw CollectionParseException(std::string("XML file error: ") + ex.what());
   }
 }
 
+std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetByID(std::string id){
+  auto it = collections_by_id.find(id);
+  if(it == collections_by_id.end()) return nullptr;
+  else return it->second;
+}
 
+std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string filepath){
+  std::ifstream file(filepath);
+  if(!file)
+    throw CollectionLoadingException(filepath,"File does not exist or is not readable");
+  try{
+    auto collection = std::make_shared<ModuleCollection>(file);
+    if(collections_by_id.find(collection->id) != collections_by_id.end())
+      throw CollectionLoadingException(filepath, "The collection has a duplicate id");
+    collections_by_id[collection->id] = collection;
+    return collection;
+  }catch(CollectionParseException ex){
+    throw CollectionLoadingException(filepath, "Collection file parsing failed: " + ex.what());
+  }
+}
 
 } // namespace AlgAudio

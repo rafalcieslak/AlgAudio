@@ -3,6 +3,7 @@
 #include <fstream>
 #include <list>
 #include <memory>
+#include <map>
 
 #include "ModuleTemplate.hpp"
 #include "Utilities.hpp"
@@ -18,6 +19,13 @@ struct CollectionParseException : public Exception{
   };
   std::string id = "";
 };
+struct CollectionLoadingException : public Exception{
+  CollectionLoadingException(std::string p, std::string t) : Exception(t), path(p) {};
+  virtual std::string what() override {
+    return "While loading collection from '" + path + "': " + text;
+  };
+  std::string path;
+};
 
 class ModuleCollection{
 public:
@@ -27,6 +35,16 @@ public:
   std::string name;
   bool has_defaultlib;
   std::string defaultlib;
+};
+
+class ModuleCollectionBase{
+private:
+  ModuleCollectionBase() = delete; // static class
+
+  static std::map<std::string, std::shared_ptr<ModuleCollection>> collections_by_id;
+public:
+  static std::shared_ptr<ModuleCollection> GetByID(std::string id);
+  static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
 };
 
 } // namespace AlgAudio

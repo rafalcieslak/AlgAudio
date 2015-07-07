@@ -14,8 +14,10 @@ protected:
 };
 
 class Utilities{
+private:
+  Utilities() = delete; // static
 public:
-
+  static bool GetFileExists(std::string name);
 };
 
 } // namespace AlgAudio
