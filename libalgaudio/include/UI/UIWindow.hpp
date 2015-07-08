@@ -18,7 +18,7 @@ public:
 
   // explicitly forbid copying windows
   UIWindow(const UIWindow&) = delete;
-  operator=(const UIWindow&) = delete;
+  UIWindow& operator=(const UIWindow&) = delete;
 
   void Render();
 
