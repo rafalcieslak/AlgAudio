@@ -31,9 +31,7 @@ void UIWindow::Render(){
   c.SetColor(255,255,255);
 
 	SDL_RenderClear(renderer);
-  if(child){
-    child->Draw(c);
-  }
+  if(child) child->Draw(c);
 	SDL_RenderPresent(renderer);
 }
 
@@ -44,10 +42,14 @@ void UIWindow::Insert(std::shared_ptr<UIWidget> ch){
 }
 
 void UIWindow::ProcessCloseEvent(){
-  std::cout << "Window close event" << std::endl;
   SDL_HideWindow(window);
   // If the window was not registered, the following has no effect.
   SDLMain::UnregisterWindow(shared_from_this());
+}
+
+void UIWindow::ProcessMouseButtonEvent(bool d, short b, int x, int y){
+  if(child)
+    child->OnMouseButton(d,b,x,y);
 }
 
 } // namespace AlgAudio

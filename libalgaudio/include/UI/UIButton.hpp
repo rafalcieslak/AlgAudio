@@ -8,6 +8,7 @@ class UIButton : public UIWidget{
 public:
   UIButton(std::string text);
   virtual void Draw(DrawContext& c) override;
+  virtual void OnMouseButton(bool,short,int,int) override;
 private:
   std::string text;
 };

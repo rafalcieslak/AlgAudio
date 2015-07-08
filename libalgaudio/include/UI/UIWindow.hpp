@@ -25,6 +25,8 @@ public:
   void Insert(std::shared_ptr<UIWidget> child);
 
   void ProcessCloseEvent();
+  void ProcessMouseButtonEvent(bool down, short button, int x, int y);
+
   unsigned int GetID() const {return id;}
 private:
   std::string title;

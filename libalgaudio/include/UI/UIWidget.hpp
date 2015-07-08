@@ -15,6 +15,8 @@ public:
   virtual ~UIWidget() {}
   // TODO: Draw cache
   virtual void Draw(DrawContext& c) = 0; // pure abstract
+  // Arguments: down, button, x, y
+  virtual void OnMouseButton(bool, short, int, int) {}
   std::weak_ptr<UIWidget> parent;
   std::weak_ptr<UIWindow> window;
 };

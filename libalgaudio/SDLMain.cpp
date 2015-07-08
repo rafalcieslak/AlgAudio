@@ -44,6 +44,17 @@ void SDLMain::ProcessEvents(){
       }
     }else if(ev.type == SDL_QUIT){
       Quit();
+    }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
+      const SDL_MouseButtonEvent& butt_ev = ev.button;
+      auto it = registered_windows.find(butt_ev.windowID);
+      if(it == registered_windows.end()){
+        // TODO: Events for unregistered windows should be passed to an externally
+        // visible signal, so that modules can subscribe to it.
+        std::cout << "Warning: Received an event for an unregistered window " << butt_ev.windowID << std::endl;
+      }else{
+        auto window = it->second;
+        window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), butt_ev.button, butt_ev.x, butt_ev.y);
+      }
     }
   }
 }

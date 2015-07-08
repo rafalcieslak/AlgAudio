@@ -18,4 +18,10 @@ void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
   child->parent = shared_from_this();
 }
 
+void UIMarginBox::OnMouseButton(bool down, short b,int x,int y){
+  if(!child) return;
+  if(x < left || y < top) return;
+  child->OnMouseButton(down,b,x,y);
+}
+
 } // namespace AlgAudio
