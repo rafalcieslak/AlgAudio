@@ -11,7 +11,7 @@ std::shared_ptr<UIMarginBox> UIMarginBox::Create(int t, int r, int b, int l){
   return res;
 }
 
-void UIMarginBox::Draw(DrawContext& c){
+void UIMarginBox::CustomDraw(DrawContext& c){
   DrawContext c2 = c.SubContext(left, top, c.width - right - left, c.height - top - bottom);
   if(!c2.HasZeroArea() && child)
     child->Draw(c2);

@@ -7,7 +7,7 @@ namespace AlgAudio{
 class UIButton : public UIWidget{
 public:
   static std::shared_ptr<UIButton> Create(std::string text);
-  virtual void Draw(DrawContext& c) override;
+  virtual void CustomDraw(DrawContext& c) override;
   virtual void OnMouseButton(bool,short,int,int) override;
 private:
   UIButton(std::string text);
