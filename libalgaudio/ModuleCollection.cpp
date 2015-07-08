@@ -1,7 +1,11 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
-#include <windows.h>
+#ifdef __unix__
+  #include <glob.h>
+#else
+  #include <windows.h>
+#endif
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
@@ -112,12 +116,21 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string 
 
 void ModuleCollectionBase::InstallDir(std::string dirpath){
   std::cout << "Loading all collections from '" << dirpath << "' directory..." << std::endl;
+#ifdef __unix__
+ glob_t glob_result;
+ std::string glob_pattern = dirpath + "/*.xml";
+ glob(glob_pattern.c_str(),0 , NULL, &glob_result);
+ for(unsigned int i=0; i<glob_result.gl_pathc;i++){
+   InstallFile(glob_result.gl_pathv[i]);
+ }
+#else
   WIN32_FIND_DATA fileData;
   std::string glob = dirpath + "/*.xml";
   HANDLE hFind = FindFirstFile(glob.c_str(), &fileData);
   do{
     InstallFile( dirpath + "/" + fileData.cFileName);
   }while(FindNextFile(hFind, &fileData) != 0);
+#endif
 }
 
 std::string ModuleCollectionBase::ListInstalledTemplates(){

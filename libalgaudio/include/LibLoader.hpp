@@ -2,9 +2,12 @@
 #define LIBLOADER_HPP
 
 #include <string>
-#include <windows.h>
 #include <map>
 #include <memory>
+
+#ifndef __unix__
+  #include <windows.h>
+#endif
 
 #include "Module.hpp"
 #include "Utilities.hpp"
@@ -32,9 +35,14 @@ public:
   ~LibLoader();
 private:
   const std::string path;
+  create_instance_func_t* create_instance_func = nullptr;
+  deleter_t* deleter_func = nullptr;
+
+#ifdef __unix__
+  void* handle;
+#else
   HINSTANCE hLib;
-  create_instance_func_t* create_instance_func;
-  deleter_t* deleter_func;
+#endif
 
   static std::map<std::string, std::shared_ptr<LibLoader>> libs_by_path;
 };

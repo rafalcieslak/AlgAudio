@@ -5,7 +5,7 @@
 #include <algorithm>
 
 namespace AlgAudio {
-#ifdef __LINUX__
+#ifdef __unix__
   const char Utilities::OSDirSeparator = '/';
   const std::string Utilities::OSLibSuffix = ".so";
 #else
