@@ -42,6 +42,8 @@ void SDLMain::ProcessEvents(){
           window->ProcessCloseEvent();
         }
       }
+    }else if(ev.type == SDL_QUIT){
+      Quit();
     }
   }
 }
