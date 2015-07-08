@@ -2,6 +2,7 @@
 #include "ModuleCollection.hpp"
 #include "ModuleFactory.hpp"
 #include "SDLMain.hpp"
+#include "UI/UIButton.hpp"
 
 using namespace AlgAudio;
 
@@ -14,6 +15,9 @@ int main(){
 
     auto blah_window = std::make_shared<UIWindow>("BLAH");
     SDLMain::RegisterWindow(blah_window);
+    auto button = std::make_shared<UIButton>("Button");
+    blah_window->Insert(button);
+
     SDLMain::Run();
 
   }catch(Exception ex){

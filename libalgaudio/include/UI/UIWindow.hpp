@@ -2,6 +2,7 @@
 #define UIWINDOW_HPP
 #include <memory>
 #include "SDLHandle.hpp"
+#include "UIWidget.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -21,6 +22,8 @@ public:
 
   void Render();
 
+  void Insert(std::shared_ptr<UIWidget> child);
+
   void ProcessCloseEvent();
   unsigned int GetID() const {return id;}
 private:
@@ -31,6 +34,7 @@ private:
   SDL_Window* window;
   SDL_Renderer* renderer;
 
+  std::shared_ptr<UIWidget> child;
 };
 
 } //namespace AlgAudio

@@ -2,6 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
+#include "UI/DrawContext.hpp"
 #include "SDLMain.hpp"
 
 namespace AlgAudio{
@@ -24,13 +25,28 @@ UIWindow::~UIWindow(){
 }
 
 void UIWindow::Render(){
+  // TODO: Window size
+  DrawContext c(renderer, 0, 0, 350, 300); // Full window DC
+  // TODO: Themeset color
+  c.SetColor(255,255,255);
+
 	SDL_RenderClear(renderer);
+  if(child){
+    child->Draw(c);
+  }
 	SDL_RenderPresent(renderer);
+}
+
+void UIWindow::Insert(std::shared_ptr<UIWidget> ch){
+  child = ch;
+  child->window = shared_from_this();
+  child->parent.reset();
 }
 
 void UIWindow::ProcessCloseEvent(){
   std::cout << "Window close event" << std::endl;
   SDL_HideWindow(window);
+  // If the window was not registered, the following has no effect.
   SDLMain::UnregisterWindow(shared_from_this());
 }
 
