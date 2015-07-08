@@ -8,6 +8,9 @@ namespace AlgAudio{
 struct SDLException : public Exception{
   SDLException(std::string t);
 };
+struct SDLExceptionNoDesc : public Exception{
+  SDLExceptionNoDesc(std::string t) : Exception(t) {}
+};
 
 /* A wrapper class for RAII SDL init/cleanup.
    All objects that require access to SDL should aquire such handle.

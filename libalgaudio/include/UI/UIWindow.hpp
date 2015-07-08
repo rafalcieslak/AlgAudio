@@ -1,5 +1,6 @@
 #ifndef UIWINDOW_HPP
 #define UIWINDOW_HPP
+#include <memory>
 #include "SDLHandle.hpp"
 
 struct SDL_Window;
@@ -7,18 +8,26 @@ struct SDL_Renderer;
 
 namespace AlgAudio{
 
-class UIWindow{
+class UIWindow : public std::enable_shared_from_this<UIWindow>{
 private:
   SDLHandle h;
 public:
-  UIWindow(std::string title = "AlgAudio", int w = 100, int h = 100);
+  UIWindow(std::string title = "AlgAudio", int w = 350, int h = 300);
   ~UIWindow();
-  void ProcessCloseEvent();
 
+  // explicitly forbid copying windows
+  UIWindow(const UIWindow&) = delete;
+  operator=(const UIWindow&) = delete;
+
+  void Render();
+
+  void ProcessCloseEvent();
+  unsigned int GetID() const {return id;}
 private:
   std::string title;
   int width;
   int height;
+  unsigned int id;
   SDL_Window* window;
   SDL_Renderer* renderer;
 

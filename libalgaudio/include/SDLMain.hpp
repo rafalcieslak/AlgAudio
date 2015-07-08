@@ -1,6 +1,6 @@
 #ifndef SDLMAIN_HPP
 #define SDLMAIN_HPP
-#include <list>
+#include <map>
 #include <memory>
 #include <atomic>
 
@@ -24,10 +24,11 @@ public:
   // register it.
   static void RegisterWindow(std::shared_ptr<UIWindow>);
   static void UnregisterWindow(std::shared_ptr<UIWindow>);
+  static unsigned int GetWindowNum() {return registered_windows.size();}
 private:
   static std::atomic_bool keep_running;
-  static std::list<std::shared_ptr<UIWindow>> registered_windows;
-  static ProcessEvents();
+  static std::map<unsigned int, std::shared_ptr<UIWindow>> registered_windows;
+  static void ProcessEvents();
 };
 
 } // namespace AlgAudio
