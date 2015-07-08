@@ -18,6 +18,7 @@ public:
   void DrawLine(int x1, int y1, int x2, int y2);
   void DrawTexture(SDL_Texture* texture, const SDL_Rect* srcrect, const SDL_Rect* dstrect);
   DrawContext SubContext(int x1, int y1, int width, int height);
+  bool HasZeroArea() const;
 private:
   int x, y;
   SDL_Renderer* renderer;

@@ -7,7 +7,8 @@ namespace AlgAudio{
 
 class UIWindow;
 
-class UIWidget{
+// shared_from_this is required for proper parent tracking
+class UIWidget : public std::enable_shared_from_this<UIWidget>{
   // Pure abstract
 public:
   UIWidget() {};

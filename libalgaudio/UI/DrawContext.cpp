@@ -21,5 +21,9 @@ void DrawContext::SetColor(short r, short g, short b, short a){
 void DrawContext::SetColor(const SDL_Color& c){
   SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
 }
+bool DrawContext::HasZeroArea() const{
+  if(width <= 0 || height <= 0) return true;
+  return false;
+}
 
 } // namespace AlgAudio

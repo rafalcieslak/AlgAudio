@@ -3,6 +3,7 @@
 #include "ModuleFactory.hpp"
 #include "SDLMain.hpp"
 #include "UI/UIButton.hpp"
+#include "UI/UIMarginBox.hpp"
 
 using namespace AlgAudio;
 
@@ -14,10 +15,12 @@ int main(){
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
 
     auto blah_window = std::make_shared<UIWindow>("BLAH");
-    SDLMain::RegisterWindow(blah_window);
+    auto marginbox = std::make_shared<UIMarginBox>(100,50,20,5);
     auto button = std::make_shared<UIButton>("Button");
-    blah_window->Insert(button);
+    blah_window->Insert(marginbox);
+    marginbox->Insert(button);
 
+    SDLMain::RegisterWindow(blah_window);
     SDLMain::Run();
 
   }catch(Exception ex){
