@@ -50,6 +50,9 @@ public:
 
 protected:
   WidgetSize last_drawn_size;
+  void SetNeedsRedrawing();
+private:
+  bool needs_redrawing = true;
 };
 
 } // namespace AlgAudio

@@ -24,6 +24,8 @@ public:
 
   void Insert(std::shared_ptr<UIWidget> child);
 
+  void SetNeedsRedrawing();
+
   void ProcessCloseEvent();
   void ProcessMouseButtonEvent(bool down, short button, int x, int y);
 
@@ -36,6 +38,8 @@ private:
   unsigned int id;
   SDL_Window* window;
   SDL_Renderer* renderer;
+
+  bool needs_redrawing = true;
 
   std::shared_ptr<UIWidget> child;
 };

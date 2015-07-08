@@ -31,6 +31,10 @@ UIWindow::~UIWindow(){
 }
 
 void UIWindow::Render(){
+  if(!needs_redrawing) return;
+
+  std::cout << "Redrawing window." << std::endl;
+
   // TODO: Window size
   DrawContext c(renderer, 0, 0, 350, 300); // Full window DC
   // TODO: Themeset color
@@ -39,12 +43,18 @@ void UIWindow::Render(){
 	SDL_RenderClear(renderer);
   if(child) child->Draw(c);
 	SDL_RenderPresent(renderer);
+
+  needs_redrawing = false;
 }
 
 void UIWindow::Insert(std::shared_ptr<UIWidget> ch){
   child = ch;
   child->window = shared_from_this();
   child->parent.reset();
+}
+
+void UIWindow::SetNeedsRedrawing(){
+  needs_redrawing = true;
 }
 
 void UIWindow::ProcessCloseEvent(){

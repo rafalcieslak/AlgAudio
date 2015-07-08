@@ -12,6 +12,7 @@ public:
 private:
   UIButton(std::string text);
   std::string text;
+  bool pressed = false;
 };
 
 } // namespace AlgAudio
