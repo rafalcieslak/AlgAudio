@@ -23,7 +23,7 @@ void UIButton::CustomDraw(const DrawContext& c){
   c.DrawLine(0,c.height,c.width,c.height);
 }
 
-void UIButton::OnMouseButton(bool down, short b,int x,int y){
+void UIButton::OnMouseButton(bool down, short b,int,int){
   if(down == 1 && b == SDL_BUTTON_LEFT)
     std::cout << "Button pressed" << std::endl;
 }

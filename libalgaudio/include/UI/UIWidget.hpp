@@ -8,7 +8,7 @@ namespace AlgAudio{
 class UIWindow;
 
 struct WidgetSize{
-  WidgetSize(int w, int h) : width(w), height(h) {}
+  WidgetSize(int w = 0, int h = 0) : width(w), height(h) {}
   int width, height;
 };
 
@@ -48,8 +48,8 @@ public:
   // Toggles widget display
   bool visible = true;
 
-private:
-  int last_drawn_width, last_drawn_height;
+protected:
+  WidgetSize last_drawn_size;
 };
 
 } // namespace AlgAudio
