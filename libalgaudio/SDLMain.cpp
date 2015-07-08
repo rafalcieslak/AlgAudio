@@ -28,36 +28,37 @@ void SDLMain::Run(){
 void SDLMain::ProcessEvents(){
   SDL_Event ev;
   while(SDL_PollEvent(&ev)){
-    if(ev.type == SDL_WINDOWEVENT){
-      const SDL_WindowEvent& win_ev = ev.window;
-      auto it = registered_windows.find(win_ev.windowID);
-      if(it == registered_windows.end()){
-        // TODO: Events for unregistered windows should be passed to an externally
-        // visible signal, so that modules can subscribe to it.
-        std::cout << "Warning: Received an event for an unregistered window " << win_ev.windowID << std::endl;
-      }
-      else{
-        auto window = it->second;
-        if(win_ev.event == SDL_WINDOWEVENT_CLOSE){
-          window->ProcessCloseEvent();
-        }
-      }
-    }else if(ev.type == SDL_QUIT){
+    if(ev.type == SDL_QUIT){
       Quit();
-    }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
-      const SDL_MouseButtonEvent& butt_ev = ev.button;
-      auto it = registered_windows.find(butt_ev.windowID);
-      if(it == registered_windows.end()){
-        // TODO: Events for unregistered windows should be passed to an externally
-        // visible signal, so that modules can subscribe to it.
-        std::cout << "Warning: Received an event for an unregistered window " << butt_ev.windowID << std::endl;
-      }else{
-        auto window = it->second;
-        window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), butt_ev.button, butt_ev.x, butt_ev.y);
-      }
+      return;
     }
-  }
+
+
+    unsigned int window_id = ev.window.windowID;
+    auto it = registered_windows.find(window_id);
+    if(it == registered_windows.end()){
+      // TODO: Events for unregistered windows should be passed to an externally
+      // visible signal, so that modules can subscribe to it.
+      std::cout << "Warning: Received an event for an unregistered window " << window_id << std::endl;
+      continue;
+    }
+    auto window = it->second;
+    if(ev.type == SDL_WINDOWEVENT){
+      if(ev.window.event == SDL_WINDOWEVENT_CLOSE){
+        window->ProcessCloseEvent();
+      }else if(ev.window.event == SDL_WINDOWEVENT_ENTER){
+        window->ProcessEnterEvent();
+      }else if(ev.window.event == SDL_WINDOWEVENT_LEAVE){
+        window->ProcessLeaveEvent();
+      }
+    }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
+      window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, ev.button.x, ev.button.y);
+    }else if(ev.type == SDL_MOUSEMOTION){
+      window->ProcessMotionEvent(ev.motion.x, ev.motion.y);
+    } // if(ev.type = ...)
+  } // while PollEvent
 }
+
 
 void SDLMain::Quit(){
   keep_running = false;

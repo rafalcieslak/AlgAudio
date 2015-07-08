@@ -5,13 +5,13 @@
 #include <functional>
 
 template <typename... Types>
-class CSignal
+class Signal
 {
 private:
     std::list< std::function<void(Types...)> > subscribers;
     std::list< std::function<void() > > deaf_subscribers;
 public:
-    CSignal<Types...>() { subscribers.clear(); }
+    Signal<Types...>() { subscribers.clear(); }
     void Subscribe( std::function<void(Types...)> f )
     {
         subscribers.push_back(f);
@@ -40,12 +40,12 @@ public:
 // Specialisation for 0 args, because the general case cannot distinguish
 // subscribers from deaf subscribers
 template <>
-class CSignal<>
+class Signal<>
 {
 private:
     std::list< std::function<void()> > subscribers;
 public:
-    CSignal<>() { subscribers.clear(); }
+    Signal<>() { subscribers.clear(); }
     void Subscribe( std::function<void()> f )
     {
         subscribers.push_back(f);

@@ -63,6 +63,23 @@ void UIWindow::ProcessCloseEvent(){
   SDLMain::UnregisterWindow(shared_from_this());
 }
 
+void UIWindow::ProcessMotionEvent(int x, int y){
+  if(child)
+    child->OnMotion(prev_motion_x, prev_motion_y, x, y);
+  prev_motion_x = x;
+  prev_motion_y = y;
+}
+
+void UIWindow::ProcessEnterEvent(){
+  if(child)
+    child->OnMotionEnter();
+}
+
+void UIWindow::ProcessLeaveEvent(){
+  if(child)
+    child->OnMotionLeave();
+}
+
 void UIWindow::ProcessMouseButtonEvent(bool d, short b, int x, int y){
   if(child)
     child->OnMouseButton(d,b,x,y);

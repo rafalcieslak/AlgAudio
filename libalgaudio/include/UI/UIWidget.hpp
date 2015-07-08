@@ -2,6 +2,7 @@
 #define UIWIDGET_HPP
 #include <memory>
 #include "DrawContext.hpp"
+#include "Signal.hpp"
 
 namespace AlgAudio{
 
@@ -41,6 +42,11 @@ public:
 
   // Arguments: down, button, x, y
   virtual void OnMouseButton(bool, short, int, int) {}
+  // Arguments: fromx, fromy, tox, toy
+  virtual void OnMotion(int, int, int, int) {}
+  virtual void OnMotionLeave() {}
+  virtual void OnMotionEnter() {}
+
 
   std::weak_ptr<UIWidget> parent;
   std::weak_ptr<UIWindow> window;

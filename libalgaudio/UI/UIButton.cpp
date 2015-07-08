@@ -14,10 +14,13 @@ std::shared_ptr<UIButton> UIButton::Create(std::string text){
 }
 
 void UIButton::CustomDraw(const DrawContext& c){
-  if(!pressed)
-    c.SetColor(50,50,50);
+  if(pressed)
+    c.SetColor(220,90,90);
+  else if(pointed)
+    c.SetColor(100,50,250);
   else
-    c.SetColor(200,50,50);
+    c.SetColor(50,50,50);
+
   c.DrawLine(0,0,c.width,0);
   c.DrawLine(0,0,0,c.height);
   c.DrawLine(0,0,c.width,c.height);
@@ -30,10 +33,24 @@ void UIButton::OnMouseButton(bool down, short b,int,int){
   if(down == true && b == SDL_BUTTON_LEFT){
     pressed = 1;
     SetNeedsRedrawing();
-  }else if(down == false && b == SDL_BUTTON_LEFT){
+  }else if(down == false && b == SDL_BUTTON_LEFT && pressed == 1){
     pressed = 0;
     SetNeedsRedrawing();
+    on_clicked.Happen();
   }
+}
+
+void UIButton::OnMotionEnter(){
+  //std::cout << "Button entered" << std::endl;
+  pointed = true;
+  SetNeedsRedrawing();
+}
+
+void UIButton::OnMotionLeave(){
+  //std::cout << "Button left" << std::endl;
+  pressed = 0;
+  pointed = 0;
+  SetNeedsRedrawing();
 }
 
 } // namespace AlgAudio

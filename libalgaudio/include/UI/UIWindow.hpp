@@ -28,6 +28,9 @@ public:
 
   void ProcessCloseEvent();
   void ProcessMouseButtonEvent(bool down, short button, int x, int y);
+  void ProcessMotionEvent(int x, int y);
+  void ProcessEnterEvent();
+  void ProcessLeaveEvent();
 
   unsigned int GetID() const {return id;}
 private:
@@ -38,6 +41,8 @@ private:
   unsigned int id;
   SDL_Window* window;
   SDL_Renderer* renderer;
+
+  int prev_motion_x = -1, prev_motion_y = -1;
 
   bool needs_redrawing = true;
 
