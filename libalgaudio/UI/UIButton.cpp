@@ -13,7 +13,7 @@ std::shared_ptr<UIButton> UIButton::Create(std::string text){
   return res;
 }
 
-void UIButton::CustomDraw(DrawContext& c){
+void UIButton::CustomDraw(const DrawContext& c){
   c.SetColor(50,50,50);
   c.DrawLine(0,0,c.width,0);
   c.DrawLine(0,0,0,c.height);

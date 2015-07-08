@@ -2,7 +2,7 @@
 
 namespace AlgAudio{
 
-void UIWidget::Draw(DrawContext& c){
+void UIWidget::Draw(const DrawContext& c){
   if(visible)
     CustomDraw(c);
 }

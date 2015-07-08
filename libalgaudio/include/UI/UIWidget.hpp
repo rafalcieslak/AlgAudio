@@ -36,8 +36,8 @@ public:
   size clipping, resizing and texture caching. Use Draw, but write CustomDraw.
   */
   // TODO: Draw cache
-  void Draw(DrawContext& c);
-  virtual void CustomDraw(DrawContext& c) = 0; // pure abstract
+  void Draw(const DrawContext& c);
+  virtual void CustomDraw(const DrawContext& c) = 0; // pure abstract
 
   // Arguments: down, button, x, y
   virtual void OnMouseButton(bool, short, int, int) {}
