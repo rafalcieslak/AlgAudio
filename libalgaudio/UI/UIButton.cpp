@@ -8,6 +8,11 @@ namespace AlgAudio{
 UIButton::UIButton(std::string t) : text(t){
 }
 
+std::shared_ptr<UIButton> UIButton::Create(std::string text){
+  std::shared_ptr<UIButton> res(new UIButton(text));
+  return res;
+}
+
 void UIButton::Draw(DrawContext& c){
   c.SetColor(50,50,50);
   c.DrawLine(0,0,c.width,0);

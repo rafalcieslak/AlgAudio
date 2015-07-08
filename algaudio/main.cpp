@@ -15,9 +15,10 @@ int main(){
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     auto module3 = ModuleFactory::CreateNewInstance("debug/window");
 
-    auto blah_window = std::make_shared<UIWindow>("BLAH");
-    auto marginbox = std::make_shared<UIMarginBox>(100,50,20,5);
-    auto button = std::make_shared<UIButton>("Button");
+    auto blah_window = UIWindow::Create("BLAH");
+    auto marginbox = UIMarginBox::Create(100,50,20,5);
+    auto button = UIButton::Create("Button");
+    
     blah_window->Insert(marginbox);
     marginbox->Insert(button);
 

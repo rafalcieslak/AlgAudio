@@ -6,11 +6,12 @@ namespace AlgAudio{
 
 class UIMarginBox : public UIWidget{
 public:
-  UIMarginBox(int top, int right, int bottom, int left);
+  static std::shared_ptr<UIMarginBox> Create(int top, int right, int bottom, int left);
   virtual void Draw(DrawContext& c) override;
   virtual void Insert(std::shared_ptr<UIWidget>);
   virtual void OnMouseButton(bool down, short b,int x,int y) override;
 private:
+  UIMarginBox(int top, int right, int bottom, int left);
   int top, right, bottom, left;
   std::shared_ptr<UIWidget> child;
 };

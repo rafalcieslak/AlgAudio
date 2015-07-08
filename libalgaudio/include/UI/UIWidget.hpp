@@ -19,6 +19,15 @@ public:
   virtual void OnMouseButton(bool, short, int, int) {}
   std::weak_ptr<UIWidget> parent;
   std::weak_ptr<UIWindow> window;
+  
+/* It is recommended for widgets to implement Create static method,
+   which returns a new shared_ptr of that object type, which simplifies
+   the syntax for interface building. It shall be remembered, however,
+   that a separate init() function may be destignated to be run once the
+   constructor finishes, so that shared_from_this can work correctly
+   (in case the this pointer is needed during initialisation, e.g. if a widget
+   wishes to build a subinterface and parent pointers have to be filled).
+*/
 };
 
 } // namespace AlgAudio

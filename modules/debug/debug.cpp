@@ -17,7 +17,7 @@ public:
 class Window : public AlgAudio::Module{
 public:
   void on_init(){
-    my_window = std::make_shared<AlgAudio::UIWindow>("My window!", 500, 50);
+    my_window = AlgAudio::UIWindow::Create("My window!", 500, 50);
     AlgAudio::SDLMain::RegisterWindow(my_window);
   }
   std::shared_ptr<AlgAudio::UIWindow> my_window;

@@ -18,6 +18,12 @@ UIWindow::UIWindow(std::string t, int w, int h) :
   id = SDL_GetWindowID(window);
 }
 
+std::shared_ptr<UIWindow> UIWindow::Create(std::string title, int w, int h){
+  std::shared_ptr<UIWindow> res(new UIWindow(title,w,h));
+  return res;
+}
+
+
 UIWindow::~UIWindow(){
   std::cout << "Destructing window" << std::endl;
   SDL_DestroyRenderer(renderer);

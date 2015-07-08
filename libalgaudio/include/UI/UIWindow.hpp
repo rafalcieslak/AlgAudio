@@ -13,7 +13,7 @@ class UIWindow : public std::enable_shared_from_this<UIWindow>{
 private:
   SDLHandle h;
 public:
-  UIWindow(std::string title = "AlgAudio", int w = 350, int h = 300);
+  static std::shared_ptr<UIWindow> Create(std::string title = "AlgAudio", int w = 350, int h = 300);
   ~UIWindow();
 
   // explicitly forbid copying windows
@@ -29,6 +29,7 @@ public:
 
   unsigned int GetID() const {return id;}
 private:
+  UIWindow(std::string title, int w, int h);
   std::string title;
   int width;
   int height;
