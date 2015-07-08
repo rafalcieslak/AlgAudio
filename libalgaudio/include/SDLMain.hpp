@@ -27,6 +27,7 @@ public:
 private:
   static std::atomic_bool keep_running;
   static std::list<std::shared_ptr<UIWindow>> registered_windows;
+  static ProcessEvents();
 };
 
 } // namespace AlgAudio

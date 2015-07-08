@@ -14,7 +14,12 @@ void SDLMain::Run(){
     // Process user input
 
     // Redraw registered windows
+
   }
+}
+
+void SDLMain::ProcessEvents(){
+  
 }
 
 void SDLMain::Quit(){

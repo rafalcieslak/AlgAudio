@@ -13,6 +13,7 @@ private:
 public:
   UIWindow(std::string title = "AlgAudio", int w = 100, int h = 100);
   ~UIWindow();
+  void ProcessCloseEvent();
 
 private:
   std::string title;
