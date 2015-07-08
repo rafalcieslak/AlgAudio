@@ -4,10 +4,41 @@
 #include <list>
 #include <functional>
 
-template <typename...>
-class CSignal;
+template <typename... Types>
+class CSignal
+{
+private:
+    std::list< std::function<void(Types...)> > subscribers;
+    std::list< std::function<void() > > deaf_subscribers;
+public:
+    CSignal<Types...>() { subscribers.clear(); }
+    void Subscribe( std::function<void(Types...)> f )
+    {
+        subscribers.push_back(f);
+    };
+    void Subscribe( std::function<void()> f )
+    {
+        deaf_subscribers.push_back(f);
+    };
+    template<class C>
+    void Subscribe( C* class_ptr, void (C::*member_ptr)(Types...))
+    {
+        subscribers.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) );
+    }
+    template<class C>
+    void Subscribe( C* class_ptr, void (C::*member_ptr)())
+    {
+        deaf_subscribers.push_back( std::bind(member_ptr,class_ptr) );
+    }
+    void Happen(Types... t) const
+    {
+        for(auto f : subscribers) f(t...);
+        for(auto f : deaf_subscribers) f();
+    }
+};
 
-// 0 arg
+// Specialisation for 0 args, because the general case cannot distinguish
+// subscribers from deaf subscribers
 template <>
 class CSignal<>
 {
@@ -31,74 +62,6 @@ public:
     void Clear()
     {
         subscribers.clear();
-    }
-};
-
-// 1 arg
-template <typename T>
-class CSignal<T>
-{
-private:
-    std::list< std::function<void(T)> > subscribers;
-    std::list< std::function<void() > > deaf_subscribers;
-public:
-    CSignal<T>() { subscribers.clear(); }
-    void Subscribe( std::function<void(T)> f )
-    {
-        subscribers.push_back(f);
-    };
-    void Subscribe( std::function<void()> f )
-    {
-        deaf_subscribers.push_back(f);
-    };
-    template<class C>
-    void Subscribe( C* class_ptr, void (C::*member_ptr)(T))
-    {
-        subscribers.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) );
-    }
-    template<class C>
-    void Subscribe( C* class_ptr, void (C::*member_ptr)())
-    {
-        deaf_subscribers.push_back( std::bind(member_ptr,class_ptr) );
-    }
-    void Happen(T t) const
-    {
-        for(auto f : subscribers) f(t);
-        for(auto f : deaf_subscribers) f();
-    }
-};
-
-// 2 arg
-template <typename T, typename S>
-class CSignal<T,S>
-{
-private:
-    std::list< std::function<void(T,S)> > subscribers;
-    std::list< std::function<void() > > deaf_subscribers;
-public:
-    CSignal<T,S>() { subscribers.clear(); }
-    void Subscribe( std::function<void(T,S)> f )
-    {
-        subscribers.push_back(f);
-    };
-    void Subscribe( std::function<void()> f )
-    {
-        deaf_subscribers.push_back(f);
-    };
-    template<class C>
-    void Subscribe( C* class_ptr, void (C::*member_ptr)(T,S))
-    {
-        subscribers.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1,std::placeholders::_2) );
-    }
-    template<class C>
-    void Subscribe( C* class_ptr, void (C::*member_ptr)())
-    {
-        deaf_subscribers.push_back( std::bind(member_ptr,class_ptr) );
-    }
-    void Happen(T t, S s) const
-    {
-        for(auto f : subscribers) f(t,s);
-        for(auto f : deaf_subscribers) f();
     }
 };
 
