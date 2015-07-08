@@ -35,6 +35,7 @@ LibLoader::~LibLoader(){
 
 Module* LibLoader::AskForInstance(std::string name){
   auto ptr = reinterpret_cast<Module*>(create_instance_func(name.c_str()));
+  if(ptr == nullptr) return nullptr;
   ptr->SetDeleter(deleter_func);
   return ptr;
 }

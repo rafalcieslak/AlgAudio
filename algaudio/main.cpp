@@ -13,6 +13,7 @@ int main(){
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     auto module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
+    auto module3 = ModuleFactory::CreateNewInstance("debug/window");
 
     auto blah_window = std::make_shared<UIWindow>("BLAH");
     auto marginbox = std::make_shared<UIMarginBox>(100,50,20,5);

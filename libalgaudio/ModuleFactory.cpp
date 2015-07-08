@@ -18,6 +18,10 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
     // Ask the corresponding libloader to create a class.
     // TODO: non-default libs
     Module* module = templ->collection.defaultlib->AskForInstance(templ->class_name);
+    if(module == nullptr){
+      std::cout << "Warning: Failed to create class instance '" << templ->class_name << "' from library." << std::endl;
+      return nullptr;
+    }
     module->templ = templ;
     /*
     Wrapping the returned instance pointer in a shared_ptr is a bit tricky.
