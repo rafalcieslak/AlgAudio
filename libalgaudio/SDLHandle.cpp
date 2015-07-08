@@ -7,13 +7,16 @@ namespace AlgAudio{
 
 int SDLHandle::reference_counter = 0;
 
+SDLException::SDLException(std::string t) :
+   Exception(t + ": " + SDL_GetError()) {}
+
 SDLHandle::SDLHandle(){
   if(reference_counter == 0){
     std::cout << "Starting SDL." << std::endl;
     if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
-      throw SDLInitException(std::string("SDL_Init failed: ") + SDL_GetError());
+      throw SDLException("SDL_Init failed");
     if(TTF_Init() != 0 )
-      throw SDLInitException(std::string("TTF_Init failed: ") + SDL_GetError());
+      throw SDLException("TTF_Init failed");
   }
   reference_counter++;
 }

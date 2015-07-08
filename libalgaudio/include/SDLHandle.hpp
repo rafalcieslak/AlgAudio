@@ -5,11 +5,15 @@
 
 namespace AlgAudio{
 
-struct SDLInitException : public Exception{
-  SDLInitException(std::string t) : Exception(t) {}
+struct SDLException : public Exception{
+  SDLException(std::string t);
 };
 
-// A wrapper class for RAII SDL init/cleanup
+/* A wrapper class for RAII SDL init/cleanup.
+   All objects that require access to SDL should aquire such handle.
+   Most importantly, all top-level independend windows need to keep one.
+   Also: modules which use SDL to e.g. get mouse position should also take one.
+*/
 class SDLHandle{
 private:
   static int reference_counter;
