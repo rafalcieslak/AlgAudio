@@ -4,6 +4,7 @@
 #include "SDLMain.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UIMarginBox.hpp"
+#include "SCLauncher.hpp"
 
 using namespace AlgAudio;
 
@@ -14,6 +15,8 @@ int main(){
     auto module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     //auto module3 = ModuleFactory::CreateNewInstance("debug/window");
+
+    SCLauncher::Start();
 
     auto blah_window = Window::Create("BLAH",400,300);
     auto marginbox = blah_window->Create<UIMarginBox>(100,200,40,110);
@@ -34,4 +37,5 @@ int main(){
   }catch(Exception ex){
     std::cout << "An unhandled exception occured: " << ex.what() << std::endl;
   }
+  SCLauncher::Stop();
 }
