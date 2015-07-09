@@ -15,6 +15,7 @@ public:
 private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;
+  str::shared_ptr<SDLTexture> texture;
   bool pressed = false;
   bool pointed = false;
 };
