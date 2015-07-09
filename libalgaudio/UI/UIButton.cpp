@@ -2,10 +2,12 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
+#include "TextRenderer.hpp"
 
 namespace AlgAudio{
 
 UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t){
+  UpdateTexture();
 }
 
 std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<Window> w, std::string text){
@@ -27,6 +29,12 @@ void UIButton::CustomDraw(DrawContext& c){
   c.DrawLine(0,c.height-1,c.width-1,0);
   c.DrawLine(c.width-1,0,c.width-1,c.height-1);
   c.DrawLine(0,c.height-1,c.width-1,c.height-1);
+  c.DrawTexture(texture, 5, 5);
+}
+
+void UIButton::SetText(std::string t){
+  text = t;
+  UpdateTexture();
 }
 
 void UIButton::OnMouseButton(bool down, short b,int,int){
@@ -38,6 +46,11 @@ void UIButton::OnMouseButton(bool down, short b,int,int){
     SetNeedsRedrawing();
     on_clicked.Happen();
   }
+}
+
+void UIButton::UpdateTexture(){
+  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",16), text, SDL_Color{0,0,0,255});
+  SetNeedsRedrawing();
 }
 
 void UIButton::OnMotionEnter(){

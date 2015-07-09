@@ -23,7 +23,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surf);
   if(!texture) throw SDLException("CreateTexture failed");
   size.width = surf->w;
-  size.height = surf->w;
+  size.height = surf->h;
 }
 
 SDLTexture::~SDLTexture(){

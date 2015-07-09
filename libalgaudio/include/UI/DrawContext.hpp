@@ -24,7 +24,7 @@ public:
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const SDL_Color&);
   void DrawLine(int x1, int y1, int x2, int y2);
-  void DrawTexture(std::shared_ptr<SDLTexture> texture);
+  void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void Clear();
   Size2D Size() {return Size2D(width,height);}
   bool HasZeroArea();

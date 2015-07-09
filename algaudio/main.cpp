@@ -17,11 +17,12 @@ int main(){
 
     auto blah_window = Window::Create("BLAH",400,300);
     auto marginbox = blah_window->Create<UIMarginBox>(100,200,40,110);
-    auto button    = blah_window->Create<UIButton>("Button");
+    auto button    = blah_window->Create<UIButton>("This is a button");
     // Alternative syntax
     // auto button = UIButton::Create(blah_window,"Button");
-    button->on_clicked.Subscribe([](){
+    button->on_clicked.Subscribe([&](){
       std::cout << "Button clicked!" << std::endl;
+      button->SetText("Tada!");
     });
 
     blah_window->Insert(marginbox);
