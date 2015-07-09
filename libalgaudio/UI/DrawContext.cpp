@@ -7,7 +7,10 @@
 namespace AlgAudio{
 
 DrawContext::DrawContext(SDL_Renderer* r, int x_, int y_, int w, int h) :
-  width(w), height(h), x(x_), y(y_), renderer(r) { }
+  width(w), height(h), x(x_), y(y_), renderer(r)
+{
+    UpdateClipRect();
+}
 
 void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
   SDL_RenderDrawLine(renderer, x+x1, y+y1, x+x2, y+y2);
@@ -30,6 +33,7 @@ void DrawContext::Push(int x1, int y1, int width_, int height_){
   // Set new state
   x = x1; y = y1;
   width = width_; height = height_;
+  UpdateClipRect();
 }
 void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){
   // Remember the previous state
@@ -38,6 +42,7 @@ void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){
   SwitchToTarget(t);
   x = 0; y = 0;
   width = width_; height = height_;
+  UpdateClipRect();
 }
 void DrawContext::Pop(){
   if(context_stack.empty()){
@@ -50,6 +55,7 @@ void DrawContext::Pop(){
   SwitchToTarget(state.target);
   x = state.xoffset; y = state.yoffset;
   width = state.width; height = state.height;
+  UpdateClipRect();
 }
 
 void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
@@ -58,6 +64,11 @@ void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
   else
     SDL_SetRenderTarget(renderer, NULL);
   current_target = t;
+}
+
+void DrawContext::UpdateClipRect(){
+  SDL_Rect clip{x,y,width,height};
+  SDL_RenderSetClipRect(renderer, &clip);
 }
 
 void DrawContext::SetColor(short r, short g, short b, short a){

@@ -45,6 +45,7 @@ private:
   };
   std::stack<DCLevel> context_stack;
   void SwitchToTarget(std::shared_ptr<SDLTexture>);
+  void UpdateClipRect();
 };
 
 } // namespace AlgAudio
