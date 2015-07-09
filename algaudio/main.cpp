@@ -15,9 +15,11 @@ int main(){
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     //auto module3 = ModuleFactory::CreateNewInstance("debug/window");
 
-    auto blah_window = UIWindow::Create("BLAH");
-    auto marginbox = UIMarginBox::Create(100,50,20,5);
-    auto button = UIButton::Create("Button");
+    auto blah_window = UIWindow::Create("BLAH",400,200);
+    auto marginbox = blah_window->Create<UIMarginBox>(100,50,20,5);
+    auto button    = blah_window->Create<UIButton>("Button");
+    // Alternative syntax
+    // auto button = UIButton::Create(blah_window,"Button");
     button->on_clicked.Subscribe([](){
       std::cout << "Button clicked!" << std::endl;
     });

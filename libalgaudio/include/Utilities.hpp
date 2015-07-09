@@ -5,6 +5,13 @@
 
 namespace AlgAudio{
 
+struct Size2D{
+  Size2D(int w = 0, int h = 0) : width(w), height(h) {}
+  int width, height;
+  bool operator==(const Size2D& other) const{ return (width == other.width && height == other.height); }
+  bool operator!=(const Size2D& other) const{ return !(*this == other); }
+};
+
 class Exception{
 public:
   Exception(std::string t) : text(t) {};

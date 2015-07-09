@@ -3,21 +3,21 @@
 #include <memory>
 #include "DrawContext.hpp"
 #include "Signal.hpp"
+#include "Utilities.hpp"
+#include "SDLTexture.hpp"
 
 namespace AlgAudio{
 
 class UIWindow;
 
-struct WidgetSize{
-  WidgetSize(int w = 0, int h = 0) : width(w), height(h) {}
-  int width, height;
-};
-
 // shared_from_this is required for proper parent tracking
 class UIWidget : public std::enable_shared_from_this<UIWidget>{
   // Pure abstract
 public:
-  UIWidget() {};
+  UIWidget(std::weak_ptr<UIWindow> parent_window)
+    : window(parent_window) {
+      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
+    };
 
 /* It is recommended for widgets to implement Create static method,
    which returns a new shared_ptr of that object type, which simplifies
@@ -37,8 +37,8 @@ public:
   size clipping, resizing and texture caching. Use Draw, but write CustomDraw.
   */
   // TODO: Draw cache
-  void Draw(const DrawContext& c);
-  virtual void CustomDraw(const DrawContext& c) = 0; // pure abstract
+  void Draw(DrawContext& c);
+  virtual void CustomDraw(DrawContext& c) = 0; // pure abstract
 
   // Arguments: down, button, x, y
   virtual void OnMouseButton(bool, short, int, int) {}
@@ -55,10 +55,12 @@ public:
   bool visible = true;
 
 protected:
-  WidgetSize last_drawn_size;
+  Size2D last_drawn_size;
   void SetNeedsRedrawing();
 private:
   bool needs_redrawing = true;
+  std::shared_ptr<SDLTexture> cache_texture;
+  void RedrawToCache(Size2D size);
 };
 
 } // namespace AlgAudio

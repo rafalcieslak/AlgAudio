@@ -1,27 +1,72 @@
 #include "UI/DrawContext.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <iostream>
+#include "SDLTexture.hpp"
 
 namespace AlgAudio{
 
 DrawContext::DrawContext(SDL_Renderer* r, int x_, int y_, int w, int h) :
   width(w), height(h), x(x_), y(y_), renderer(r) { }
 
-void DrawContext::DrawLine(int x1, int y1, int x2, int y2) const{
+void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
   SDL_RenderDrawLine(renderer, x+x1, y+y1, x+x2, y+y2);
 }
 
-DrawContext DrawContext::SubContext(int x1, int y1, int width_, int height_) const{
-  return DrawContext(renderer, x + x1, y + y1, width_, height_);
+void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture){
+  const Size2D texture_size = texture->GetSize();
+  SDL_Rect source{0, 0, texture_size.width, texture_size.height};
+  SDL_Rect dest{x, y, x+texture_size.width, y+texture_size.height};
+  SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
 
-void DrawContext::SetColor(short r, short g, short b, short a) const{
+void DrawContext::Clear(){
+	SDL_RenderClear(renderer);
+}
+
+void DrawContext::Push(int x1, int y1, int width_, int height_){
+  // Remember the previous state
+  context_stack.push(DCLevel(current_target, x, y, width, height));
+  // Set new state
+  x = x1; y = y1;
+  width = width_; height = height_;
+}
+void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){
+  // Remember the previous state
+  context_stack.push(DCLevel(current_target, x, y, width, height));
+  // Set new state
+  SwitchToTarget(t);
+  x = 0; y = 0;
+  width = width_; height = height_;
+}
+void DrawContext::Pop(){
+  if(context_stack.empty()){
+    std::cout << "Warning: too many POPS on a DrawContext" << std::endl;
+    return;
+  }
+  DCLevel state = context_stack.top();
+  context_stack.pop();
+
+  SwitchToTarget(state.target);
+  x = state.xoffset; y = state.yoffset;
+  width = state.width; height = state.height;
+}
+
+void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
+  if(t)
+    SDL_SetRenderTarget(renderer, t->texture);
+  else
+    SDL_SetRenderTarget(renderer, NULL);
+  current_target = t;
+}
+
+void DrawContext::SetColor(short r, short g, short b, short a){
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
-void DrawContext::SetColor(const SDL_Color& c) const{
+void DrawContext::SetColor(const SDL_Color& c){
   SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
 }
-bool DrawContext::HasZeroArea() const{
+bool DrawContext::HasZeroArea(){
   if(width <= 0 || height <= 0) return true;
   return false;
 }

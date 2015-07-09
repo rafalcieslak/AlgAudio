@@ -32,7 +32,13 @@ public:
   void ProcessEnterEvent();
   void ProcessLeaveEvent();
 
+  template<class W, typename... Args>
+  std::shared_ptr<W> Create(Args... args){
+    return W::Create(shared_from_this(), args...);
+  }
+
   unsigned int GetID() const {return id;}
+  SDL_Renderer* GetRenderer() const {return renderer;}
 private:
   UIWindow(std::string title, int w, int h);
   std::string title;

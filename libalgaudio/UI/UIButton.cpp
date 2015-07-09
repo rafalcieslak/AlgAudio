@@ -5,21 +5,23 @@
 
 namespace AlgAudio{
 
-UIButton::UIButton(std::string t) : text(t){
+UIButton::UIButton(std::weak_ptr<UIWindow> w, std::string t) : UIWidget(w), text(t){
 }
 
-std::shared_ptr<UIButton> UIButton::Create(std::string text){
-  std::shared_ptr<UIButton> res(new UIButton(text));
+std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<UIWindow> w, std::string text){
+  std::shared_ptr<UIButton> res(new UIButton(w,text));
   return res;
 }
 
-void UIButton::CustomDraw(const DrawContext& c){
+void UIButton::CustomDraw(DrawContext& c){
   if(pressed)
     c.SetColor(220,90,90);
   else if(pointed)
     c.SetColor(100,50,250);
   else
     c.SetColor(50,50,50);
+
+  std::cout << "Rendering a button " << c.width <<  " " << c.height << std::endl;
 
   c.DrawLine(0,0,c.width,0);
   c.DrawLine(0,0,0,c.height);

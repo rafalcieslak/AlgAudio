@@ -2,19 +2,20 @@
 
 namespace AlgAudio{
 
-UIMarginBox::UIMarginBox(int t, int r, int b, int l) :
-  top(t), right(r), bottom(b), left(l)
+UIMarginBox::UIMarginBox(std::weak_ptr<UIWindow> w, int t, int r, int b, int l) :
+  UIWidget(w), top(t), right(r), bottom(b), left(l)
 { }
 
-std::shared_ptr<UIMarginBox> UIMarginBox::Create(int t, int r, int b, int l){
-  std::shared_ptr<UIMarginBox> res(new UIMarginBox(t,r,b,l));
+std::shared_ptr<UIMarginBox> UIMarginBox::Create(std::weak_ptr<UIWindow> w, int t, int r, int b, int l){
+  std::shared_ptr<UIMarginBox> res(new UIMarginBox(w,t,r,b,l));
   return res;
 }
 
-void UIMarginBox::CustomDraw(const DrawContext& c){
-  DrawContext c2 = c.SubContext(left, top, c.width - right - left, c.height - top - bottom);
-  if(!c2.HasZeroArea() && child)
-    child->Draw(c2);
+void UIMarginBox::CustomDraw(DrawContext& c){
+  c.Push(left, top, c.width - right - left, c.height - top - bottom);
+  if(!c.HasZeroArea() && child)
+    child->Draw(c);
+  c.Pop();
 }
 
 void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){

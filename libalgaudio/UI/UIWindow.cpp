@@ -35,8 +35,9 @@ void UIWindow::Render(){
 
   std::cout << "Redrawing window." << std::endl;
 
-  // TODO: Window size
-  DrawContext c(renderer, 0, 0, 350, 300); // Full window DC
+  int w,h;
+  SDL_GetWindowSize(window, &w, &h);
+  DrawContext c(renderer, 0, 0, w, h); // Full window DC
   // TODO: Themeset color
   c.SetColor(255,255,255);
 
