@@ -17,6 +17,15 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
     if(!texture) throw SDLException("CreateTexture failed");
 }
 
+SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
+  : parent(w) {
+  auto window = parent.lock();
+  texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surf);
+  if(!texture) throw SDLException("CreateTexture failed");
+  size.width = surf->w;
+  size.height = surf->w;
+}
+
 SDLTexture::~SDLTexture(){
   SDL_DestroyTexture(texture);
 }

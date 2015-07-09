@@ -5,6 +5,7 @@
 #include <memory>
 
 struct SDL_Texture;
+struct SDL_Surface;
 
 namespace AlgAudio{
 
@@ -14,6 +15,7 @@ class Window;
 class SDLTexture{
 public:
   SDLTexture(std::weak_ptr<Window> parent_window, Size2D size);
+  SDLTexture(std::weak_ptr<Window> parent_window, SDL_Surface*);
   ~SDLTexture();
   SDLTexture(const SDLTexture& other) = delete; // No copyconstructing
   SDLTexture& operator=(const SDLTexture& other) = delete; // No copying
