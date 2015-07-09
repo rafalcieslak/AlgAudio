@@ -15,8 +15,8 @@ int main(){
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     //auto module3 = ModuleFactory::CreateNewInstance("debug/window");
 
-    auto blah_window = UIWindow::Create("BLAH",400,200);
-    auto marginbox = blah_window->Create<UIMarginBox>(100,50,20,5);
+    auto blah_window = UIWindow::Create("BLAH",400,400);
+    auto marginbox = blah_window->Create<UIMarginBox>(300,0,0,300);
     auto button    = blah_window->Create<UIButton>("Button");
     // Alternative syntax
     // auto button = UIButton::Create(blah_window,"Button");

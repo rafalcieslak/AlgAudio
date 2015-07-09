@@ -21,14 +21,12 @@ void UIButton::CustomDraw(DrawContext& c){
   else
     c.SetColor(50,50,50);
 
-  std::cout << "Rendering a button " << c.width <<  " " << c.height << std::endl;
-
-  c.DrawLine(0,0,c.width,0);
-  c.DrawLine(0,0,0,c.height);
-  c.DrawLine(0,0,c.width,c.height);
-  c.DrawLine(0,c.height,c.width,0);
-  c.DrawLine(c.width,0,c.width,c.height);
-  c.DrawLine(0,c.height,c.width,c.height);
+  c.DrawLine(0,0,c.width-1,0);
+  c.DrawLine(0,0,0,c.height-1);
+  c.DrawLine(0,0,c.width-1,c.height-1);
+  c.DrawLine(0,c.height-1,c.width-1,0);
+  c.DrawLine(c.width-1,0,c.width-1,c.height-1);
+  c.DrawLine(0,c.height-1,c.width-1,c.height-1);
 }
 
 void UIButton::OnMouseButton(bool down, short b,int,int){

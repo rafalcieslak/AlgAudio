@@ -16,7 +16,7 @@ void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture){
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
-  SDL_Rect dest{x, y, x+texture_size.width, y+texture_size.height};
+  SDL_Rect dest{x, y, texture_size.width, texture_size.height};
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
 
