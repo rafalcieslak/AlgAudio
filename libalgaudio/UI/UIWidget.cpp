@@ -1,6 +1,6 @@
 #include "UI/UIWidget.hpp"
 #include <iostream>
-#include "UI/UIWindow.hpp"
+#include "Window.hpp"
 
 namespace AlgAudio{
 

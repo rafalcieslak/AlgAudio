@@ -1,13 +1,14 @@
-#include "UI/UIWindow.hpp"
+#include "Window.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include "UI/DrawContext.hpp"
+#include "UI/UIWidget.hpp"
 #include "SDLMain.hpp"
 
 namespace AlgAudio{
 
-UIWindow::UIWindow(std::string t, int w, int h) :
+Window::Window(std::string t, int w, int h) :
   title(t), width(w), height(h)
 {
   // TODO: investigate SDL_WINDOW_INPUT_GRABBED
@@ -18,19 +19,19 @@ UIWindow::UIWindow(std::string t, int w, int h) :
   id = SDL_GetWindowID(window);
 }
 
-std::shared_ptr<UIWindow> UIWindow::Create(std::string title, int w, int h){
-  std::shared_ptr<UIWindow> res(new UIWindow(title,w,h));
+std::shared_ptr<Window> Window::Create(std::string title, int w, int h){
+  std::shared_ptr<Window> res(new Window(title,w,h));
   return res;
 }
 
 
-UIWindow::~UIWindow(){
+Window::~Window(){
   std::cout << "Destructing window" << std::endl;
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 }
 
-void UIWindow::Render(){
+void Window::Render(){
   if(!needs_redrawing) return;
 
   std::cout << "Redrawing window." << std::endl;
@@ -48,40 +49,40 @@ void UIWindow::Render(){
   needs_redrawing = false;
 }
 
-void UIWindow::Insert(std::shared_ptr<UIWidget> ch){
+void Window::Insert(std::shared_ptr<UIWidget> ch){
   child = ch;
   child->window = shared_from_this();
   child->parent.reset();
 }
 
-void UIWindow::SetNeedsRedrawing(){
+void Window::SetNeedsRedrawing(){
   needs_redrawing = true;
 }
 
-void UIWindow::ProcessCloseEvent(){
+void Window::ProcessCloseEvent(){
   SDL_HideWindow(window);
   // If the window was not registered, the following has no effect.
   SDLMain::UnregisterWindow(shared_from_this());
 }
 
-void UIWindow::ProcessMotionEvent(int x, int y){
+void Window::ProcessMotionEvent(int x, int y){
   if(child)
     child->OnMotion(prev_motion_x, prev_motion_y, x, y);
   prev_motion_x = x;
   prev_motion_y = y;
 }
 
-void UIWindow::ProcessEnterEvent(){
+void Window::ProcessEnterEvent(){
   if(child)
     child->OnMotionEnter();
 }
 
-void UIWindow::ProcessLeaveEvent(){
+void Window::ProcessLeaveEvent(){
   if(child)
     child->OnMotionLeave();
 }
 
-void UIWindow::ProcessMouseButtonEvent(bool d, short b, int x, int y){
+void Window::ProcessMouseButtonEvent(bool d, short b, int x, int y){
   if(child)
     child->OnMouseButton(d,b,x,y);
 }

@@ -6,7 +6,7 @@ namespace AlgAudio{
 
 class UIMarginBox : public UIWidget{
 public:
-  static std::shared_ptr<UIMarginBox> Create(std::weak_ptr<UIWindow> parent_window, int top, int right, int bottom, int left);
+  static std::shared_ptr<UIMarginBox> Create(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
   virtual void CustomDraw(DrawContext& c) override;
   virtual void Insert(std::shared_ptr<UIWidget>);
   virtual void OnMouseButton(bool down, short b,int x,int y) override;
@@ -14,7 +14,7 @@ public:
   virtual void OnMotionEnter() override;
   virtual void OnMotionLeave() override;
 private:
-  UIMarginBox(std::weak_ptr<UIWindow> parent_window, int top, int right, int bottom, int left);
+  UIMarginBox(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
   inline bool IsInside(int x, int y) const;
   int top, right, bottom, left;
   std::shared_ptr<UIWidget> child;

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstring>
 
-#include "UI/UIWindow.hpp"
+#include "Window.hpp"
 #include "SDLMain.hpp"
 
 // The custom class NEVER takes ownership of the instances
@@ -17,10 +17,10 @@ public:
 class Window : public AlgAudio::Module{
 public:
   void on_init(){
-    my_window = AlgAudio::UIWindow::Create("My window!", 500, 50);
+    my_window = AlgAudio::Window::Create("My window!", 500, 50);
     AlgAudio::SDLMain::RegisterWindow(my_window);
   }
-  std::shared_ptr<AlgAudio::UIWindow> my_window;
+  std::shared_ptr<AlgAudio::Window> my_window;
 };
 
 

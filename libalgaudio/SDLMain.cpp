@@ -5,7 +5,7 @@
 
 namespace AlgAudio{
 
-std::map<unsigned int, std::shared_ptr<UIWindow>> SDLMain::registered_windows;
+std::map<unsigned int, std::shared_ptr<Window>> SDLMain::registered_windows;
 std::atomic_bool SDLMain::keep_running;
 
 void SDLMain::Run(){
@@ -64,11 +64,11 @@ void SDLMain::Quit(){
   keep_running = false;
 }
 
-void SDLMain::RegisterWindow(std::shared_ptr<UIWindow> w){
+void SDLMain::RegisterWindow(std::shared_ptr<Window> w){
   registered_windows[w->GetID()] = w;
 }
 
-void SDLMain::UnregisterWindow(std::shared_ptr<UIWindow> w){
+void SDLMain::UnregisterWindow(std::shared_ptr<Window> w){
   registered_windows.erase(w->GetID());
 }
 

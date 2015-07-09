@@ -4,7 +4,7 @@
 #include <memory>
 #include <atomic>
 
-#include "UI/UIWindow.hpp"
+#include "Window.hpp"
 
 namespace AlgAudio{
 
@@ -22,12 +22,12 @@ public:
   // redrawing it when needed.
   // However, if you wish to redraw a window on your own, you should not
   // register it.
-  static void RegisterWindow(std::shared_ptr<UIWindow>);
-  static void UnregisterWindow(std::shared_ptr<UIWindow>);
+  static void RegisterWindow(std::shared_ptr<Window>);
+  static void UnregisterWindow(std::shared_ptr<Window>);
   static unsigned int GetWindowNum() {return registered_windows.size();}
 private:
   static std::atomic_bool keep_running;
-  static std::map<unsigned int, std::shared_ptr<UIWindow>> registered_windows;
+  static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
   static void ProcessEvents();
 };
 

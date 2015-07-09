@@ -2,11 +2,11 @@
 
 namespace AlgAudio{
 
-UIMarginBox::UIMarginBox(std::weak_ptr<UIWindow> w, int t, int r, int b, int l) :
+UIMarginBox::UIMarginBox(std::weak_ptr<Window> w, int t, int r, int b, int l) :
   UIWidget(w), top(t), right(r), bottom(b), left(l)
 { }
 
-std::shared_ptr<UIMarginBox> UIMarginBox::Create(std::weak_ptr<UIWindow> w, int t, int r, int b, int l){
+std::shared_ptr<UIMarginBox> UIMarginBox::Create(std::weak_ptr<Window> w, int t, int r, int b, int l){
   std::shared_ptr<UIMarginBox> res(new UIMarginBox(w,t,r,b,l));
   return res;
 }

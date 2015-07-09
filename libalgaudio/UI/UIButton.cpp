@@ -5,10 +5,10 @@
 
 namespace AlgAudio{
 
-UIButton::UIButton(std::weak_ptr<UIWindow> w, std::string t) : UIWidget(w), text(t){
+UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t){
 }
 
-std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<UIWindow> w, std::string text){
+std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<Window> w, std::string text){
   std::shared_ptr<UIButton> res(new UIButton(w,text));
   return res;
 }

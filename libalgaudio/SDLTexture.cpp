@@ -1,11 +1,11 @@
 #include "SDLTexture.hpp"
-#include "UI/UIWindow.hpp"
+#include "Window.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
 namespace AlgAudio{
 
-SDLTexture::SDLTexture(std::weak_ptr<UIWindow> w, Size2D s)
+SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
   : parent(w), size(s){
     auto window = parent.lock();
     texture = SDL_CreateTexture(

@@ -8,12 +8,12 @@ struct SDL_Texture;
 
 namespace AlgAudio{
 
-class UIWindow;
+class Window;
 
 // A wrapper class for operations on an SDL_Texture
 class SDLTexture{
 public:
-  SDLTexture(std::weak_ptr<UIWindow> parent_window, Size2D size);
+  SDLTexture(std::weak_ptr<Window> parent_window, Size2D size);
   ~SDLTexture();
   SDLTexture(const SDLTexture& other) = delete; // No copyconstructing
   SDLTexture& operator=(const SDLTexture& other) = delete; // No copying
@@ -23,7 +23,7 @@ public:
 private:
   SDLHandle handle;
   SDL_Texture* texture;
-  std::weak_ptr<UIWindow> parent;
+  std::weak_ptr<Window> parent;
   Size2D size;
 };
 

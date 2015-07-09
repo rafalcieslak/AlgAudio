@@ -8,13 +8,13 @@
 
 namespace AlgAudio{
 
-class UIWindow;
+class Window;
 
 // shared_from_this is required for proper parent tracking
 class UIWidget : public std::enable_shared_from_this<UIWidget>{
   // Pure abstract
 public:
-  UIWidget(std::weak_ptr<UIWindow> parent_window)
+  UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {
       cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
     };
@@ -49,7 +49,7 @@ public:
 
 
   std::weak_ptr<UIWidget> parent;
-  std::weak_ptr<UIWindow> window;
+  std::weak_ptr<Window> window;
 
   // Toggles widget display
   bool visible = true;
