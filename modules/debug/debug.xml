@@ -14,4 +14,7 @@ Out.ar(outbus,in);
   <module id="window" name="Custom window">
     <class name="Window"/>
   </module>
+  <module id="console" name="SCLang console view">
+    <class name="Console"/>
+  </module>
 </collection>

@@ -22,6 +22,10 @@ Color::operator SDL_Color(){
   return SDL();
 }
 
+void Utilities::Wait(int ms){
+  SDL_Delay(ms);
+}
+
 bool Utilities::GetFileExists(std::string name)
 {
   // For compilers that support C++14 experimental TS:

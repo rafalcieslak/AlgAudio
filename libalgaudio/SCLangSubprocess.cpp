@@ -8,6 +8,10 @@ SCLangSubprocess::SCLangSubprocess(std::string command)
  {}
 
 SCLangSubprocess::~SCLangSubprocess(){
+  // Ask the interpreter to quit now
+  SendInstruction("\n\n0.exit;\n\n");
+  Utilities::Wait(20); // Give it a chance to close gracefully
+  PollOutput(); // We wish to capture the farewell message.
 }
 
 void SCLangSubprocess::SendInstruction(std::string i){
