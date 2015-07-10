@@ -53,6 +53,8 @@ void SDLMain::ProcessEvents(){
         window->ProcessEnterEvent();
       }else if(ev.window.event == SDL_WINDOWEVENT_LEAVE){
         window->ProcessLeaveEvent();
+      }else if(ev.window.event == SDL_WINDOWEVENT_RESIZED){
+        window->ProcessResizeEvent();
       }
     }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
       window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, ev.button.x, ev.button.y);

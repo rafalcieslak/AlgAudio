@@ -32,6 +32,7 @@ public:
   void ProcessMotionEvent(int x, int y);
   void ProcessEnterEvent();
   void ProcessLeaveEvent();
+  void ProcessResizeEvent();
 
   template<class W, typename... Args>
   std::shared_ptr<W> Create(Args... args){
