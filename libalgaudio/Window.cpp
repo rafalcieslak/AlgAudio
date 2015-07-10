@@ -25,7 +25,7 @@ std::shared_ptr<Window> Window::Create(std::string title, int w, int h){
 
 
 Window::~Window(){
-  std::cout << "Destructing window" << std::endl;
+  std::cout << "Destructing window " << title << std::endl;
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 }
@@ -60,9 +60,8 @@ void Window::SetNeedsRedrawing(){
 }
 
 void Window::ProcessCloseEvent(){
+  on_close.Happen();
   SDL_HideWindow(window);
-  // If the window was not registered, the following has no effect.
-  SDLMain::UnregisterWindow(shared_from_this());
 }
 
 void Window::ProcessMotionEvent(int x, int y){

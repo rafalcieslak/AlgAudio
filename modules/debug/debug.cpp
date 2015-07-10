@@ -38,6 +38,9 @@ public:
     AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
       textarea->PushLine(line);
     });
+    console_window->on_close.Subscribe([=](){
+      AlgAudio::SDLMain::UnregisterWindow(console_window);
+    });
     console_window->Insert(textarea);
     AlgAudio::SDLMain::RegisterWindow(console_window);
   }

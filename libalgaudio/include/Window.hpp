@@ -2,6 +2,7 @@
 #define Window_HPP
 #include <memory>
 #include "SDLHandle.hpp"
+#include "Signal.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -38,6 +39,8 @@ public:
   std::shared_ptr<W> Create(Args... args){
     return W::Create(shared_from_this(), args...);
   }
+
+  Signal<> on_close;
 
   unsigned int GetID() const {return id;}
   Size2D GetSize() const;
