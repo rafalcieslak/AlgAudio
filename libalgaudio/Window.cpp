@@ -1,6 +1,5 @@
 #include "Window.hpp"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <iostream>
 #include "UI/DrawContext.hpp"
 #include "UI/UIWidget.hpp"
