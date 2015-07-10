@@ -18,20 +18,26 @@ void UIMarginBox::CustomDraw(DrawContext& c){
   c.Pop();
 }
 
+void UIMarginBox::CustomResize(Size2D s){
+  if(!child) return;
+  child->Resize(Size2D(s.width - top - bottom, s.height - left - right));
+}
+
 void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
   child = ch;
   child->window = window;
   child->parent = shared_from_this();
+  TriggerFakeResize();
 }
 
 void UIMarginBox::OnMouseButton(bool down, short b,int x,int y){
   if(!child) return;
-  if(x < left || y < top || x > last_drawn_size.width - right || y > last_drawn_size.height - bottom) return;
+  if(x < left || y < top || x > current_size.width - right || y > current_size.height - bottom) return;
   child->OnMouseButton(down,b,x-top,y-left);
 }
 
 bool UIMarginBox::IsInside(int x, int y) const{
-  if(x < left || y < top || x > last_drawn_size.width - right || y > last_drawn_size.height - bottom) return false;
+  if(x < left || y < top || x > current_size.width - right || y > current_size.height - bottom) return false;
   else return true;
 }
 

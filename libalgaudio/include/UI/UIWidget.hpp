@@ -35,10 +35,24 @@ public:
   has children and you wish to draw them too, use their Draw.
   Draw is basically a wrapper for CustomDraw, which performs visibility check,
   size clipping, resizing and texture caching. Use Draw, but write CustomDraw.
+
+  When a widget gets drawn, the draw area size is guaranteed to be of exactly
+  the same dimentions, as were set by the last call to CustomResize. Therefore
+  you can use CustomResize to calculate your children size, but remeber to pass
+  the resize event down to them, by using Resize.
+
+  At the moment when CustomResize is called, the previous widget size is still
+  stored in current_size, the new size is passed as an argument to CustomResize
+  (but you don't need to correct current_size on your own).
   */
-  // TODO: Draw cache
   void Draw(DrawContext& c);
-  virtual void CustomDraw(DrawContext& c) = 0; // pure abstract
+  virtual void CustomDraw(DrawContext& c) = 0;
+  void Resize(Size2D s);
+  virtual void CustomResize(Size2D) {};
+
+  // Starts the downward resize-chain without actually changing size.
+  // Useful for propagating size to a newly inserted child.
+  void TriggerFakeResize() { CustomResize(current_size); }
 
   // Arguments: down, button, x, y
   virtual void OnMouseButton(bool, short, int, int) {}
@@ -55,7 +69,7 @@ public:
   bool visible = true;
 
 protected:
-  Size2D last_drawn_size;
+  Size2D current_size;
   void SetNeedsRedrawing();
 private:
   bool needs_redrawing = true;

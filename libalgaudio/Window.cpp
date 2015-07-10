@@ -35,9 +35,8 @@ void Window::Render(){
 
   std::cout << "Redrawing window." << std::endl;
 
-  int w,h;
-  SDL_GetWindowSize(window, &w, &h);
-  DrawContext c(renderer, 0, 0, w, h); // Full window DC
+  Size2D size = GetSize();
+  DrawContext c(renderer, 0, 0, size.width, size.height); // Full window DC
   // TODO: Themeset color
   c.SetColor(255,255,255);
 
@@ -52,6 +51,8 @@ void Window::Insert(std::shared_ptr<UIWidget> ch){
   child = ch;
   child->window = shared_from_this();
   child->parent.reset();
+
+  child->Resize(GetSize());
 }
 
 void Window::SetNeedsRedrawing(){
@@ -82,12 +83,22 @@ void Window::ProcessLeaveEvent(){
 }
 
 void Window::ProcessResizeEvent(){
+  if(child){
+    child->Resize(GetSize());
+  }
   needs_redrawing = true;
 }
 
 void Window::ProcessMouseButtonEvent(bool d, short b, int x, int y){
   if(child)
     child->OnMouseButton(d,b,x,y);
+}
+
+
+Size2D Window::GetSize() const{
+  int w,h;
+  SDL_GetWindowSize(window, &w, &h);
+  return Size2D(w,h);
 }
 
 } // namespace AlgAudio

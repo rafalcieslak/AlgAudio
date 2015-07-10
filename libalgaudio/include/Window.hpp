@@ -40,6 +40,7 @@ public:
   }
 
   unsigned int GetID() const {return id;}
+  Size2D GetSize() const;
   SDL_Renderer* GetRenderer() const {return renderer;}
 private:
   Window(std::string title, int w, int h);

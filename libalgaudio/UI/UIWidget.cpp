@@ -6,23 +6,34 @@ namespace AlgAudio{
 
 void UIWidget::Draw(DrawContext& c){
   if(visible){
-    const Size2D newsize = c.Size();
-    if(newsize != last_drawn_size){
-      cache_texture->Resize(newsize);
+    const Size2D drawsize = c.Size();
+    if(drawsize != current_size){
+      std::cout << "WARNING: Implicitly calling Resize, because the draw"
+      "context size is incoherent with widget size!" << std::endl;
+      Resize(drawsize);
     }
-    if(newsize != last_drawn_size || needs_redrawing){
-      c.Push(cache_texture, newsize.width, newsize.height);
+    if(needs_redrawing){
+      c.Push(cache_texture, drawsize.width, drawsize.height);
       c.Clear();
       CustomDraw(c);
       c.Pop();
     }
     c.DrawTexture(cache_texture);
-    last_drawn_size = newsize;
+    current_size = drawsize;
     needs_redrawing = false;
   }
 }
 
+void UIWidget::Resize(Size2D s){
+  if(current_size == s) return;
+  cache_texture->Resize(s);
+  SetNeedsRedrawing();
+  CustomResize(s);
+  current_size = s;
+}
+
 void UIWidget::SetNeedsRedrawing(){
+  if(needs_redrawing) return;
   needs_redrawing = true;
   auto p = parent.lock();
   auto w = window.lock();
