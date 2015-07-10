@@ -27,7 +27,9 @@ void UIWidget::Draw(DrawContext& c){
 void UIWidget::Resize(Size2D s){
   if(current_size == s) return;
   cache_texture->Resize(s);
+  in_custom_resize = true;
   SetNeedsRedrawing();
+  in_custom_resize = false;
   CustomResize(s);
   current_size = s;
 }
@@ -39,6 +41,16 @@ void UIWidget::SetNeedsRedrawing(){
   auto w = window.lock();
   if(p) p->SetNeedsRedrawing();
   else if(w) w->SetNeedsRedrawing();
+}
+
+void UIWidget::SetRequestedSize(Size2D s){
+  if(in_custom_resize){
+    std::cout << "WARNING: A widget called SetRequestedSize while inside resize-chain. Change ignored." << std::endl;
+    return;
+  }
+  requested_size = s;
+  auto p = parent.lock();
+  if(p) p->OnChildRequestedSizeChanged();
 }
 
 } // namespace AlgAudio

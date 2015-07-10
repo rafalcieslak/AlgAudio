@@ -49,6 +49,7 @@ void UIButton::OnMouseButton(bool down, short b,int,int){
 
 void UIButton::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",16), text, SDL_Color{0,0,0,255});
+  SetRequestedSize(texture->GetSize());
   SetNeedsRedrawing();
 }
 

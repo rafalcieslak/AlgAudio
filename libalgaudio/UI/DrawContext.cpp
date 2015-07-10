@@ -23,7 +23,7 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
 }
 
 void DrawContext::Clear(){
-  SetColor(255,255,255);
+  //SetColor(255,255,255);
 	SDL_RenderClear(renderer);
 }
 

@@ -68,11 +68,32 @@ public:
   // Toggles widget display
   bool visible = true;
 
+  const Size2D& GetRequestedSize() const{ return requested_size; }
+  
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();
+
+  /* If you are implementng a custom widget, you will want to use
+  SetRequestedSize a lot, to notify parent widgets what is the minimal area
+  size that will be large enough for your widget to draw completely.
+  However, by no means should you use SetRequestedSize while inside
+  CustomResize. This could lead to huge problems, including stack loops and
+  undefined widget state. On the other hand, you are very welcome to
+  Resize while reacting on child's requested size change in
+  OnChildRequestedSizeChanged. */
+  void SetRequestedSize(Size2D);
+
+  /* This method will be called by a child when it changes the desired size. */
+  virtual void OnChildRequestedSizeChanged() {}
+
 private:
   bool needs_redrawing = true;
+  Size2D requested_size = Size2D(0,0);
+
+  // This flag is used to track incorrect usage of SetRequestedSize()
+  bool in_custom_resize = false;
+
   std::shared_ptr<SDLTexture> cache_texture;
   void RedrawToCache(Size2D size);
 };

@@ -28,6 +28,13 @@ void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
   child->window = window;
   child->parent = shared_from_this();
   TriggerFakeResize();
+
+  OnChildRequestedSizeChanged();
+}
+
+void UIMarginBox::OnChildRequestedSizeChanged(){
+  Size2D s = child->GetRequestedSize();
+  SetRequestedSize(Size2D(s.width + top + bottom, s.height + left + right));
 }
 
 void UIMarginBox::OnMouseButton(bool down, short b,int x,int y){
