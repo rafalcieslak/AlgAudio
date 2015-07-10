@@ -1,6 +1,7 @@
 #include "Utilities.hpp"
 #include "Module.hpp"
 #include "ModuleTemplate.hpp"
+#include <SDL2/SDL.h>
 #include <fstream>
 #include <algorithm>
 
@@ -12,6 +13,14 @@ namespace AlgAudio {
   const char Utilities::OSDirSeparator = '\\';
   const std::string Utilities::OSLibSuffix = ".dll";
 #endif
+
+SDL_Color Color::SDL(){
+  return SDL_Color{r,g,b,alpha};
+}
+
+Color::operator SDL_Color(){
+  return SDL();
+}
 
 bool Utilities::GetFileExists(std::string name)
 {

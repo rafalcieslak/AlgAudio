@@ -3,7 +3,16 @@
 #include <string>
 #include <vector>
 
+struct SDL_Color;
+
 namespace AlgAudio{
+
+struct Color{
+  Color(unsigned char R, unsigned char G, unsigned char B, unsigned char A=255) : r(R), g(G), b(B), alpha(A) {}
+  unsigned char r,g,b,alpha;
+  SDL_Color SDL();
+  operator SDL_Color();
+};
 
 struct Size2D{
   Size2D(int w = 0, int h = 0) : width(w), height(h) {}

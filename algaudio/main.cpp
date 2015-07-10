@@ -4,6 +4,7 @@
 #include "SDLMain.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UIMarginBox.hpp"
+#include "UI/UITextArea.hpp"
 #include "Subprocess.hpp"
 
 using namespace AlgAudio;
@@ -20,17 +21,20 @@ int main(){
     //auto module3 = ModuleFactory::CreateNewInstance("debug/window");
 
     auto blah_window = Window::Create("BLAH",400,300);
-    auto marginbox = blah_window->Create<UIMarginBox>(100,200,40,110);
-    auto button    = blah_window->Create<UIButton>("This is a button");
+    auto marginbox = blah_window->Create<UIMarginBox>(10,10,10,10);
+    //auto button    = blah_window->Create<UIButton>("This is a button");
+    auto text    = blah_window->Create<UITextArea>(Color(255,255,255), Color(0,0,0));
+    text->SetBottomAligned(true);
     // Alternative syntax
     // auto button = UIButton::Create(blah_window,"Button");
-    button->on_clicked.Subscribe([&](){
+    /* button->on_clicked.Subscribe([&](){
       std::cout << "Button clicked!" << std::endl;
       button->SetText("Tada!");
     });
-
+    */
+    text->Push("AAASDADasd asda\ndiaudh iauh \n\nakduha iud\nasiudh a\nadasdad");
     blah_window->Insert(marginbox);
-    marginbox->Insert(button);
+    marginbox->Insert(text);
 
     SDLMain::RegisterWindow(blah_window);
     SDLMain::running = true;
