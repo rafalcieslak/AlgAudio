@@ -13,9 +13,10 @@ private:
   SDLMain() = delete; // static class
 public:
   static void Quit();
-  // Run is not re-entrant!
+  // Loop is not re-entrant!
   // Also, it will block for at least until Quit is called.
-  static void Run();
+  static void Loop();
+  static void Step();
   // A registered window is managed and rendered as SDLMain sees fit.
   // This is handy it you wish to create a window and forget about it,
   // as SDLMain will then sustain the ownership of the window, and it will keep
@@ -25,8 +26,9 @@ public:
   static void RegisterWindow(std::shared_ptr<Window>);
   static void UnregisterWindow(std::shared_ptr<Window>);
   static unsigned int GetWindowNum() {return registered_windows.size();}
+
+  static std::atomic_bool running;
 private:
-  static std::atomic_bool keep_running;
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
   static void ProcessEvents();
 };

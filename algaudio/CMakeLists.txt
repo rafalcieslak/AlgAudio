@@ -29,5 +29,5 @@ endif()
 add_custom_command(
 	TARGET algaudio POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/algaudio${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_BINARY_DIR}/"
-	COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/fonts" "${CMAKE_BINARY_DIR}/"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/fonts" "${CMAKE_BINARY_DIR}/fonts"
 )

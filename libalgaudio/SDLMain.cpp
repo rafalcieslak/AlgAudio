@@ -6,23 +6,27 @@
 namespace AlgAudio{
 
 std::map<unsigned int, std::shared_ptr<Window>> SDLMain::registered_windows;
-std::atomic_bool SDLMain::keep_running;
+std::atomic_bool SDLMain::running;
 
-void SDLMain::Run(){
-  keep_running = true;
-  while(keep_running){
-    // TODO: Actual FPS limit
-    SDL_Delay(18);
-    // Process user input
-    ProcessEvents();
-    // Redraw registered windows
-    for(auto& it : registered_windows){
-      it.second->Render();
-    }
-    // Temporarily, by default, stop the main loop if there are no registered
-    // windows left.
-    if(registered_windows.size() == 0) Quit();
+void SDLMain::Loop(){
+  running = true;
+  while(running){
+    Step();
   }
+}
+
+void SDLMain::Step(){
+  // TODO: Actual FPS limit
+  SDL_Delay(18);
+  // Process user input
+  ProcessEvents();
+  // Redraw registered windows
+  for(auto& it : registered_windows){
+    it.second->Render();
+  }
+  // Temporarily, by default, stop the main loop if there are no registered
+  // windows left.
+  if(registered_windows.size() == 0) Quit();
 }
 
 void SDLMain::ProcessEvents(){
@@ -61,7 +65,7 @@ void SDLMain::ProcessEvents(){
 
 
 void SDLMain::Quit(){
-  keep_running = false;
+  running = false;
 }
 
 void SDLMain::RegisterWindow(std::shared_ptr<Window> w){
