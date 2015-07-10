@@ -5,14 +5,14 @@
 #include "UI/UIButton.hpp"
 #include "UI/UIMarginBox.hpp"
 #include "UI/UITextArea.hpp"
-#include "Subprocess.hpp"
+#include "SCLangSubprocess.hpp"
 
 using namespace AlgAudio;
 
 int main(){
   try{
     std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
-    Subprocess sclang(sclang_path);
+    SCLangSubprocess sclang(sclang_path);
 
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
@@ -32,7 +32,11 @@ int main(){
       button->SetText("Tada!");
     });
     */
-    text->Push("AAASDADasd asda\ndiaudh iauh \n\nakduha iud\nasiudh a\nadasdad");
+
+    sclang.on_line_received.Subscribe([&](std::string line){
+      text->PushLine(line);
+    });
+
     blah_window->Insert(marginbox);
     marginbox->Insert(text);
 
@@ -40,8 +44,7 @@ int main(){
     SDLMain::running = true;
     while(SDLMain::running){
       SDLMain::Step();
-      std::cout << sclang.ReadData();
-      std::cout.flush();
+      sclang.PollOutput();
     }
 
   }catch(Exception ex){

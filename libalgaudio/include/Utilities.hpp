@@ -41,6 +41,7 @@ public:
   static std::string ConvertUnipathToOSPath(const std::string& unipath);
   static std::vector<std::string> SplitString(std::string str, std::string delimiter);
   static std::string JoinString(std::vector<std::string> str, std::string c);
+  static void Replace(std::string& str, const std::string& from, const std::string& to);
 };
 
 } // namespace AlgAudio

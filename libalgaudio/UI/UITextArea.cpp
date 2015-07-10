@@ -28,7 +28,7 @@ void UITextArea::CustomDraw(DrawContext& c){
     }
   }else{
     int n = text.size()-1;
-    for(int y = c.height-2; y > 0 - spacing && n >= 0; y -= 12, n--){
+    for(int y = c.height-2-spacing; y > 0 - spacing && n >= 0; y -= spacing, n--){
       c.DrawTexture(textures[n], 2, y);
     }
   }
