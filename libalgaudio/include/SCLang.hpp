@@ -13,6 +13,9 @@ class SCLang{
 public:
   static void Start(std::string command);
   static void Restart(std::string command);
+  /* It is recommended to call Stop() manually before the global library
+  destructor kicks in. Otherwise, the on_line_received signal may fire for some
+  already destroyed objects. */
   static void Stop();
   static bool IsRunning() { return subprocess != nullptr; }
   static void Poll();

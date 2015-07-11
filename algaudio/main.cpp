@@ -57,6 +57,8 @@ int main(){
       SDLMain::Step();
       SCLang::Poll();
     }
+    
+    SCLang::Stop();
 
   }catch(Exception ex){
     std::cout << "An unhandled exception occured: " << ex.what() << std::endl;
