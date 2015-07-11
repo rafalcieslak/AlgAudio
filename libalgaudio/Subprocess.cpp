@@ -104,12 +104,17 @@ void Subprocess::SendData(const std::string& data){
 
 std::string Subprocess::ReadData(){
   char buffer[5000];
-  int n = read(pipe_child_stdout_fd[0], buffer, 5000);
-  if(n == -1){
+  ssize_t n = read(pipe_child_stdout_fd[0], buffer, 5000);
+  if(n < 0){
     if(errno == EAGAIN || errno == EWOULDBLOCK){
       return ""; // Non-blocking access
     }// else throw exception?
+    return "";
+  }else if(n == 0){
+    // This will happen iff the process send an EOF (closed stdout).
+    return "";
   }
+  buffer[n] = '\0';
   return std::string(buffer);
 }
 
