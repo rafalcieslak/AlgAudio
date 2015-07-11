@@ -40,6 +40,7 @@ Subprocess::Subprocess(std::string c){
     // Spit command into arguments
 		char command[1024];
 		strncpy(command,c.c_str(),c.length());
+    command[c.length()] = '\0';
 		char* args[64];
 		int argc = 0;
 		char* token = strtok (command," ");
