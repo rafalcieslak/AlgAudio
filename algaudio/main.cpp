@@ -10,7 +10,11 @@
 
 using namespace AlgAudio;
 
-static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
+#ifdef __unix__
+  static const std::string sclang_path = "/usr/bin/sclang";
+#else
+  static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
+#endif
 
 int main(){
   try{

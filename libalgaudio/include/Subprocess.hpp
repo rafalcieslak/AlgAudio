@@ -1,10 +1,10 @@
 #ifndef SCLANUCHER_HPP
 #define SCLANUCHER_HPP
 #include <string>
-#ifndef __unix__
-  #include <windows.h>
-#else
+#ifdef __unix__
 
+#else
+  #include <windows.h>
 #endif
 #include "Utilities.hpp"
 
@@ -25,7 +25,9 @@ public:
 private:
   std::string command;
   #ifdef __unix__
-
+    int pipe_child_stdout_fd[2];
+    int pipe_child_stdin_fd[2];
+    int pid;
   #else
     PROCESS_INFORMATION piProcInfo;
     HANDLE g_hChildStd_IN_Rd = NULL;
