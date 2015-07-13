@@ -25,37 +25,39 @@ int main(){
     auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     auto module3 = ModuleFactory::CreateNewInstance("debug/console");
 
-    auto blah_window = Window::Create("BLAH",250,200);
-    auto marginbox = blah_window->Create<UIMarginBox>(10,10,10,10);
-    auto button1   = blah_window->Create<UIButton>("Start SCLang");
-    auto label   = blah_window->Create<UILabel>("A label");
-    auto button2   = blah_window->Create<UIButton>("Quit App");
-    auto vbox = UIVBox::Create(blah_window);
-    // Alternative syntax
-    // auto button = UIButton::Create(blah_window,"Button");
-    button1->on_clicked.Subscribe([&](){
+    auto mainwindow = Window::Create("AlgAudio config",280,400);
+    auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
+    auto startbutton = mainwindow->Create<UIButton>("Start SCLang");
+    auto quitbutton = mainwindow->Create<UIButton>("Quit App");
+    auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",36);
+    auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
+    auto mainvbox = UIVBox::Create(mainwindow);
+    auto buttonhbox = UIHBox::Create(mainwindow);
+
+    mainvbox->SetPadding(10);
+    mainwindow->Insert(marginbox);
+    marginbox->Insert(mainvbox);
+    mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
+    mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
+    mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
+    buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
+
+    startbutton->on_clicked.Subscribe([&](){
       if(!SCLang::IsRunning()){
         SCLang::Start(sclang_path);
-        button1->SetText("Stop SCLang");
+        startbutton->SetText("Stop SCLang");
       }else{
         SCLang::Stop();
-        button1->SetText("Restart SCLang");
+        startbutton->SetText("Restart SCLang");
       }
     });
-    blah_window->on_close.Subscribe([&](){
+    mainwindow->on_close.Subscribe([&](){
       // Let closing the main window close the whole app.
       SDLMain::Quit();
     });
 
-    blah_window->Insert(marginbox);
-    //marginbox->Insert(button1);
-    marginbox->Insert(vbox);
-    vbox->Insert(button1,UIVBox::PackMode::TIGHT);
-    vbox->Insert(label,UIVBox::PackMode::WIDE);
-    vbox->Insert(button2,UIVBox::PackMode::WIDE);
-    vbox->SetPadding(10);
-
-    SDLMain::RegisterWindow(blah_window);
+    SDLMain::RegisterWindow(mainwindow);
     SDLMain::running = true;
     while(SDLMain::running){
       SDLMain::Step();
