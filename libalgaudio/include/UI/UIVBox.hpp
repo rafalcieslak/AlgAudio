@@ -13,7 +13,10 @@ public:
   };
   static std::shared_ptr<UIVBox> Create(std::weak_ptr<Window> parent_window);
   virtual void CustomDraw(DrawContext& c) override;
+  virtual void CustomResize(Size2D) override;
+  virtual void OnChildRequestedSizeChanged() override;
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
+  int padding = 0;
 private:
   UIVBox(std::weak_ptr<Window> parent_window);
   struct PackData{
@@ -22,6 +25,12 @@ private:
     int size;
   };
   std::vector<PackData> children;
+  Size2D GetChildSize(unsigned int n);
+  void TriggerChildResizes();
+  void RecalculateChildSizes(unsigned int available_space);
+  unsigned int GetChildLocation(unsigned int n);
+  unsigned int GetTotalSize();
+  unsigned int GetChildMaxWidth();
 };
 
 } // namespace AlgAudio

@@ -20,6 +20,9 @@ struct Size2D{
   int width, height;
   bool operator==(const Size2D& other) const{ return (width == other.width && height == other.height); }
   bool operator!=(const Size2D& other) const{ return !(*this == other); }
+  std::string ToString() {return "{" + std::to_string(width) + ", " + std::to_string(height) + " }"; }
+  Size2D operator+(const Size2D& other) const { return Size2D(width + other.width, height + other.height);}
+  Size2D operator-(const Size2D& other) const { return Size2D(width - other.width, height - other.height);}
 };
 
 class Exception{

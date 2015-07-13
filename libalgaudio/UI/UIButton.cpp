@@ -15,6 +15,9 @@ std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<Window> w, std::string 
 }
 
 void UIButton::CustomDraw(DrawContext& c){
+  c.SetColor(255,255,255);
+  c.Clear();
+  
   if(pressed)
     c.SetColor(220,90,90);
   else if(pointed)
@@ -49,7 +52,7 @@ void UIButton::OnMouseButton(bool down, short b,int,int){
 
 void UIButton::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",16), text, SDL_Color{0,0,0,255});
-  SetRequestedSize(texture->GetSize());
+  SetRequestedSize(texture->GetSize() + Size2D(10,10));
   SetNeedsRedrawing();
 }
 
