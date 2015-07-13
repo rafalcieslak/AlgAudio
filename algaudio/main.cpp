@@ -5,7 +5,7 @@
 #include "UI/UIButton.hpp"
 #include "UI/UIMarginBox.hpp"
 #include "UI/UITextArea.hpp"
-#include "UI/UIVBox.hpp"
+#include "UI/UIBox.hpp"
 #include "SCLang.hpp"
 
 using namespace AlgAudio;
@@ -29,7 +29,7 @@ int main(){
     auto button1   = blah_window->Create<UIButton>("Start SCLang");
     auto button2   = blah_window->Create<UIButton>("Quit App");
     auto button3   = blah_window->Create<UIButton>("CustomButton");
-    auto vbox = UIVBox::Create(blah_window);
+    auto vbox = UIHBox::Create(blah_window);
     // Alternative syntax
     // auto button = UIButton::Create(blah_window,"Button");
     button1->on_clicked.Subscribe([&](){
