@@ -14,7 +14,7 @@ void UIWidget::Draw(DrawContext& c){
     }
     if(needs_redrawing){
       c.Push(cache_texture, drawsize.width, drawsize.height);
-      c.Clear();
+      //c.Clear();
       CustomDraw(c);
       c.Pop();
     }

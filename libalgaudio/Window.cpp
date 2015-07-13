@@ -16,7 +16,8 @@ Window::Window(std::string t, int w, int h) :
   if(!window) throw SDLException("Unable to create a window");
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
   //std::cout << "new renderer" << renderer << std::endl;
-  if(!window) throw SDLException("Unable to create a renderer");
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  if(!renderer) throw SDLException("Unable to create a renderer");
   id = SDL_GetWindowID(window);
 }
 
@@ -39,8 +40,7 @@ void Window::Render(){
 
   Size2D size = GetSize();
   DrawContext c(renderer, 0, 0, size.width, size.height); // Full window DC
-  // TODO: Themeset color
-  c.SetColor(255,255,255);
+  c.SetColor(Theme::Get("bg-main"));
 
 	SDL_RenderClear(renderer);
   if(child) child->Draw(c);

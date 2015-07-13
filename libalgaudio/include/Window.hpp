@@ -3,6 +3,7 @@
 #include <memory>
 #include "SDLHandle.hpp"
 #include "Signal.hpp"
+#include "Theme.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;

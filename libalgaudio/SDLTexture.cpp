@@ -22,6 +22,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
       size.width, size.height
     );
     if(!texture) throw SDLException("CreateTexture failed");
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   }
 }
 
@@ -32,6 +33,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   auto window = parent.lock();
   texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surf);
   if(!texture) throw SDLException("CreateTexture failed");
+  SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   size.width = surf->w;
   size.height = surf->h;
 }
@@ -58,6 +60,7 @@ void SDLTexture::Resize(Size2D s){
       size.width, size.height
     );
     if(!texture) throw SDLException("CreateTexture failed");
+    SDL_SetTextureBlendMode(texture, SDL_BLENDMODE_BLEND);
   }
 }
 

@@ -8,6 +8,7 @@
 #include "UI/UIBox.hpp"
 #include "UI/UILabel.hpp"
 #include "SCLang.hpp"
+#include "Theme.hpp"
 
 using namespace AlgAudio;
 
@@ -19,6 +20,8 @@ using namespace AlgAudio;
 
 int main(){
   try{
+    Theme::Init();
+
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     auto module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
@@ -42,6 +45,9 @@ int main(){
     mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
+
+    startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
+    quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
 
     startbutton->on_clicked.Subscribe([&](){
       if(!SCLang::IsRunning()){

@@ -25,7 +25,7 @@ struct FontParrams{
 class TextRenderer{
   TextRenderer() = delete; // static class
 public:
-  static std::shared_ptr<SDLTexture> Render(std::weak_ptr<Window>, FontParrams, std::string,  const SDL_Color&);
+  static std::shared_ptr<SDLTexture> Render(std::weak_ptr<Window>, FontParrams, std::string,  const Color&, const Color&);
   static TTF_Font* GetFont(FontParrams);
   static TTF_Font* Preload(FontParrams);
 private:

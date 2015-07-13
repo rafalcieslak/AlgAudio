@@ -22,9 +22,13 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
 
+void DrawContext::DrawRect(int x, int y, int w, int h){
+  SDL_Rect rect{x,y,w,h};
+  SDL_RenderFillRect(renderer,&rect);
+}
+
 void DrawContext::Clear(){
-  //SetColor(255,255,255);
-	SDL_RenderClear(renderer);
+	SDL_RenderFillRect(renderer,NULL);
 }
 
 void DrawContext::Push(int x1, int y1, int width_, int height_){

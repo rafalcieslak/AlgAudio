@@ -22,11 +22,12 @@ TTF_Font* TextRenderer::Preload(FontParrams fp){
   return f;
 }
 
-std::shared_ptr<SDLTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text, const SDL_Color& cl){
+std::shared_ptr<SDLTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text, const Color& cl, const Color& bg){
   // Woarkaround for rendering empty strings
   if(text == "") text = " ";
-  
-  SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl);
+
+  //SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl.SDL());
+  SDL_Surface* surf = TTF_RenderUTF8_Shaded(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255}, bg);
   if(!surf)
     std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
   auto res = std::make_shared<SDLTexture>(w, surf);
