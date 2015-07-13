@@ -76,5 +76,8 @@ void SDLMain::RegisterWindow(std::shared_ptr<Window> w){
 void SDLMain::UnregisterWindow(std::shared_ptr<Window> w){
   registered_windows.erase(w->GetID());
 }
+void SDLMain::UnregisterAll(){
+  registered_windows.clear();
+}
 
 } // namespace AlgAudio

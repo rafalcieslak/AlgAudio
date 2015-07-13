@@ -25,6 +25,7 @@ public:
   // register it.
   static void RegisterWindow(std::shared_ptr<Window>);
   static void UnregisterWindow(std::shared_ptr<Window>);
+  static void UnregisterAll();
   static unsigned int GetWindowNum() {return registered_windows.size();}
 
   static std::atomic_bool running;

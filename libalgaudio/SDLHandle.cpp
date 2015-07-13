@@ -19,9 +19,11 @@ SDLHandle::SDLHandle(){
       throw SDLException("TTF_Init failed");
   }
   reference_counter++;
+  //std::cout << "Created a new SDLHandle " << reference_counter << std::endl;
 }
 
 SDLHandle::~SDLHandle(){
+  //std::cout << "Destroying an SDLHandle " << reference_counter << std::endl;
   reference_counter--;
   if(reference_counter ==0){
     std::cout << "Stopping SDL." << std::endl;

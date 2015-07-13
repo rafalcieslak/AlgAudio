@@ -10,10 +10,12 @@ namespace AlgAudio{
 Window::Window(std::string t, int w, int h) :
   title(t), width(w), height(h)
 {
+  //std::cout << "Creating a new window" << std::endl;
   // TODO: investigate SDL_WINDOW_INPUT_GRABBED
   window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
   if(!window) throw SDLException("Unable to create a window");
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+  //std::cout << "new renderer" << renderer << std::endl;
   if(!window) throw SDLException("Unable to create a renderer");
   id = SDL_GetWindowID(window);
 }
@@ -23,9 +25,9 @@ std::shared_ptr<Window> Window::Create(std::string title, int w, int h){
   return res;
 }
 
-
 Window::~Window(){
   std::cout << "Destructing window " << title << std::endl;
+  //std::cout << "destroying renderer" << renderer << std::endl;
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
 }

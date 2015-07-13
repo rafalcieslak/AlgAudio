@@ -1,11 +1,13 @@
 #include "SDLTexture.hpp"
 #include "Window.hpp"
 #include <SDL2/SDL.h>
+#include <iostream>
 
 namespace AlgAudio{
 
 SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
   : parent(w), size(s){
+    //std::cout << "Creating a texture" << std::endl;
     auto window = parent.lock();
     texture = SDL_CreateTexture(
       window->GetRenderer(),
@@ -18,6 +20,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
 
 SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   : parent(w) {
+  //std::cout << "Creating a texture" << std::endl;
   auto window = parent.lock();
   texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surf);
   if(!texture) throw SDLException("CreateTexture failed");
@@ -26,6 +29,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
 }
 
 SDLTexture::~SDLTexture(){
+  //std::cout << "Destroying a texture" << std::endl;
   SDL_DestroyTexture(texture);
 }
 
