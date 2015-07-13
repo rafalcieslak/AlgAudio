@@ -6,12 +6,13 @@ namespace AlgAudio{
 
 class UILabel : public UIWidget{
 public:
-  static std::shared_ptr<UILabel> Create(std::weak_ptr<Window> parent_window, std::string text);
+  static std::shared_ptr<UILabel> Create(std::weak_ptr<Window> parent_window, std::string text, int size = 16);
   void SetText(std::string);
   virtual void CustomDraw(DrawContext& c) override;
 private:
-  UILabel(std::weak_ptr<Window> parent_window, std::string text);
+  UILabel(std::weak_ptr<Window> parent_window, std::string text, int size = 16);
   std::string text;
+  int fontsize;
   std::shared_ptr<SDLTexture> texture;
   void UpdateTexture();
 };
