@@ -17,7 +17,7 @@ struct Color{
 struct Size2D{
   Size2D(int w = 0, int h = 0) : width(w), height(h) {}
   bool Fits(const Size2D& other) const{ return (width >= other.width && height >= other.height); }
-  bool IsEmpty() const {return width < 0 || height < 0; }
+  bool IsEmpty() const {return width <= 0 || height <= 0; }
   int width, height;
   bool operator==(const Size2D& other) const{ return (width == other.width && height == other.height); }
   bool operator!=(const Size2D& other) const{ return !(*this == other); }

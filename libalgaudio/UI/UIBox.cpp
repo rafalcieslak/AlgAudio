@@ -33,7 +33,7 @@ void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
   w->parent = shared_from_this();
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(Size2D(GetChildMaxContra(), GetTotalSize()));
+  SetRequestedSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
 }
 
 void UIBox::RecalculateChildSizes(unsigned int available){
@@ -81,7 +81,7 @@ void UIBox::SetPadding(unsigned int p){
   padding = p;
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(Size2D(GetChildMaxContra(), GetTotalSize()));
+  SetRequestedSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
 }
 
 void UIBox::TriggerChildResizes(){
