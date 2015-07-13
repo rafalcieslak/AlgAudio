@@ -27,11 +27,11 @@ void UIButton::CustomDraw(DrawContext& c){
 
   c.DrawLine(0,0,c.width-1,0);
   c.DrawLine(0,0,0,c.height-1);
-  c.DrawLine(0,0,c.width-1,c.height-1);
-  c.DrawLine(0,c.height-1,c.width-1,0);
+  //c.DrawLine(0,0,c.width-1,c.height-1);
+  //c.DrawLine(0,c.height-1,c.width-1,0);
   c.DrawLine(c.width-1,0,c.width-1,c.height-1);
   c.DrawLine(0,c.height-1,c.width-1,c.height-1);
-  c.DrawTexture(texture, 5, 5);
+  c.DrawTexture(texture, c.width/2 - texture->GetSize().width/2, c.height/2 - texture->GetSize().height/2);
 }
 
 void UIButton::SetText(std::string t){

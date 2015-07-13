@@ -52,6 +52,9 @@ int main(){
         startbutton->SetText("Restart SCLang");
       }
     });
+    quitbutton->on_clicked.Subscribe([&](){
+      SDLMain::Quit();
+    });
     mainwindow->on_close.Subscribe([&](){
       // Let closing the main window close the whole app.
       SDLMain::Quit();
