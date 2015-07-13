@@ -16,7 +16,7 @@ public:
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
-  int padding = 0;
+  void SetPadding(unsigned int padding);
 private:
   UIVBox(std::weak_ptr<Window> parent_window);
   struct PackData{
@@ -25,6 +25,7 @@ private:
     int size;
   };
   std::vector<PackData> children;
+  unsigned int padding = 0;
   Size2D GetChildSize(unsigned int n);
   void TriggerChildResizes();
   void RecalculateChildSizes(unsigned int available_space);

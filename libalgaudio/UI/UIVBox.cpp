@@ -29,11 +29,10 @@ void UIVBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
 }
 
 void UIVBox::RecalculateChildSizes(unsigned int available){
-  //for(unsigned int n = 0; n < children.size(); n++){
-  //  children[n].size = available / children.size();
-  //}
+  // Begin by removing the space taken up by padding.
+  available -= padding*(children.size() - 1);
 
-  // First, each tightly packed child has to be given exactly as much space as
+  // Then, each tightly packed child has to be given exactly as much space as
   // the requested. Also count the space left, as well as the number of loosely
   // packed children.
   int left = available;
@@ -48,7 +47,7 @@ void UIVBox::RecalculateChildSizes(unsigned int available){
     }
   }
   if(left  < 0) left  = 0; // Sigh.
-  // Now, split the space that is left more or less equally among the other
+  // Finally, split the space that is left more or less equally among the other
   // children.
   for(unsigned int n = 0; n < children.size(); n++){
     if(children[n].mode == PackMode::TIGHT){
@@ -70,9 +69,15 @@ Size2D UIVBox::GetChildSize(unsigned int n){
   return Size2D(current_size.width, children[n].size);
 }
 
+void UIVBox::SetPadding(unsigned int p){
+  padding = p;
+  RecalculateChildSizes(current_size.height);
+  TriggerChildResizes();
+  SetRequestedSize(Size2D(GetChildMaxWidth(), GetTotalSize()));
+}
+
 void UIVBox::TriggerChildResizes(){
   for(unsigned int n = 0; n < children.size(); n++){
-    std::cout << "Calling child resize to " << GetChildSize(n).ToString() << std::endl;
     children[n].child->Resize(GetChildSize(n));
   }
 }
@@ -88,6 +93,7 @@ void UIVBox::CustomResize(Size2D newsize){
   RecalculateChildSizes(newsize.height);
   current_size = newsize; // Manually setting this before triggerchildresizes
   TriggerChildResizes();
+  // DO NOT set requested size here!
 }
 
 unsigned int UIVBox::GetTotalSize(){
@@ -114,7 +120,7 @@ unsigned int UIVBox::GetChildLocation(unsigned int m){
     total += children[n].size;
     total += padding;
   }
-  return total - padding;
+  return total;
 }
 
 } // namespace AlgAudio

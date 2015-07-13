@@ -47,11 +47,12 @@ int main(){
     });
 
     blah_window->Insert(marginbox);
-    marginbox->Insert(button1);
-    //marginbox->Insert(vbox);
-    //vbox->Insert(button1,UIVBox::PackMode::TIGHT);
-    //vbox->Insert(button2,UIVBox::PackMode::WIDE);
-    //vbox->Insert(button3,UIVBox::PackMode::WIDE);
+    //marginbox->Insert(button1);
+    marginbox->Insert(vbox);
+    vbox->Insert(button1,UIVBox::PackMode::TIGHT);
+    vbox->Insert(button2,UIVBox::PackMode::WIDE);
+    vbox->Insert(button3,UIVBox::PackMode::WIDE);
+    vbox->SetPadding(10);
 
     SDLMain::RegisterWindow(blah_window);
     SDLMain::running = true;
