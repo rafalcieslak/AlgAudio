@@ -11,8 +11,8 @@ public:
   void SetText(std::string);
   virtual void CustomDraw(DrawContext& c) override;
   virtual void OnMouseButton(bool,short,int,int) override;
-  virtual void OnMotionEnter() override;
-  virtual void OnMotionLeave() override;
+  virtual void OnMotionEnter(int, int) override;
+  virtual void OnMotionLeave(int, int) override;
 private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;

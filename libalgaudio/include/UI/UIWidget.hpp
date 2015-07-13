@@ -58,8 +58,8 @@ public:
   virtual void OnMouseButton(bool, short, int, int) {}
   // Arguments: fromx, fromy, tox, toy
   virtual void OnMotion(int, int, int, int) {}
-  virtual void OnMotionLeave() {}
-  virtual void OnMotionEnter() {}
+  virtual void OnMotionLeave(int, int) {}
+  virtual void OnMotionEnter(int, int) {}
 
 
   std::weak_ptr<UIWidget> parent;
@@ -69,7 +69,7 @@ public:
   bool visible = true;
 
   const Size2D& GetRequestedSize() const{ return requested_size; }
-  
+
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();

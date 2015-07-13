@@ -55,6 +55,7 @@ private:
   SDL_Renderer* renderer;
 
   int prev_motion_x = -1, prev_motion_y = -1;
+  bool mouse_just_entered = false;
 
   bool needs_redrawing = true;
 

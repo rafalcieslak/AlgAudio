@@ -66,27 +66,37 @@ void Window::ProcessCloseEvent(){
   SDL_HideWindow(window);
 }
 
+void Window::ProcessEnterEvent(){
+  if(!child) return;
+  // The SDL enter event has no mouse position, but is always followed by a
+  // motion event. We'll mark that we an enter event, and we will send it to the
+  // widgets once we receive the next motion event.
+  mouse_just_entered = true;
+}
+
 void Window::ProcessMotionEvent(int x, int y){
-  if(child)
+  if(child){
+    if(mouse_just_entered){
+      child->OnMotionEnter(x,y);
+      mouse_just_entered = false;
+    }
     child->OnMotion(prev_motion_x, prev_motion_y, x, y);
+  }
   prev_motion_x = x;
   prev_motion_y = y;
 }
 
-void Window::ProcessEnterEvent(){
-  if(child)
-    child->OnMotionEnter();
-}
 
 void Window::ProcessLeaveEvent(){
-  if(child)
-    child->OnMotionLeave();
+  if(!child) return;
+  // The SDL leave event has no mouse position, but is always preceded by a
+  // motion event
+  child->OnMotionLeave(prev_motion_x, prev_motion_y);
 }
 
 void Window::ProcessResizeEvent(){
-  if(child){
-    child->Resize(GetSize());
-  }
+  if(!child) return;
+  child->Resize(GetSize());
   needs_redrawing = true;
 }
 

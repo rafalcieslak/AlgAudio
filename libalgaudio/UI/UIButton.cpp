@@ -17,7 +17,7 @@ std::shared_ptr<UIButton> UIButton::Create(std::weak_ptr<Window> w, std::string 
 void UIButton::CustomDraw(DrawContext& c){
   c.SetColor(255,255,255);
   c.Clear();
-  
+
   if(pressed)
     c.SetColor(220,90,90);
   else if(pointed)
@@ -56,13 +56,13 @@ void UIButton::UpdateTexture(){
   SetNeedsRedrawing();
 }
 
-void UIButton::OnMotionEnter(){
+void UIButton::OnMotionEnter(int, int){
   //std::cout << "Button entered" << std::endl;
   pointed = true;
   SetNeedsRedrawing();
 }
 
-void UIButton::OnMotionLeave(){
+void UIButton::OnMotionLeave(int, int){
   //std::cout << "Button left" << std::endl;
   pressed = 0;
   pointed = 0;

@@ -53,21 +53,22 @@ void UIMarginBox::OnMotion(int x1, int y1, int x2, int y2){
   if(IsInside(x1,y1) && IsInside(x2,y2)) child->OnMotion(x1,y1,x2,y2);
   else if(IsInside(x1,y1)){
     // start inside, end ouside
-    child->OnMotionLeave();
+    child->OnMotionLeave(x1,y1);
   }else if(IsInside(x2,y2)){
     // start outside, enter outside
-    child->OnMotionEnter();
+    child->OnMotionEnter(x2,y2);
   }else{
     // both outside, ignore
   }
 }
 
-void UIMarginBox::OnMotionEnter(){
-
+void UIMarginBox::OnMotionEnter(int x, int y){
+  if(!child) return;
+  if(IsInside(x,y)) child->OnMotionEnter(x,y);
 }
-void UIMarginBox::OnMotionLeave(){
-  if(child)
-    child->OnMotionLeave();
+void UIMarginBox::OnMotionLeave(int x, int y){
+  if(!child) return;
+  if(IsInside(x,y)) child->OnMotionLeave(x,y);
 }
 
 

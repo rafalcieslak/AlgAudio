@@ -13,8 +13,8 @@ public:
   virtual void Insert(std::shared_ptr<UIWidget>);
   virtual void OnMouseButton(bool down, short b,int x,int y) override;
   virtual void OnMotion(int x1, int y1, int x2, int y2) override;
-  virtual void OnMotionEnter() override;
-  virtual void OnMotionLeave() override;
+  virtual void OnMotionEnter(int x, int y) override;
+  virtual void OnMotionLeave(int x, int y) override;
 private:
   UIMarginBox(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
   inline bool IsInside(int x, int y) const;
