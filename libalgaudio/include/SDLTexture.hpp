@@ -1,6 +1,6 @@
 #ifndef SDLTEXTURE_HPP
 #define SDLTEXTURE_HPP
-#include "Utilities.hpp"
+#include "Color.hpp"
 #include "SDLHandle.hpp"
 #include <memory>
 

@@ -1,7 +1,7 @@
 #include "UI/UITextArea.hpp"
 #include <SDL2/SDL.h>
 #include "TextRenderer.hpp"
-#include "Utilities.hpp"
+#include "Color.hpp"
 
 namespace AlgAudio{
 

@@ -14,7 +14,7 @@ void Theme::Init(){
   thememap["bg-button-neutral"] = Color(0x3d4f67ff);
   thememap["mg_main"] = Color(0x5c6878ff);
   thememap["text-generic"] = Color(0xaaaeb8ff);
-  thememap["text-button"] = Color(0x3c3e47ff);
+  thememap["text-button"] = Color(0x212227ff);
 }
 
 const Color& Theme::Get(const std::string& id){

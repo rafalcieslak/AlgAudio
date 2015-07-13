@@ -3,7 +3,7 @@
 #include <memory>
 #include "DrawContext.hpp"
 #include "Signal.hpp"
-#include "Utilities.hpp"
+#include "Color.hpp"
 #include "SDLTexture.hpp"
 
 namespace AlgAudio{

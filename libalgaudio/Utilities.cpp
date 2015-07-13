@@ -14,14 +14,6 @@ namespace AlgAudio {
   const std::string Utilities::OSLibSuffix = ".dll";
 #endif
 
-SDL_Color Color::SDL() const{
-  return SDL_Color{r,g,b,alpha};
-}
-
-Color::operator SDL_Color() const{
-  return SDL();
-}
-
 void Utilities::Wait(int ms){
   SDL_Delay(ms);
 }

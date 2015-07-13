@@ -1,6 +1,6 @@
 #ifndef THEME_HPP
 #define THEME_HPP
-#include "Utilities.hpp"
+#include "Color.hpp"
 #include <map>
 
 namespace AlgAudio{

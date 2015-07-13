@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include "SDLHandle.hpp"
+#include "Color.hpp"
 
 struct _TTF_Font;
 typedef _TTF_Font TTF_Font;

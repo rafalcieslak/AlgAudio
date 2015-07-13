@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <memory>
+#include "Color.hpp"
 #include "Utilities.hpp"
 
 struct SDL_Renderer;
@@ -22,7 +23,7 @@ public:
   DrawContext(SDL_Renderer* renderer, int x, int y, int width, int height);
   int width, height;
   void SetColor(short r, short g, short b, short a = 255);
-  void SetColor(const SDL_Color&);
+  void SetColor(const Color&);
   void DrawLine(int x1, int y1, int x2, int y2);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawRect(int x, int y, int w, int h);

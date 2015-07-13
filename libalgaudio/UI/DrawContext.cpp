@@ -86,8 +86,8 @@ void DrawContext::UpdateClipRect(){
 void DrawContext::SetColor(short r, short g, short b, short a){
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
-void DrawContext::SetColor(const SDL_Color& c){
-  SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.a);
+void DrawContext::SetColor(const Color& c){
+  SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.alpha);
 }
 bool DrawContext::HasZeroArea(){
   if(width <= 0 || height <= 0) return true;

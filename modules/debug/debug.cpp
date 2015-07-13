@@ -5,7 +5,6 @@
 #include "Window.hpp"
 #include "UI/UITextArea.hpp"
 #include "SDLMain.hpp"
-#include "Utilities.hpp"
 #include "SCLang.hpp"
 
 // The custom class NEVER takes ownership of the instances
