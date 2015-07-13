@@ -13,7 +13,7 @@ std::shared_ptr<UIVBox> UIVBox::Create(std::weak_ptr<Window> w){
 
 void UIVBox::CustomDraw(DrawContext& c){
   for(unsigned int n = 0; n < children.size(); n++){
-    c.Push(0, GetChildLocation(n), current_size.width, children[n].size);
+    c.Push(GetChildLocation(n), GetChildSize(n));
     children[n].child->Draw(c);
     c.Pop();
   }
@@ -23,9 +23,9 @@ void UIVBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
   children.push_back(PackData{w,m,50});
   w->window = window;
   w->parent = shared_from_this();
-  RecalculateChildSizes(current_size.height);
+  RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(Size2D(GetChildMaxWidth(), GetTotalSize()));
+  SetRequestedSize(Size2D(GetChildMaxContra(), GetTotalSize()));
 }
 
 void UIVBox::RecalculateChildSizes(unsigned int available){
@@ -39,7 +39,7 @@ void UIVBox::RecalculateChildSizes(unsigned int available){
   unsigned int loose_children = 0;
   for(unsigned int n = 0; n < children.size(); n++){
     if(children[n].mode == PackMode::TIGHT){
-      unsigned int q = children[n].child->GetRequestedSize().height;
+      unsigned int q = DirectionalDimension(children[n].child->GetRequestedSize());
       children[n].size = q;
       left  -= q;
     }else{
@@ -66,14 +66,14 @@ void UIVBox::RecalculateChildSizes(unsigned int available){
 }
 
 Size2D UIVBox::GetChildSize(unsigned int n){
-  return Size2D(current_size.width, children[n].size);
+  return DirectionalSize2D(children[n].size, ContradirectionalDimension(current_size));
 }
 
 void UIVBox::SetPadding(unsigned int p){
   padding = p;
-  RecalculateChildSizes(current_size.height);
+  RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(Size2D(GetChildMaxWidth(), GetTotalSize()));
+  SetRequestedSize(Size2D(GetChildMaxContra(), GetTotalSize()));
 }
 
 void UIVBox::TriggerChildResizes(){
@@ -83,14 +83,13 @@ void UIVBox::TriggerChildResizes(){
 }
 
 void UIVBox::OnChildRequestedSizeChanged(){
-  RecalculateChildSizes(current_size.height);
+  RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(Size2D(GetChildMaxWidth(), GetTotalSize()));
+  SetRequestedSize(DirectionalSize2D(GetTotalSize(), GetChildMaxContra()));
 }
 
 void UIVBox::CustomResize(Size2D newsize){
-  std::cout << "Custom resize for vbox" << std::endl;
-  RecalculateChildSizes(newsize.height);
+  RecalculateChildSizes(DirectionalDimension(newsize));
   current_size = newsize; // Manually setting this before triggerchildresizes
   TriggerChildResizes();
   // DO NOT set requested size here!
@@ -105,75 +104,76 @@ unsigned int UIVBox::GetTotalSize(){
   return total - padding;
 }
 
-unsigned int UIVBox::GetChildMaxWidth(){
+unsigned int UIVBox::GetChildMaxContra(){
   unsigned int max = 0;
   for(unsigned int n = 0; n < children.size(); n++){
-    unsigned int w = children[n].child->GetRequestedSize().width;
+    unsigned int w = ContradirectionalDimension(children[n].child->GetRequestedSize());
     if(w > max) max = w;
   }
   return max;
 }
 
-unsigned int UIVBox::GetChildLocation(unsigned int m){
+Point2D UIVBox::GetChildLocation(unsigned int m){
   unsigned int total = 0;
   for(unsigned int n = 0; n < m; n++){
     total += children[n].size;
     total += padding;
   }
-  return total;
+  return DirectionalPoint2D(total, 0);
 }
 
-int UIVBox::InWhich(int, int y){
+int UIVBox::InWhich(Point2D p){
+  int q = DirectionalDimension(p);
   int totaly = 0;
-  if(y < totaly) return -1;
+  if(q < totaly) return -1;
   for(unsigned int n = 0; n < children.size(); n++){
     totaly += children[n].size;
-    if(y < totaly) return n;
+    if(q < totaly) return n;
     totaly += padding;
-    if(y < totaly) return -1;
+    if(q < totaly) return -1;
   }
   return -1;
 }
 
-void UIVBox::OnMouseButton(bool down, short b,int x,int y){
-  int n = InWhich(x,y);
+void UIVBox::OnMouseButton(bool down, short b,Point2D p){
+  int n = InWhich(p);
   if(n<0) return;
-  children[n].child->OnMouseButton(down,b,x,y - GetChildLocation(n));
+  children[n].child->OnMouseButton(down,b,p - GetChildLocation(n));
 }
 
-void UIVBox::OnMotion(int x1, int y1, int x2, int y2){
-  int n1 = InWhich(x1,y1);
-  int n2 = InWhich(x2,y2);
+void UIVBox::OnMotion(Point2D p1, Point2D p2){
+  int n1 = InWhich(p1);
+  int n2 = InWhich(p2);
   if(n1 < 0 && n2 < 0){
     // Ignore.
   }else if(n1 < 0 && n2 >= 0){
     // Start outside, end inside
-    children[n2].child->OnMotionEnter(x2,y2 - GetChildLocation(n2));
+    children[n2].child->OnMotionEnter(p2 - GetChildLocation(n2));
   }else if(n1 >= 0 && n2 < 0){
     // Start inside, end outside
-    children[n1].child->OnMotionLeave(x1,y1 - GetChildLocation(n1));
+    children[n1].child->OnMotionLeave(p1 - GetChildLocation(n1));
   }else if(n1 >= 0 && n2 >= 0){
     // Both inside
     if(n1 == n2){
       // Movement inside a widget
-      children[n1].child->OnMotion(x1, y1 - GetChildLocation(n1), x2, y2 - GetChildLocation(n1));
+      children[n1].child->OnMotion(p1 - GetChildLocation(n1), p2 - GetChildLocation(n1));
     }else{
       // Movement from a widget to another
-      children[n1].child->OnMotionLeave(x1,y1 - GetChildLocation(n1));
-      children[n2].child->OnMotionEnter(x2,y2 - GetChildLocation(n2));
+      children[n1].child->OnMotionLeave(p1 - GetChildLocation(n1));
+      children[n2].child->OnMotionEnter(p2 - GetChildLocation(n2));
     }
   }
 }
 
-void UIVBox::OnMotionEnter(int x, int y){
-  int n = InWhich(x,y);
+void UIVBox::OnMotionEnter(Point2D p){
+  int n = InWhich(p);
   if(n < 0) return;
-  children[n].child->OnMotionEnter(x, y - GetChildLocation(n));
+  children[n].child->OnMotionEnter(p - GetChildLocation(n));
 }
-void UIVBox::OnMotionLeave(int x, int y){
-  int n = InWhich(x,y);
+void UIVBox::OnMotionLeave(Point2D p){
+  int n = InWhich(p);
   if(n < 0) return;
-  children[n].child->OnMotionLeave(x, y - GetChildLocation(n));
+  children[n].child->OnMotionLeave(p - GetChildLocation(n));
 }
 
 } // namespace AlgAudio

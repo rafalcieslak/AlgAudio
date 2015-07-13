@@ -37,38 +37,38 @@ void UIMarginBox::OnChildRequestedSizeChanged(){
   SetRequestedSize(Size2D(s.width + top + bottom, s.height + left + right));
 }
 
-void UIMarginBox::OnMouseButton(bool down, short b,int x,int y){
+void UIMarginBox::OnMouseButton(bool down, short b,Point2D p){
   if(!child) return;
-  if(IsInside(x,y))
-    child->OnMouseButton(down,b,x-left,y-top);
+  if(IsInside(p))
+    child->OnMouseButton(down,b,p - Point2D(left,top));
 }
 
-bool UIMarginBox::IsInside(int x, int y) const{
-  if(x < left || y < top || x > current_size.width - right || y > current_size.height - bottom) return false;
+bool UIMarginBox::IsInside(Point2D p) const{
+  if(p.x < left || p.y < top || p.x > current_size.width - right || p.y > current_size.height - bottom) return false;
   else return true;
 }
 
-void UIMarginBox::OnMotion(int x1, int y1, int x2, int y2){
+void UIMarginBox::OnMotion(Point2D p1, Point2D p2){
   if(!child) return;
-  if(IsInside(x1,y1) && IsInside(x2,y2)) child->OnMotion(x1 - left, y1 - top, x2 - left, y2 - top);
-  else if(IsInside(x1,y1)){
+  if(IsInside(p1) && IsInside(p2)) child->OnMotion(p1 - Point2D(left,top), p2 - Point2D(left,top));
+  else if(IsInside(p1)){
     // start inside, end ouside
-    child->OnMotionLeave(x1 - left, y1 - top);
-  }else if(IsInside(x2,y2)){
+    child->OnMotionLeave(p1 - Point2D(left,top));
+  }else if(IsInside(p2)){
     // start outside, enter outside
-    child->OnMotionEnter(x2 - left, y2 - top);
+    child->OnMotionEnter(p2 - Point2D(left,top));
   }else{
     // both outside, ignore
   }
 }
 
-void UIMarginBox::OnMotionEnter(int x, int y){
+void UIMarginBox::OnMotionEnter(Point2D p){
   if(!child) return;
-  if(IsInside(x,y)) child->OnMotionEnter(x - left, y - top);
+  if(IsInside(p)) child->OnMotionEnter(p - Point2D(left,top));
 }
-void UIMarginBox::OnMotionLeave(int x, int y){
+void UIMarginBox::OnMotionLeave(Point2D p){
   if(!child) return;
-  if(IsInside(x,y)) child->OnMotionLeave(x - left, y - top);
+  if(IsInside(p)) child->OnMotionLeave(p - Point2D(left,top));
 }
 
 

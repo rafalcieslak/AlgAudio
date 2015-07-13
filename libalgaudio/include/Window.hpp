@@ -29,8 +29,8 @@ public:
   void SetNeedsRedrawing();
 
   void ProcessCloseEvent();
-  void ProcessMouseButtonEvent(bool down, short button, int x, int y);
-  void ProcessMotionEvent(int x, int y);
+  void ProcessMouseButtonEvent(bool down, short button, Point2D);
+  void ProcessMotionEvent(Point2D);
   void ProcessEnterEvent();
   void ProcessLeaveEvent();
   void ProcessResizeEvent();
@@ -54,7 +54,7 @@ private:
   SDL_Window* window;
   SDL_Renderer* renderer;
 
-  int prev_motion_x = -1, prev_motion_y = -1;
+  Point2D prev_motion = Point2D(-1,-1);
   bool mouse_just_entered = false;
 
   bool needs_redrawing = true;

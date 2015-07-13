@@ -57,9 +57,9 @@ void SDLMain::ProcessEvents(){
         window->ProcessResizeEvent();
       }
     }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
-      window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, ev.button.x, ev.button.y);
+      window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, Point2D(ev.button.x, ev.button.y));
     }else if(ev.type == SDL_MOUSEMOTION){
-      window->ProcessMotionEvent(ev.motion.x, ev.motion.y);
+      window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
     } // if(ev.type = ...)
   } // while PollEvent
 }

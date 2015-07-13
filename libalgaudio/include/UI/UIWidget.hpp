@@ -54,12 +54,12 @@ public:
   // Useful for propagating size to a newly inserted child.
   void TriggerFakeResize() { CustomResize(current_size); }
 
-  // Arguments: down, button, x, y
-  virtual void OnMouseButton(bool, short, int, int) {}
-  // Arguments: fromx, fromy, tox, toy
-  virtual void OnMotion(int, int, int, int) {}
-  virtual void OnMotionLeave(int, int) {}
-  virtual void OnMotionEnter(int, int) {}
+  // Arguments: down, button, position
+  virtual void OnMouseButton(bool, short, Point2D) {}
+  // Arguments: from, to
+  virtual void OnMotion(Point2D, Point2D) {}
+  virtual void OnMotionLeave(Point2D) {}
+  virtual void OnMotionEnter(Point2D) {}
 
 
   std::weak_ptr<UIWidget> parent;

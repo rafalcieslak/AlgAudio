@@ -35,6 +35,14 @@ void DrawContext::Push(int x1, int y1, int width_, int height_){
   width = width_; height = height_;
   UpdateClipRect();
 }
+void DrawContext::Push(Point2D p, Size2D s){
+  // Remember the previous state
+  context_stack.push(DCLevel(current_target, x, y, width, height));
+  // Set new state
+  x = p.x; y = p.y;
+  width = s.width; height = s.height;
+  UpdateClipRect();
+}
 void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){
   // Remember the previous state
   context_stack.push(DCLevel(current_target, x, y, width, height));

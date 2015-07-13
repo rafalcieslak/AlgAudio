@@ -25,6 +25,18 @@ struct Size2D{
   Size2D operator-(const Size2D& other) const { return Size2D(width - other.width, height - other.height);}
 };
 
+// Same as size2d, but never interchangable. TODO: Turn both into a common base class.
+struct Point2D{
+  Point2D(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
+  bool Fits(const Point2D& other) const{ return (x >= other.x && y >= other.y); }
+  int x, y;
+  bool operator==(const Point2D& other) const{ return (x == other.x && y == other.y); }
+  bool operator!=(const Point2D& other) const{ return !(*this == other); }
+  std::string ToString() {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
+  Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y);}
+  Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
+};
+
 class Exception{
 public:
   Exception(std::string t) : text(t) {};

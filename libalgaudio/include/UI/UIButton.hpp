@@ -10,9 +10,9 @@ public:
   Signal<> on_clicked;
   void SetText(std::string);
   virtual void CustomDraw(DrawContext& c) override;
-  virtual void OnMouseButton(bool,short,int,int) override;
-  virtual void OnMotionEnter(int, int) override;
-  virtual void OnMotionLeave(int, int) override;
+  virtual void OnMouseButton(bool,short,Point2D) override;
+  virtual void OnMotionEnter(Point2D) override;
+  virtual void OnMotionLeave(Point2D) override;
 private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;

@@ -39,7 +39,7 @@ void UIButton::SetText(std::string t){
   UpdateTexture();
 }
 
-void UIButton::OnMouseButton(bool down, short b,int,int){
+void UIButton::OnMouseButton(bool down, short b,Point2D){
   if(down == true && b == SDL_BUTTON_LEFT){
     pressed = 1;
     SetNeedsRedrawing();
@@ -56,13 +56,13 @@ void UIButton::UpdateTexture(){
   SetNeedsRedrawing();
 }
 
-void UIButton::OnMotionEnter(int, int){
+void UIButton::OnMotionEnter(Point2D){
   //std::cout << "Button entered" << std::endl;
   pointed = true;
   SetNeedsRedrawing();
 }
 
-void UIButton::OnMotionLeave(int, int){
+void UIButton::OnMotionLeave(Point2D){
   //std::cout << "Button left" << std::endl;
   pressed = 0;
   pointed = 0;
