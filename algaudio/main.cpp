@@ -6,6 +6,7 @@
 #include "UI/UIMarginBox.hpp"
 #include "UI/UITextArea.hpp"
 #include "UI/UIBox.hpp"
+#include "UI/UILabel.hpp"
 #include "SCLang.hpp"
 
 using namespace AlgAudio;
@@ -27,9 +28,9 @@ int main(){
     auto blah_window = Window::Create("BLAH",250,200);
     auto marginbox = blah_window->Create<UIMarginBox>(10,10,10,10);
     auto button1   = blah_window->Create<UIButton>("Start SCLang");
+    auto label   = blah_window->Create<UILabel>("A label");
     auto button2   = blah_window->Create<UIButton>("Quit App");
-    auto button3   = blah_window->Create<UIButton>("CustomButton");
-    auto vbox = UIHBox::Create(blah_window);
+    auto vbox = UIVBox::Create(blah_window);
     // Alternative syntax
     // auto button = UIButton::Create(blah_window,"Button");
     button1->on_clicked.Subscribe([&](){
@@ -50,8 +51,8 @@ int main(){
     //marginbox->Insert(button1);
     marginbox->Insert(vbox);
     vbox->Insert(button1,UIVBox::PackMode::TIGHT);
+    vbox->Insert(label,UIVBox::PackMode::WIDE);
     vbox->Insert(button2,UIVBox::PackMode::WIDE);
-    vbox->Insert(button3,UIVBox::PackMode::WIDE);
     vbox->SetPadding(10);
 
     SDLMain::RegisterWindow(blah_window);
