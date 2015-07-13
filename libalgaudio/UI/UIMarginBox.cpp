@@ -39,8 +39,8 @@ void UIMarginBox::OnChildRequestedSizeChanged(){
 
 void UIMarginBox::OnMouseButton(bool down, short b,int x,int y){
   if(!child) return;
-  if(x < left || y < top || x > current_size.width - right || y > current_size.height - bottom) return;
-  child->OnMouseButton(down,b,x-top,y-left);
+  if(IsInside(x,y))
+    child->OnMouseButton(down,b,x-left,y-top);
 }
 
 bool UIMarginBox::IsInside(int x, int y) const{
@@ -50,13 +50,13 @@ bool UIMarginBox::IsInside(int x, int y) const{
 
 void UIMarginBox::OnMotion(int x1, int y1, int x2, int y2){
   if(!child) return;
-  if(IsInside(x1,y1) && IsInside(x2,y2)) child->OnMotion(x1,y1,x2,y2);
+  if(IsInside(x1,y1) && IsInside(x2,y2)) child->OnMotion(x1 - left, y1 - top, x2 - left, y2 - top);
   else if(IsInside(x1,y1)){
     // start inside, end ouside
-    child->OnMotionLeave(x1,y1);
+    child->OnMotionLeave(x1 - left, y1 - top);
   }else if(IsInside(x2,y2)){
     // start outside, enter outside
-    child->OnMotionEnter(x2,y2);
+    child->OnMotionEnter(x2 - left, y2 - top);
   }else{
     // both outside, ignore
   }
@@ -64,11 +64,11 @@ void UIMarginBox::OnMotion(int x1, int y1, int x2, int y2){
 
 void UIMarginBox::OnMotionEnter(int x, int y){
   if(!child) return;
-  if(IsInside(x,y)) child->OnMotionEnter(x,y);
+  if(IsInside(x,y)) child->OnMotionEnter(x - left, y - top);
 }
 void UIMarginBox::OnMotionLeave(int x, int y){
   if(!child) return;
-  if(IsInside(x,y)) child->OnMotionLeave(x,y);
+  if(IsInside(x,y)) child->OnMotionLeave(x - left, y - top);
 }
 
 

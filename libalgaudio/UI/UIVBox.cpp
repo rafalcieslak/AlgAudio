@@ -123,4 +123,57 @@ unsigned int UIVBox::GetChildLocation(unsigned int m){
   return total;
 }
 
+int UIVBox::InWhich(int, int y){
+  int totaly = 0;
+  if(y < totaly) return -1;
+  for(unsigned int n = 0; n < children.size(); n++){
+    totaly += children[n].size;
+    if(y < totaly) return n;
+    totaly += padding;
+    if(y < totaly) return -1;
+  }
+  return -1;
+}
+
+void UIVBox::OnMouseButton(bool down, short b,int x,int y){
+  int n = InWhich(x,y);
+  if(n<0) return;
+  children[n].child->OnMouseButton(down,b,x,y - GetChildLocation(n));
+}
+
+void UIVBox::OnMotion(int x1, int y1, int x2, int y2){
+  int n1 = InWhich(x1,y1);
+  int n2 = InWhich(x2,y2);
+  if(n1 < 0 && n2 < 0){
+    // Ignore.
+  }else if(n1 < 0 && n2 >= 0){
+    // Start outside, end inside
+    children[n2].child->OnMotionEnter(x2,y2 - GetChildLocation(n2));
+  }else if(n1 >= 0 && n2 < 0){
+    // Start inside, end outside
+    children[n1].child->OnMotionLeave(x1,y1 - GetChildLocation(n1));
+  }else if(n1 >= 0 && n2 >= 0){
+    // Both inside
+    if(n1 == n2){
+      // Movement inside a widget
+      children[n1].child->OnMotion(x1, y1 - GetChildLocation(n1), x2, y2 - GetChildLocation(n1));
+    }else{
+      // Movement from a widget to another
+      children[n1].child->OnMotionLeave(x1,y1 - GetChildLocation(n1));
+      children[n2].child->OnMotionEnter(x2,y2 - GetChildLocation(n2));
+    }
+  }
+}
+
+void UIVBox::OnMotionEnter(int x, int y){
+  int n = InWhich(x,y);
+  if(n < 0) return;
+  children[n].child->OnMotionEnter(x, y - GetChildLocation(n));
+}
+void UIVBox::OnMotionLeave(int x, int y){
+  int n = InWhich(x,y);
+  if(n < 0) return;
+  children[n].child->OnMotionLeave(x, y - GetChildLocation(n));
+}
+
 } // namespace AlgAudio
