@@ -25,6 +25,8 @@ public:
 private:
   SDLHandle handle;
   SDL_Texture* texture;
+  // Creating a textire of 0 size will mark it as invalid.
+  bool valid = true;
   std::weak_ptr<Window> parent;
   Size2D size;
 };
