@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SDL2/SDL.h>
 #include "ModuleCollection.hpp"
 #include "ModuleFactory.hpp"
 #include "SDLMain.hpp"
@@ -18,7 +19,7 @@ using namespace AlgAudio;
   static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
 #endif
 
-int main(){
+int main(int argc, char *argv[]){
   try{
     Theme::Init();
 

@@ -14,7 +14,7 @@ add_library(
 
 target_link_libraries(
 	modules_base.aa
-  libalgaudio
+	libalgaudio
   ${EXTRA_SYS_LIBS}
 )
 

@@ -1,3 +1,4 @@
+
 add_definitions(
 	--std=c++14
 	-Wall
@@ -7,18 +8,30 @@ add_definitions(
 
 file(GLOB ALGAUDIO_SOURCES ./*.cpp)
 
-include_directories(../libalgaudio/include)
+include_directories(
+	../libalgaudio/include
+	${SDL2_INCLUDE_DIR}
+)
+
+set(CMAKE_EXE_LINKER_FLAGS "-mwindows -static -static-libgcc -static-libstdc++")
 
 add_executable(
 	algaudio
 	${ALGAUDIO_SOURCES}
 )
 
+link_directories(
+	${SDL2_LIBRARY_DIR}
+)
+
 target_link_libraries(
 	algaudio
   libalgaudio
+	${SDL2_LIBRARY}
 	${EXTRA_SYS_LIBS}
 )
+
+add_dependencies(algaudio libalgaudio)
 
 if(UNIX)
 	# The suffix is needed to distinguish between the binary and a directory in

@@ -1,5 +1,4 @@
-find_package(SDL2 REQUIRED)
-find_package(SDL2_ttf REQUIRED)
+
 
 add_definitions(
 	--std=c++14
@@ -32,7 +31,6 @@ add_library(
 
 add_dependencies(libalgaudio liblo)
 
-
 # Disables the addition of one more "lib" prefix on libalgaudio
 SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
 
@@ -41,6 +39,7 @@ target_link_libraries(
 	${SDL2_LIBRARY}
 	${SDL2_TTF_LIBRARY}
 	${LIBLO_LIBRARY}
+	freetype
 	${EXTRA_SYS_LIBS}
 )
 # The following command will clear transitive dependencies of libalgaudio.

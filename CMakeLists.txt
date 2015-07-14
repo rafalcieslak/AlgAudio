@@ -13,7 +13,7 @@ set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # Global config
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-#	set(EXTRA_SYS_LIBS wsock32 Ws2_32 comdlg32)
+	set(EXTRA_SYS_LIBS dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid  wsock32 Ws2_32 comdlg32)
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
@@ -23,6 +23,9 @@ endif()
 
 # The libs subdir has to be processed first
 add_subdirectory(libs)
+
+find_package(SDL2 REQUIRED)
+find_package(SDL2_ttf REQUIRED)
 
 add_subdirectory(libalgaudio)
 add_subdirectory(algaudio)
