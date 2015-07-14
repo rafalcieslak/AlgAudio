@@ -12,6 +12,9 @@ void SCLang::Start(std::string command){
   subprocess->on_line_received.Subscribe([&](std::string l){
     on_line_received.Happen(l);
   });
+  // The SC dir should be in current directory.
+  // TODO: Check if the directories exist.
+  SendInstruction("(\"sc/main.sc\").loadPaths;");
 }
 void SCLang::Restart(std::string command){
   Stop();
@@ -21,7 +24,7 @@ void SCLang::Stop(){
   subprocess.reset(); // Resets the unique_ptr, not the process.
 }
 void SCLang::SendInstruction(std::string i){
-  if(subprocess) subprocess->SendInstruction(i);
+  if(subprocess) subprocess->SendInstruction(i + "\n");
 }
 void SCLang::Poll(){
   if(subprocess) subprocess->PollOutput();
