@@ -21,6 +21,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
+# The libs subdir has to be processed first
+add_subdirectory(libs)
+
 add_subdirectory(libalgaudio)
 add_subdirectory(algaudio)
 add_subdirectory(modules)

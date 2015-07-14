@@ -21,6 +21,7 @@ public:
   static void Poll();
   static Signal<std::string> on_line_received;
   static void SendInstruction(std::string);
+  static void SendOSCSimple(std::string);
 private:
   static std::unique_ptr<SCLangSubprocess> subprocess;
 };

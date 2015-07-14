@@ -16,6 +16,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/libs"
 	${SDL2_INCLUDE_DIR}
 	${SDL2_TTF_INCLUDE_DIR}
+	${LIBLO_INCLUDE_DIR}
 )
 
 link_directories(
@@ -28,6 +29,10 @@ add_library(
 	${LIBALGAUDIO_SOURCES}
   ${LIBALGAUDIO_INCLUDES}
 )
+
+add_dependencies(libalgaudio liblo)
+
+
 # Disables the addition of one more "lib" prefix on libalgaudio
 SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
 
@@ -35,6 +40,7 @@ target_link_libraries(
 	libalgaudio
 	${SDL2_LIBRARY}
 	${SDL2_TTF_LIBRARY}
+	${LIBLO_LIBRARY}
 	${EXTRA_SYS_LIBS}
 )
 # The following command will clear transitive dependencies of libalgaudio.

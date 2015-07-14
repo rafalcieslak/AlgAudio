@@ -54,8 +54,9 @@ int main(){
         SCLang::Start(sclang_path);
         startbutton->SetText("Stop SCLang");
       }else{
-        SCLang::Stop();
-        startbutton->SetText("Restart SCLang");
+        SCLang::SendOSCSimple("/hello");
+        //SCLang::Stop();
+        //startbutton->SetText("Restart SCLang");
       }
     });
     quitbutton->on_clicked.Subscribe([&](){
