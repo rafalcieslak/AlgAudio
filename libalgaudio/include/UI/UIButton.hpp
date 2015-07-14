@@ -24,6 +24,7 @@ private:
   void UpdateTexture();
   bool pressed = false;
   bool pointed = false;
+  Color GetBgColor() const;
 };
 
 } // namespace AlgAudio
