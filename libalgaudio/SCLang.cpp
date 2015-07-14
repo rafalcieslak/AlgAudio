@@ -18,7 +18,7 @@ void SCLang::Start(std::string command){
   // The SC dir should be in current directory.
   // TODO: Check if the directories exist.
   SendInstruction("(\"sc/main.sc\").loadPaths;");
-  SendInstruction("NetAddr.localAddr.postln;");
+  SendInstruction("NetAddr.localAddr.port;");
 }
 void SCLang::Restart(std::string command){
   Stop();

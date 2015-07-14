@@ -29,10 +29,20 @@ std::shared_ptr<SDLTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontPar
   //SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl.SDL());
   SDL_Surface* surf = TTF_RenderUTF8_Shaded(GetFont(fp), text.c_str(), cl, bg);
   if(!surf)
+    std::cout << "Warning: TTF_RenderUTF8_Shaded failed " << TTF_GetError() << std::endl;
+  auto res = std::make_shared<SDLTexture>(w, surf);
+  SDL_FreeSurface(surf);
+  return res;
+}
+std::shared_ptr<SDLTexture> TextRenderer::RenderBlended(std::weak_ptr<Window> w,FontParrams fp, std::string text, const Color& cl){
+  // Woarkaround for rendering empty strings
+  if(text == "") text = " ";
+
+  SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl);
+  if(!surf)
     std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
   auto res = std::make_shared<SDLTexture>(w, surf);
   SDL_FreeSurface(surf);
   return res;
 }
-
 } // namespace AlgAudio
