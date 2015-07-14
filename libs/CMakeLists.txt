@@ -2,6 +2,7 @@ include(ExternalProject)
 
 ExternalProject_Add(
   liblo
+  PREFIX liblo
   URL http://downloads.sourceforge.net/liblo/liblo-0.28.tar.gz
   CONFIGURE_COMMAND sh ${CMAKE_CURRENT_BINARY_DIR}/liblo/src/liblo/configure --prefix=${CMAKE_CURRENT_BINARY_DIR}/install
   BUILD_COMMAND ${MAKE}

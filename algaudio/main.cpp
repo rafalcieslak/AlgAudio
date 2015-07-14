@@ -31,6 +31,7 @@ int main(){
     auto mainwindow = Window::Create("AlgAudio config",280,400);
     auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
     auto startbutton = mainwindow->Create<UIButton>("Start SCLang");
+    auto oscbutton = mainwindow->Create<UIButton>("OSC test");
     auto quitbutton = mainwindow->Create<UIButton>("Quit App");
     auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",36);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
@@ -44,6 +45,7 @@ int main(){
     mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
     mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(oscbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
 
     startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
@@ -54,10 +56,12 @@ int main(){
         SCLang::Start(sclang_path);
         startbutton->SetText("Stop SCLang");
       }else{
-        SCLang::SendOSCSimple("/hello");
-        //SCLang::Stop();
-        //startbutton->SetText("Restart SCLang");
+        SCLang::Stop();
+        startbutton->SetText("Restart SCLang");
       }
+    });
+    oscbutton->on_clicked.Subscribe([&](){
+      SCLang::SendOSCSimple("/hello");
     });
     quitbutton->on_clicked.Subscribe([&](){
       SDLMain::Quit();

@@ -16,9 +16,14 @@ public:
   // the folling PollOutput method.
   void PollOutput();
   Signal<std::string> on_line_received;
+  void WaitForPrompt();
+  std::string WaitForReply(std::string command);
 private:
   std::string buffer;
   void ProcessBuffer();
+  bool at_prompt = false;
+  bool collecting_reply = false;
+  std::string reply_buffer;
 };
 
 } // namespace AlgAudio
