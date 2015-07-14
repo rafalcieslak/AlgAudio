@@ -34,6 +34,7 @@ private:
     HANDLE g_hChildStd_IN_Wr = NULL;
     HANDLE g_hChildStd_OUT_Rd = NULL;
     HANDLE g_hChildStd_OUT_Wr = NULL;
+    static HANDLE job; // = NULL
   #endif
 };
 

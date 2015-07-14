@@ -50,12 +50,12 @@ Subprocess::Subprocess(std::string c){
 			token = strtok (NULL, " ");
 		}
 		args[argc] = NULL;
-    
+
     dup2(pipe_child_stdin_fd[0],STDIN_FILENO);
     close(pipe_child_stdin_fd[1]);
     dup2(pipe_child_stdout_fd[1],STDOUT_FILENO);
     close(pipe_child_stdout_fd[0]);
-    
+
     // Disable stdio buffering
     setvbuf(stdout,NULL,_IONBF,0);
     setvbuf(stdin,NULL,_IONBF,0);
@@ -69,17 +69,17 @@ Subprocess::Subprocess(std::string c){
     exit(1);
   }else{
     // parent process
-    
+
     // Set the read-end of stdout pipe to non-blocking mode
     int flags = fcntl(pipe_child_stdout_fd[0], F_GETFL);
     fcntl(pipe_child_stdout_fd[0], F_SETFL, flags | O_NONBLOCK);
     // Set the write-end of stdin pipe to non-blocking mode
     flags = fcntl(pipe_child_stdin_fd[1], F_GETFL);
     fcntl(pipe_child_stdin_fd[1], F_SETFL, flags | O_NONBLOCK);
-    
+
     // store pid
     pid = p;
-    
+
     // TODO: Wait for the child to swap image (by pid), and if it fails,
     // throw an exception
   }
@@ -87,11 +87,11 @@ Subprocess::Subprocess(std::string c){
 
 Subprocess::~Subprocess(){
   // Closing all pipes, this will also send EOF.
-	close(pipe_child_stdin_fd[0]); 
+	close(pipe_child_stdin_fd[0]);
 	close(pipe_child_stdin_fd[1]);
-	close(pipe_child_stdout_fd[0]); 
+	close(pipe_child_stdout_fd[0]);
 	close(pipe_child_stdout_fd[1]);
-  // XXX: Maybe let the child wait a little bit before EOF? Depends on 
+  // XXX: Maybe let the child wait a little bit before EOF? Depends on
   // what else the subprocess class might be used for.
 	kill(pid, SIGHUP);
 	int i;
@@ -121,10 +121,32 @@ std::string Subprocess::ReadData(){
 
 #else
 /* ================= WIN32 implementation ================= */
+
+HANDLE Subprocess::job = NULL;
+
 Subprocess::Subprocess(std::string c){
   command = c;
 
-  // Begin by preparing a control structure for pipe creation
+  // Once for all children:
+  if(!job){
+    // First, create a new job.
+    // Default security attributes, no name.
+    // This job handle will be uninheritable.
+    job = CreateJobObject (NULL,NULL);
+    // Once this process is attached to a job, all new children will be too.
+    if( ! AssignProcessToJobObject(job, GetCurrentProcess()) )
+      throw SubprocessException("AssignProcessToJobObject failed: " + GetLastErrorAsString());
+
+    // Set the job limit so that closing the last handle to the job (which only the parent process has)
+    // will kill all child process. This way no children are left if we crash or terminate.
+     JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits;
+    if( ! QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits), NULL))
+      throw SubprocessException("QueryInformationJobObject failed: " + GetLastErrorAsString());
+    limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+    if( ! SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
+      throw SubprocessException("SetInformationJobObject failed: " + GetLastErrorAsString());
+  }
+  // Prepare a control structure for pipe creation
   SECURITY_ATTRIBUTES saAttr;
   saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
   saAttr.bInheritHandle = TRUE;
