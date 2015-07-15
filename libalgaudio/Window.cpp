@@ -34,14 +34,13 @@ Window::~Window(){
 }
 
 void Window::Render(){
-  if(!needs_redrawing) return;
-
-  std::cout << "Redrawing window." << std::endl;
-
+  // Cannot skip. On some platforms SDL requires continuous RenderPresent
+  // calls. It's not a big deal, though, the child will use a full cached
+  // texture, so it should be pretty efficient anyway.
+  //if(!needs_redrawing) return;
   Size2D size = GetSize();
   DrawContext c(renderer, 0, 0, size.width, size.height); // Full window DC
   c.SetColor(Theme::Get("bg-main"));
-
 	SDL_RenderClear(renderer);
   if(child) child->Draw(c);
 	SDL_RenderPresent(renderer);

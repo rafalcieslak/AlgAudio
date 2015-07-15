@@ -16,7 +16,7 @@ void SDLMain::Loop(){
 
 void SDLMain::Step(){
   // TODO: Actual FPS limit
-  SDL_Delay(18);
+  SDL_Delay(10);
   // Process user input
   ProcessEvents();
   // Redraw registered windows

@@ -22,6 +22,6 @@ else()
   add_custom_command(
   	TARGET liblo POST_BUILD
   	COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/lib/liblo.so.7.2.0" "${CMAKE_BINARY_DIR}/liblo.so.7"
-    COMMAND ln -s "${CMAKE_BINARY_DIR}/liblo.so.7" "${CMAKE_BINARY_DIR}/liblo.so"
+    COMMAND ln -sf "${CMAKE_BINARY_DIR}/liblo.so.7" "${CMAKE_BINARY_DIR}/liblo.so"
   )
 endif()
