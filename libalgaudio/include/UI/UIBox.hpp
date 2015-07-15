@@ -54,7 +54,7 @@ protected:
 };
 
 class UIVBox : public UIBox{
-private:
+protected:
   UIVBox(std::weak_ptr<Window> parent_window);
 public:
   static std::shared_ptr<UIVBox> Create(std::weak_ptr<Window> parent_window);
@@ -67,7 +67,7 @@ public:
   inline virtual Point2D DirectionalPoint2D(int direction, int contra) const override {return Point2D(contra, direction);}
 };
 class UIHBox : public UIBox{
-private:
+protected:
   UIHBox(std::weak_ptr<Window> parent_window);
 public:
   static std::shared_ptr<UIHBox> Create(std::weak_ptr<Window> parent_window);

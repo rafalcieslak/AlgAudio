@@ -1,6 +1,7 @@
 #ifndef UIWIDGET_HPP
 #define UIWIDGET_HPP
 #include <memory>
+#include <iostream>
 #include "DrawContext.hpp"
 #include "Signal.hpp"
 #include "Color.hpp"
@@ -12,13 +13,16 @@ class Window;
 
 // shared_from_this is required for proper parent tracking
 class UIWidget : public std::enable_shared_from_this<UIWidget>{
-  // Pure abstract
-public:
+protected:
   UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {
       cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
     };
-
+  UIWidget(){
+    // Useful for shadowing virtual inheritance. Never use this constructor.
+    std::cout << "FAIL: the Widget() constructor should never be used." << std::endl;
+  }
+public:
 /* It is recommended for widgets to implement Create static method,
    which returns a new shared_ptr of that object type, which simplifies
    the syntax for interface building. It shall be remembered, however,
@@ -79,6 +83,15 @@ public:
 
   const Size2D& GetRequestedSize() const{ return requested_size; }
 
+  void SetClearColor(const Color& c){
+    clear_color = c;
+    SetNeedsRedrawing();
+  }
+  void SetOverlayColor(const Color& c){
+    overlay_color = c;
+    SetNeedsRedrawing();
+  }
+
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();
@@ -99,6 +112,8 @@ protected:
   virtual void OnChildRequestedSizeChanged() {}
 
 private:
+  Color clear_color = Color(0,0,0,0);
+  Color overlay_color = Color(0,0,0,0);
   bool needs_redrawing = true;
   Size2D requested_size = Size2D(0,0);
 

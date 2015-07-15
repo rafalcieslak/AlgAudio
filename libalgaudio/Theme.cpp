@@ -9,6 +9,7 @@ Color no_color(0,0,0);
 void Theme::Init(){
   // A possible example theme
   thememap["bg-main"] = Color(0x3f4752ff);
+  thememap["bg-main-alt"] = Color(0x2f3722ff);
   thememap["bg-button-positive"] = Color(0x5c786cff);
   thememap["bg-button-negative"] = Color(0x785c6aff);
   thememap["bg-button-neutral"] = Color(0x3d4f67ff);

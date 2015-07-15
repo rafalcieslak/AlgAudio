@@ -16,8 +16,10 @@ void UIWidget::Draw(DrawContext& c){
     if(needs_redrawing){
       std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
       c.Push(cache_texture, drawsize.width, drawsize.height);
-      //c.Clear();
+      c.Clear(clear_color);
       CustomDraw(c);
+      c.SetColor(overlay_color);
+      c.Fill();
       c.Pop();
     }else{
       std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;

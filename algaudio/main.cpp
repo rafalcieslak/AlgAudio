@@ -10,6 +10,7 @@
 #include "UI/UILabel.hpp"
 #include "SCLang.hpp"
 #include "Theme.hpp"
+#include "UI/UICheckbox.hpp"
 
 using namespace AlgAudio;
 
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]){
     auto quitbutton = mainwindow->Create<UIButton>("Quit App");
     auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",36);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
+    auto chkbox = mainwindow->Create<UICheckbox>("Checkbox");
     auto mainvbox = UIVBox::Create(mainwindow);
     auto buttonhbox = UIHBox::Create(mainwindow);
 
@@ -46,6 +48,7 @@ int main(int argc, char *argv[]){
     marginbox->Insert(mainvbox);
     mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
     mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
+    mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
     mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(oscbutton, UIHBox::PackMode::WIDE);
@@ -57,7 +60,6 @@ int main(int argc, char *argv[]){
     startbutton->on_clicked.Subscribe([&](){
       if(!SCLang::IsRunning()){
         SCLang::Start(sclang_path);
-        SCLang::SetOSCDebug(true);
         startbutton->SetText("Stop SCLang");
       }else{
         SCLang::Stop();
@@ -65,11 +67,13 @@ int main(int argc, char *argv[]){
       }
     });
     oscbutton->on_clicked.Subscribe([&](){
-      //SCLang::SendOSCSimple("/hello");
       ModuleCollectionBase::InstallAllTemplatesIntoSC();
     });
     quitbutton->on_clicked.Subscribe([&](){
       SDLMain::Quit();
+    });
+    chkbox->on_toggled.Subscribe([&](bool state){
+      SCLang::SetOSCDebug(state);
     });
     mainwindow->on_close.Subscribe([&](){
       // Let closing the main window close the whole app.

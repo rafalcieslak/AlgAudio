@@ -19,7 +19,7 @@ void UITextArea::Clear(){
 }
 void UITextArea::CustomDraw(DrawContext& c){
   c.SetColor(c_bg);
-  c.Clear();
+  c.Fill();
   const int spacing = 12;
   if(!bottom_alligned){
     unsigned int n = 0;

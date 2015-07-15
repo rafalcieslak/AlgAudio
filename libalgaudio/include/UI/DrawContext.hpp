@@ -27,7 +27,9 @@ public:
   void DrawLine(int x1, int y1, int x2, int y2);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawRect(int x, int y, int w, int h);
+  void Fill();
   void Clear();
+  void Clear(Color);
   Size2D Size() {return Size2D(width,height);}
   bool HasZeroArea();
 

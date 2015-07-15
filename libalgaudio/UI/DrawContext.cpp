@@ -28,10 +28,21 @@ void DrawContext::DrawRect(int x, int y, int w, int h){
   SDL_RenderFillRect(renderer,&rect);
 }
 
-void DrawContext::Clear(){
+void DrawContext::Fill(){
 	SDL_RenderFillRect(renderer,NULL);
 }
-
+void DrawContext::Clear(){
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+  SetColor(Color(0,0,0,0));
+  Fill();
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+}
+void DrawContext::Clear(Color c){
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+  SetColor(c);
+  Fill();
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+}
 void DrawContext::Push(int x1, int y1, int width_, int height_){
   // Remember the previous state
   context_stack.push(DCLevel(current_target, x, y, width, height));

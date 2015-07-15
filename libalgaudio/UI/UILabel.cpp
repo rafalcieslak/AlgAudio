@@ -17,7 +17,7 @@ std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string te
 
 void UILabel::CustomDraw(DrawContext& c){
   c.SetColor(Theme::Get(color).ZeroAlpha());
-  c.Clear();
+  c.Fill();
   c.DrawTexture(texture, c.width/2 - texture->GetSize().width/2, c.height/2 - texture->GetSize().height/2);
 }
 
