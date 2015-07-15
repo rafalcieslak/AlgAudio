@@ -37,21 +37,28 @@ void SCLangSubprocess::ThreadMain(){
 }
 void SCLangSubprocess::Step(){
 
-  Utilities::WaitOS(20);
+  Utilities::WaitOS(200);
   // Take an instruction, send it, wait for prompt collecting reply, store
   // the reply in out buffer
 
   io_mutex.lock();
-  for(auto& p : instructions_actions){
-    std::string reply = WaitForReply(p.first);
-    replies.push_back(std::make_pair(reply,p.second));
-  }
-  for(auto& p : instructions){
-    SendInstructionRaw(p);
-  }
+  auto instructions_actions_copy = instructions_actions;
+  auto instructions_copy = instructions;
+  // Waiting for reply may be relativelly long. To avoid starving other threads,
+  // make a local copy of stuff to do, to unlock the mutex ASAP.
   instructions_actions.clear();
   instructions.clear();
   io_mutex.unlock();
+
+  for(auto& p : instructions_actions_copy){
+    std::string reply = WaitForReply(p.first);
+    io_mutex.lock();
+    replies.push_back(std::make_pair(reply,p.second));
+    io_mutex.unlock();
+  }
+  for(auto& p : instructions_copy){
+    SendInstructionRaw(p);
+  }
 
   PollOutput();
 }
