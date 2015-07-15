@@ -20,14 +20,14 @@ std::shared_ptr<UIHBox> UIHBox::Create(std::weak_ptr<Window> w){
 }
 
 void UIBox::CustomDraw(DrawContext& c){
-  std::cout << "Start" << std::endl;
+  //std::cout << "Start" << std::endl;
   for(unsigned int n = 0; n < children.size(); n++){
     c.Push(GetChildLocation(n), GetChildSize(n));
-    std::cout << "Drawing child at " << GetChildLocation(n).ToString() << " size " << GetChildSize(n).ToString() << std::endl;
+    //std::cout << "Drawing child at " << GetChildLocation(n).ToString() << " size " << GetChildSize(n).ToString() << std::endl;
     children[n].child->Draw(c);
     c.Pop();
   }
-  std::cout << "End" << std::endl;
+  //std::cout << "End" << std::endl;
 }
 
 void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){

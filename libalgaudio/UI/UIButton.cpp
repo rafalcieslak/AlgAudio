@@ -12,7 +12,6 @@ UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIClickable(w), tex
 
   // UIClickable events
   on_pointed.Subscribe([&](bool){
-    std::cout << "POINTED" << std::endl;
     UpdateTexture();
   });
   on_pressed.Subscribe([&](bool){

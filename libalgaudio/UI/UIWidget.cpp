@@ -13,7 +13,7 @@ void UIWidget::Draw(DrawContext& c){
       Resize(drawsize);
     }
     if(needs_redrawing){
-      std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
+      //std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
       c.Push(cache_texture, drawsize.width, drawsize.height);
       c.Clear(clear_color);
       CustomDraw(c);
@@ -21,7 +21,7 @@ void UIWidget::Draw(DrawContext& c){
       c.Fill();
       c.Pop();
     }else{
-      std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;
+      //std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;
     }
     c.DrawTexture(cache_texture);
     current_size = drawsize;

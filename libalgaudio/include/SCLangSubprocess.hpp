@@ -35,7 +35,7 @@ private:
   bool last_started = false; // Used by the MAIN thread only!
   std::string buffer;
   void ProcessBuffer();
-  bool at_prompt = false;
+  int prompts = 0;
   bool collecting_reply = false;
   std::string reply_buffer;
 
@@ -46,14 +46,15 @@ private:
   void ThreadMain();
   void Step();
   std::thread the_thread;
-  std::mutex io_mutex;
+  std::recursive_mutex io_mutex;
   std::string WaitForReply(std::string);
   void WaitForPrompt();
   void SendInstructionRaw(std::string);
   void PollOutput();
   // std::atomic does not work with std::list, as it has no default noexcept constructor.
   std::list<std::string> lines_received;
-  std::list<std::pair<std::string,std::function<void(std::string)>>> instructions;
+  std::list<std::pair<std::string,std::function<void(std::string)>>> instructions_actions;
+  std::list<std::string> instructions;
   std::list<std::pair<std::string,std::function<void(std::string)>>> replies;
 };
 

@@ -42,26 +42,35 @@ void SCLangSubprocess::Step(){
   // the reply in out buffer
 
   io_mutex.lock();
-  for(auto& p : instructions){
+  for(auto& p : instructions_actions){
     std::string reply = WaitForReply(p.first);
     replies.push_back(std::make_pair(reply,p.second));
   }
+  for(auto& p : instructions){
+    SendInstructionRaw(p);
+  }
+  instructions_actions.clear();
+  instructions.clear();
   io_mutex.unlock();
 
   PollOutput();
 }
 
 void SCLangSubprocess::SendInstruction(std::string i){
-  SendInstruction(i, [](std::string){} );
+  io_mutex.lock();
+  instructions.push_back(i);
+  io_mutex.unlock();
 }
 void SCLangSubprocess::SendInstruction(std::string i, std::function<void(std::string)> f){
-  std::lock_guard<std::mutex> lock(io_mutex);
-  instructions.push_back(std::make_pair(i,f));
+  io_mutex.lock();
+  instructions_actions.push_back(std::make_pair(i,f));
+  io_mutex.unlock();
 }
 void SCLangSubprocess::TriggerSignals(){
-  std::lock_guard<std::mutex> lock(io_mutex);
+  if( ! io_mutex.try_lock()) return;
   if(started != last_started){
     if(started){
+
       on_started.Happen();
       // autofire
     }else{
@@ -75,6 +84,9 @@ void SCLangSubprocess::TriggerSignals(){
   }
   lines_received.clear();
   replies.clear();
+  io_mutex.unlock();
+
+  // Call the signals once the mutexes are freed
 }
 
 
@@ -91,12 +103,12 @@ void SCLangSubprocess::PollOutput(){
 
 void SCLangSubprocess::SendInstructionRaw(std::string i){
   WaitForPrompt();
-  at_prompt = false;
+  prompts--;
   subprocess->SendData(i + '\n');
 }
 
 void SCLangSubprocess::WaitForPrompt(){
-  while(!at_prompt){
+  while(prompts < 1){
     Utilities::WaitOS(20);
     PollOutput();
   }
@@ -119,11 +131,11 @@ void SCLangSubprocess::ProcessBuffer(){
     io_mutex.lock();
     lines_received.push_back(l);
     io_mutex.unlock();
-    //if(l.length() >= 5 && l.substr(0,5) == "sc3> "){
+    if(l.length() >= 5 && l.substr(0,5) == "sc3> "){
       // prompt
-    //  at_prompt = true;
-      //l = l.substr(5);
-    //}
+      prompts++;
+      l = l.substr(5);
+    }
     if(collecting_reply){
       if(reply_buffer.length() == 0) reply_buffer = l;
       else reply_buffer += "\n" + l;
@@ -135,7 +147,7 @@ void SCLangSubprocess::ProcessBuffer(){
     lines_received.push_back("sc3> "); // Pretend it is full output (flush)
     io_mutex.unlock();
     buffer = buffer.substr(5);
-    at_prompt = true;
+    prompts++;
   }
 }
 
