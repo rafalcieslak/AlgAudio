@@ -34,10 +34,15 @@ Window::~Window(){
 }
 
 void Window::Render(){
-  // Cannot skip. On some platforms SDL requires continuous RenderPresent
+#ifdef __unix__
+  // Cannot skip. On many configurations SDL requires continuous RenderPresent
   // calls. It's not a big deal, though, the child will use a full cached
   // texture, so it should be pretty efficient anyway.
-  //if(!needs_redrawing) return;
+  // --------- if(!needs_redrawing) return;
+#else
+  if(!needs_redrawing) return;
+  std::cout << "Redrawing window" << std::endl;
+#endif
   Size2D size = GetSize();
   DrawContext c(renderer, 0, 0, size.width, size.height); // Full window DC
   c.SetColor(Theme::Get("bg-main"));
