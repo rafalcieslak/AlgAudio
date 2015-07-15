@@ -12,6 +12,7 @@
 
 #include "ModuleCollection.hpp"
 #include "LibLoader.hpp"
+#include "SCLang.hpp"
 
 using namespace rapidxml;
 
@@ -143,6 +144,15 @@ std::string ModuleCollectionBase::ListInstalledTemplates(){
     }
   }
   return result;
+}
+
+void ModuleCollectionBase::InstallAllTemplatesIntoSC(){
+  for(const auto& it1 : collections_by_id){
+    for(const auto& it2 : it1.second->templates_by_id){
+      const ModuleTemplate& t = *(it2.second);
+      SCLang::InstallTemplate(t);
+    }
+  }
 }
 
 } // namespace AlgAudio

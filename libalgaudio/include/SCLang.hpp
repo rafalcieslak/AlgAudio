@@ -1,11 +1,13 @@
 #ifndef SCLANG_HPP
 #define SCLANG_HPP
 #include <memory>
+#include <set>
 #include "Signal.hpp"
 
 namespace AlgAudio{
 
 class SCLangSubprocess;
+class ModuleTemplate;
 
 // The static interface to a single global sclang process
 class SCLang{
@@ -22,8 +24,13 @@ public:
   static Signal<std::string> on_line_received;
   static void SendInstruction(std::string);
   static void SendOSCSimple(std::string);
+  static void InstallTemplate(const ModuleTemplate&);
+  static bool WasInstalled(const std::string&);
+  static void SetOSCDebug(bool enabled);
+  static void SendOSC(const std::string &path, const std::string &tag, ...);
 private:
   static std::unique_ptr<SCLangSubprocess> subprocess;
+  static std::set<std::string> installed_templates;
 };
 
 } // namespace AlgAudio

@@ -1,15 +1,17 @@
 #include <winsock2.h>
 #include "SCLang.hpp"
-#include "SCLangSubprocess.hpp"
 #include <lo/lo.h>
 #include <lo/lo_cpp.h>
 #include <iostream>
+#include "SCLangSubprocess.hpp"
+#include "ModuleTemplate.hpp"
 
 namespace AlgAudio{
 
 std::unique_ptr<SCLangSubprocess> SCLang::subprocess;
+std::set<std::string> SCLang::installed_templates;
 Signal<std::string> SCLang::on_line_received;
-lo_address addr;
+lo::Address addr("");
 
 void SCLang::Start(std::string command){
   if(subprocess) return;
@@ -23,8 +25,10 @@ void SCLang::Start(std::string command){
   std::string port = subprocess->WaitForReply("NetAddr.localAddr.port.postln;");
   port = Utilities::SplitString(port,"\n")[1];
   std::cout << "SCLang is using port " << port << std::endl;
-  addr = lo_address_new("localhost", port.c_str());
-  //subprocess->SendInstruction("OSCFunc.trace(true);");
+  // The constructor for lo::Address is messed up. Creating an lo_address
+  // manually and binding it to lo::Address fixes the issue.
+  lo_address a = lo_address_new("localhost", port.c_str());
+  addr = lo::Address(a,true);
 }
 void SCLang::Restart(std::string command){
   Stop();
@@ -38,9 +42,34 @@ void SCLang::SendInstruction(std::string i){
 }
 void SCLang::SendOSCSimple(std::string a){
   if(!subprocess) return;
-  lo_send(addr, a.c_str(), "");
+  addr.send(a);
 }
+void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
+{
+    va_list q;
+    va_start(q, tag);
+    lo_message m = lo_message_new();
+    std::string t = tag + "$$";
+    lo_message_add_varargs(m, t.c_str(), q);
+    addr.send(path, m);
+    lo_message_free(m);
+}
+
 void SCLang::Poll(){
   if(subprocess) subprocess->PollOutput();
 }
+void SCLang::SetOSCDebug(bool enabled){
+  if(enabled) SendInstruction("OSCFunc.trace(true);");
+  else SendInstruction("OSCFunc.trace(false);");
+}
+void SCLang::InstallTemplate(const ModuleTemplate& t){
+  if(!t.has_sc_code) return;
+  SendOSC("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
+  installed_templates.insert(t.GetFullID());
+}
+bool SCLang::WasInstalled(const std::string& s){
+  auto it = installed_templates.find(s);
+  return (it != installed_templates.end());
+}
+
 } // namespace AlgAudio

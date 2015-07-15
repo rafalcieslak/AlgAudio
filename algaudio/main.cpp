@@ -20,6 +20,8 @@ using namespace AlgAudio;
 #endif
 
 int main(int argc, char *argv[]){
+  (void)argc;
+  (void)argv;
   try{
     Theme::Init();
 
@@ -55,6 +57,7 @@ int main(int argc, char *argv[]){
     startbutton->on_clicked.Subscribe([&](){
       if(!SCLang::IsRunning()){
         SCLang::Start(sclang_path);
+        SCLang::SetOSCDebug(true);
         startbutton->SetText("Stop SCLang");
       }else{
         SCLang::Stop();
@@ -62,7 +65,8 @@ int main(int argc, char *argv[]){
       }
     });
     oscbutton->on_clicked.Subscribe([&](){
-      SCLang::SendOSCSimple("/hello");
+      //SCLang::SendOSCSimple("/hello");
+      ModuleCollectionBase::InstallAllTemplatesIntoSC();
     });
     quitbutton->on_clicked.Subscribe([&](){
       SDLMain::Quit();
@@ -88,4 +92,5 @@ int main(int argc, char *argv[]){
   }catch(Exception ex){
     std::cout << "An unhandled exception occured: " << ex.what() << std::endl;
   }
+  return 0;
 }

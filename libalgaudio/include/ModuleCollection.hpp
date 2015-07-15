@@ -51,6 +51,7 @@ public:
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
   static void InstallDir(std::string dirpath);
   static std::string ListInstalledTemplates();
+  static void InstallAllTemplatesIntoSC();
 };
 
 } // namespace AlgAudio

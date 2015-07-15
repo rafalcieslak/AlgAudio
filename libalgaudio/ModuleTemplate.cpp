@@ -2,6 +2,7 @@
 #include "rapidxml/rapidxml.hpp"
 using namespace rapidxml;
 #include "Module.hpp"
+#include "ModuleCollection.hpp"
 
 namespace AlgAudio{
 
@@ -35,6 +36,10 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
 
   if(!has_class && !has_sc_code) throw ModuleParseException(id, "Module must have either SC code, class name, or both.");
 
+}
+
+std::string ModuleTemplate::GetFullID() const{
+  return collection.id + "/" + id;
 }
 
 } // namespace AlgAudio
