@@ -16,6 +16,7 @@ void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
 }
 
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
+  std::cout << "Drawing texture " << texture << " at " << x+x_ << " " << y+y_ << std::endl;
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
@@ -71,6 +72,7 @@ void DrawContext::Pop(){
 }
 
 void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
+  std::cout << "Switching to target " << t << std::endl;
   if(t)
     SDL_SetRenderTarget(renderer, t->texture);
   else
@@ -79,6 +81,7 @@ void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
 }
 
 void DrawContext::UpdateClipRect(){
+  std::cout << "Clip set: " << x << " " << y << " " << width << " " << height << std::endl;
   SDL_Rect clip{x,y,width,height};
   SDL_RenderSetClipRect(renderer, &clip);
 }

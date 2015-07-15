@@ -20,16 +20,18 @@ std::shared_ptr<UIHBox> UIHBox::Create(std::weak_ptr<Window> w){
 }
 
 void UIBox::CustomDraw(DrawContext& c){
+  std::cout << "Start" << std::endl;
   for(unsigned int n = 0; n < children.size(); n++){
     c.Push(GetChildLocation(n), GetChildSize(n));
+    std::cout << "Drawing child at " << GetChildLocation(n).ToString() << " size " << GetChildSize(n).ToString() << std::endl;
     children[n].child->Draw(c);
     c.Pop();
   }
+  std::cout << "End" << std::endl;
 }
 
 void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
   children.push_back(PackData{w,m,50});
-  w->window = window;
   w->parent = shared_from_this();
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
@@ -97,6 +99,7 @@ void UIBox::OnChildRequestedSizeChanged(){
 }
 
 void UIBox::CustomResize(Size2D newsize){
+  std::cout << "Custom resize to " << newsize.ToString() << std::endl;
   RecalculateChildSizes(DirectionalDimension(newsize));
   current_size = newsize; // Manually setting this before triggerchildresizes
   TriggerChildResizes();

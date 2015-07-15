@@ -51,7 +51,7 @@ void Window::Render(){
 
 void Window::Insert(std::shared_ptr<UIWidget> ch){
   child = ch;
-  child->window = shared_from_this();
+  //child->SetWindow(shared_from_this());
   child->parent.reset();
 
   child->Resize(GetSize());

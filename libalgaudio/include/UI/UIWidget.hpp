@@ -63,8 +63,17 @@ public:
 
 
   std::weak_ptr<UIWidget> parent;
-  std::weak_ptr<Window> window;
-
+  /*
+  std::shared_ptr<UIWidget> GetRoot(){
+    auto p = parent.lock();
+    if(!p) return shared_from_this();
+    return p->GetRoot();
+  };
+  std::weak_ptr<Window> GetWindow(){
+    return GetRoot()->window;
+  };
+  void SetWindow(std::weak_ptr<Window> w){window = w;}
+  */
   // Toggles widget display
   bool visible = true;
 
@@ -73,6 +82,8 @@ public:
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();
+  // Only the topmost widget should be bound to a window.
+  std::weak_ptr<Window> window;
 
   /* If you are implementng a custom widget, you will want to use
   SetRequestedSize a lot, to notify parent widgets what is the minimal area
