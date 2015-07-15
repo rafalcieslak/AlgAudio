@@ -14,6 +14,7 @@ std::unique_ptr<SCLangSubprocess> SCLang::subprocess;
 std::set<std::string> SCLang::installed_templates;
 Signal<std::string> SCLang::on_line_received;
 lo::Address addr("");
+bool SCLang::osc_debug = false;
 
 void SCLang::Start(std::string command){
   if(subprocess) return;
@@ -22,6 +23,7 @@ void SCLang::Start(std::string command){
     on_line_received.Happen(l);
   });
   // The SC dir should be in current directory.
+  SetOSCDebug(osc_debug);
   // TODO: Check if the directories exist.
   SendInstruction("(\"sc/main.sc\").loadPaths;");
   std::string port = subprocess->WaitForReply("NetAddr.localAddr.port.postln;");
@@ -63,6 +65,7 @@ void SCLang::Poll(){
 void SCLang::SetOSCDebug(bool enabled){
   if(enabled) SendInstruction("OSCFunc.trace(true);");
   else SendInstruction("OSCFunc.trace(false);");
+  osc_debug = enabled;
 }
 void SCLang::InstallTemplate(const ModuleTemplate& t){
   if(!t.has_sc_code) return;

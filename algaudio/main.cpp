@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
     auto quitbutton = mainwindow->Create<UIButton>("Quit App");
     auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",36);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
-    auto chkbox = mainwindow->Create<UICheckbox>("Checkbox");
+    auto chkbox = mainwindow->Create<UICheckbox>("Enable OSC debugging");
     auto mainvbox = UIVBox::Create(mainwindow);
     auto buttonhbox = UIHBox::Create(mainwindow);
 

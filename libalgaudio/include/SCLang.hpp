@@ -31,6 +31,7 @@ public:
 private:
   static std::unique_ptr<SCLangSubprocess> subprocess;
   static std::set<std::string> installed_templates;
+  static bool osc_debug;
 };
 
 } // namespace AlgAudio
