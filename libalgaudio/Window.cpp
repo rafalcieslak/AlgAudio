@@ -15,7 +15,9 @@ Window::Window(std::string t, int w, int h) :
   window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
   if(!window) throw SDLException("Unable to create a window");
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
-  //std::cout << "new renderer" << renderer << std::endl;
+  SDL_RendererInfo r;
+  SDL_GetRendererInfo(renderer,&r);
+  std::cout << "New renderer: " << r.name << std::endl;
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
   if(!renderer) throw SDLException("Unable to create a renderer");
   id = SDL_GetWindowID(window);

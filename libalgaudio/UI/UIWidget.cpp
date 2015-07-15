@@ -6,7 +6,6 @@ namespace AlgAudio{
 
 void UIWidget::Draw(DrawContext& c){
   if(visible){
-    std::cout << "Doing a draw" << std::endl;
     const Size2D drawsize = c.Size();
     if(drawsize != current_size){
       std::cout << "WARNING: Implicitly calling Resize, because the draw"
@@ -27,17 +26,18 @@ void UIWidget::Draw(DrawContext& c){
     c.DrawTexture(cache_texture);
     current_size = drawsize;
     needs_redrawing = false;
-    std::cout << "Okay, drawn." << std::endl;
   }
 }
 
 void UIWidget::Resize(Size2D s){
+  //std::cout << "Resizing from " << current_size.ToString() << " to " << s.ToString() << std::endl;
   if(current_size == s) return;
+  //std::cout << "Performing" << std::endl;
   cache_texture->Resize(s);
-  in_custom_resize = true;
   SetNeedsRedrawing();
-  in_custom_resize = false;
+  in_custom_resize = true;
   CustomResize(s);
+  in_custom_resize = false;
   current_size = s;
 }
 
