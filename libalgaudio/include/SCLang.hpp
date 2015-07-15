@@ -22,6 +22,7 @@ public:
   static bool IsRunning() { return subprocess != nullptr; }
   static void Poll();
   static Signal<std::string> on_line_received;
+  static Signal<> on_start_completed;
   static void SendInstruction(std::string);
   static void SendOSCSimple(std::string);
   static void InstallTemplate(const ModuleTemplate&);
@@ -29,6 +30,7 @@ public:
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string &path, const std::string &tag, ...);
 private:
+  static void Start2();
   static std::unique_ptr<SCLangSubprocess> subprocess;
   static std::set<std::string> installed_templates;
   static bool osc_debug;

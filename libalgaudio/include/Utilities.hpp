@@ -45,6 +45,7 @@ private:
   Utilities() = delete; // static
 public:
   static void Wait(int ms);
+  static void WaitOS(int ms);
   static bool GetFileExists(std::string name);
   static std::string GetDir(std::string);
   static const char OSDirSeparator;

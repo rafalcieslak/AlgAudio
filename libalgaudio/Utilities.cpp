@@ -4,8 +4,14 @@
 #include <SDL2/SDL.h>
 #include <fstream>
 #include <algorithm>
+#ifdef __unix__
+  #include <unistd.h>
+#else
+  #include <windows.h>
+#endif
 
 namespace AlgAudio {
+
 #ifdef __unix__
   const char Utilities::OSDirSeparator = '/';
   const std::string Utilities::OSLibSuffix = ".so";
@@ -16,6 +22,14 @@ namespace AlgAudio {
 
 void Utilities::Wait(int ms){
   SDL_Delay(ms);
+}
+
+void Utilities::WaitOS(int ms){
+#ifdef __unix__
+  usleep(ms*1000);
+#else
+  Sleep(ms);
+#endif
 }
 
 bool Utilities::GetFileExists(std::string name)
