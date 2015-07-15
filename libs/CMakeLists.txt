@@ -10,10 +10,18 @@ ExternalProject_Add(
 )
 ExternalProject_Get_Property(liblo INSTALL_DIR)
 set(LIBLO_INCLUDE_DIR "${INSTALL_DIR}/include" PARENT_SCOPE)
-set(LIBLO_LIBRARY "${CMAKE_BINARY_DIR}/liblo-7.dll" PARENT_SCOPE)
 
-#TODO: Multi-OS
-add_custom_command(
-	TARGET liblo POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/bin/liblo-7.dll" "${CMAKE_BINARY_DIR}/"
-)
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+  set(LIBLO_LIBRARY "${CMAKE_BINARY_DIR}/liblo-7.dll" PARENT_SCOPE)
+  add_custom_command(
+  	TARGET liblo POST_BUILD
+  	COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/bin/liblo-7.dll" "${CMAKE_BINARY_DIR}/"
+  )
+else()
+  set(LIBLO_LIBRARY "${CMAKE_BINARY_DIR}/liblo.so.7" PARENT_SCOPE)
+  add_custom_command(
+  	TARGET liblo POST_BUILD
+  	COMMAND ${CMAKE_COMMAND} -E copy "${INSTALL_DIR}/lib/liblo.so.7.2.0" "${CMAKE_BINARY_DIR}/liblo.so.7"
+    COMMAND ln -s "${CMAKE_BINARY_DIR}/liblo.so.7" "${CMAKE_BINARY_DIR}/liblo.so"
+  )
+endif()

@@ -13,7 +13,11 @@ include_directories(
 	${SDL2_INCLUDE_DIR}
 )
 
-set(CMAKE_EXE_LINKER_FLAGS "-mwindows -static -static-libgcc -static-libstdc++")
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
+	set(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -mwindows)
+endif()
+
 
 add_executable(
 	algaudio

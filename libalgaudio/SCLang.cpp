@@ -1,4 +1,6 @@
-#include <winsock2.h>
+#ifndef __unix
+  #include <winsock2.h>
+#endif
 #include "SCLang.hpp"
 #include <lo/lo.h>
 #include <lo/lo_cpp.h>

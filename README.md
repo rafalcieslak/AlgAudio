@@ -6,7 +6,7 @@ Temporarily, please check the [wiki](https://github.com/rafalcieslak/algAudio/wi
 
 ## On Linux
 
-To build, you will need CMake 3.0 or newer, SDL2 and SDL2-ttf development headers. Run:
+To build, you will need CMake 3.0 or newer, SDL2 and SDL2-ttf, as well as freetype development headers. Run:
 
 	mkdir build
 	cd build

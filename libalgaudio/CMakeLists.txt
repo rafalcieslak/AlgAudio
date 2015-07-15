@@ -19,6 +19,7 @@ include_directories(
 )
 
 link_directories(
+	${CMAKE_BINARY_DIR}
 	${SDL2_LIBRARY_DIR}
 	${SDL2_TTF_LIBRARY_DIR}
 )
@@ -33,6 +34,8 @@ add_dependencies(libalgaudio liblo)
 
 # Disables the addition of one more "lib" prefix on libalgaudio
 SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
+
+message(STATUS "liblo: ${CMAKE_BINARY_DIR}")
 
 target_link_libraries(
 	libalgaudio
