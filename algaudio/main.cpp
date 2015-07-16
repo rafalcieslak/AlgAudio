@@ -20,10 +20,25 @@ using namespace AlgAudio;
   static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
 #endif
 
+void TestSubscriptions(){
+  Signal<> signal1;
+  signal1.SubscribeForever([](){
+    std::cout << "1 for" << std::endl;
+  });
+  {
+    Subscription s = signal1.Subscribe([](){
+      std::cout << "1 temporary" << std::endl;
+    });
+    signal1.Happen();
+  }
+  signal1.Happen();
+}
+
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
   try{
+    //TestSubscriptions(); return 0;
     Theme::Init();
 
     ModuleCollectionBase::InstallDir("modules");
