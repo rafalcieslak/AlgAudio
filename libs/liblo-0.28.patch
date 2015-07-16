@@ -1,0 +1,68 @@
+diff -rupN liblo/lo/lo_cpp.h liblo2/lo/lo_cpp.h
+--- liblo/lo/lo_cpp.h	2014-01-27 18:30:49.000000000 +0100
++++ liblo2/lo/lo_cpp.h	2015-07-16 11:41:38.082262700 +0200
+@@ -625,23 +625,6 @@ namespace lo {
+         }
+     };
+ 
+-	// This function needed since lo::ServerThread doesn't
+-	// properly auto-upcast to lo::Server -> lo_server.  (Because
+-	// both lo_server and lo_serverthread are typedef'd as void*)
+-	int Address::send_from(lo::ServerThread &from, const string_type &path,
+-						   const string_type &type, ...) const
+-	{
+-		va_list q;
+-		va_start(q, type);
+-		lo_message m = lo_message_new();
+-		std::string t = std::string(type) + "$$";
+-		lo_message_add_varargs(m, t.c_str(), q);
+-		lo_server s = static_cast<lo::Server&>(from);
+-		int r = lo_send_message_from(address, s, path, m);
+-		lo_message_free(m);
+-		return r;
+-	}
+-
+     class Blob
+     {
+       public:
+@@ -803,14 +786,6 @@ namespace lo {
+         lo_bundle bundle;
+     };
+ 
+-    std::string version() {
+-        char str[32];
+-        lo_version(str, 32, 0, 0, 0, 0, 0, 0, 0);
+-        return std::string(str);
+-    }
+-
+-    lo_timetag now() { lo_timetag tt; lo_timetag_now(&tt); return tt; }
+-    lo_timetag immediate() { return LO_TT_IMMEDIATE; }
+ };
+ 
+ #endif // _LO_CPP_H_
+diff -rupN liblo/src/cpp_test.cpp liblo2/src/cpp_test.cpp
+--- liblo/src/cpp_test.cpp	2014-01-27 18:30:49.000000000 +0100
++++ liblo2/src/cpp_test.cpp	2015-07-16 11:42:07.722262700 +0200
+@@ -39,14 +39,6 @@ void init(lo::Server &s)
+ {
+     int j = 234;
+ 
+-    std::cout << "liblo version: " << lo::version() << std::endl;
+-
+-    lo_timetag now = lo::now();
+-    std::cout << "now: " << now.sec << "," << now.frac << std::endl;
+-
+-    lo_timetag imm = lo::immediate();
+-    std::cout << "immediate: " << imm.sec << "," << imm.frac << std::endl;
+-
+     std::cout << "URL: " << s.url() << std::endl;
+ 
+     class test3
+@@ -159,7 +151,6 @@ int main()
+     a.set_iface(0, "127.0.0.1");
+     printf("iface: %s\n", a.iface().c_str());
+ 
+-    a.send_from(st, "test1", "i", 20);
+     a.send("test2", "i", 40);
+     a.send("test3", "i", 60);
+     a.send("test4", "i", 80);
