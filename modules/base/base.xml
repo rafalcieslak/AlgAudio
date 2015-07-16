@@ -1,0 +1,34 @@
+<collection version="1" id="base">
+  <name>Base modules</name>
+  <defaultlib file="base.aa"/>
+  <module id="pipe" name="Pipe">
+    <sc>
+arg inbus, outbus;
+var in = In.ar(inbus);
+Out.ar(outbus,in);
+    </sc>
+  </module>
+  <module id="simpleout" name="Simple output">
+    <sc>
+arg inbus;
+var in = In.ar(inbus);
+Out.ar(0,in);
+    </sc>
+  </module>
+  <module id="simplein" name="Simple input">
+    <sc>
+arg outbus;
+var in = SoundIn.ar(0);
+Out.ar(outbus,in);
+    </sc>
+  </module>
+  <module id="stereout" name="Stereo output">
+    <sc>
+arg inbus1, inbus2;
+var in1 = In.ar(inbus1);
+var in2 = In.ar(inbus2);
+Out.ar(0,in1);
+Out.ar(1,in2);
+    </sc>
+  </module>
+</collection>

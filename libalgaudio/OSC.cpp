@@ -16,7 +16,6 @@ OSC::OSC(std::string address, std::string port) : addr(""){
 
   server->add_method("/algaudio/reply", NULL, [&](lo_message msg){
     std::lock_guard<std::recursive_mutex> lock(osc_mutex);
-    lo_message_pp(msg);
     int n = lo_message_get_argc(msg);
     int id = lo_message_get_argv(msg)[n-1]->i32;
     auto it = waiting_for_reply.find(id);
