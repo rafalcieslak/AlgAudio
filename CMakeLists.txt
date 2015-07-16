@@ -35,3 +35,16 @@ add_custom_target(
   sc_scripts ALL
 )
 copy_directory_if_changed(${PROJECT_SOURCE_DIR}/sc ${PROJECT_BINARY_DIR}/sc sc_scripts)
+
+add_custom_target(
+  package-windows
+  COMMAND sh ${PROJECT_SOURCE_DIR}/package/package-windows.sh
+)
+add_dependencies(
+  package-windows
+  libalgaudio
+  liblo
+  modules_base
+  modules_debug
+  algaudio
+)

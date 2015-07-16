@@ -39,8 +39,6 @@ add_dependencies(libalgaudio liblo)
 # Disables the addition of one more "lib" prefix on libalgaudio
 SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
 
-message(STATUS "liblo: ${CMAKE_BINARY_DIR}")
-
 target_link_libraries(
 	libalgaudio
 	${SDL2_LIBRARY}
