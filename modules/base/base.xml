@@ -2,6 +2,10 @@
   <name>Base modules</name>
   <defaultlib file="base.aa"/>
   <module id="pipe" name="Pipe">
+    <parrams>
+      <parram id="inbus" type="inlet"/>
+      <parram id="outbus" type="outlet"/>
+    </parrams>
     <sc>
 arg inbus, outbus;
 var in = In.ar(inbus);
@@ -23,6 +27,10 @@ Out.ar(outbus,in);
     </sc>
   </module>
   <module id="stereout" name="Stereo output">
+    <parrams>
+      <inlet id="inbus1"/>
+      <inlet id="inbus2"/>
+    </parrams>
     <sc>
 arg inbus1, inbus2;
 var in1 = In.ar(inbus1);
