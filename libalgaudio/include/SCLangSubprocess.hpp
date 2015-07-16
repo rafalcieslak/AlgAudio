@@ -55,7 +55,7 @@ private:
   std::list<std::string> lines_received;
   std::list<std::pair<std::string,std::function<void(std::string)>>> instructions_actions;
   std::list<std::string> instructions;
-  std::list<std::pair<std::string,std::function<void(std::string)>>> replies;
+  std::list<std::function<void()>> replies;
 };
 
 } // namespace AlgAudio

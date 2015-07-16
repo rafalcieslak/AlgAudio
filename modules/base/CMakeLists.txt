@@ -7,6 +7,11 @@ add_definitions(
 
 file(GLOB MODULES_BASE_SOURCES ./*.cpp)
 
+# Suppress warnings from included headers
+include_directories( SYSTEM
+	${LIBLO_INCLUDE_DIR}
+)
+
 add_library(
 	modules_base.aa SHARED
 	${MODULES_BASE_SOURCES}

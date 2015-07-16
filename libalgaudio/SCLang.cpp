@@ -7,6 +7,7 @@
 #include <iostream>
 #include "SCLangSubprocess.hpp"
 #include "ModuleTemplate.hpp"
+#include "OSC.hpp"
 
 namespace AlgAudio{
 
@@ -14,8 +15,8 @@ std::unique_ptr<SCLangSubprocess> SCLang::subprocess;
 std::set<std::string> SCLang::installed_templates;
 Signal<std::string> SCLang::on_line_received;
 Signal<> SCLang::on_start_completed;
-lo::Address addr("");
 bool SCLang::osc_debug = false;
+std::unique_ptr<OSC> SCLang::osc;
 
 void SCLang::Start(std::string command){
   if(subprocess) return;
@@ -34,10 +35,7 @@ void SCLang::Start2(){
   subprocess->SendInstruction("NetAddr.localAddr.port.postln;", [&](std::string port){
     port = Utilities::SplitString(port,"\n")[1];
     std::cout << "SCLang is using port " << port << std::endl;
-    // The constructor for lo::Address is messed up. Creating an lo_address
-    // manually and binding it to lo::Address fixes the issue.
-    lo_address a = lo_address_new("localhost", port.c_str());
-    addr = lo::Address(a,true);
+    osc = std::make_unique<OSC>("localhost", port);
   });
   on_start_completed.Happen();
 }
@@ -53,22 +51,32 @@ void SCLang::SendInstruction(std::string i){
   if(subprocess) subprocess->SendInstruction(i);
 }
 void SCLang::SendOSCSimple(std::string a){
-  if(!subprocess) return;
-  addr.send(a);
+  if(!osc) return;
+  osc->Send(a);
 }
 void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
 {
-    va_list q;
-    va_start(q, tag);
-    lo_message m = lo_message_new();
-    std::string t = tag + "$$";
-    lo_message_add_varargs(m, t.c_str(), q);
-    addr.send(path, m);
-    lo_message_free(m);
+  if(!osc) return;
+  va_list q;
+  va_start(q, tag);
+  lo::Message m;
+  std::string t = tag + "$$";
+  m.add_varargs(t, q);
+  osc->Send(path, m);
+}
+void SCLang::SendOSC(std::function<void(lo::Message)> f, const std::string &path, const std::string &tag, ...){
+  if(!osc) return;
+  va_list q;
+  va_start(q, tag);
+  lo::Message m;
+  std::string t = tag + "$$";
+  m.add_varargs(t, q);
+  osc->Send(path, f, m);
 }
 
 void SCLang::Poll(){
   if(subprocess) subprocess->TriggerSignals();
+  if(osc) osc->TriggerReplies();
 }
 void SCLang::SetOSCDebug(bool enabled){
   if(enabled) SendInstruction("OSCFunc.trace(true);");
@@ -77,7 +85,9 @@ void SCLang::SetOSCDebug(bool enabled){
 }
 void SCLang::InstallTemplate(const ModuleTemplate& t){
   if(!t.has_sc_code) return;
-  SendOSC("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
+  SendOSC([&](lo::Message){
+    std::cout << "Got install reply!" << std::endl;
+  }, "/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
   installed_templates.insert(t.GetFullID());
 }
 bool SCLang::WasInstalled(const std::string& s){

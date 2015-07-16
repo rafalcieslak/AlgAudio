@@ -2,6 +2,8 @@
 #define SCLANG_HPP
 #include <memory>
 #include <set>
+
+#include "OSC.hpp"
 #include "Signal.hpp"
 
 namespace AlgAudio{
@@ -24,16 +26,18 @@ public:
   static Signal<std::string> on_line_received;
   static Signal<> on_start_completed;
   static void SendInstruction(std::string);
-  static void SendOSCSimple(std::string);
   static void InstallTemplate(const ModuleTemplate&);
   static bool WasInstalled(const std::string&);
   static void SetOSCDebug(bool enabled);
+  static void SendOSCSimple(std::string);
   static void SendOSC(const std::string &path, const std::string &tag, ...);
+  static void SendOSC(std::function<void(lo::Message)>, const std::string &path, const std::string &tag, ...);
 private:
   static void Start2();
   static std::unique_ptr<SCLangSubprocess> subprocess;
   static std::set<std::string> installed_templates;
   static bool osc_debug;
+  static std::unique_ptr<OSC> osc;
 };
 
 } // namespace AlgAudio

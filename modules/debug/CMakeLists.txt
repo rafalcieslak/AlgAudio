@@ -7,6 +7,11 @@ add_definitions(
 
 file(GLOB MODULES_DEBUG_SOURCES ./*.cpp)
 
+# Suppress warnings from included headers
+include_directories( SYSTEM
+	${LIBLO_INCLUDE_DIR}
+)
+
 add_library(
 	debug.aa SHARED
 	${MODULES_DEBUG_SOURCES}

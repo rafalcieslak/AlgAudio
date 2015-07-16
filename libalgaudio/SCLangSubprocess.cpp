@@ -53,7 +53,7 @@ void SCLangSubprocess::Step(){
   for(auto& p : instructions_actions_copy){
     std::string reply = WaitForReply(p.first);
     io_mutex.lock();
-    replies.push_back(std::make_pair(reply,p.second));
+    replies.push_back(std::bind(p.second,reply));
     io_mutex.unlock();
   }
   for(auto& p : instructions_copy){
@@ -87,13 +87,11 @@ void SCLangSubprocess::TriggerSignals(){
   }
   for(std::string& l : lines_received) on_any_line_received.Happen(l);
   for(auto& p : replies){
-     (p.second)(p.first);
+     p();
   }
   lines_received.clear();
   replies.clear();
   io_mutex.unlock();
-
-  // Call the signals once the mutexes are freed
 }
 
 

@@ -12,6 +12,10 @@ include_directories(
 	../libalgaudio/include
 	${SDL2_INCLUDE_DIR}
 )
+# Suppress warnings from included headers
+include_directories( SYSTEM
+	${LIBLO_INCLUDE_DIR}
+)
 
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")

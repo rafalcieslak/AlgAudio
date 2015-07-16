@@ -15,6 +15,10 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/libs"
 	${SDL2_INCLUDE_DIR}
 	${SDL2_TTF_INCLUDE_DIR}
+)
+
+# Suppress warnings from included headers
+include_directories( SYSTEM
 	${LIBLO_INCLUDE_DIR}
 )
 
