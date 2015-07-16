@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
     startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
     quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
 
-    startbutton->on_clicked.Subscribe([&](){
+    startbutton->on_clicked.SubscribeForever([&](){
       if(!SCLang::IsRunning()){
         SCLang::Start(sclang_path);
         startbutton->SetText("Stop SCLang");
@@ -66,26 +66,27 @@ int main(int argc, char *argv[]){
         startbutton->SetText("Restart SCLang");
       }
     });
-    oscbutton->on_clicked.Subscribe([&](){
+    oscbutton->on_clicked.SubscribeForever([&](){
       ModuleCollectionBase::InstallAllTemplatesIntoSC();
     });
-    quitbutton->on_clicked.Subscribe([&](){
+    quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
     });
-    chkbox->on_toggled.Subscribe([&](bool state){
+    chkbox->on_toggled.SubscribeForever([&](bool state){
       SCLang::SetOSCDebug(state);
     });
-    mainwindow->on_close.Subscribe([&](){
+    mainwindow->on_close.SubscribeForever([&](){
       // Let closing the main window close the whole app.
       SDLMain::Quit();
     });
 
-    SDLMain::RegisterWindow(mainwindow);
-    SDLMain::running = true;
-    while(SDLMain::running){
-      SDLMain::Step();
+    Utilities::global_idle.SubscribeForever([&](){
       SCLang::Poll();
-    }
+    });
+
+    SDLMain::RegisterWindow(mainwindow);
+
+    SDLMain::Loop();
 
     SCLang::Stop();
     // SDL seems to have problems when the destroy functions are called from

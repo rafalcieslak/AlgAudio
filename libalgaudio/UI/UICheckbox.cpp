@@ -29,7 +29,7 @@ void UICheckbox::Init(){
   child_box->Insert(child_label, UIBox::PackMode::WIDE);
 
   SetClearColor(Theme::Get("bg-main"));
-  on_clicked.Subscribe([&](){
+  on_clicked.SubscribeForever([&](){
     if(active){
       child_button->SetText("   ");
       on_toggled.Happen(false);
@@ -40,7 +40,7 @@ void UICheckbox::Init(){
       active = true;
     };
   });
-  on_pointed.Subscribe([&](bool p){
+  on_pointed.SubscribeForever([&](bool p){
     if(p) SetOverlayColor(Color(255,255,255,20));
     else SetOverlayColor(Color(0,0,0,0));
   });

@@ -11,10 +11,10 @@ UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIClickable(w), tex
   UpdateTexture();
 
   // UIClickable events
-  on_pointed.Subscribe([&](bool){
+  on_pointed.SubscribeForever([&](bool){
     UpdateTexture();
   });
-  on_pressed.Subscribe([&](bool){
+  on_pressed.SubscribeForever([&](bool){
     UpdateTexture();
   });
 }

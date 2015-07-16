@@ -20,6 +20,8 @@ namespace AlgAudio {
   const std::string Utilities::OSLibSuffix = ".dll";
 #endif
 
+Signal<> Utilities::global_idle;
+
 void Utilities::Wait(int ms){
   SDL_Delay(ms);
 }

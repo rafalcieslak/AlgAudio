@@ -21,7 +21,7 @@ std::unique_ptr<OSC> SCLang::osc;
 void SCLang::Start(std::string command){
   if(subprocess) return;
   subprocess = std::make_unique<SCLangSubprocess>(command);
-  subprocess->on_any_line_received.Subscribe([&](std::string l){
+  subprocess->on_any_line_received.SubscribeForever([&](std::string l){
     on_line_received.Happen(l);
   });
   subprocess->on_started.SubscribeOnce([](){ SCLang::Start2(); });

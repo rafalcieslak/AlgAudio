@@ -23,6 +23,8 @@ void SDLMain::Step(){
   for(auto& it : registered_windows){
     it.second->Render();
   }
+  // Call the global idle, allowing all subsribers to do whatever they need
+  Utilities::global_idle.Happen();
   // Temporarily, by default, stop the main loop if there are no registered
   // windows left.
   if(registered_windows.size() == 0) Quit();
