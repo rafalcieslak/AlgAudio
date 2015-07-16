@@ -92,6 +92,12 @@ public:
     SetNeedsRedrawing();
   }
 
+  bool HasParent(){
+    // Conversion from shared_ptr to bool determines whether the
+    // pointer is non-empty
+    return (bool)(parent.lock());
+  }
+
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();

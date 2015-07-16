@@ -24,6 +24,10 @@ void UIMarginBox::CustomResize(Size2D s){
 }
 
 void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
+  if(ch->HasParent()){
+    std::cout << "WARNING: Insert to marginbox ignored, child already has a parent." << std::endl;
+    return;
+  }
   child = ch;
   child->parent = shared_from_this();
   TriggerFakeResize();

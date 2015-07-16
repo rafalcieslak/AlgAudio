@@ -31,6 +31,10 @@ void UIBox::CustomDraw(DrawContext& c){
 }
 
 void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
+  if(w->HasParent()){
+    std::cout << "WARNING: Insert to box ignored, child already has a parent." << std::endl;
+    return;
+  }
   children.push_back(PackData{w,m,50});
   w->parent = shared_from_this();
   RecalculateChildSizes(DirectionalDimension(current_size));
