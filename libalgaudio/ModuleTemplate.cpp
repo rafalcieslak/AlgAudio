@@ -33,6 +33,19 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
     if(!class_name_attr) throw ModuleParseException(id, "Module has class node, but the class name is missing");
     class_name = class_name_attr->value();
   }
+  xml_node<>* parrams_node = node->first_node("class");
+  if(parrams_node){
+    for(xml_node<>* inlet_node = parrams_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
+      xml_attribute<>* inlet_id = inlet_node->first_attribute("id");
+      if(!inlet_id) throw ModuleParseException(id, "An inlet is missing its id");
+      inlets.push_back(inlet_id->value());
+    }
+    for(xml_node<>* outlet_node = parrams_node->first_node("outlet"); outlet_node; outlet_node = outlet_node->next_sibling("outlet")){
+      xml_attribute<>* outlet_id = outlet_node->first_attribute("id");
+      if(!outlet_id) throw ModuleParseException(id, "An outlet is missing its id");
+      outlets.push_back(outlet_id->value());
+    }
+  }
 
   if(!has_class && !has_sc_code) throw ModuleParseException(id, "Module must have either SC code, class name, or both.");
 

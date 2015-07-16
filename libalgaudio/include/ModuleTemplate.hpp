@@ -2,6 +2,7 @@
 #define MODULE_TEMPLATE
 #include <string>
 #include <memory>
+#include <list>
 
 #include "Utilities.hpp"
 
@@ -37,6 +38,8 @@ struct ModuleTemplate{
   bool has_class = false;
   std::string class_name;
   ModuleCollection& collection;
+  std::list<std::string> inlets;
+  std::list<std::string> outlets;
 };
 
 } // namespace AlgAudio

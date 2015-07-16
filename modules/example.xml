@@ -12,11 +12,11 @@
   <module id="mix2" name="2-channel Mixer">
     <categories>Mixers</categories>
     <parrams>
-      <parram id="in1" type="inlet"/>
-      <parram id="in2" type="inlet"/>
+      <inlet id="in1"/>
+      <inlet id="in2"/>
       <parram id="gain1" type="float" min="0.0" max="4.0" default="1.0"/>
       <parram id="gain2" type="float" min="0.0" max="10.0" default="1.0"/>
-      <parram id="out1" type="outlet"/>
+      <outlet id="out1"/>
     </parrams>
     <sc>
 arg in1, in2, out1, gain1, gain2;
@@ -44,11 +44,11 @@ Out.ar(out1,res);
   <module id="echo" name="Simple echo">
     <categories>Delays</categories>
     <parrams>
-      <parram id="in1" type="inlet"/>
+      <inlet id="in1"/>
       <!-- Slider type could be omitted, as lin is the default value.-->
       <parram id="delay" type="float" min="0.0" max="4.0" default="1.0" slider_name="Delay time" slider_type="lin"/>
       <parram id="decay" type="float" min="0.0" max="10.0" default="1.0" slider_name="Decay to -60dB" slider_type="lin"/>
-      <parram id="out1" type="outlet"/>
+      <outlet id="out1"/>
     </parrams>
     <sc>
 arg in1, out1, delay = 0.2, decay = 4;

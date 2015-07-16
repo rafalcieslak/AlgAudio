@@ -3,8 +3,8 @@
   <defaultlib file="base.aa"/>
   <module id="pipe" name="Pipe">
     <parrams>
-      <parram id="inbus" type="inlet"/>
-      <parram id="outbus" type="outlet"/>
+      <inlet id="inbus"/>
+      <outlet id="outbus"/>
     </parrams>
     <sc>
 arg inbus, outbus;
