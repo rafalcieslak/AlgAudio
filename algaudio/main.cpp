@@ -73,7 +73,7 @@ int main(int argc, char *argv[]){
     auto startbutton = mainwindow->Create<UIButton>("Start SCLang");
     auto oscbutton = mainwindow->Create<UIButton>("OSC test");
     auto quitbutton = mainwindow->Create<UIButton>("Quit App");
-    auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",36);
+    auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",52);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
     auto chkbox = mainwindow->Create<UICheckbox>("Enable OSC debugging");
     auto mainvbox = UIVBox::Create(mainwindow);
