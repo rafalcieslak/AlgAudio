@@ -34,8 +34,10 @@ using namespace AlgAudio;
 
 #ifdef __unix__
   static const std::string sclang_path = "/usr/bin/sclang";
+  static const std::string scsynth_path = "/usr/bin/scsynth";
 #else
   static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
+  static const std::string scsynth_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\scsynth.exe";
 #endif
 
 void TestSubscriptions(){
@@ -99,8 +101,12 @@ int main(int argc, char *argv[]){
         startbutton->SetText("Restart SCLang");
       }
     });
+    SCLang::on_start_progress.SubscribeForever([&](int n, std::string msg){
+      std::cout << n << " " << msg << std::endl;
+    });
     oscbutton->on_clicked.SubscribeForever([&](){
-      ModuleCollectionBase::InstallAllTemplatesIntoSC();
+      //ModuleCollectionBase::InstallAllTemplatesIntoSC();
+      SCLang::BootServer();
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();

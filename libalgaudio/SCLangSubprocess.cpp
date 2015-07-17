@@ -61,11 +61,11 @@ void SCLangSubprocess::Step(){
 
   io_mutex.lock();
   auto instructions_actions_copy = instructions_actions;
-  auto instructions_copy = instructions;
+  //auto instructions_copy = instructions;
   // Waiting for reply may be relativelly long. To avoid starving other threads,
   // make a local copy of stuff to do, to unlock the mutex ASAP.
   instructions_actions.clear();
-  instructions.clear();
+  //instructions.clear();
   io_mutex.unlock();
 
   for(auto& p : instructions_actions_copy){
@@ -74,16 +74,16 @@ void SCLangSubprocess::Step(){
     replies.push_back(std::bind(p.second,reply));
     io_mutex.unlock();
   }
-  for(auto& p : instructions_copy){
-    SendInstructionRaw(p);
-  }
+  //for(auto& p : instructions_copy){
+  //  SendInstructionRaw(p);
+  //}
 
   PollOutput();
 }
 
 void SCLangSubprocess::SendInstruction(std::string i){
   io_mutex.lock();
-  instructions.push_back(i);
+  instructions_actions.push_back(std::make_pair(i,[](std::string){}));
   io_mutex.unlock();
 }
 void SCLangSubprocess::SendInstruction(std::string i, std::function<void(std::string)> f){

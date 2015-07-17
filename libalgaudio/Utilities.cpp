@@ -70,9 +70,24 @@ std::string Utilities::GetDir(std::string path){
   }
 }
 
+std::string Utilities::GetCurrentDir(){
+  char buffer[1000];
+#ifdef __unix__
+  getcwd(buffer,1000);
+#else
+  GetCurrentDirectory(1000,buffer);
+#endif
+  return std::string(buffer);
+}
+
 std::string Utilities::ConvertUnipathToOSPath(const std::string& unipath){
   std::string result = unipath;
   std::replace(result.begin(), result.end(), '/', OSDirSeparator);
+  return result;
+}
+std::string Utilities::ConvertOSpathToUniPath(const std::string& ospath){
+  std::string result = ospath;
+  std::replace(result.begin(), result.end(), OSDirSeparator, '/');
   return result;
 }
 

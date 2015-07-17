@@ -50,6 +50,7 @@ namespace AlgAudio {
 #ifdef __unix__
 /* ================= UNIX implementation ================= */
 Subprocess::Subprocess(std::string c){
+  // TODO: change working directory
   pipe(pipe_child_stdin_fd);
   pipe(pipe_child_stdout_fd);
   int p = fork();
@@ -199,15 +200,17 @@ Subprocess::Subprocess(std::string c){
   // Prepare commandline
   char cmd[1000];
   strncpy(cmd, command.c_str(), 1000);
+  // Prepare working directory
+  std::string workdir = Utilities::GetDir(command);
   // Create the child process.
   bool res = CreateProcess(NULL,
      cmd,           // command line
      NULL,          // process security attributes
      NULL,          // primary thread security attributes
      TRUE,          // handles are inherited
-     CREATE_NO_WINDOW,             // creation flags
+     CREATE_NO_WINDOW, // creation flags
      NULL,          // use parent's environment
-     NULL,          // use parent's current directory
+     workdir.c_str(), // working directory
      &siStartInfo,  // STARTUPINFO pointer
      &piProcInfo);  // receives PROCESS_INFORMATION.
   if (!res) throw SubprocessException("CreateProcess failed: " + GetLastErrorAsString());

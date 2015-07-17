@@ -29,6 +29,9 @@ OSC::OSC(std::string address, std::string port) : addr(""){
     server = std::make_unique<lo::ServerThread>(2543);
     if(!server->is_valid()){
       server = std::make_unique<lo::ServerThread>(2544);
+      if(!server->is_valid()){
+        throw OSCException("OSC server failed to bind to a socket");
+      }
     }
   }
 

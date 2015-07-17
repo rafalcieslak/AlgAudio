@@ -43,13 +43,18 @@ public:
   static void Poll();
   static Signal<std::string> on_line_received;
   static Signal<> on_start_completed;
+  static Signal<> on_server_started;
+  static Signal<int,std::string> on_start_progress;
   static void SendInstruction(std::string);
   static void InstallTemplate(const ModuleTemplate&);
   static bool WasInstalled(const std::string&);
   static void SetOSCDebug(bool enabled);
   static void SendOSCSimple(std::string);
+  static void SendOSCSimple(std::function<void(lo::Message)> f, std::string a);
   static void SendOSC(const std::string &path, const std::string &tag, ...);
   static void SendOSC(std::function<void(lo::Message)>, const std::string &path, const std::string &tag, ...);
+  static void BootServer(bool supernova = false);
+  static void StopServer();
 private:
   static void Start2();
   static std::unique_ptr<SCLangSubprocess> subprocess;

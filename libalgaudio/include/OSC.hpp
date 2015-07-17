@@ -29,10 +29,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
   // Othrewise lo is confused when building under MSYS
   #define WIN32
 #endif
-
 #include <lo/lo_cpp.h>
+#include "Utilities.hpp"
 
 namespace AlgAudio{
+
+struct OSCException : public Exception{
+  OSCException(std::string t) : Exception(t) {}
+};
 
 class OSC{
 public:

@@ -72,7 +72,7 @@ private:
   // std::atomic does not work with std::list, as it has no default noexcept constructor.
   std::list<std::string> lines_received;
   std::list<std::pair<std::string,std::function<void(std::string)>>> instructions_actions;
-  std::list<std::string> instructions;
+  //std::list<std::string> instructions;
   std::list<std::function<void()>> replies;
 };
 
