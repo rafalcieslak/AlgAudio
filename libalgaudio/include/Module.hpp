@@ -3,12 +3,13 @@
 
 #include <memory>
 #include "DynamicallyLoadableClass.hpp"
+#include "Signal.hpp"
 
 namespace AlgAudio{
 
 class ModuleTemplate;
 
-class Module : public DynamicallyLoadableClass{
+class Module : public DynamicallyLoadableClass, public SubscriptionsManager{
 public:
   Module(){};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};

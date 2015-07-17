@@ -6,8 +6,8 @@
 #include <functional>
 #include <iostream>
 
-/* A quick explanation of signal semantics
-I will write the full docs once things get a bit more stable.
+/*
+ ==== A quick explanation of signal semantics ====
 
 A signal represents an event happening from the application's point of view.
 Clicking a button may be represented as a Signal. Getting reply from SCLang
@@ -26,7 +26,7 @@ There are 3 mores of subscription:
 SubscribeOnce    - The function will be called the first time the signal happens
                     after it was subscribed, it will be automatically
                     unsubscribed afterwards.
-SubscriveForever - The function will be called always from now on, there is
+SubscribeForever - The function will be called always from now on, there is
                     no way to unsibscribe. This is useful if you wish to react
                     on a signal repetivelly, but don't want to care about
                     releasing subscription.
@@ -42,14 +42,36 @@ You can also unsubscribe from a signal by calling .Release() on a Subscription.
 This resets the Subscription to the default, empty state. A Subscription is
 not copiable and not copy-constructible, but it is movable.
 
+If you subscribed to a signal using SubscribeForever or SubscribeOnce, and the
+signal gets destroyed, nothing wrong should happen, your calee function will
+simply never get executed anymore. However, if a signal you subscribed to using
+Subscribe is destroyed, then the calee function will never get called AND the
+Subscription stays in invalid state - but that shouldn't matter, as it's always
+safe to release a Subscription.
+
+If your class has a lot of Subscription-type members which are used solely to
+automatically unregister subscriptions when the class is destructed, you
+may wish to inherit from SubsctiptionManager. This will inherit `subscriptions`
+field, where new subscriptions can be added with a += operator:
+  subscriptions += some_signal.Subscribe([](){ ... });
+
 */
 namespace AlgAudio{
 
 class Subscription{
 public:
   Subscription() : id(0), parent_signal_id(0) {}
-  Subscription(Subscription&& other) : id(std::move(other.id)),  parent_signal_id(std::move(other.parent_signal_id)) {}
-  Subscription& operator=(Subscription&& other) { id = std::move(other.id); parent_signal_id = std::move(other.parent_signal_id); return *this;}
+  Subscription(Subscription&& other)
+    : id(std::move(other.id)),
+      parent_signal_id(std::move(other.parent_signal_id)) {
+    other.id = 0;
+  }
+  Subscription& operator=(Subscription&& other) {
+    id = std::move(other.id);
+    parent_signal_id = std::move(other.parent_signal_id);
+    other.id = 0;
+    return *this;
+  }
   ~Subscription(){ Release(); }
   inline bool IsEmpty() const { return id == 0;}
   void Release();
@@ -100,11 +122,7 @@ private:
 public:
     Signal<Types...>() {}
     ~Signal(){}
-    Subscription Subscribe( std::function<void(Types...)> f ) {
-      int sub_id = ++subscription_id_counter;
-      subscribers_with_id[sub_id] = f;
-      return Subscription(sub_id, my_id);
-    }
+    Subscription Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
     void SubscribeForever( std::function<void(Types...)> f ) { subscribers_forever.push_back(f); }
     void SubscribeOnce( std::function<void(Types...)> f ) { subscribers_once.push_back(f); }
     template<class C>
@@ -126,6 +144,27 @@ public:
         for(auto f : list_to_call) f(t...);
     }
     friend class Subscription;
+};
+
+template <typename... Types>
+Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
+  int sub_id = ++subscription_id_counter;
+  subscribers_with_id[sub_id] = f;
+  return Subscription(sub_id, my_id);
+}
+
+class SubscriptionsManager{
+public:
+  class SubscriptionList{
+  public:
+    std::list<Subscription> list;
+    void ReleaseAll() { list.clear(); }
+    SubscriptionList& operator+=(Subscription&& s) {
+      list.emplace_back(std::move(s));
+      return *this;
+    }
+  };
+  SubscriptionList subscriptions;
 };
 
 } //namespace AlgAudio

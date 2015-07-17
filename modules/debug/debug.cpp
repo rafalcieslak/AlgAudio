@@ -30,12 +30,11 @@ public:
 
 class Console : public AlgAudio::Module{
 public:
-  std::shared_ptr<AlgAudio::Window> console_window;
   void on_init(){
-    console_window = AlgAudio::Window::Create("SCLang console", 500, 400);
+    std::shared_ptr<AlgAudio::Window> console_window = AlgAudio::Window::Create("SCLang console", 500, 400);
     auto textarea = AlgAudio::UITextArea::Create(console_window, AlgAudio::Color(255,255,255), AlgAudio::Color(0,0,0));
     textarea->SetBottomAligned(true);
-    AlgAudio::SCLang::on_line_received.SubscribeForever([=](std::string line){
+    subscriptions += AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
       textarea->PushLine(line);
     });
     console_window->on_close.SubscribeForever([&](){
