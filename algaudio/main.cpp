@@ -64,14 +64,13 @@ int main(int argc, char *argv[]){
 
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
-    auto module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
-    auto module2 = ModuleFactory::CreateNewInstance("debug/pipe");
-    auto module3 = ModuleFactory::CreateNewInstance("debug/console");
+    std::shared_ptr<Module> module1, module2, module3;
+    module3 = ModuleFactory::CreateNewInstance("debug/console");
 
     auto mainwindow = Window::Create("AlgAudio config",280,400);
     auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
     auto startbutton = mainwindow->Create<UIButton>("Start SCLang");
-    auto oscbutton = mainwindow->Create<UIButton>("OSC test");
+    auto testbutton = mainwindow->Create<UIButton>("Test button");
     auto quitbutton = mainwindow->Create<UIButton>("Quit App");
     auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",52);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
@@ -91,7 +90,7 @@ int main(int argc, char *argv[]){
     mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
     mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
-    buttonhbox->Insert(oscbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
 
     startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
@@ -112,8 +111,8 @@ int main(int argc, char *argv[]){
       progressbar->SetAmount(n/8.0);
       statustext->SetText(msg);
     });
-    oscbutton->on_clicked.SubscribeForever([&](){
-      //ModuleCollectionBase::InstallAllTemplatesIntoSC();
+    testbutton->on_clicked.SubscribeForever([&](){
+      module1 = module2 = module3 = nullptr;
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
@@ -124,6 +123,11 @@ int main(int argc, char *argv[]){
     mainwindow->on_close.SubscribeForever([&](){
       // Let closing the main window close the whole app.
       SDLMain::Quit();
+    });
+    SCLang::on_start_completed.SubscribeForever([&](){
+      // Pretend we are creating new instances
+      module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
+      module2 = ModuleFactory::CreateNewInstance("debug/pipe");
     });
 
     Utilities::global_idle.SubscribeForever([&](){

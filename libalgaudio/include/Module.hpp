@@ -35,6 +35,7 @@ public:
   virtual ~Module() {};
   virtual void on_init() {};
   std::shared_ptr<ModuleTemplate> templ;
+  int sc_id = -1;
 };
 
 } // namespace AlgAudio

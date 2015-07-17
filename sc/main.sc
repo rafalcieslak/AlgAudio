@@ -1,22 +1,19 @@
 // This method estabilishes two-way osc connection
 
-OSCdef.new(
-	'hello',
-	{
+OSCdef.new( 'hello', {
 		arg msg, time, addr, recvPort;
 		[msg, time, addr, recvPort].postln;
 		// This is when the ~addr is stored.
 		~addr = addr;
+		~minstances = Dictionary.new(0);
+		~instanceid = 0;
 		"Hello World!".postln;
 		~addr.sendMsg("/algaudio/reply",msg[msg.size-1]);
-	},
-	'/algaudioSC/hello'
+	}, '/algaudioSC/hello'
 ).postln;
 
 
-OSCdef.new(
-	'installtemplate',
-	{
+OSCdef.new( 'installtemplate', {
 		arg msg;
 		var command, f;
 		if((msg.size < 2),{
@@ -28,20 +25,29 @@ OSCdef.new(
 			f.value();
 		});
 		~addr.sendMsg("/algaudio/reply", "aaaaaa", msg[msg.size-1]);
-	},
-	'/algaudioSC/installtemplate'
+	}, '/algaudioSC/installtemplate'
 ).postln;
 
 // A helper method for notifying the app if starting the server succeeded.
-OSCdef.new(
-	'boothelper',
-	{
+OSCdef.new( 'boothelper', {
 		arg msg;
 		s.waitForBoot({
 			~addr.sendMsg("/algaudio/reply", 1, msg[msg.size-1]);
 		}, 50, {
 			~addr.sendMsg("/algaudio/reply", 0, msg[msg.size-1]);
 		});
-	},
-	'/algaudioSC/boothelper'
+	}, '/algaudioSC/boothelper'
+).postln;
+
+// 1 argument: the template name
+// reply value: instance id
+OSCdef.new( 'newinstance', {
+		arg msg;
+		var name = "aa/" ++ msg[1];
+		var id = ~instanceid;
+		~instanceid = ~instanceid + 1;
+		("Creating new \"" ++ name ++ "\" instance " ++ id.asString).postln;
+		~minstances.add( id -> Synth.new(name)); // TODO: default args
+		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
+	}, '/algaudioSC/newinstance'
 ).postln;

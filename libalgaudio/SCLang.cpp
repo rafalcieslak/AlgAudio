@@ -36,6 +36,7 @@ Signal<> SCLang::on_start_completed;
 Signal<> SCLang::on_server_started;
 Signal<int,std::string> SCLang::on_start_progress;
 bool SCLang::osc_debug = false;
+bool SCLang::ready = false;
 std::unique_ptr<OSC> SCLang::osc;
 
 void SCLang::Start(std::string command){
@@ -63,6 +64,7 @@ void SCLang::Start2(){
     SendOSCSimple([](lo::Message){
       on_start_progress.Happen(5,"Booting server...");
       on_server_started.SubscribeOnce([&](){
+        ready = true;
         on_start_progress.Happen(8,"Complete");
         on_start_completed.Happen();
       });
@@ -76,6 +78,7 @@ void SCLang::Restart(std::string command){
   Start(command);
 }
 void SCLang::Stop(){
+  ready = false;
   subprocess.reset(); // Resets the unique_ptr, not the process.
   osc.reset();
 }

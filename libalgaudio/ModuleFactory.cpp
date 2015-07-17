@@ -16,6 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "SCLang.hpp"
 #include "ModuleFactory.hpp"
 #include "ModuleCollection.hpp"
 #include "LibLoader.hpp"
@@ -53,8 +54,22 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
      deallocates the pointed instance from within the module.
     */
     res = std::shared_ptr<Module>(module, [](Module* mod){
+      std::cout << "Deleting a module " << mod->templ->GetFullID() << "!" << std::endl;
       mod->SelfDestruct();
     });
+  }
+  // Create SC instance
+  if(templ->has_sc_code){
+    // TODO: Return a late replay, so that init happens after the instance was
+    // successfully created on SC side
+    if(!SCLang::ready){
+      std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
+    }
+    /*SCLang::SendOSC([=](lo::Message msg){
+      int id = msg.argv()[0]->i32;
+      std::cout << "On id " << id << std::endl;
+      res->sc_id = id;
+    },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());*/
   }
   res->on_init();
   return res;

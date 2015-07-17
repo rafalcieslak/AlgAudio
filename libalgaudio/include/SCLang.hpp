@@ -55,6 +55,7 @@ public:
   static void SendOSC(std::function<void(lo::Message)>, const std::string &path, const std::string &tag, ...);
   static void BootServer(bool supernova = false);
   static void StopServer();
+  static bool ready;
 private:
   static void Start2();
   static std::unique_ptr<SCLangSubprocess> subprocess;
