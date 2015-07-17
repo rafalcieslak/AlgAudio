@@ -29,6 +29,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SCLang.hpp"
 #include "Theme.hpp"
 #include "UI/UICheckbox.hpp"
+#include "UI/UIProgressBar.hpp"
 
 using namespace AlgAudio;
 
@@ -77,14 +78,18 @@ int main(int argc, char *argv[]){
     auto chkbox = mainwindow->Create<UICheckbox>("Enable OSC debugging");
     auto mainvbox = UIVBox::Create(mainwindow);
     auto buttonhbox = UIHBox::Create(mainwindow);
+    auto progressbar = UIProgressBar::Create(mainwindow);
+    auto statustext = UILabel::Create(mainwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",10);
 
-    mainvbox->SetPadding(10);
+    //mainvbox->SetPadding(10);
     mainwindow->Insert(marginbox);
     marginbox->Insert(mainvbox);
     mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
     mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
     mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
     mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
+    mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
+    mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(oscbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
@@ -98,15 +103,17 @@ int main(int argc, char *argv[]){
         startbutton->SetText("Stop SCLang");
       }else{
         SCLang::Stop();
-        startbutton->SetText("Restart SCLang");
+        progressbar->SetAmount(0.0);
+        statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
+        startbutton->SetText("Start SCLang");
       }
     });
     SCLang::on_start_progress.SubscribeForever([&](int n, std::string msg){
-      std::cout << n << " " << msg << std::endl;
+      progressbar->SetAmount(n/8.0);
+      statustext->SetText(msg);
     });
     oscbutton->on_clicked.SubscribeForever([&](){
       //ModuleCollectionBase::InstallAllTemplatesIntoSC();
-      SCLang::BootServer();
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();

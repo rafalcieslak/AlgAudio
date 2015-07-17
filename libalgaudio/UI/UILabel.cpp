@@ -34,8 +34,6 @@ std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string te
 }
 
 void UILabel::CustomDraw(DrawContext& c){
-  c.SetColor(Theme::Get(color).ZeroAlpha());
-  c.Fill();
   c.DrawTexture(texture, c.width/2 - texture->GetSize().width/2, c.height/2 - texture->GetSize().height/2);
 }
 
@@ -46,7 +44,7 @@ void UILabel::SetText(std::string t){
 
 void UILabel::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text, Theme::Get(color), Theme::Get("bg-main"));
-  SetRequestedSize(texture->GetSize() + Size2D(10,10));
+  SetRequestedSize(texture->GetSize() + Size2D(5,5));
   SetNeedsRedrawing();
 }
 

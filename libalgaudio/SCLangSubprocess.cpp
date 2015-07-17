@@ -45,6 +45,7 @@ void SCLangSubprocess::Stop(){
 
 void SCLangSubprocess::ThreadMain(){
   subprocess = std::make_unique<Subprocess>(command);
+  WaitForPrompt();
   started = true;
   while(run) Step();
   // Close everything
