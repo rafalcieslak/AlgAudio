@@ -1,6 +1,12 @@
 # algAudio
 
-Temporarily, please check the [wiki](https://github.com/rafalcieslak/algAudio/wiki) for docs & info.
+AlgAudio is an audio processing framework, designed to be easy to learn and use at live performances.
+
+Copyright (C) 2015 CeTA - Audiovisual Technology Center
+
+Algaudio is released under the terms of the GNU Lesser General Public License version 3, see COPYING and COPYING.LESSER for details.
+
+For developer documentation, browse the [wiki](https://github.com/rafalcieslak/algAudio/wiki).
 
 # Building and running
 
