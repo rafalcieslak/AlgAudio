@@ -26,6 +26,42 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/* The LateReplay is a mechanism that alows functions to return a value with
+some asynchronic delay. It is useful when a function waits for OSC reply from
+SCLang, and therefore would block execution for a while. Instead of returning
+a value, it returns LateReply<value>. The caller can use the .Then method
+of LateReply to set a function which should be called when the reply is ready.
+The callee can only prepare a LateReply by creating a Relay. The relay is useful
+only within the calee, it has two interesting methods: .Return, which should be
+called when the reply value is ready - it will execute the "Then" procedure,
+and GetLateReply, which creates a corresponding LateReply, which the function
+should return. For convience, Relay is imnplicitly convertible to LateReply.
+If the callee happens to return immediatelly, this is not a problem, in such
+case the Then procedure will be executed as soon as it is set.
+
+Example LateReturn function:
+
+LateReturn<int> GetSCVersion(){
+  auto r = Relay<int>::Create();
+  SCLang::SendOSC([](lo::Message msg){
+    r.Return( msg[1]->i32 );
+  });
+  return r;
+}
+
+Example usage:
+
+GetSCVersion.Then([](int v){
+  std::cout << "Version " << v << std::endl;
+});
+std::cout << "Asked for version" << std::endl;
+
+Keep in mind that the lambda above will be (most likely) executed AFTER the last
+line of the example, at the time when the OSC reply arrives.
+
+*/
+
+
 template <typename... Types>
 class LateReply;
 template <typename... Types>
