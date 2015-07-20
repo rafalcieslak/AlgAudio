@@ -59,9 +59,9 @@ void TestSubscriptions(){
 
 LateReply<std::string> Example(){
   auto r = Relay<std::string>::Create();
-  SCLang::SendOSCSimple([=](lo::Message){
+  //SCLang::SendOSCSimple([=](lo::Message){
     r.Return("haha!");
-  }, "/algaudioSC/hello");
+  //}, "/algaudioSC/hello");
   return r.GetLateReply();
 }
 
@@ -119,7 +119,7 @@ int main(int argc, char *argv[]){
       }
     });
     SCLang::on_start_progress.SubscribeForever([&](int n, std::string msg){
-      progressbar->SetAmount(n/8.0);
+      progressbar->SetAmount(n/10.0);
       statustext->SetText(msg);
     });
     testbutton->on_clicked.SubscribeForever([&](){
@@ -131,11 +131,8 @@ int main(int argc, char *argv[]){
       module2 = ModuleFactory::CreateNewInstance("base/simpleout");
       main_canvas->InsertModule(module1);
       main_canvas->InsertModule(module2);*/
-      Example().Then([](std::string s) -> int{
+      Example().Then([](std::string s){
         std::cout << "Late reply " << s << std::endl;
-        return 5;
-      }).Ther([](int x)-> double{
-        
       });
     });
     quitbutton->on_clicked.SubscribeForever([&](){
@@ -150,7 +147,6 @@ int main(int argc, char *argv[]){
     });
     SCLang::on_start_completed.SubscribeForever([&](){
       // Pretend we are creating new instances
-      ModuleCollectionBase::InstallAllTemplatesIntoSC();
       //SCLang::DebugQueryInstalled();
       main_canvas = Canvas::CreateEmpty();
     });

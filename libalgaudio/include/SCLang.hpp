@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "OSC.hpp"
 #include "Signal.hpp"
+#include "LateReply.hpp"
 
 namespace AlgAudio{
 
@@ -39,9 +40,6 @@ class SCLang{
 public:
   static void Start(std::string command);
   static void Restart(std::string command);
-  /* It is recommended to call Stop() manually before the global library
-  destructor kicks in. Otherwise, the on_line_received signal may fire for some
-  already destroyed objects. */
   static void Stop();
   static bool IsRunning() { return subprocess != nullptr; }
   static void Poll();
@@ -50,7 +48,7 @@ public:
   static Signal<> on_server_started;
   static Signal<int,std::string> on_start_progress;
   static void SendInstruction(std::string);
-  static void InstallTemplate(const ModuleTemplate&);
+  static LateReply<> InstallTemplate(const ModuleTemplate&);
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);

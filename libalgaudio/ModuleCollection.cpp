@@ -110,6 +110,26 @@ std::shared_ptr<ModuleTemplate> ModuleCollection::GetTemplateByID(std::string id
   else return it->second;
 }
 
+LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from){
+  auto r = Relay<>::Create();
+  if(from == templates_by_id.end()){
+    return r.Return();
+  };
+  SCLang::InstallTemplate(*(from->second)).Then([=]()mutable{
+    from++;
+    InstallAllTemplatesIntoSC(from).Then([=](){
+      r.Return();
+    });
+  });
+  return r.GetLateReply();
+}
+
+LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(){
+  auto r = Relay<>::Create();
+  InstallAllTemplatesIntoSC( templates_by_id.begin() ).ThenReturn(r);
+  return r.GetLateReply();
+}
+
 std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetCollectionByID(std::string id){
   auto it = collections_by_id.find(id);
   if(it == collections_by_id.end()) return nullptr;
@@ -165,13 +185,27 @@ std::string ModuleCollectionBase::ListInstalledTemplates(){
   return result;
 }
 
-void ModuleCollectionBase::InstallAllTemplatesIntoSC(){
-  for(const auto& it1 : collections_by_id){
-    for(const auto& it2 : it1.second->templates_by_id){
-      const ModuleTemplate& t = *(it2.second);
-      SCLang::InstallTemplate(t);
-    }
-  }
+
+
+LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from){
+  auto r = Relay<>::Create();
+  if(from == collections_by_id.end()){
+    return r.Return();
+  };
+  (from->second)->InstallAllTemplatesIntoSC().Then([=]()mutable{
+    from++;
+    InstallAllTemplatesIntoSC(from).Then([=](){
+      r.Return();
+    });
+  });
+  return r.GetLateReply();
 }
+
+LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(){
+  auto r = Relay<>::Create();
+  InstallAllTemplatesIntoSC( collections_by_id.begin() ).ThenReturn(r);
+  return r.GetLateReply();
+}
+
 
 } // namespace AlgAudio

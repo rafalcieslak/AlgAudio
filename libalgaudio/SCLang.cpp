@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include "SCLangSubprocess.hpp"
 #include "ModuleTemplate.hpp"
+#include "ModuleCollection.hpp"
 #include "OSC.hpp"
 
 namespace AlgAudio{
@@ -65,8 +66,11 @@ void SCLang::Start2(){
       on_start_progress.Happen(5,"Booting server...");
       on_server_started.SubscribeOnce([&](){
         ready = true;
-        on_start_progress.Happen(8,"Complete");
-        on_start_completed.Happen();
+        on_start_progress.Happen(8,"Installing module templates...");
+        ModuleCollectionBase::InstallAllTemplatesIntoSC().Then([=](){
+          on_start_progress.Happen(10,"Complete.");
+          on_start_completed.Happen();
+        });
       });
       BootServer();
     }, "/algaudioSC/hello");
@@ -123,12 +127,15 @@ void SCLang::SetOSCDebug(bool enabled){
   else SendInstruction("OSCFunc.trace(false);");
   osc_debug = enabled;
 }
-void SCLang::InstallTemplate(const ModuleTemplate& t){
-  if(!t.has_sc_code) return;
-  SendOSC([&](lo::Message){
+LateReply<> SCLang::InstallTemplate(const ModuleTemplate& t){
+  auto r = Relay<>::Create();
+  if(!t.has_sc_code) return r.GetLateReply();
+  SendOSC([=](lo::Message){
+    installed_templates.insert(t.GetFullID());
     std::cout << "Got install reply!" << std::endl;
+    r.Return();
   }, "/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
-  installed_templates.insert(t.GetFullID());
+  return r.GetLateReply();
 }
 bool SCLang::WasInstalled(const std::string& s){
   auto it = installed_templates.find(s);

@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "DynamicallyLoadableClass.hpp"
 #include "Signal.hpp"
+#include "LateReply.hpp"
 
 namespace AlgAudio{
 
@@ -33,7 +34,7 @@ class Canvas;
 class Bus{
 public:
   int GetID() {return id;}
-  static std::shared_ptr<Bus> CreateNew();
+  static LateReply<std::shared_ptr<Bus>> CreateNew();
 private:
   Bus();
   ~Bus();
