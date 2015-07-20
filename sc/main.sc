@@ -53,6 +53,15 @@ OSCdef.new( 'newinstance', {
 	}, '/algaudioSC/newinstance'
 ).postln;
 
+// Args: instance id, parram name, value
+OSCdef.new( 'setparram', {
+		arg msg;
+		~minstances[msg[1].asString].set(
+			msg[2].asString,
+			msg[3]
+		)
+	}, '/algaudioSC/setparram'
+).postln;
 
 // A dummy helper for listing all installed synthdefs
 OSCdef.new( 'listall', {

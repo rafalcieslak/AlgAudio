@@ -29,6 +29,17 @@ namespace AlgAudio{
 class ModuleTemplate;
 class Canvas;
 
+// A wrapper for SC buses.
+class Bus{
+public:
+  int GetID() {return id;}
+  static std::shared_ptr<Bus> CreateNew();
+private:
+  Bus();
+  ~Bus();
+  int id;
+};
+
 class Module : public DynamicallyLoadableClass, public SubscriptionsManager{
 public:
   Module(){};
@@ -41,28 +52,32 @@ public:
   std::weak_ptr<Canvas> canvas;
 
   // TODO: Common base class
-  class Inlet{
-  public:
-    Inlet(std::string i, Module& m) : id(i), mod(m) {}
-    std::string id;
-    Module& mod;
-    int connection = -1;
-  };
   class Outlet{
   public:
     Outlet(std::string i, Module& m) : id(i), mod(m) {}
     std::string id;
     Module& mod;
-    int connection = -1;
+    // The outlet is not the owner of a bus.
+    std::weak_ptr<Bus> bus;
   };
+  class Inlet{
+  public:
+    Inlet(std::string i, Module& m) : id(i), mod(m) {}
+    std::string id;
+    Module& mod;
+    // The inlet is the owner of a bus.
+    std::shared_ptr<Bus> bus;
+  };
+  void SetParram(std::string name, int value);
 
   void AddInlet(std::string s);
   void AddOutlet(std::string s);
   void CreateIOFromTemplate();
   std::vector<Inlet> inlets;
   std::vector<Outlet> outlets;
-};
 
+  static void Connect(std::shared_ptr<Module> a, std::shared_ptr<Module> b);
+};
 
 } // namespace AlgAudio
 

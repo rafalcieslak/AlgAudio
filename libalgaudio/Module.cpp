@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Module.hpp"
 #include "ModuleTemplate.hpp"
+#include "SCLang.hpp"
 
 namespace AlgAudio{
 
@@ -31,6 +32,10 @@ void Module::AddOutlet(std::string s){
 void Module::CreateIOFromTemplate(){
   for(std::string id : templ->inlets) AddInlet(id);
   for(std::string id : templ->outlets) AddOutlet(id);
+}
+
+void Module::SetParram(std::string name, int value){
+  SCLang::SendOSC("/algaudioSC/setparram", "isi", sc_id, name.c_str(), value);
 }
 
 } // namespace AlgAudio

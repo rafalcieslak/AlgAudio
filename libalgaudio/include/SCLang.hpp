@@ -29,6 +29,10 @@ namespace AlgAudio{
 class SCLangSubprocess;
 class ModuleTemplate;
 
+struct SCLangException : public Exception{
+  SCLangException(std::string t) : Exception(t) {}
+};
+
 // The static interface to a single global sclang process
 class SCLang{
   SCLang() = delete; // static class
