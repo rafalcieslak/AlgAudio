@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <memory>
+#include <vector>
 #include "DynamicallyLoadableClass.hpp"
 #include "Signal.hpp"
 
@@ -38,6 +39,28 @@ public:
   std::shared_ptr<ModuleTemplate> templ;
   int sc_id = -1;
   std::weak_ptr<Canvas> canvas;
+
+  // TODO: Common base class
+  class Inlet{
+  public:
+    Inlet(std::string i, Module& m) : id(i), mod(m) {}
+    std::string id;
+    Module& mod;
+    int connection = -1;
+  };
+  class Outlet{
+  public:
+    Outlet(std::string i, Module& m) : id(i), mod(m) {}
+    std::string id;
+    Module& mod;
+    int connection = -1;
+  };
+
+  void AddInlet(std::string s);
+  void AddOutlet(std::string s);
+  void CreateIOFromTemplate();
+  std::vector<Inlet> inlets;
+  std::vector<Outlet> outlets;
 };
 
 

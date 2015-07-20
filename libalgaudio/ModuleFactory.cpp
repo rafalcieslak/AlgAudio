@@ -70,6 +70,7 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
       res->sc_id = id;
     },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());*/
   }
+  res->CreateIOFromTemplate();
   res->on_init();
   return res;
 }
