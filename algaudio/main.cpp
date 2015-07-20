@@ -117,6 +117,11 @@ int main(int argc, char *argv[]){
       module1 = nullptr;
       module2 = nullptr;
       console_module = nullptr;
+      if(!main_canvas) return;
+      module1 = ModuleFactory::CreateNewInstance("base/simplein");
+      module2 = ModuleFactory::CreateNewInstance("base/simpleout");
+      main_canvas->InsertModule(module1);
+      main_canvas->InsertModule(module2);
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
@@ -130,11 +135,9 @@ int main(int argc, char *argv[]){
     });
     SCLang::on_start_completed.SubscribeForever([&](){
       // Pretend we are creating new instances
+      ModuleCollectionBase::InstallAllTemplatesIntoSC();
+      //SCLang::DebugQueryInstalled();
       main_canvas = Canvas::CreateEmpty();
-      module1 = ModuleFactory::CreateNewInstance("base/simplein");
-      module2 = ModuleFactory::CreateNewInstance("base/simpleout");
-      main_canvas->InsertModule(module1);
-      main_canvas->InsertModule(module2);
     });
 
     Utilities::global_idle.SubscribeForever([&](){

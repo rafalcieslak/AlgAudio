@@ -153,4 +153,8 @@ void SCLang::StopServer(){
   SendInstruction("s.quit;");
 }
 
+void SCLang::DebugQueryInstalled(){
+  SendOSCSimple("/algaudioSC/listall");
+}
+
 } // namespace AlgAudio

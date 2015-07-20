@@ -48,6 +48,7 @@ public:
   static void SendInstruction(std::string);
   static void InstallTemplate(const ModuleTemplate&);
   static bool WasInstalled(const std::string&);
+  static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);
   static void SendOSCSimple(std::string);
   static void SendOSCSimple(std::function<void(lo::Message)> f, std::string a);

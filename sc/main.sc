@@ -19,6 +19,7 @@ OSCdef.new( 'installtemplate', {
 		if((msg.size < 2),{
 			"Invalid message".postln;
 		},{
+			("Installing template " ++ msg[1]).postln;
 			command = "SynthDef.new('aa/" ++ msg[1] ++ "', {" ++ msg[2] ++ "}).add;";
 			//command.postln;
 			f = command.compile();
@@ -50,4 +51,16 @@ OSCdef.new( 'newinstance', {
 		~minstances.add( id -> Synth.new(name)); // TODO: default args
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newinstance'
+).postln;
+
+
+// A dummy helper for listing all installed synthdefs
+OSCdef.new( 'listall', {
+		SynthDescLib.global.synthDescs.do { |desc|
+			if(desc.def.notNil) {
+				"\nSynthDef %\n".postf(desc.name.asCompileString);
+				//desc.def.func.postcs;
+			};
+		};
+	}, '/algaudioSC/listall'
 ).postln;

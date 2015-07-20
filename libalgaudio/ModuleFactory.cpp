@@ -64,11 +64,11 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
     if(!SCLang::ready){
       std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
     }
-    /*SCLang::SendOSC([=](lo::Message msg){
+    SCLang::SendOSC([=](lo::Message msg){
       int id = msg.argv()[0]->i32;
       std::cout << "On id " << id << std::endl;
       res->sc_id = id;
-    },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());*/
+    },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());
   }
   res->CreateIOFromTemplate();
   res->on_init();
