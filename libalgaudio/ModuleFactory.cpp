@@ -54,7 +54,6 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
      deallocates the pointed instance from within the module.
     */
     res = std::shared_ptr<Module>(module, [](Module* mod){
-      std::cout << "Deleting a module " << mod->templ->GetFullID() << "!" << std::endl;
       mod->SelfDestruct();
     });
   }

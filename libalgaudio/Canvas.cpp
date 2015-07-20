@@ -1,5 +1,3 @@
-#ifndef MODULE_HPP
-#define MODULE_HPP
 /*
 This file is part of AlgAudio.
 
@@ -18,29 +16,21 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-#include <memory>
-#include "DynamicallyLoadableClass.hpp"
-#include "Signal.hpp"
+#include "Canvas.hpp"
 
 namespace AlgAudio{
 
-class ModuleTemplate;
-class Canvas;
+Canvas::Canvas(){
 
-class Module : public DynamicallyLoadableClass, public SubscriptionsManager{
-public:
-  Module(){};
-  Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
-  Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
-  virtual ~Module() {};
-  virtual void on_init() {};
-  std::shared_ptr<ModuleTemplate> templ;
-  int sc_id = -1;
-  std::weak_ptr<Canvas> canvas;
-};
+}
 
+std::shared_ptr<Canvas> Canvas::CreateEmpty(){
+  return std::shared_ptr<Canvas>( new Canvas() );
+}
+
+void Canvas::InsertModule(std::shared_ptr<Module> m, Point2D pos){
+  modules.emplace_back(ModuleData{m,pos});
+  m->canvas = shared_from_this();
+}
 
 } // namespace AlgAudio
-
-#endif //MODULE_HPP

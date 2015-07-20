@@ -28,6 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UILabel.hpp"
 #include "SCLang.hpp"
 #include "Theme.hpp"
+#include "Canvas.hpp"
 #include "UI/UICheckbox.hpp"
 #include "UI/UIProgressBar.hpp"
 
@@ -64,8 +65,9 @@ int main(int argc, char *argv[]){
 
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
-    std::shared_ptr<Module> module1, module2, module3;
-    module3 = ModuleFactory::CreateNewInstance("debug/console");
+    std::shared_ptr<Module> module1, module2, console_module;
+    std::shared_ptr<Canvas> main_canvas;
+    console_module = ModuleFactory::CreateNewInstance("debug/console");
 
     auto mainwindow = Window::Create("AlgAudio config",280,400);
     auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
@@ -112,7 +114,9 @@ int main(int argc, char *argv[]){
       statustext->SetText(msg);
     });
     testbutton->on_clicked.SubscribeForever([&](){
-      module1 = module2 = module3 = nullptr;
+      module1 = nullptr;
+      module2 = nullptr;
+      console_module = nullptr;
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
@@ -126,8 +130,11 @@ int main(int argc, char *argv[]){
     });
     SCLang::on_start_completed.SubscribeForever([&](){
       // Pretend we are creating new instances
-      module1 = ModuleFactory::CreateNewInstance("debug/helloworld");
-      module2 = ModuleFactory::CreateNewInstance("debug/pipe");
+      main_canvas = Canvas::CreateEmpty();
+      module1 = ModuleFactory::CreateNewInstance("base/simplein");
+      module2 = ModuleFactory::CreateNewInstance("base/simpleout");
+      main_canvas->InsertModule(module1);
+      main_canvas->InsertModule(module2);
     });
 
     Utilities::global_idle.SubscribeForever([&](){
