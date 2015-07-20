@@ -185,6 +185,8 @@ public:
   SubscriptionList subscriptions;
 };
 
+
+
 } //namespace AlgAudio
 
 #endif //CSIGNAL_HPP

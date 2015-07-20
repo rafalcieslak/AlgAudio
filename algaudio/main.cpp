@@ -31,6 +31,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include "UI/UICheckbox.hpp"
 #include "UI/UIProgressBar.hpp"
+#include "LateReply.hpp"
 
 using namespace AlgAudio;
 
@@ -54,6 +55,14 @@ void TestSubscriptions(){
     signal1.Happen();
   }
   signal1.Happen();
+}
+
+LateReply<std::string> Example(){
+  auto r = Relay<std::string>::Create();
+  SCLang::SendOSCSimple([=](lo::Message){
+    r.Return("haha!");
+  }, "/algaudioSC/hello");
+  return r.GetLateReply();
 }
 
 int main(int argc, char *argv[]){
@@ -114,14 +123,20 @@ int main(int argc, char *argv[]){
       statustext->SetText(msg);
     });
     testbutton->on_clicked.SubscribeForever([&](){
-      module1 = nullptr;
+      /*module1 = nullptr;
       module2 = nullptr;
       console_module = nullptr;
       if(!main_canvas) return;
       module1 = ModuleFactory::CreateNewInstance("base/simplein");
       module2 = ModuleFactory::CreateNewInstance("base/simpleout");
       main_canvas->InsertModule(module1);
-      main_canvas->InsertModule(module2);
+      main_canvas->InsertModule(module2);*/
+      Example().Then([](std::string s) -> int{
+        std::cout << "Late reply " << s << std::endl;
+        return 5;
+      }).Ther([](int x)-> double{
+        
+      });
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();

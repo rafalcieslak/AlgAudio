@@ -36,6 +36,7 @@ target_link_libraries(
 	algaudio
   libalgaudio
 	${SDL2_LIBRARY}
+	${LIBLO_LIBRARY}
 	${EXTRA_SYS_LIBS}
 )
 
