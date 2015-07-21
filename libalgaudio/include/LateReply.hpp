@@ -26,7 +26,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-/* The LateReplay is a mechanism that alows functions to return a value with
+/* The LateReply is a mechanism that alows functions to return a value with
 some asynchronic delay. It is useful when a function waits for OSC reply from
 SCLang, and therefore would block execution for a while. Instead of returning
 a value, it returns LateReply<value>. The caller can use the .Then method
