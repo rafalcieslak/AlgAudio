@@ -1,4 +1,4 @@
-# algAudio
+# AlgAudio
 
 AlgAudio is an audio processing framework, designed to be easy to learn and use at live performances.
 
