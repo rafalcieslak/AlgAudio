@@ -91,6 +91,10 @@ std::string Utilities::ConvertOSpathToUniPath(const std::string& ospath){
   return result;
 }
 
+void Utilities::CopyToClipboard(std::string s){
+  SDL_SetClipboardText(s.c_str());
+}
+
 std::vector<std::string> Utilities::SplitString(std::string str, std::string delimiter){
     std::vector<std::string> res;
     size_t pos = 0;

@@ -61,4 +61,8 @@ void UITextArea::PushLine(std::string s){
   SetNeedsRedrawing();
 }
 
+std::string UITextArea::GetAllText(){
+  return Utilities::JoinString(text,"\n");
+}
+
 } // namespace AlgAudio

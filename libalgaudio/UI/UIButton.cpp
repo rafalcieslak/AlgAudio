@@ -82,12 +82,16 @@ void UIButton::SetColors(Color text, Color background){
   text_color = text;
   bg_color = background;
   UpdateTexture();
-  SetNeedsRedrawing();
+}
+
+void UIButton::SetFontSize(int fs){
+  fontsize = fs;
+  UpdateTexture();
 }
 
 void UIButton::UpdateTexture(){
   // Todo: Blended render, so that the same text texture can be used for any BG
-  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",16), text, text_color, GetBgColor());
+  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text, text_color, GetBgColor());
   SetRequestedSize(texture->GetSize() + Size2D(10,10));
   SetNeedsRedrawing();
 }

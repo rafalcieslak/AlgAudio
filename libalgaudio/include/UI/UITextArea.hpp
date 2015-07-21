@@ -33,6 +33,7 @@ public:
     bottom_alligned = b;
   }
   virtual void CustomDraw(DrawContext& c) override;
+  std::string GetAllText();
 private:
   UITextArea(std::weak_ptr<Window> parent_window, Color c_fg, Color c_bg = Color(0,0,0));
   std::vector<std::string> text;

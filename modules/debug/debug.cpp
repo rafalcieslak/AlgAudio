@@ -22,6 +22,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Window.hpp"
 #include "UI/UITextArea.hpp"
+#include "UI/UIButton.hpp"
+#include "UI/UIBox.hpp"
+#include "Theme.hpp"
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
 
@@ -49,16 +52,27 @@ public:
 class Console : public AlgAudio::Module{
 public:
   void on_init(){
-    std::shared_ptr<AlgAudio::Window> console_window = AlgAudio::Window::Create("SCLang console", 500, 400);
+    auto console_window = AlgAudio::Window::Create("SCLang console", 500, 400);
+    auto mainvbox = AlgAudio::UIVBox::Create(console_window);
     auto textarea = AlgAudio::UITextArea::Create(console_window, AlgAudio::Color(255,255,255), AlgAudio::Color(0,0,0));
+    auto clipboard_button = AlgAudio::UIButton::Create(console_window, "Copy console output to clipboard");
     textarea->SetBottomAligned(true);
+    clipboard_button->SetFontSize(13);
+    clipboard_button->SetColors(AlgAudio::Theme::Get("text-generic"),AlgAudio::Theme::Get("bg-button-neutral"));
+
+    mainvbox->Insert(textarea, AlgAudio::UIBox::PackMode::WIDE);
+    mainvbox->Insert(clipboard_button, AlgAudio::UIBox::PackMode::TIGHT);
+    console_window->Insert(mainvbox);
+
     subscriptions += AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
       textarea->PushLine(line);
     });
-    console_window->on_close.SubscribeForever([&](){
+    subscriptions += clipboard_button->on_clicked.Subscribe([=](){
+      AlgAudio::Utilities::CopyToClipboard(textarea->GetAllText());
+    });
+    console_window->on_close.SubscribeForever([=](){
       AlgAudio::SDLMain::UnregisterWindow(console_window);
     });
-    console_window->Insert(textarea);
     AlgAudio::SDLMain::RegisterWindow(console_window);
   }
 };

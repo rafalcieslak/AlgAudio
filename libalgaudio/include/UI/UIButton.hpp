@@ -29,9 +29,11 @@ public:
   void SetText(std::string);
   void SetColors(Color text, Color background);
   virtual void CustomDraw(DrawContext& c) override;
+  void SetFontSize(int fontsize);
 private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;
+  int fontsize = 16;
   std::shared_ptr<SDLTexture> texture;
   Color bg_color;
   Color text_color;
