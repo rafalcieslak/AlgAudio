@@ -41,9 +41,9 @@ case the Then procedure will be executed as soon as it is set.
 
 Example LateReturn function:
 
-LateReturn<int> GetSCVersion(){
+LateReturn<int> GetReplyFromSubprocess(){
   auto r = Relay<int>::Create();
-  SCLang::SendOSC([](lo::Message msg){
+  AsyncActivities::CallThisFunctionWhenSubprocessSendsReply([](lo::Message msg){
     r.Return( msg[1]->i32 );
   });
   return r;

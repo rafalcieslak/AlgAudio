@@ -62,7 +62,7 @@ void SCLang::Start2(){
     std::cout << "SCLang is using port " << port << std::endl;
     on_start_progress.Happen(4,"Starting OSC...");
     osc = std::make_unique<OSC>("localhost", port);
-    SendOSCSimple([](lo::Message){
+    SendOSCWithReply("/algaudioSC/hello").Then([](lo::Message){
       on_start_progress.Happen(5,"Booting server...");
       on_server_started.SubscribeOnce([&](){
         ready = true;
@@ -73,7 +73,7 @@ void SCLang::Start2(){
         });
       });
       BootServer();
-    }, "/algaudioSC/hello");
+    });
   });
 }
 
@@ -89,18 +89,22 @@ void SCLang::Stop(){
 void SCLang::SendInstruction(std::string i){
   if(subprocess) subprocess->SendInstruction(i);
 }
-void SCLang::SendOSCSimple(std::string a){
-  if(!osc) return;
-  osc->Send(a);
+void SCLang::SendOSC(const std::string& path){
+  if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
+  osc->Send(path);
 }
-void SCLang::SendOSCSimple(std::function<void(lo::Message)> f, std::string a){
-  if(!osc) return;
+LateReply<lo::Message> SCLang::SendOSCWithReply(const std::string& path){
+  auto r = Relay<lo::Message>::Create();
+  if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   lo::Message m;
-  osc->Send(a, f, m);
+  osc->Send(path, [=](lo::Message msg){
+    r.Return(msg);
+  }, m);
+  return r;
 }
 void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
 {
-  if(!osc) return;
+  if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
   lo::Message m;
@@ -108,14 +112,18 @@ void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
   m.add_varargs(t, q);
   osc->Send(path, m);
 }
-void SCLang::SendOSC(std::function<void(lo::Message)> f, const std::string &path, const std::string &tag, ...){
-  if(!osc) return;
+LateReply<lo::Message> SCLang::SendOSCWithReply(const std::string &path, const std::string &tag, ...){
+  auto r = Relay<lo::Message>::Create();
+  if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
   lo::Message m;
   std::string t = tag + "$$";
   m.add_varargs(t, q);
-  osc->Send(path, f, m);
+  osc->Send(path, [=](lo::Message msg){
+    r.Return(msg);
+  }, m);
+  return r;
 }
 
 void SCLang::Poll(){
@@ -130,11 +138,11 @@ void SCLang::SetOSCDebug(bool enabled){
 LateReply<> SCLang::InstallTemplate(const ModuleTemplate& t){
   auto r = Relay<>::Create();
   if(!t.has_sc_code) return r.Return();
-  SendOSC([=](lo::Message){
+  SendOSCWithReply("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str()).Then([=](lo::Message){
     installed_templates.insert(t.GetFullID());
     std::cout << "Got install reply!" << std::endl;
     r.Return();
-  }, "/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
+  });
   return r;
 }
 bool SCLang::WasInstalled(const std::string& s){
@@ -147,21 +155,21 @@ void SCLang::BootServer(bool supernova){
   // TODO: Server options
   if(supernova) SendInstruction("Server.supernova;");
   else SendInstruction("Server.scsynth;");
-  SendOSCSimple([&](lo::Message m){
+  SendOSCWithReply("/algaudioSC/boothelper").Then([&](lo::Message m){
     int status = m.argv()[0]->i32;
     if(status){
       on_server_started.Happen();
     }else{
       std::cout << "WARNING: sc server failed to boot!" << std::endl;
     }
-  },"/algaudioSC/boothelper");
+  });
 }
 void SCLang::StopServer(){
   SendInstruction("s.quit;");
 }
 
 void SCLang::DebugQueryInstalled(){
-  SendOSCSimple("/algaudioSC/listall");
+  SendOSC("/algaudioSC/listall");
 }
 
 } // namespace AlgAudio

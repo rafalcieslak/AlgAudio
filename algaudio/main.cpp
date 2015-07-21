@@ -66,14 +66,6 @@ void TestSync(){
   s.Trigger();
 }
 
-LateReply<std::string> Example(){
-  auto r = Relay<std::string>::Create();
-  //SCLang::SendOSCSimple([=](lo::Message){
-    r.Return("haha!");
-  //}, "/algaudioSC/hello");
-  return r.GetLateReply();
-}
-
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;

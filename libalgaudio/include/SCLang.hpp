@@ -52,10 +52,10 @@ public:
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);
-  static void SendOSCSimple(std::string);
-  static void SendOSCSimple(std::function<void(lo::Message)> f, std::string a);
-  static void SendOSC(const std::string &path, const std::string &tag, ...);
-  static void SendOSC(std::function<void(lo::Message)>, const std::string &path, const std::string &tag, ...);
+  static void SendOSC(const std::string& path);
+  static void SendOSC(const std::string& path, const std::string &tag, ...);
+  static LateReply<lo::Message> SendOSCWithReply(const std::string& path);
+  static LateReply<lo::Message> SendOSCWithReply(const std::string& path, const std::string& tag, ...);
   static void BootServer(bool supernova = false);
   static void StopServer();
   static bool ready;
