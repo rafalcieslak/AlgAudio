@@ -19,10 +19,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
 #include <list>
 #include <map>
 #include <functional>
 #include <iostream>
+#include <memory>
 
 /*
  ==== A quick explanation of signal semantics ====
@@ -95,10 +97,10 @@ public:
   void Release();
   template <typename...>
   friend class Signal;
-private:
-  Subscription(int id_, int parent) : id(id_), parent_signal_id(parent) {}
   Subscription(const Subscription& other) = delete; // no copy-constructing
   Subscription& operator=(const Subscription& other) = delete; // no copy assignment
+private:
+  Subscription(int id_, int parent) : id(id_), parent_signal_id(parent) {}
   int id;
   // This field is used to track who is my parent, and who where should I
   // unsubscribe from when releasing. This cannot be a pointer, because the
@@ -140,7 +142,7 @@ private:
 public:
     Signal<Types...>() {}
     ~Signal(){}
-    Subscription Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
+    std::shared_ptr<Subscription> Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
     void SubscribeForever( std::function<void(Types...)> f ) { subscribers_forever.push_back(f); }
     void SubscribeOnce( std::function<void(Types...)> f ) { subscribers_once.push_back(f); }
     template<class C>
@@ -165,22 +167,23 @@ public:
 };
 
 template <typename... Types>
-Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
+std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = f;
-  return Subscription(sub_id, my_id);
+  return std::shared_ptr<Subscription>(new Subscription(sub_id, my_id));
 }
 
 class SubscriptionsManager{
 public:
   class SubscriptionList{
   public:
-    std::list<Subscription> list;
+    std::list<std::shared_ptr<Subscription>> list;
     void ReleaseAll() { list.clear(); }
-    SubscriptionList& operator+=(Subscription&& s) {
+    SubscriptionList& operator+=(std::shared_ptr<Subscription>&& s) {
       list.emplace_back(std::move(s));
       return *this;
     }
+    SubscriptionList() : list(0){}
   };
   SubscriptionList subscriptions;
 };

@@ -33,7 +33,7 @@ class Canvas;
 // A wrapper for SC buses.
 class Bus{
 public:
-  int GetID() {return id;}
+  int GetID() const {return id;}
   static LateReply<std::shared_ptr<Bus>> CreateNew();
   ~Bus();
 private:
@@ -55,35 +55,35 @@ public:
   // TODO: Common base class
   class Outlet{
   public:
-    Outlet(std::string i, Module& m) : id(i), mod(m) {
-      mod.SetParram(id, 999999999);
-    }
     std::string id;
     Module& mod;
     // The outlet is not the owner of a bus.
     std::weak_ptr<Bus> bus;
+    static std::shared_ptr<Outlet> Create(std::string id, Module& mod);
+  private:
+    Outlet(std::string i, Module& m) : id(i), mod(m) {
+      mod.SetParram(id, 999999999);
+    }
   };
   class Inlet{
   public:
-    Inlet(std::string i, Module& m) : id(i), mod(m) {
-      Bus::CreateNew().Then([=](std::shared_ptr<Bus> b){
-        std::cout << b.get() << " " << this << std::endl;
-        bus = b;
-        mod.SetParram(id, b->GetID());
-      });
+    ~Inlet(){
+      //(*(int*)0x00000) = 1;
+      std::cout << "Inlet destroyed" << std::endl;
     }
+    static LateReply<std::shared_ptr<Inlet>> Create(std::string id, Module& mod);
     std::string id;
     Module& mod;
     // The inlet is the owner of a bus.
     std::shared_ptr<Bus> bus;
+  private:
+    Inlet(std::string i, Module& m, std::shared_ptr<Bus> b) : id(i), mod(m), bus(b) {}
   };
   void SetParram(std::string name, int value);
 
-  void AddInlet(std::string s);
-  void AddOutlet(std::string s);
-  void CreateIOFromTemplate();
-  std::vector<Inlet> inlets;
-  std::vector<Outlet> outlets;
+  LateReply<> CreateIOFromTemplate();
+  std::vector<std::shared_ptr<Inlet>> inlets;
+  std::vector<std::shared_ptr<Outlet>> outlets;
 
   static void Connect(std::shared_ptr<Module> a, std::shared_ptr<Module> b);
 };

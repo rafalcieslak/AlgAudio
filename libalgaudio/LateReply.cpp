@@ -20,10 +20,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-std::map<int, Sync::SyncEntry*> Sync::entries;
-int Sync::id_counter;
+std::map<unsigned int, Sync::SyncEntry*> Sync::entries;
+unsigned int Sync::id_counter = 0;
 std::map<int, LateReplyEntryBase*> LateReplyEntryBase::entries;
 int LateReplyEntryBase::id_counter;
+
+Sync::Sync(int count) : id(id_counter++){
+  entries[id] = new SyncEntry(count);
+}
 
 void Sync::WhenAll(std::function<void()> f) const{
   auto it = entries.find(id);
@@ -54,11 +58,6 @@ void Sync::Trigger() const{
     delete entry;
     entries.erase(it);
   }
-}
-Sync Sync::Create(int count){
-  id_counter++;
-  entries[id_counter] = new SyncEntry(count);
-  return Sync(id_counter);
 }
 
 } // namespace AlgAudio

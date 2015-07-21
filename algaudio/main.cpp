@@ -49,7 +49,7 @@ void TestSubscriptions(){
     std::cout << "1 for" << std::endl;
   });
   {
-    Subscription s = signal1.Subscribe([](){
+    auto s = signal1.Subscribe([](){
       std::cout << "1 temporary" << std::endl;
     });
     signal1.Happen();
@@ -58,7 +58,7 @@ void TestSubscriptions(){
 }
 
 void TestSync(){
-  Sync s = Sync::Create(2);
+  Sync s(2);
   s.WhenAll([](){
     std::cout << "All!" << std::endl;
   });
@@ -137,7 +137,7 @@ int main(int argc, char *argv[]){
     testbutton->on_clicked.SubscribeForever([&](){
       if(!main_canvas) return;
 
-      Sync s = Sync::Create(2);
+      Sync s(2);
       LateAssign(module1, ModuleFactory::CreateNewInstance("base/sine")).ThenSync(s);
       LateAssign(module2, ModuleFactory::CreateNewInstance("base/simplein")).ThenSync(s);
       s.WhenAll([&](){

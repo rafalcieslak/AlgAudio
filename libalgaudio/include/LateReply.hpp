@@ -69,20 +69,19 @@ class Relay;
 
 class Sync{
 public:
+  Sync(int count);
   void WhenAll(std::function<void()> f) const;
   void Trigger() const;
-  static Sync Create(int count = 2);
 private:
-  int id;
-  Sync(int i) : id(i) {};
+  const unsigned int id;
   struct SyncEntry{
     SyncEntry(int c) : count(c) {}
     int count = 2;
     bool stored = false;
     std::function<void()> stored_func;
   };
-  static std::map<int, SyncEntry*> entries;
-  static int id_counter;
+  static std::map<unsigned int, SyncEntry*> entries;
+  static unsigned int id_counter;
 };
 
 class LateReplyEntryBase{
@@ -200,9 +199,7 @@ private:
 template <typename T>
 LateReply<> LateAssign(T& to_set, LateReply<T> lr){
   auto r = Relay<>::Create();
-  std::cout << "LateAssign created relay no " << r.id << std::endl;
   lr.Then([r,&to_set](T val)mutable{
-    std::cout << "Setting!" << std::endl;
     to_set = val;
     r.Return();
   });
