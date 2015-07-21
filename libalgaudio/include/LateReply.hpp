@@ -67,6 +67,24 @@ class LateReply;
 template <typename... Types>
 class Relay;
 
+class Sync{
+public:
+  void WhenAll(std::function<void()> f) const;
+  void Trigger() const;
+  static Sync Create(int count = 2);
+private:
+  int id;
+  Sync(int i) : id(i) {};
+  struct SyncEntry{
+    SyncEntry(int c) : count(c) {}
+    int count = 2;
+    bool stored = false;
+    std::function<void()> stored_func;
+  };
+  static std::map<int, SyncEntry*> entries;
+  static int id_counter;
+};
+
 class LateReplyEntryBase{
 protected:
   virtual ~LateReplyEntryBase(){}
@@ -109,7 +127,7 @@ public:
   void Then(std::function<void(Types...)> f) const{
     auto it = LateReplyEntryBase::entries.find(id);
     if(it == LateReplyEntryBase::entries.end()){
-      std::cout << "ERROR: LateReplay Then called, but it is not in the base!" << std::endl;
+      std::cout << "ERROR: LateReply Then called, but it is not in the base!" << std::endl;
       return;
     }
     LateReplyEntry<Types...>* entry = dynamic_cast<LateReplyEntry<Types...>*>(it->second);
@@ -120,8 +138,14 @@ public:
       // The Relay has already returned, but it was not bound until now.
       std::function<void()> g = bind_tuple(f,entry->stored_args);
       g();
+      delete entry;
       LateReplyEntryBase::entries.erase(it);
     }
+  }
+  void ThenSync(Sync& s) const{
+    Then([=](Types... args)mutable{
+      s.Trigger();
+    });
   }
   template<typename... Ts>
   void ThenReturn(Relay<Ts...> r, Ts... args){ r.Return(args...);}
@@ -135,6 +159,7 @@ private:
   LateReply(int i) : id(i) {};
   const int id;
 };
+
 template <typename... Types>
 class Relay{
 public:
@@ -148,6 +173,7 @@ public:
     LateReplyEntry<Types...>* entry = dynamic_cast<LateReplyEntry<Types...>*>(it->second);
     if(entry->stored){
       (entry->stored_func)(args...);
+      delete entry;
       LateReplyEntryBase::entries.erase(it);
     }else{
       entry->stored_args = std::tuple<Types...>(args...);
@@ -164,20 +190,25 @@ public:
     return Relay(newid);
   }
   friend class LateReply<Types...>;
+  const int id;
 private:
   Relay(int i) : id(i) {};
-  const int id;
 };
 
+/* This is a wrapper method for setting variable values as returned by a
+   latereply. */
 template <typename T>
-LateReply<> LateSet(T& to_set, LateReply<T> lr){
+LateReply<> LateAssign(T& to_set, LateReply<T> lr){
   auto r = Relay<>::Create();
-  lr.Then([=](T val)mutable{
+  std::cout << "LateAssign created relay no " << r.id << std::endl;
+  lr.Then([r,&to_set](T val)mutable{
+    std::cout << "Setting!" << std::endl;
     to_set = val;
     r.Return();
   });
   return r;
 }
+
 
 } // namespace AlgAudio
 

@@ -57,6 +57,15 @@ void TestSubscriptions(){
   signal1.Happen();
 }
 
+void TestSync(){
+  Sync s = Sync::Create(2);
+  s.WhenAll([](){
+    std::cout << "All!" << std::endl;
+  });
+  s.Trigger();
+  s.Trigger();
+}
+
 LateReply<std::string> Example(){
   auto r = Relay<std::string>::Create();
   //SCLang::SendOSCSimple([=](lo::Message){
@@ -70,6 +79,7 @@ int main(int argc, char *argv[]){
   (void)argv;
   try{
     //TestSubscriptions(); return 0;
+    //TestSync(); return 0;
     Theme::Init();
 
     ModuleCollectionBase::InstallDir("modules");
@@ -126,11 +136,17 @@ int main(int argc, char *argv[]){
     });
     testbutton->on_clicked.SubscribeForever([&](){
       if(!main_canvas) return;
-      LateSet( module1, ModuleFactory::CreateNewInstance("base/sine"));
-      //module2 = ModuleFactory::CreateNewInstance("base/simpleout");
-      //main_canvas->InsertModule(module1);
-      //main_canvas->InsertModule(module2);
-      //auto in =
+
+      Sync s = Sync::Create(2);
+      LateAssign(module1, ModuleFactory::CreateNewInstance("base/sine")).ThenSync(s);
+      LateAssign(module2, ModuleFactory::CreateNewInstance("base/simplein")).ThenSync(s);
+      s.WhenAll([&](){
+        std::cout << "Both modules ready" << std::endl;
+        main_canvas->InsertModule(module1);
+        main_canvas->InsertModule(module2);
+        // connect module1 and module2
+      });
+
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
