@@ -110,7 +110,7 @@ std::shared_ptr<ModuleTemplate> ModuleCollection::GetTemplateByID(std::string id
   else return it->second;
 }
 
-LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from){
+LateReturn<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from){
   auto r = Relay<>::Create();
   if(from == templates_by_id.end()){
     return r.Return();
@@ -122,13 +122,13 @@ LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, st
       r.Return();
     });
   });
-  return r.GetLateReply();
+  return r.GetLateReturn();
 }
 
-LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(){
+LateReturn<> ModuleCollection::InstallAllTemplatesIntoSC(){
   auto r = Relay<>::Create();
   InstallAllTemplatesIntoSC( templates_by_id.begin() ).ThenReturn(r);
-  return r.GetLateReply();
+  return r.GetLateReturn();
 }
 
 std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetCollectionByID(std::string id){
@@ -188,7 +188,7 @@ std::string ModuleCollectionBase::ListInstalledTemplates(){
 
 
 
-LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from){
+LateReturn<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from){
   auto r = Relay<>::Create();
   if(from == collections_by_id.end()){
     return r.Return();
@@ -200,13 +200,13 @@ LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string
       r.Return();
     });
   });
-  return r.GetLateReply();
+  return r.GetLateReturn();
 }
 
-LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(){
+LateReturn<> ModuleCollectionBase::InstallAllTemplatesIntoSC(){
   auto r = Relay<>::Create();
   InstallAllTemplatesIntoSC( collections_by_id.begin() ).ThenReturn(r);
-  return r.GetLateReply();
+  return r.GetLateReturn();
 }
 
 

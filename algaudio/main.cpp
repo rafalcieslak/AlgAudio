@@ -31,7 +31,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include "UI/UICheckbox.hpp"
 #include "UI/UIProgressBar.hpp"
-#include "LateReply.hpp"
+#include "LateReturn.hpp"
 
 using namespace AlgAudio;
 

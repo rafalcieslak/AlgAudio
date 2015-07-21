@@ -16,14 +16,14 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "LateReply.hpp"
+#include "LateReturn.hpp"
 
 namespace AlgAudio{
 
 std::map<unsigned int, Sync::SyncEntry*> Sync::entries;
 unsigned int Sync::id_counter = 0;
-std::map<int, LateReplyEntryBase*> LateReplyEntryBase::entries;
-int LateReplyEntryBase::id_counter;
+std::map<int, LateReturnEntryBase*> LateReturnEntryBase::entries;
+int LateReturnEntryBase::id_counter;
 
 Sync::Sync(int count) : id(id_counter++){
   entries[id] = new SyncEntry(count);

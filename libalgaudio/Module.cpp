@@ -28,7 +28,7 @@ Bus::~Bus(){
   /// TODO: Ask SC to remove the bus
 }
 
-LateReply<std::shared_ptr<Bus>> Bus::CreateNew(){
+LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   auto r = Relay<std::shared_ptr<Bus>>::Create();
   SCLang::SendOSCWithReply("/algaudioSC/newbus").Then( [r](lo::Message msg){
     int id = msg.argv()[0]->i32;
@@ -41,7 +41,7 @@ std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, Module& m
   return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, mod));
 }
 
-LateReply<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, Module& mod){
+LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, Module& mod){
   auto r = Relay<std::shared_ptr<Module::Inlet>>::Create();
   Bus::CreateNew().Then([=](std::shared_ptr<Bus> b)mutable{
     mod.SetParram(id, b->GetID());
@@ -55,7 +55,7 @@ void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::
   o->mod.SetParram(o->id, i->bus->GetID());
 }
 
-LateReply<> Module::CreateIOFromTemplate(){
+LateReturn<> Module::CreateIOFromTemplate(){
   auto r = Relay<>::Create();
   Sync s(templ->inlets.size());
   for(std::string id : templ->inlets){

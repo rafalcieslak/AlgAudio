@@ -26,16 +26,16 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-/* The LateReply is a mechanism that alows functions to return a value with
+/* The LateReturn is a mechanism that alows functions to return a value with
 some asynchronic delay. It is useful when a function waits for OSC reply from
 SCLang, and therefore would block execution for a while. Instead of returning
-a value, it returns LateReply<value>. The caller can use the .Then method
-of LateReply to set a function which should be called when the reply is ready.
-The callee can only prepare a LateReply by creating a Relay. The relay is useful
+a value, it returns LateReturn<value>. The caller can use the .Then method
+of LateReturn to set a function which should be called when the reply is ready.
+The callee can only prepare a LateReturn by creating a Relay. The relay is useful
 only within the calee, it has two interesting methods: .Return, which should be
 called when the reply value is ready - it will execute the "Then" procedure,
-and GetLateReply, which creates a corresponding LateReply, which the function
-should return. For convience, Relay is imnplicitly convertible to LateReply.
+and GetLateReturn, which creates a corresponding LateReturn, which the function
+should return. For convience, Relay is imnplicitly convertible to LateReturn.
 If the callee happens to return immediatelly, this is not a problem, in such
 case the Then procedure will be executed as soon as it is set.
 
@@ -63,7 +63,7 @@ line of the example, at the time when the OSC reply arrives.
 
 
 template <typename... Types>
-class LateReply;
+class LateReturn;
 template <typename... Types>
 class Relay;
 
@@ -84,21 +84,21 @@ private:
   static unsigned int id_counter;
 };
 
-class LateReplyEntryBase{
+class LateReturnEntryBase{
 protected:
-  virtual ~LateReplyEntryBase(){}
+  virtual ~LateReturnEntryBase(){}
   bool triggered = false;
 public:
-  static std::map<int, LateReplyEntryBase*> entries;
+  static std::map<int, LateReturnEntryBase*> entries;
   static int id_counter;
 };
 template <typename... Types>
-class LateReplyEntry : public LateReplyEntryBase{
+class LateReturnEntry : public LateReturnEntryBase{
 public:
-  friend class LateReply<Types...>;
+  friend class LateReturn<Types...>;
   friend class Relay<Types...>;
 private:
-  LateReplyEntry(){};
+  LateReturnEntry(){};
   std::function<void(Types...)> stored_func;
   std::tuple<Types...> stored_args;
   bool stored = false;
@@ -121,15 +121,15 @@ inline std::function<void()> bind_tuple(std::function<void()> f, std::tuple<>){
 }
 
 template <typename... Types>
-class LateReply{
+class LateReturn{
 public:
   void Then(std::function<void(Types...)> f) const{
-    auto it = LateReplyEntryBase::entries.find(id);
-    if(it == LateReplyEntryBase::entries.end()){
-      std::cout << "ERROR: LateReply Then called, but it is not in the base!" << std::endl;
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it == LateReturnEntryBase::entries.end()){
+      std::cout << "ERROR: LateReturn Then called, but it is not in the base!" << std::endl;
       return;
     }
-    LateReplyEntry<Types...>* entry = dynamic_cast<LateReplyEntry<Types...>*>(it->second);
+    LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
     if(!entry->triggered){
       entry->stored_func = f;
       entry->stored = true;
@@ -138,7 +138,7 @@ public:
       std::function<void()> g = bind_tuple(f,entry->stored_args);
       g();
       delete entry;
-      LateReplyEntryBase::entries.erase(it);
+      LateReturnEntryBase::entries.erase(it);
     }
   }
   void ThenSync(Sync& s) const{
@@ -148,14 +148,14 @@ public:
   }
   template<typename... Ts>
   void ThenReturn(Relay<Ts...> r, Ts... args){ r.Return(args...);}
-  LateReply(const Relay<Types...>& r) : id(r.id) {}
-  LateReply(const LateReply& other) = delete;
-  LateReply& operator=(const LateReply& other) = delete;
-  LateReply(LateReply&& other) : id(other.id) {}
-  LateReply& operator=(LateReply&& other) {id = other.id;}
+  LateReturn(const Relay<Types...>& r) : id(r.id) {}
+  LateReturn(const LateReturn& other) = delete;
+  LateReturn& operator=(const LateReturn& other) = delete;
+  LateReturn(LateReturn&& other) : id(other.id) {}
+  LateReturn& operator=(LateReturn&& other) {id = other.id;}
   friend class Relay<Types...>;
 private:
-  LateReply(int i) : id(i) {};
+  LateReturn(int i) : id(i) {};
   const int id;
 };
 
@@ -163,32 +163,32 @@ template <typename... Types>
 class Relay{
 public:
   const Relay& Return(Types... args) const{
-    auto it = LateReplyEntryBase::entries.find(id);
+    auto it = LateReturnEntryBase::entries.find(id);
     //std::cout << "Returning " << id << std::endl;
-    if(it == LateReplyEntryBase::entries.end()){
+    if(it == LateReturnEntryBase::entries.end()){
       std::cout << "ERROR: Return() used on the same relay twice!" << std::endl;
       return *this;
     }
-    LateReplyEntry<Types...>* entry = dynamic_cast<LateReplyEntry<Types...>*>(it->second);
+    LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
     if(entry->stored){
       (entry->stored_func)(args...);
       delete entry;
-      LateReplyEntryBase::entries.erase(it);
+      LateReturnEntryBase::entries.erase(it);
     }else{
       entry->stored_args = std::tuple<Types...>(args...);
       entry->triggered = true;
     }
     return *this;
   }
-  LateReply<Types...> GetLateReply() const{
-    return LateReply<Types...>(id);
+  LateReturn<Types...> GetLateReturn() const{
+    return LateReturn<Types...>(id);
   }
   static Relay Create(){
-    int newid = LateReplyEntryBase::id_counter++;
-    LateReplyEntryBase::entries[newid] = new LateReplyEntry<Types...>();
+    int newid = LateReturnEntryBase::id_counter++;
+    LateReturnEntryBase::entries[newid] = new LateReturnEntry<Types...>();
     return Relay(newid);
   }
-  friend class LateReply<Types...>;
+  friend class LateReturn<Types...>;
   const int id;
 private:
   Relay(int i) : id(i) {};
@@ -197,7 +197,7 @@ private:
 /* This is a wrapper method for setting variable values as returned by a
    latereply. */
 template <typename T>
-LateReply<> LateAssign(T& to_set, LateReply<T> lr){
+LateReturn<> LateAssign(T& to_set, LateReturn<T> lr){
   auto r = Relay<>::Create();
   lr.Then([r,&to_set](T val)mutable{
     to_set = val;

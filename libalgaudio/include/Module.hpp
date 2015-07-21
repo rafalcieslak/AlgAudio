@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "DynamicallyLoadableClass.hpp"
 #include "Signal.hpp"
-#include "LateReply.hpp"
+#include "LateReturn.hpp"
 
 namespace AlgAudio{
 
@@ -33,7 +33,7 @@ class Canvas;
 class Bus{
 public:
   int GetID() const {return id;}
-  static LateReply<std::shared_ptr<Bus>> CreateNew();
+  static LateReturn<std::shared_ptr<Bus>> CreateNew();
   ~Bus();
 private:
   Bus(int id);
@@ -66,7 +66,7 @@ public:
   };
   class Inlet{
   public:
-    static LateReply<std::shared_ptr<Inlet>> Create(std::string id, Module& mod);
+    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, Module& mod);
     std::string id;
     Module& mod;
     // The inlet is the owner of a bus.
@@ -79,7 +79,7 @@ public:
 
   static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);
 
-  LateReply<> CreateIOFromTemplate();
+  LateReturn<> CreateIOFromTemplate();
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
 

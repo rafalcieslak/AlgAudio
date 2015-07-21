@@ -24,7 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ModuleTemplate.hpp"
 #include "Utilities.hpp"
-#include "LateReply.hpp"
+#include "LateReturn.hpp"
 
 namespace AlgAudio{
 
@@ -50,8 +50,8 @@ struct CollectionLoadingException : public Exception{
 class ModuleCollection{
 public:
   ModuleCollection(std::ifstream& file, std::string basedir);
-  LateReply<> InstallAllTemplatesIntoSC();
-  LateReply<> InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from);
+  LateReturn<> InstallAllTemplatesIntoSC();
+  LateReturn<> InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from);
   std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string id);
   std::map<std::string, std::shared_ptr<ModuleTemplate>> templates_by_id;
   std::string id;
@@ -67,13 +67,13 @@ private:
   ModuleCollectionBase() = delete; // static class
 
   static std::map<std::string, std::shared_ptr<ModuleCollection>> collections_by_id;
-  static LateReply<> InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from);
+  static LateReturn<> InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from);
 public:
   static std::shared_ptr<ModuleCollection> GetCollectionByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
   static void InstallDir(std::string dirpath);
   static std::string ListInstalledTemplates();
-  static LateReply<> InstallAllTemplatesIntoSC();
+  static LateReturn<> InstallAllTemplatesIntoSC();
 };
 
 } // namespace AlgAudio

@@ -25,11 +25,11 @@ namespace AlgAudio{
 
 std::set<std::shared_ptr<Module>> ModuleFactory::instances;
 
-LateReply<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id){
+LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id){
   return CreateNewInstance( GetTemplateByID(id) );
 }
 
-LateReply<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ){
+LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ){
   auto r = Relay<std::shared_ptr<Module>>::Create();
   std::shared_ptr<Module> res;
   if(!templ->has_class){

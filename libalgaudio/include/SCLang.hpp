@@ -23,7 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "OSC.hpp"
 #include "Signal.hpp"
-#include "LateReply.hpp"
+#include "LateReturn.hpp"
 
 namespace AlgAudio{
 
@@ -48,14 +48,14 @@ public:
   static Signal<> on_server_started;
   static Signal<int,std::string> on_start_progress;
   static void SendInstruction(std::string);
-  static LateReply<> InstallTemplate(const ModuleTemplate&);
+  static LateReturn<> InstallTemplate(const ModuleTemplate&);
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
   static void SendOSC(const std::string& path, const std::string &tag, ...);
-  static LateReply<lo::Message> SendOSCWithReply(const std::string& path);
-  static LateReply<lo::Message> SendOSCWithReply(const std::string& path, const std::string& tag, ...);
+  static LateReturn<lo::Message> SendOSCWithReply(const std::string& path);
+  static LateReturn<lo::Message> SendOSCWithReply(const std::string& path, const std::string& tag, ...);
   static void BootServer(bool supernova = false);
   static void StopServer();
   static bool ready;
