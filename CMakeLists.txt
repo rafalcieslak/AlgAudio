@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
-include(cmake/CopyMacros.cmake)
-
 project(
   AlgAudio
   VERSION 0.1
@@ -30,11 +28,7 @@ find_package(SDL2_ttf REQUIRED)
 add_subdirectory(libalgaudio)
 add_subdirectory(algaudio)
 add_subdirectory(modules)
-
-add_custom_target(
-  sc_scripts ALL
-)
-copy_directory_if_changed(${PROJECT_SOURCE_DIR}/sc ${PROJECT_BINARY_DIR}/sc sc_scripts)
+add_subdirectory(sc)
 
 add_custom_target(
   package-windows
