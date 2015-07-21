@@ -169,6 +169,16 @@ private:
   const int id;
 };
 
+template <typename T>
+LateReply<> LateSet(T& to_set, LateReply<T> lr){
+  auto r = Relay<>::Create();
+  lr.Then([=](T val)mutable{
+    to_set = val;
+    r.Return();
+  });
+  return r;
+}
+
 } // namespace AlgAudio
 
 #endif // LATEREPLY_HPP

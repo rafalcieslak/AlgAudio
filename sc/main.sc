@@ -7,6 +7,7 @@ OSCdef.new( 'hello', {
 		~addr = addr;
 		~minstances = Dictionary.new(0);
 		~instanceid = 0;
+		~buses = Dictionary.new(0);
 		"Hello World!".postln;
 		~addr.sendMsg("/algaudio/reply",msg[msg.size-1]);
 	}, '/algaudioSC/hello'
@@ -53,13 +54,28 @@ OSCdef.new( 'newinstance', {
 	}, '/algaudioSC/newinstance'
 ).postln;
 
+// reply value: bus instance id
+OSCdef.new( 'newbus', {
+		arg msg;
+		var newbus = Bus.audio(s,1);
+		var id = newbus.index
+		("Creating new bus " ++ id.asString).postln;
+		~buses.add( id -> newbus); // TODO: default args
+		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
+	}, '/algaudioSC/newbus'
+).postln;
+
 // Args: instance id, parram name, value
 OSCdef.new( 'setparram', {
 		arg msg;
-		~minstances[msg[1].asString].set(
+		if((msg[1] == -1),{
+			("Not setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3] ++ ", because it's not a valid instance!").postln;
+		});
+		("Setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3]).postln;
+		~minstances[msg[1]].set(
 			msg[2].asString,
 			msg[3]
-		)
+		);
 	}, '/algaudioSC/setparram'
 ).postln;
 

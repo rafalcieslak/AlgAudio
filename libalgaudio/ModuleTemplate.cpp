@@ -51,7 +51,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
     if(!class_name_attr) throw ModuleParseException(id, "Module has class node, but the class name is missing");
     class_name = class_name_attr->value();
   }
-  xml_node<>* parrams_node = node->first_node("class");
+  xml_node<>* parrams_node = node->first_node("parrams");
   if(parrams_node){
     for(xml_node<>* inlet_node = parrams_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
       xml_attribute<>* inlet_id = inlet_node->first_attribute("id");

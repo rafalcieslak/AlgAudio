@@ -76,7 +76,9 @@ int main(int argc, char *argv[]){
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     std::shared_ptr<Module> module1, module2, console_module;
     std::shared_ptr<Canvas> main_canvas;
-    console_module = ModuleFactory::CreateNewInstance("debug/console");
+    ModuleFactory::CreateNewInstance("debug/console").Then([&](auto mod){
+      console_module = mod;
+    });
 
     auto mainwindow = Window::Create("AlgAudio config",280,400);
     auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
@@ -123,17 +125,12 @@ int main(int argc, char *argv[]){
       statustext->SetText(msg);
     });
     testbutton->on_clicked.SubscribeForever([&](){
-      /*module1 = nullptr;
-      module2 = nullptr;
-      console_module = nullptr;
       if(!main_canvas) return;
-      module1 = ModuleFactory::CreateNewInstance("base/simplein");
-      module2 = ModuleFactory::CreateNewInstance("base/simpleout");
-      main_canvas->InsertModule(module1);
-      main_canvas->InsertModule(module2);*/
-      Example().Then([](std::string s){
-        std::cout << "Late reply " << s << std::endl;
-      });
+      LateSet( module1, ModuleFactory::CreateNewInstance("base/sine"));
+      //module2 = ModuleFactory::CreateNewInstance("base/simpleout");
+      //main_canvas->InsertModule(module1);
+      //main_canvas->InsertModule(module2);
+      //auto in =
     });
     quitbutton->on_clicked.SubscribeForever([&](){
       SDLMain::Quit();
@@ -149,6 +146,7 @@ int main(int argc, char *argv[]){
       // Pretend we are creating new instances
       //SCLang::DebugQueryInstalled();
       main_canvas = Canvas::CreateEmpty();
+
     });
 
     Utilities::global_idle.SubscribeForever([&](){

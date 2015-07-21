@@ -22,6 +22,21 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+Bus::Bus(int i) : id(i) {}
+
+Bus::~Bus(){
+  /// TODO: Ask SC to remove the bus
+}
+
+LateReply<std::shared_ptr<Bus>> Bus::CreateNew(){
+  auto r = Relay<std::shared_ptr<Bus>>::Create();
+  SCLang::SendOSCSimple([r](lo::Message msg){
+    int id = msg.argv()[0]->i32;
+    r.Return( std::shared_ptr<Bus>(new Bus(id)) );
+  }, "/algaudioSC/newbus");
+  return r;
+}
+
 void Module::AddInlet(std::string s){
   inlets.emplace_back(Inlet(s,*this));
 }

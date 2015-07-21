@@ -13,6 +13,9 @@ Out.ar(outbus,in);
     </sc>
   </module>
   <module id="simpleout" name="Simple output">
+    <parrams>
+      <inlet id="inbus"/>
+    </parrams>
     <sc>
 arg inbus;
 var in = In.ar(inbus);
@@ -20,6 +23,9 @@ Out.ar(0,in);
     </sc>
   </module>
   <module id="simplein" name="Simple input">
+    <parrams>
+      <inlet id="output"/>
+    </parrams>
     <sc>
 arg outbus;
 var in = SoundIn.ar(0);
@@ -39,4 +45,16 @@ Out.ar(0,in1);
 Out.ar(1,in2);
     </sc>
   </module>
+
+
+  <module id="sine" name="Sine oscillator">
+    <parrams>
+      <outlet id="outbus"/>
+    </parrams>
+    <sc>
+arg freq=440, amp=1, outbus;
+Out.ar(outbus, SinOsc.ar(freq,0,amp));
+    </sc>
+  </module>
+
 </collection>

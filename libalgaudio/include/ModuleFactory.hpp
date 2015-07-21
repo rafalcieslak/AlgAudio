@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 #include "Module.hpp"
 #include "ModuleTemplate.hpp"
+#include "LateReply.hpp"
 
 namespace AlgAudio{
 
@@ -31,8 +32,8 @@ private:
   ModuleFactory() = delete; // static class
   static std::set<std::shared_ptr<Module>> instances;
 public:
-  static std::shared_ptr<Module> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ);
-  static std::shared_ptr<Module> CreateNewInstance(std::string id);
+  static LateReply<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ);
+  static LateReply<std::shared_ptr<Module>> CreateNewInstance(std::string id);
   static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string);
 };
 

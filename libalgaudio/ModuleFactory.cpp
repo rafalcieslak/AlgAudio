@@ -25,11 +25,12 @@ namespace AlgAudio{
 
 std::set<std::shared_ptr<Module>> ModuleFactory::instances;
 
-std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::string id){
+LateReply<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id){
   return CreateNewInstance( GetTemplateByID(id) );
 }
 
-std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ){
+LateReply<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ){
+  auto r = Relay<std::shared_ptr<Module>>::Create();
   std::shared_ptr<Module> res;
   if(!templ->has_class){
     res = std::make_shared<Module>(templ);
@@ -39,7 +40,7 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
     Module* module = templ->collection.defaultlib->AskForInstance(templ->class_name);
     if(module == nullptr){
       std::cout << "Warning: Failed to create class instance '" << templ->class_name << "' from library." << std::endl;
-      return nullptr;
+      return r.Return(nullptr);
     }
     module->templ = templ;
     /*
@@ -68,11 +69,16 @@ std::shared_ptr<Module> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleT
       int id = msg.argv()[0]->i32;
       std::cout << "On id " << id << std::endl;
       res->sc_id = id;
+      res->CreateIOFromTemplate();
+      // TODO: on_init after latereply of CreateIOFromTemplate
+      res->on_init();
+      r.Return(res);
     },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());
+  }else{
+    res->on_init();
+    r.Return(res);
   }
-  res->CreateIOFromTemplate();
-  res->on_init();
-  return res;
+  return r;
 }
 
 std::shared_ptr<ModuleTemplate> ModuleFactory::GetTemplateByID(std::string id){

@@ -35,9 +35,9 @@ class Bus{
 public:
   int GetID() {return id;}
   static LateReply<std::shared_ptr<Bus>> CreateNew();
-private:
-  Bus();
   ~Bus();
+private:
+  Bus(int id);
   int id;
 };
 
@@ -55,7 +55,9 @@ public:
   // TODO: Common base class
   class Outlet{
   public:
-    Outlet(std::string i, Module& m) : id(i), mod(m) {}
+    Outlet(std::string i, Module& m) : id(i), mod(m) {
+      mod.SetParram(id, 999999999);
+    }
     std::string id;
     Module& mod;
     // The outlet is not the owner of a bus.
@@ -63,7 +65,13 @@ public:
   };
   class Inlet{
   public:
-    Inlet(std::string i, Module& m) : id(i), mod(m) {}
+    Inlet(std::string i, Module& m) : id(i), mod(m) {
+      Bus::CreateNew().Then([=](std::shared_ptr<Bus> b){
+        std::cout << b.get() << " " << this << std::endl;
+        bus = b;
+        mod.SetParram(id, b->GetID());
+      });
+    }
     std::string id;
     Module& mod;
     // The inlet is the owner of a bus.

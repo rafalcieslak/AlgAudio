@@ -49,14 +49,14 @@ void SCLangSubprocess::ThreadMain(){
   started = true;
   while(run) Step();
   // Close everything
-  SendInstruction("\n\n0.exit;\n\n");
+  SendInstruction("\n\ns.quit;\n0.exit;\n\n");
   Step();
   subprocess = nullptr;
   started = false;
 }
 void SCLangSubprocess::Step(){
 
-  Utilities::WaitOS(200);
+  Utilities::WaitOS(20);
   // Take an instruction, send it, wait for prompt collecting reply, store
   // the reply in out buffer
 
@@ -75,9 +75,6 @@ void SCLangSubprocess::Step(){
     replies.push_back(std::bind(p.second,reply));
     io_mutex.unlock();
   }
-  //for(auto& p : instructions_copy){
-  //  SendInstructionRaw(p);
-  //}
 
   PollOutput();
 }
