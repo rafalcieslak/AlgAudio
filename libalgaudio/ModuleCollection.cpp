@@ -115,6 +115,7 @@ LateReply<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, st
   if(from == templates_by_id.end()){
     return r.Return();
   };
+  std::cout << "Installing template " << (from->second)->name << std::endl;
   SCLang::InstallTemplate(*(from->second)).Then([=]()mutable{
     from++;
     InstallAllTemplatesIntoSC(from).Then([=](){
@@ -192,6 +193,7 @@ LateReply<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string
   if(from == collections_by_id.end()){
     return r.Return();
   };
+  std::cout << "Installing collection " << from->second->name << std::endl;
   (from->second)->InstallAllTemplatesIntoSC().Then([=]()mutable{
     from++;
     InstallAllTemplatesIntoSC(from).Then([=](){

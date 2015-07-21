@@ -138,13 +138,15 @@ int main(int argc, char *argv[]){
       if(!main_canvas) return;
 
       Sync s(2);
+      LateAssign(module2, ModuleFactory::CreateNewInstance("base/stereoout")).ThenSync(s);
       LateAssign(module1, ModuleFactory::CreateNewInstance("base/sine")).ThenSync(s);
-      LateAssign(module2, ModuleFactory::CreateNewInstance("base/simplein")).ThenSync(s);
       s.WhenAll([&](){
         std::cout << "Both modules ready" << std::endl;
         main_canvas->InsertModule(module1);
         main_canvas->InsertModule(module2);
-        // connect module1 and module2
+        //module1->SetParram("amp", 0.3);
+        Module::Connect(module1->outlets[0], module2->inlets[0]);
+        //Module::Connect(module1->outlets[0], module2->inlets[1]);
       });
 
     });

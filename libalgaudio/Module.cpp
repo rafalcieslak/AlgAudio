@@ -50,6 +50,11 @@ LateReply<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, 
   return r;
 }
 
+void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::Inlet> i){
+  o->bus = i->bus;
+  o->mod.SetParram(o->id, i->bus->GetID());
+}
+
 LateReply<> Module::CreateIOFromTemplate(){
   auto r = Relay<>::Create();
   Sync s(templ->inlets.size());
@@ -71,6 +76,9 @@ LateReply<> Module::CreateIOFromTemplate(){
 
 void Module::SetParram(std::string name, int value){
   SCLang::SendOSC("/algaudioSC/setparram", "isi", sc_id, name.c_str(), value);
+}
+void Module::SetParram(std::string name, double value){
+  SCLang::SendOSC("/algaudioSC/setparram", "isd", sc_id, name.c_str(), value);
 }
 
 } // namespace AlgAudio

@@ -32,17 +32,15 @@ var in = SoundIn.ar(0);
 Out.ar(outbus,in);
     </sc>
   </module>
-  <module id="stereout" name="Stereo output">
+  <module id="stereoout" name="Stereo output">
     <parrams>
       <inlet id="inbus1"/>
       <inlet id="inbus2"/>
     </parrams>
     <sc>
 arg inbus1, inbus2;
-var in1 = In.ar(inbus1);
-var in2 = In.ar(inbus2);
-Out.ar(0,in1);
-Out.ar(1,in2);
+Out.ar(0,In.ar(inbus1));
+Out.ar(1,In.ar(inbus2));
     </sc>
   </module>
 

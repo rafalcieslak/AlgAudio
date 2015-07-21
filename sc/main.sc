@@ -59,7 +59,7 @@ OSCdef.new( 'newbus', {
 		arg msg;
 		var newbus = Bus.audio(s,1);
 		var id = newbus.index;
-		("Creating new bus ").postln;
+		("Creating new bus " ++ id.asString).postln;
 		~buses.add( id -> newbus); // TODO: default args
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newbus'

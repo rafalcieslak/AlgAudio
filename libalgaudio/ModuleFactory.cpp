@@ -69,10 +69,10 @@ LateReply<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_
       int id = msg.argv()[0]->i32;
       std::cout << "On id " << id << std::endl;
       res->sc_id = id;
-      res->CreateIOFromTemplate();
-      // TODO: on_init after latereply of CreateIOFromTemplate
-      res->on_init();
-      r.Return(res);
+      res->CreateIOFromTemplate().Then([=](){
+        res->on_init();
+        r.Return(res);
+      });
     },"/algaudioSC/newinstance", "s", templ->GetFullID().c_str());
   }else{
     res->on_init();

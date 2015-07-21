@@ -129,13 +129,13 @@ void SCLang::SetOSCDebug(bool enabled){
 }
 LateReply<> SCLang::InstallTemplate(const ModuleTemplate& t){
   auto r = Relay<>::Create();
-  if(!t.has_sc_code) return r.GetLateReply();
+  if(!t.has_sc_code) return r.Return();
   SendOSC([=](lo::Message){
     installed_templates.insert(t.GetFullID());
     std::cout << "Got install reply!" << std::endl;
     r.Return();
   }, "/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str());
-  return r.GetLateReply();
+  return r;
 }
 bool SCLang::WasInstalled(const std::string& s){
   auto it = installed_templates.find(s);

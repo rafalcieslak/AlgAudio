@@ -18,7 +18,6 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include <memory>
 #include <vector>
 #include "DynamicallyLoadableClass.hpp"
@@ -67,10 +66,6 @@ public:
   };
   class Inlet{
   public:
-    ~Inlet(){
-      //(*(int*)0x00000) = 1;
-      std::cout << "Inlet destroyed" << std::endl;
-    }
     static LateReply<std::shared_ptr<Inlet>> Create(std::string id, Module& mod);
     std::string id;
     Module& mod;
@@ -80,6 +75,9 @@ public:
     Inlet(std::string i, Module& m, std::shared_ptr<Bus> b) : id(i), mod(m), bus(b) {}
   };
   void SetParram(std::string name, int value);
+  void SetParram(std::string name, double value);
+
+  static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);
 
   LateReply<> CreateIOFromTemplate();
   std::vector<std::shared_ptr<Inlet>> inlets;

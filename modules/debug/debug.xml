@@ -17,4 +17,19 @@ Out.ar(outbus,in);
   <module id="console" name="SCLang console view">
     <class name="Console"/>
   </module>
+  <module id="debugsrc" name="Debug sound source">
+    <parrams>
+      <inlet id="aaa"/>
+    </parrams>
+    <sc>
+Out.ar(0,SinOsc.ar(500,0,1));
+Out.ar([0,1], In.ar(10,1));
+    </sc>
+  </module>
+  <module id="debugout" name="Debug sound output">
+    <sc>
+Out.ar(1,SinOsc.ar(440,0,1));
+Out.ar(10,WhiteNoise.ar(0.5));
+    </sc>
+  </module>
 </collection>
