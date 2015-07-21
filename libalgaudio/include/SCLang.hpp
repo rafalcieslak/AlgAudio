@@ -38,14 +38,16 @@ struct SCLangException : public Exception{
 class SCLang{
   SCLang() = delete; // static class
 public:
-  static void Start(std::string command);
+  static void Start(std::string command, bool supernova = false);
   static void Restart(std::string command);
   static void Stop();
   static bool IsRunning() { return subprocess != nullptr; }
   static void Poll();
   static Signal<std::string> on_line_received;
-  static Signal<> on_start_completed;
-  static Signal<> on_server_started;
+  // Arg: bool: success, string: message
+  static Signal<bool, std::string> on_start_completed;
+  // Arg: bool: success
+  static Signal<bool> on_server_started;
   static Signal<int,std::string> on_start_progress;
   static void SendInstruction(std::string);
   static LateReturn<> InstallTemplate(const ModuleTemplate&);

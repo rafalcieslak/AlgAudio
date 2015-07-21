@@ -41,9 +41,20 @@ void UILabel::SetText(std::string t){
   text = t;
   UpdateTexture();
 }
-
+void UILabel::SetTextColor(std::string c){
+  color = c;
+  UpdateTexture();
+}
+void UILabel::SetTextSize(int size){
+  fontsize = size;
+  UpdateTexture();
+}
+void UILabel::SetBold(bool b){
+  bold = b;
+  UpdateTexture();
+}
 void UILabel::UpdateTexture(){
-  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text, Theme::Get(color), Theme::Get("bg-main"));
+  texture = TextRenderer::Render(window, FontParrams((bold)?"Dosis-Bold":"Dosis-Regular",fontsize), text, Theme::Get(color), Theme::Get("bg-main"));
   SetRequestedSize(texture->GetSize() + Size2D(5,5));
   SetNeedsRedrawing();
 }

@@ -33,48 +33,61 @@ namespace AlgAudio{
 std::unique_ptr<SCLangSubprocess> SCLang::subprocess;
 std::set<std::string> SCLang::installed_templates;
 Signal<std::string> SCLang::on_line_received;
-Signal<> SCLang::on_start_completed;
-Signal<> SCLang::on_server_started;
+Signal<bool, std::string> SCLang::on_start_completed;
+Signal<bool> SCLang::on_server_started;
 Signal<int,std::string> SCLang::on_start_progress;
 bool SCLang::osc_debug = false;
 bool SCLang::ready = false;
 std::unique_ptr<OSC> SCLang::osc;
 
-void SCLang::Start(std::string command){
+void SCLang::Start(std::string command, bool supernova){
   if(subprocess) return;
   subprocess = std::make_unique<SCLangSubprocess>(command);
   subprocess->on_any_line_received.SubscribeForever([&](std::string l){
     on_line_received.Happen(l);
   });
-  subprocess->on_started.SubscribeOnce([](){ SCLang::Start2(); });
   on_start_progress.Happen(1,"Starting SCLang...");
   subprocess->Start();
+  subprocess->on_started.SubscribeOnce([supernova](){
+    // The SC dir should be in current directory.
+    SetOSCDebug(osc_debug);
+    on_start_progress.Happen(3,"Loading scripts...");
+
+    // TODO: Check if the directories and files exist.
+    std::string main_script = Utilities::ConvertOSpathToUniPath(Utilities::GetCurrentDir()) + "/sc/main.sc";
+    if(!Utilities::GetFileExists( Utilities::ConvertUnipathToOSPath(main_script))){
+      on_start_completed.Happen(false,"Main SC scripts are missing");
+      return;
+    }
+    SendInstruction("(\"" + main_script + "\").loadPaths;");
+
+    subprocess->SendInstruction("NetAddr.localAddr.port.postln;", [&,supernova](std::string port){
+      port = Utilities::SplitString(port,"\n")[1];
+      std::cout << "SCLang is using port " << port << std::endl;
+      on_start_progress.Happen(4,"Starting OSC...");
+      osc = std::make_unique<OSC>("localhost", port);
+      SendOSCWithReply("/algaudioSC/hello").Then([supernova](lo::Message){
+        on_start_progress.Happen(5,"Booting server...");
+        BootServer(supernova);
+        on_server_started.SubscribeOnce([&](bool success){
+          if(success){
+            ready = true;
+            on_start_progress.Happen(8,"Installing module templates...");
+            ModuleCollectionBase::InstallAllTemplatesIntoSC().Then([=](){
+              on_start_progress.Happen(10,"Complete.");
+              on_start_completed.Happen(true,"");
+            });
+          }else{
+            // Server failed to boot
+            on_start_completed.Happen(false,"SC Server failed to start");
+          }
+        });
+      }); // /algaudioSC/hello
+    }); // sendinstruction port
+  }); // subprocess started
 }
 void SCLang::Start2(){
-  // The SC dir should be in current directory.
-  SetOSCDebug(osc_debug);
-  on_start_progress.Happen(3,"Loading scripts...");
-  // TODO: Check if the directories and files exist.
-  std::string path_to_scripts = Utilities::ConvertOSpathToUniPath( Utilities::GetCurrentDir() ) + "/" + "sc";
-  SendInstruction("(\"" + path_to_scripts + "/main.sc\").loadPaths;");
-  subprocess->SendInstruction("NetAddr.localAddr.port.postln;", [&](std::string port){
-    port = Utilities::SplitString(port,"\n")[1];
-    std::cout << "SCLang is using port " << port << std::endl;
-    on_start_progress.Happen(4,"Starting OSC...");
-    osc = std::make_unique<OSC>("localhost", port);
-    SendOSCWithReply("/algaudioSC/hello").Then([](lo::Message){
-      on_start_progress.Happen(5,"Booting server...");
-      on_server_started.SubscribeOnce([&](){
-        ready = true;
-        on_start_progress.Happen(8,"Installing module templates...");
-        ModuleCollectionBase::InstallAllTemplatesIntoSC().Then([=](){
-          on_start_progress.Happen(10,"Complete.");
-          on_start_completed.Happen();
-        });
-      });
-      BootServer();
-    });
-  });
+
 }
 
 void SCLang::Restart(std::string command){
@@ -155,12 +168,13 @@ void SCLang::BootServer(bool supernova){
   // TODO: Server options
   if(supernova) SendInstruction("Server.supernova;");
   else SendInstruction("Server.scsynth;");
-  SendOSCWithReply("/algaudioSC/boothelper").Then([&](lo::Message m){
+  SendOSCWithReply("/algaudioSC/boothelper", "si", "ASIO", (supernova)?1:0).Then([&](lo::Message m){
     int status = m.argv()[0]->i32;
     if(status){
-      on_server_started.Happen();
+      on_server_started.Happen(true);
     }else{
       std::cout << "WARNING: sc server failed to boot!" << std::endl;
+      on_server_started.Happen(false);
     }
   });
 }

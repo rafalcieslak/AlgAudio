@@ -33,9 +33,17 @@ OSCdef.new( 'installtemplate', {
 // A helper method for notifying the app if starting the server succeeded.
 OSCdef.new( 'boothelper', {
 		arg msg;
+		s.options.device = msg[1].asString;
+		if((msg[2].asInt == 1),{
+			"Server will start in Supernova mode".postln;
+			Server.supernova;
+		},{
+			"Server will start in SCSynth mode".postln;
+			Server.scsynth;
+		});
 		s.waitForBoot({
 			~addr.sendMsg("/algaudio/reply", 1, msg[msg.size-1]);
-		}, 50, {
+		}, 35, {
 			~addr.sendMsg("/algaudio/reply", 0, msg[msg.size-1]);
 		});
 	}, '/algaudioSC/boothelper'

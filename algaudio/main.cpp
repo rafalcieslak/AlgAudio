@@ -90,10 +90,11 @@ int main(int argc, char *argv[]){
     auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",52);
     auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
     auto chkbox = mainwindow->Create<UICheckbox>("Enable OSC debugging");
+    auto supernovachkbox = mainwindow->Create<UICheckbox>("Enable Supernova mode");
     auto mainvbox = UIVBox::Create(mainwindow);
     auto buttonhbox = UIHBox::Create(mainwindow);
     auto progressbar = UIProgressBar::Create(mainwindow);
-    auto statustext = UILabel::Create(mainwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",10);
+    auto statustext = UILabel::Create(mainwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
 
     //mainvbox->SetPadding(10);
     mainwindow->Insert(marginbox);
@@ -101,6 +102,7 @@ int main(int argc, char *argv[]){
     mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
     mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
     mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
+    mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
     mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
     mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
@@ -113,7 +115,7 @@ int main(int argc, char *argv[]){
 
     startbutton->on_clicked.SubscribeForever([&](){
       if(!SCLang::IsRunning()){
-        SCLang::Start(sclang_path);
+        SCLang::Start(sclang_path, supernovachkbox->active);
         startbutton->SetText("Stop SCLang");
       }else{
         SCLang::Stop();
@@ -121,6 +123,8 @@ int main(int argc, char *argv[]){
         statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
         startbutton->SetText("Start SCLang");
       }
+      statustext->SetTextColor("text-generic");
+      statustext->SetBold(false);
     });
     SCLang::on_start_progress.SubscribeForever([&](int n, std::string msg){
       progressbar->SetAmount(n/10.0);
@@ -152,11 +156,16 @@ int main(int argc, char *argv[]){
       // Let closing the main window close the whole app.
       SDLMain::Quit();
     });
-    SCLang::on_start_completed.SubscribeForever([&](){
-      // Pretend we are creating new instances
-      //SCLang::DebugQueryInstalled();
-      main_canvas = Canvas::CreateEmpty();
-
+    SCLang::on_start_completed.SubscribeForever([&](bool success, std::string message){
+      if(success){
+        main_canvas = Canvas::CreateEmpty();
+        /* ... */
+      }else{
+        statustext->SetText(message);
+        statustext->SetBold(true);
+        statustext->SetTextColor("text-error");
+        progressbar->SetAmount(0);
+      }
     });
 
     Utilities::global_idle.SubscribeForever([&](){
