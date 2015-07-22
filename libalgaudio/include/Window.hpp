@@ -34,7 +34,7 @@ class Window : public std::enable_shared_from_this<Window>{
 private:
   SDLHandle h;
 public:
-  static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300);
+  static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300, bool centered = true);
   ~Window();
 
   // explicitly forbid copying windows
@@ -64,8 +64,9 @@ public:
   unsigned int GetID() const {return id;}
   Size2D GetSize() const;
   SDL_Renderer* GetRenderer() const {return renderer;}
+protected:
+  Window(std::string title, int w, int h, bool centered = true);
 private:
-  Window(std::string title, int w, int h);
   std::string title;
   int width;
   int height;

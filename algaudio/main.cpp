@@ -32,6 +32,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UICheckbox.hpp"
 #include "UI/UIProgressBar.hpp"
 #include "LateReturn.hpp"
+#include "MainWindow.hpp"
 
 using namespace AlgAudio;
 
@@ -74,6 +75,8 @@ int main(int argc, char *argv[]){
     //TestSync(); return 0;
     Theme::Init();
 
+    std::shared_ptr<MainWindow> mainwindow = nullptr;
+
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     std::shared_ptr<Module> module1, module2, console_module;
@@ -82,22 +85,22 @@ int main(int argc, char *argv[]){
       console_module = mod;
     });
 
-    auto mainwindow = Window::Create("AlgAudio config",280,400);
-    auto marginbox = mainwindow->Create<UIMarginBox>(10,10,10,10);
-    auto startbutton = mainwindow->Create<UIButton>("Start SCLang");
-    auto testbutton = mainwindow->Create<UIButton>("Test button");
-    auto quitbutton = mainwindow->Create<UIButton>("Quit App");
-    auto titlelabel = mainwindow->Create<UILabel>("AlgAudio",52);
-    auto configlabel = mainwindow->Create<UILabel>("This place is left for config.");
-    auto chkbox = mainwindow->Create<UICheckbox>("Enable OSC debugging");
-    auto supernovachkbox = mainwindow->Create<UICheckbox>("Enable Supernova mode");
-    auto mainvbox = UIVBox::Create(mainwindow);
-    auto buttonhbox = UIHBox::Create(mainwindow);
-    auto progressbar = UIProgressBar::Create(mainwindow);
-    auto statustext = UILabel::Create(mainwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
+    auto configwindow = Window::Create("AlgAudio config",280,400);
+    auto marginbox = configwindow->Create<UIMarginBox>(10,10,10,10);
+    auto startbutton = configwindow->Create<UIButton>("Start SCLang");
+    auto testbutton = configwindow->Create<UIButton>("Test button");
+    auto quitbutton = configwindow->Create<UIButton>("Quit App");
+    auto titlelabel = configwindow->Create<UILabel>("AlgAudio",52);
+    auto configlabel = configwindow->Create<UILabel>("This place is left for config.");
+    auto chkbox = configwindow->Create<UICheckbox>("Enable OSC debugging");
+    auto supernovachkbox = configwindow->Create<UICheckbox>("Enable Supernova mode");
+    auto mainvbox = UIVBox::Create(configwindow);
+    auto buttonhbox = UIHBox::Create(configwindow);
+    auto progressbar = UIProgressBar::Create(configwindow);
+    auto statustext = UILabel::Create(configwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
 
     //mainvbox->SetPadding(10);
-    mainwindow->Insert(marginbox);
+    configwindow->Insert(marginbox);
     marginbox->Insert(mainvbox);
     mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
     mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
@@ -152,14 +155,21 @@ int main(int argc, char *argv[]){
     chkbox->on_toggled.SubscribeForever([&](bool state){
       SCLang::SetOSCDebug(state);
     });
-    mainwindow->on_close.SubscribeForever([&](){
-      // Let closing the main window close the whole app.
+    configwindow->on_close.SubscribeForever([&](){
+      // Let closing the config window close the whole app.
       SDLMain::Quit();
     });
     SCLang::on_start_completed.SubscribeForever([&](bool success, std::string message){
       if(success){
         main_canvas = Canvas::CreateEmpty();
-        /* ... */
+        mainwindow = MainWindow::Create();
+        mainwindow->on_close.SubscribeForever([&](){
+          // Let closing the main window close the whole app.
+          SDLMain::Quit();
+        });
+        SDLMain::UnregisterWindow(configwindow);
+        configwindow = nullptr; // loose reference
+        SDLMain::RegisterWindow(mainwindow);
       }else{
         statustext->SetText(message);
         statustext->SetBold(true);
@@ -172,7 +182,7 @@ int main(int argc, char *argv[]){
       SCLang::Poll();
     });
 
-    SDLMain::RegisterWindow(mainwindow);
+    SDLMain::RegisterWindow(configwindow);
 
     SDLMain::Loop();
 

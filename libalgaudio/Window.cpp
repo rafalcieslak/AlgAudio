@@ -25,12 +25,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-Window::Window(std::string t, int w, int h) :
+Window::Window(std::string t, int w, int h, bool centered) :
   title(t), width(w), height(h)
 {
   //std::cout << "Creating a new window" << std::endl;
   // TODO: investigate SDL_WINDOW_INPUT_GRABBED
-  window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_RESIZABLE);
+  window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE);
   if(!window) throw SDLException("Unable to create a window");
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
   SDL_RendererInfo r;
@@ -41,8 +41,8 @@ Window::Window(std::string t, int w, int h) :
   id = SDL_GetWindowID(window);
 }
 
-std::shared_ptr<Window> Window::Create(std::string title, int w, int h){
-  std::shared_ptr<Window> res(new Window(title,w,h));
+std::shared_ptr<Window> Window::Create(std::string title, int w, int h, bool centered){
+  std::shared_ptr<Window> res(new Window(title,w,h,centered));
   return res;
 }
 

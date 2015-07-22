@@ -52,7 +52,7 @@ public:
 class Console : public AlgAudio::Module{
 public:
   void on_init(){
-    auto console_window = AlgAudio::Window::Create("SCLang console", 500, 400);
+    auto console_window = AlgAudio::Window::Create("SCLang console", 500, 400, false);
     auto mainvbox = AlgAudio::UIVBox::Create(console_window);
     auto textarea = AlgAudio::UITextArea::Create(console_window, AlgAudio::Color(255,255,255), AlgAudio::Color(0,0,0));
     auto clipboard_button = AlgAudio::UIButton::Create(console_window, "Copy console output to clipboard");
@@ -70,7 +70,7 @@ public:
     subscriptions += clipboard_button->on_clicked.Subscribe([=](){
       AlgAudio::Utilities::CopyToClipboard(textarea->GetAllText());
     });
-    console_window->on_close.SubscribeForever([=](){
+    console_window->on_close.SubscribeForever([&](){
       AlgAudio::SDLMain::UnregisterWindow(console_window);
     });
     AlgAudio::SDLMain::RegisterWindow(console_window);
