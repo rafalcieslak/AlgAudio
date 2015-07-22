@@ -50,6 +50,7 @@ public:
 private:
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
   static void ProcessEvents();
+  static int last_draw_time;
 };
 
 } // namespace AlgAudio

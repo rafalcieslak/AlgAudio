@@ -24,6 +24,7 @@ namespace AlgAudio{
 
 std::map<unsigned int, std::shared_ptr<Window>> SDLMain::registered_windows;
 std::atomic_bool SDLMain::running;
+int SDLMain::last_draw_time = -1000000;
 
 void SDLMain::Loop(){
   running = true;
@@ -33,19 +34,27 @@ void SDLMain::Loop(){
 }
 
 void SDLMain::Step(){
-  // TODO: Actual FPS limit
-  SDL_Delay(10);
-  // Process user input
-  ProcessEvents();
-  // Redraw registered windows
-  for(auto& it : registered_windows){
-    it.second->Render();
+  // Temporary CPU limiter.
+  // Eventually this will have to be rewritten to waiting on a conditional variable
+  // guarding a global events (sdl, osc, subprocess) queue, so that the main loop
+  // only wakes up when it's needed.
+  SDL_Delay(2);
+  // Milliseconds from start
+  int newtime = SDL_GetTicks();
+  if(newtime > last_draw_time + 30){
+    last_draw_time = newtime;
+    // Process user input
+    ProcessEvents();
+    // Redraw registered windows
+    for(auto& it : registered_windows){
+      it.second->Render();
+    }
+    // Temporarily, by default, stop the main loop if there are no registered
+    // windows left.
+    if(registered_windows.size() == 0) Quit();
   }
   // Call the global idle, allowing all subsribers to do whatever they need
   Utilities::global_idle.Happen();
-  // Temporarily, by default, stop the main loop if there are no registered
-  // windows left.
-  if(registered_windows.size() == 0) Quit();
 }
 
 void SDLMain::ProcessEvents(){
