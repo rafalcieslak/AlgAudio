@@ -1,3 +1,5 @@
+#ifndef UILAYERED_HPP
+#define UILAYERED_HPP
 /*
 This file is part of AlgAudio.
 
@@ -16,28 +18,26 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "MainWindow.hpp"
-#include "UI/UIBox.hpp"
-#include "UI/UIButton.hpp"
+#include "UIWidget.hpp"
 
 namespace AlgAudio{
 
-MainWindow::MainWindow() : Window("AlgAudio",900,600){
-}
-
-void MainWindow::init(){
-  auto mainvbox = UIVBox::Create(shared_from_this());
-  auto addbutton = UIButton::Create(shared_from_this()," A ");
-  auto toolbarbox = UIHBox::Create(shared_from_this());
-  toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
-  Insert(mainvbox);
-}
-
-std::shared_ptr<MainWindow> MainWindow::Create(){
-  auto res = std::shared_ptr<MainWindow>( new MainWindow());
-  res->init();
-  return res;
-}
+class UILayered: public UIWidget{
+public:
+  static std::shared_ptr<UILayered> Create(std::weak_ptr<Window> parent_window);
+  void Insert(std::shared_ptr<UIWidget> child);
+  virtual void CustomDraw(DrawContext& c) override;
+  virtual void CustomResize(Size2D) override;
+  virtual void OnChildRequestedSizeChanged() override;
+private:
+  UILayered(std::weak_ptr<Window> parent_window);
+  struct ChildData{
+    std::shared_ptr<UIWidget> child;
+    bool visible;
+  }
+  std::list<std::shared_ptr<UIWidget>> children;
+};
 
 } // namespace AlgAudio
+
+#endif // UILAYERED_HPP
