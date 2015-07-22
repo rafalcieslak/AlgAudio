@@ -38,6 +38,17 @@ struct OSCException : public Exception{
   OSCException(std::string t) : Exception(t) {}
 };
 
+template<typename T>
+inline T UnpackLOMessage(const lo::Message& msg, unsigned int n);
+template<>
+inline int UnpackLOMessage<int>(const lo::Message& msg, unsigned int n){ return msg.argv()[n]->i32; }
+template<>
+inline float UnpackLOMessage<float>(const lo::Message& msg, unsigned int n){ return msg.argv()[n]->f; }
+template<>
+inline double UnpackLOMessage<double>(const lo::Message& msg, unsigned int n){ return msg.argv()[n]->d; }
+template<>
+inline std::string UnpackLOMessage<std::string>(const lo::Message& msg, unsigned int n){ return std::string(&msg.argv()[n]->s); }
+
 class OSC{
 public:
   OSC(std::string address, std::string port);

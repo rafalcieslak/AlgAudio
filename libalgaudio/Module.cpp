@@ -30,8 +30,7 @@ Bus::~Bus(){
 
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   auto r = Relay<std::shared_ptr<Bus>>::Create();
-  SCLang::SendOSCWithReply("/algaudioSC/newbus").Then( [r](lo::Message msg){
-    int id = msg.argv()[0]->i32;
+  SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
     r.Return( std::shared_ptr<Bus>(new Bus(id)) );
   });
   return r;

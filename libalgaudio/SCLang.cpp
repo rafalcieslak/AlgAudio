@@ -66,7 +66,7 @@ void SCLang::Start(std::string command, bool supernova){
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
       osc = std::make_unique<OSC>("localhost", port);
-      SendOSCWithReply("/algaudioSC/hello").Then([supernova](lo::Message){
+      SendOSCWithEmptyReply("/algaudioSC/hello").Then([supernova](){
         on_start_progress.Happen(5,"Booting server...");
         BootServer(supernova);
         on_server_started.SubscribeOnce([&](bool success){
@@ -106,7 +106,7 @@ void SCLang::SendOSC(const std::string& path){
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path);
 }
-LateReturn<lo::Message> SCLang::SendOSCWithReply(const std::string& path){
+LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   auto r = Relay<lo::Message>::Create();
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   lo::Message m;
@@ -125,7 +125,7 @@ void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
   m.add_varargs(t, q);
   osc->Send(path, m);
 }
-LateReturn<lo::Message> SCLang::SendOSCWithReply(const std::string &path, const std::string &tag, ...){
+LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, const std::string &tag, ...){
   auto r = Relay<lo::Message>::Create();
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
@@ -151,7 +151,7 @@ void SCLang::SetOSCDebug(bool enabled){
 LateReturn<> SCLang::InstallTemplate(const ModuleTemplate& t){
   auto r = Relay<>::Create();
   if(!t.has_sc_code) return r.Return();
-  SendOSCWithReply("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str()).Then([=](lo::Message){
+  SendOSCWithEmptyReply("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str()).Then([=](){
     installed_templates.insert(t.GetFullID());
     std::cout << "Got install reply!" << std::endl;
     r.Return();
@@ -168,8 +168,7 @@ void SCLang::BootServer(bool supernova){
   // TODO: Server options
   if(supernova) SendInstruction("Server.supernova;");
   else SendInstruction("Server.scsynth;");
-  SendOSCWithReply("/algaudioSC/boothelper", "si", "ASIO", (supernova)?1:0).Then([&](lo::Message m){
-    int status = m.argv()[0]->i32;
+  SendOSCWithReply<int>("/algaudioSC/boothelper", "si", "ASIO", (supernova)?1:0).Then([&](int status){
     if(status){
       on_server_started.Happen(true);
     }else{

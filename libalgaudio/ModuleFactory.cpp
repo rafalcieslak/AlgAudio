@@ -65,9 +65,8 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
     if(!SCLang::ready){
       std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
     }
-    SCLang::SendOSCWithReply("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
-      .Then([=](lo::Message msg){
-        int id = msg.argv()[0]->i32;
+    SCLang::SendOSCWithReply<int>("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
+      .Then([=](int id){
         std::cout << "On id " << id << std::endl;
         res->sc_id = id;
         res->CreateIOFromTemplate().Then([=](){

@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <memory>
 #include <set>
+#include <type_traits>
 
 #include "OSC.hpp"
 #include "Signal.hpp"
@@ -56,8 +57,14 @@ public:
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
   static void SendOSC(const std::string& path, const std::string &tag, ...);
-  static LateReturn<lo::Message> SendOSCWithReply(const std::string& path);
-  static LateReturn<lo::Message> SendOSCWithReply(const std::string& path, const std::string& tag, ...);
+  static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path);
+  static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path, const std::string& tag, ...);
+  template <typename... Q, typename... Rest>
+  inline static LateReturn<Q...> SendOSCWithReply(const std::string& path, Rest... args);
+  // The above function cannot be partially speciallised... Thus we need to use another name for the case
+  // when Q = {}.
+  template <typename... Rest>
+  inline static LateReturn<> SendOSCWithEmptyReply(const std::string& path, Rest... args);
   static void BootServer(bool supernova = false);
   static void StopServer();
   static bool ready;
@@ -68,6 +75,29 @@ private:
   static bool osc_debug;
   static std::unique_ptr<OSC> osc;
 };
+
+template <typename... T>
+struct is_nonempty : std::true_type {};
+template <>
+struct is_nonempty<> : std::false_type {};
+
+template <typename... Q, typename... Rest>
+inline LateReturn<Q...> SCLang::SendOSCWithReply(const std::string& path, Rest... args){
+  static_assert(is_nonempty<Q...>::value, "If you wish to use SendOSCWithReply with no return types, use SendOSCWithEmptyReply instead.");
+  auto r = Relay<Q...>::Create();
+  SendOSCWithLOReply(path,args...).Then([=](lo::Message msg){
+    r.Return( UnpackLOMessage<Q...>(msg,0) );
+  });
+  return r;
+}
+template <typename... Rest>
+inline LateReturn<> SCLang::SendOSCWithEmptyReply(const std::string& path, Rest... args){
+  auto r = Relay<>::Create();
+  SendOSCWithLOReply(path,args...).Then([=](lo::Message){
+    r.Return();
+  });
+  return r;
+}
 
 } // namespace AlgAudio
 
