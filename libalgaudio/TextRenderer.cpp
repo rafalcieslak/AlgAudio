@@ -40,26 +40,30 @@ TTF_Font* TextRenderer::Preload(FontParrams fp){
   return f;
 }
 
-std::shared_ptr<SDLTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text, const Color& cl, const Color& bg){
+void FixSurface(SDL_Surface* s){
+  std::cout << "Examining surface" << std::endl;
+}
+
+std::shared_ptr<SDLTextTexture> TextRenderer::RenderShaded(std::weak_ptr<Window> w,FontParrams fp, std::string text){
   // Woarkaround for rendering empty strings
   if(text == "") text = " ";
 
-  //SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl.SDL());
-  SDL_Surface* surf = TTF_RenderUTF8_Shaded(GetFont(fp), text.c_str(), cl, bg);
+  SDL_Surface* surf = TTF_RenderUTF8_Shaded(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255}, SDL_Color{0,0,0,0});
   if(!surf)
     std::cout << "Warning: TTF_RenderUTF8_Shaded failed " << TTF_GetError() << std::endl;
-  auto res = std::make_shared<SDLTexture>(w, surf);
+  auto res = std::make_shared<SDLTextTexture>(w, surf);
   SDL_FreeSurface(surf);
   return res;
 }
-std::shared_ptr<SDLTexture> TextRenderer::RenderBlended(std::weak_ptr<Window> w,FontParrams fp, std::string text, const Color& cl){
+std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text){
   // Woarkaround for rendering empty strings
   if(text == "") text = " ";
 
-  SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), cl);
+  SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255});
   if(!surf)
     std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
-  auto res = std::make_shared<SDLTexture>(w, surf);
+  FixSurface(surf);
+  auto res = std::make_shared<SDLTextTexture>(w, surf);
   SDL_FreeSurface(surf);
   return res;
 }

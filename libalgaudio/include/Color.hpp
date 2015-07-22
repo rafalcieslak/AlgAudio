@@ -18,7 +18,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <string>
 struct SDL_Color;
 
 namespace AlgAudio{
@@ -39,6 +39,9 @@ public:
     Color ZeroAlpha() const { return Color(r,g,b,0); }
     Color Lighter(double amount) const;
     Color Darker(double amount) const;
+  std::string ToString(){
+    return "{r: " + std::to_string(r) + ", g:" + std::to_string(g) + ", b:" + std::to_string(b) + "}";
+  }
 private:
 // HSL representation wrapper
   class HSL{

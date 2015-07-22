@@ -36,7 +36,7 @@ private:
   std::string color;
   int fontsize;
   bool bold = false;
-  std::shared_ptr<SDLTexture> texture;
+  std::shared_ptr<SDLTextTexture> texture;
   void UpdateTexture();
 };
 

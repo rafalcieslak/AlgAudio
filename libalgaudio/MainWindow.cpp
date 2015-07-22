@@ -32,7 +32,7 @@ void MainWindow::init(){
   auto addbutton = UIButton::Create(shared_from_this()," A ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
-  auto label1 = UILabel::Create(shared_from_this(), "This is one label", 16);
+  auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIt happens to be multiline!", 16);
   auto label2 = UILabel::Create(shared_from_this(), "THIS IS ANOTHER", 10);
 
   toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));

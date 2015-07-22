@@ -66,8 +66,9 @@ void UIButton::CustomDraw(DrawContext& c){
   c.DrawLine(1,c.height-2,c.width-2,c.height-2);
 
   c.SetColor(text_color);
-  c.DrawTexture(
+  c.DrawText(
     texture,
+    text_color,
     c.width/2  - texture->GetSize().width/2  + ((pressed)?2:0),
     c.height/2 - texture->GetSize().height/2 + ((pressed)?1:0)
   );
@@ -91,7 +92,7 @@ void UIButton::SetFontSize(int fs){
 
 void UIButton::UpdateTexture(){
   // Todo: Blended render, so that the same text texture can be used for any BG
-  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text, text_color, GetBgColor());
+  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text);
   SetRequestedSize(texture->GetSize() + Size2D(10,10));
   SetNeedsRedrawing();
 }

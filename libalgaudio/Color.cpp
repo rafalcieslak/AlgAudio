@@ -24,7 +24,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 SDL_Color Color::SDL() const{
-  return SDL_Color{r,g,b,alpha};
+  std::cout << "Used." << std::endl;
+  return SDL_Color{r*(alpha/255.0),g*(alpha/255.0),b*(alpha/255.0),alpha};
 }
 
 Color::operator SDL_Color() const{

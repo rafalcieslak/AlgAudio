@@ -34,7 +34,7 @@ private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;
   int fontsize = 16;
-  std::shared_ptr<SDLTexture> texture;
+  std::shared_ptr<SDLTextTexture> texture;
   Color bg_color;
   Color text_color;
   void UpdateTexture();

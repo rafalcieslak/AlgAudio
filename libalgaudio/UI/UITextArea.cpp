@@ -42,12 +42,12 @@ void UITextArea::CustomDraw(DrawContext& c){
   if(!bottom_alligned){
     unsigned int n = 0;
     for(int y = 2; y < c.height && n < text.size(); y += spacing, n++){
-      c.DrawTexture(textures[n], 2, y);
+      c.DrawText(textures[n], c_fg, 2, y);
     }
   }else{
     int n = text.size()-1;
     for(int y = c.height-2-spacing; y > 0 - spacing && n >= 0; y -= spacing, n--){
-      c.DrawTexture(textures[n], 2, y);
+      c.DrawText(textures[n], c_fg, 2, y);
     }
   }
 }
@@ -57,7 +57,7 @@ void UITextArea::Push(std::string s){
 }
 void UITextArea::PushLine(std::string s){
   text.push_back(s);
-  textures.push_back( TextRenderer::RenderBlended(window, FontParrams("FiraMono-Regular",10), s, c_fg) );
+  textures.push_back( TextRenderer::Render(window, FontParrams("FiraMono-Regular",10), s) );
   SetNeedsRedrawing();
 }
 

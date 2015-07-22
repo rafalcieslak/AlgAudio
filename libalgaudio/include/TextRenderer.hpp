@@ -31,6 +31,7 @@ struct SDL_Color;
 namespace AlgAudio{
 
 class SDLTexture;
+class SDLTextTexture;
 class Window;
 
 struct FontParrams{
@@ -44,8 +45,8 @@ struct FontParrams{
 class TextRenderer{
   TextRenderer() = delete; // static class
 public:
-  static std::shared_ptr<SDLTexture> Render(std::weak_ptr<Window>, FontParrams, std::string,  const Color&, const Color&);
-  static std::shared_ptr<SDLTexture> RenderBlended(std::weak_ptr<Window>, FontParrams, std::string,  const Color&);
+  static std::shared_ptr<SDLTextTexture> RenderShaded(std::weak_ptr<Window>, FontParrams, std::string);
+  static std::shared_ptr<SDLTextTexture> Render(std::weak_ptr<Window>, FontParrams, std::string);
   static TTF_Font* GetFont(FontParrams);
   static TTF_Font* Preload(FontParrams);
 private:

@@ -37,7 +37,7 @@ public:
 private:
   UITextArea(std::weak_ptr<Window> parent_window, Color c_fg, Color c_bg = Color(0,0,0));
   std::vector<std::string> text;
-  std::vector<std::shared_ptr<SDLTexture>> textures;
+  std::vector<std::shared_ptr<SDLTextTexture>> textures;
   bool bottom_alligned = false;
   Color c_fg, c_bg;
 };

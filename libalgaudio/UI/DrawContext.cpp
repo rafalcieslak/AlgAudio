@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "SDLTexture.hpp"
+#include "Color.hpp"
 
 namespace AlgAudio{
 
@@ -40,6 +41,15 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
+void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int x_, int y_){
+  //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
+  const Size2D texture_size = texture->GetSize();
+  SDL_Rect source{0, 0, texture_size.width, texture_size.height};
+  SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
+  SDL_SetTextureColorMod(texture->texture, c.r, c.g, c.b);
+  SDL_RenderCopy(renderer, texture->texture, &source, &dest);
+  SDL_SetTextureColorMod(texture->texture, 255,255,255);
+}
 
 void DrawContext::DrawRect(int x, int y, int w, int h){
   SDL_Rect rect{x,y,w,h};
@@ -58,7 +68,8 @@ void DrawContext::Clear(){
 void DrawContext::Clear(Color c){
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
   SetColor(c);
-  Fill();
+  //Fill();
+  SDL_RenderClear(renderer);
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 void DrawContext::Push(int x1, int y1, int width_, int height_){
@@ -119,7 +130,7 @@ void DrawContext::SetColor(short r, short g, short b, short a){
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 void DrawContext::SetColor(const Color& c){
-  SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.alpha);
+  SDL_SetRenderDrawColor(renderer, c.r*(c.alpha/255.0), c.g*(c.alpha/255.0), c.b*(c.alpha/255.0), c.alpha);
 }
 bool DrawContext::HasZeroArea(){
   if(width <= 0 || height <= 0) return true;

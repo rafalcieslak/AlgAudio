@@ -32,6 +32,7 @@ struct SDL_Rect;
 namespace AlgAudio{
 
 class SDLTexture;
+class SDLTextTexture;
 
 // A DrawContext is defined by it's bounds (x/y/width/height). It serves as
 // a handy offset/clip proxy to an SDL2 renderer.
@@ -44,6 +45,9 @@ public:
   void SetColor(const Color&);
   void DrawLine(int x1, int y1, int x2, int y2);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
+  void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
+  // Draws the text texture onto a clear cache. Does not blend anything, this is useful
+  void DrawTextClear(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   void DrawRect(int x, int y, int w, int h);
   void Fill();
   void Clear();
