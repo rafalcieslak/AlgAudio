@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UILayered::UILayered(std::weak_ptr<Window> w) : Widget(w){
+UILayered::UILayered(std::weak_ptr<Window> w) : UIWidget(w){
 
 }
 
@@ -28,24 +28,34 @@ std::shared_ptr<UILayered> UILayered::Create(std::weak_ptr<Window> w){
   return std::shared_ptr<UILayered>(new UILayered(w));
 }
 
-void UILayered::Insert(std::shared_ptr<UIWidget> child, bool visible){
-
+void UILayered::Insert(const std::shared_ptr<UIWidget>& child){
+  children.push_back(child); // copies the pointer
+  RecalculateSize();
+  SetNeedsRedrawing();
 }
-void UILayered::SetChildVisible(std::shared_ptr<UIWidget> child, bool visible){
-
+void UILayered::CustomDraw(DrawContext& c){
+  // No need to adjust context size etc.
+  // Just draw them all stacked each on another.
+  for(auto& child : children)
+    child->Draw(c);
 }
-virtual void CustomDraw(DrawContext& c){
-
-}
-virtual void CustomResize(Size2D size){
-  for(auto& chdata : children){
+void UILayered::CustomResize(Size2D size){
+  for(auto& child : children){
     // All children get our full size
-    if(chdata.visible)
-      chdata.child->Resize(size);
+    child->Resize(size);
   }
 }
-virtual void OnChildRequestedSizeChanged(){
-
+void UILayered::OnChildRequestedSizeChanged(){
+  RecalculateSize();
+}
+void UILayered::RecalculateSize(){
+  int maxw = 0, maxh = 0;
+  for(auto& child : children){
+    Size2D s = child->GetRequestedSize();
+    if(s.width > maxw) maxw = s.width;
+    if(s.height > maxh) maxh = s.height;
+  }
+  SetRequestedSize(Size2D(maxw,maxh));
 }
 
 } // namespace AlgAudio

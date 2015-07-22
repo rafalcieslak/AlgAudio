@@ -25,18 +25,14 @@ namespace AlgAudio{
 class UILayered: public UIWidget{
 public:
   static std::shared_ptr<UILayered> Create(std::weak_ptr<Window> parent_window);
-  void Insert(std::shared_ptr<UIWidget> child, bool visible = true);
+  void Insert(const std::shared_ptr<UIWidget>& child);
   virtual void CustomDraw(DrawContext& c) override;
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
-  void SetChildVisible(std::shared_ptr<UIWidget, bool visible);
 private:
   UILayered(std::weak_ptr<Window> parent_window);
-  struct ChildData{
-    std::shared_ptr<UIWidget> child;
-    bool visible;
-  }
-  std::list<std::shared_ptr<ChildData>> children;
+  std::list<std::shared_ptr<UIWidget>> children;
+  void RecalculateSize();
 };
 
 } // namespace AlgAudio

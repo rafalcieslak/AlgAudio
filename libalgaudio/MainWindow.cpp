@@ -19,6 +19,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "MainWindow.hpp"
 #include "UI/UIBox.hpp"
 #include "UI/UIButton.hpp"
+#include "UI/UILayered.hpp"
+#include "UI/UILabel.hpp"
 
 namespace AlgAudio{
 
@@ -29,8 +31,18 @@ void MainWindow::init(){
   auto mainvbox = UIVBox::Create(shared_from_this());
   auto addbutton = UIButton::Create(shared_from_this()," A ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
+  auto layered = UILayered::Create(shared_from_this());
+  auto label1 = UILabel::Create(shared_from_this(), "This is one label", 16);
+  auto label2 = UILabel::Create(shared_from_this(), "THIS IS ANOTHER", 10);
+
+  toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
+
+  layered->Insert(label1);
+  layered->Insert(label2);
+
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
+  mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   Insert(mainvbox);
 }
 
