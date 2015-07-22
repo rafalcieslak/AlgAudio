@@ -134,7 +134,10 @@ int main(int argc, char *argv[]){
       statustext->SetText(msg);
     });
     testbutton->on_clicked.SubscribeForever([&](){
+      testbutton->SetVisible(false);
+      
       if(!main_canvas) return;
+
 
       Sync s(2);
       LateAssign(module2, ModuleFactory::CreateNewInstance("base/stereoout")).ThenSync(s);

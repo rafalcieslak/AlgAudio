@@ -61,11 +61,20 @@ void UIWidget::Resize(Size2D s){
 
 void UIWidget::SetNeedsRedrawing(){
   if(needs_redrawing) return;
+  if(!visible) return;
   needs_redrawing = true;
   auto p = parent.lock();
   auto w = window.lock();
   if(p) p->SetNeedsRedrawing();
   else if(w) w->SetNeedsRedrawing();
+}
+
+void UIWidget::SetVisible(bool v){
+  if(v == visible) return;
+  visible = v;
+  if(v) SetNeedsRedrawing();
+  auto p = parent.lock();
+  if(p) p->OnChildVisibilityChanged();
 }
 
 void UIWidget::SetRequestedSize(Size2D s){

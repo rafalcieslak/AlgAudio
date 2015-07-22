@@ -34,6 +34,7 @@ public:
   virtual void CustomDraw(DrawContext& c) override;
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
+  virtual void OnChildVisibilityChanged() override;
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
   void SetPadding(unsigned int padding);
   virtual void OnMouseButton(bool down, short b,Point2D) override;

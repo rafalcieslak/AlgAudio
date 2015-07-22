@@ -1,5 +1,3 @@
-#ifndef UILAYERED_HPP
-#define UILAYERED_HPP
 /*
 This file is part of AlgAudio.
 
@@ -18,27 +16,36 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UIWidget.hpp"
+#include "UI/UILayered.hpp"
 
 namespace AlgAudio{
 
-class UILayered: public UIWidget{
-public:
-  static std::shared_ptr<UILayered> Create(std::weak_ptr<Window> parent_window);
-  void Insert(std::shared_ptr<UIWidget> child, bool visible = true);
-  virtual void CustomDraw(DrawContext& c) override;
-  virtual void CustomResize(Size2D) override;
-  virtual void OnChildRequestedSizeChanged() override;
-  void SetChildVisible(std::shared_ptr<UIWidget, bool visible);
-private:
-  UILayered(std::weak_ptr<Window> parent_window);
-  struct ChildData{
-    std::shared_ptr<UIWidget> child;
-    bool visible;
+UILayered::UILayered(std::weak_ptr<Window> w) : Widget(w){
+
+}
+
+std::shared_ptr<UILayered> UILayered::Create(std::weak_ptr<Window> w){
+  return std::shared_ptr<UILayered>(new UILayered(w));
+}
+
+void UILayered::Insert(std::shared_ptr<UIWidget> child, bool visible){
+
+}
+void UILayered::SetChildVisible(std::shared_ptr<UIWidget> child, bool visible){
+
+}
+virtual void CustomDraw(DrawContext& c){
+
+}
+virtual void CustomResize(Size2D size){
+  for(auto& chdata : children){
+    // All children get our full size
+    if(chdata.visible)
+      chdata.child->Resize(size);
   }
-  std::list<std::shared_ptr<ChildData>> children;
-};
+}
+virtual void OnChildRequestedSizeChanged(){
+
+}
 
 } // namespace AlgAudio
-
-#endif // UILAYERED_HPP

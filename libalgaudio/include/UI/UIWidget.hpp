@@ -97,7 +97,8 @@ public:
   void SetWindow(std::weak_ptr<Window> w){window = w;}
   */
   // Toggles widget display
-  bool visible = true;
+  void SetVisible(bool);
+  bool IsVisible(){return visible;}
 
   const Size2D& GetRequestedSize() const{ return requested_size; }
 
@@ -134,6 +135,8 @@ protected:
 
   /* This method will be called by a child when it changes the desired size. */
   virtual void OnChildRequestedSizeChanged() {}
+  /* This method will be called by a child when it changes its visibility. */
+  virtual void OnChildVisibilityChanged() {}
 
 private:
    // The 0,0,0,0 color is white on Linux. This may be because SDL interprets
@@ -147,6 +150,8 @@ private:
 
   // This flag is used to track incorrect usage of SetRequestedSize()
   bool in_custom_resize = false;
+
+  bool visible = true;
 
   std::shared_ptr<SDLTexture> cache_texture;
   void RedrawToCache(Size2D size);
