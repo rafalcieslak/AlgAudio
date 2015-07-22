@@ -26,16 +26,16 @@ Color no_color(0,0,0);
 
 void Theme::Init(){
   // A possible example theme
-  thememap["bg-main"] = Color(0x3f4752ff);
-  thememap["bg-main-alt"] = Color(0x2f3722ff);
+  thememap["bg-main"] = Color(0x424c5fff);
+  thememap["bg-main-alt"] = Color(0x363f4fff);
   thememap["bg-button-positive"] = Color(0x5c786cff);
   thememap["bg-button-negative"] = Color(0x785c6aff);
-  thememap["bg-button-neutral"] = Color(0x3d4f67ff);
+  thememap["bg-button-neutral"] = Color(0x415a8aff);
   thememap["mg_main"] = Color(0x5c6878ff);
   thememap["text-generic"] = Color(0xaaaeb8ff);
   thememap["text-button"] = Color(0x212227ff);
   thememap["text-error"] = Color(0xdc8c96ff);
-  thememap["progress-bar"] = Color(0x3c788fff);
+  thememap["progress-bar"] = Color(0x346d97ff);
 }
 
 const Color& Theme::Get(const std::string& id){
