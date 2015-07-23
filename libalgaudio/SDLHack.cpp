@@ -47,6 +47,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef ENABLE_OPENGL
 
   #include <GL/gl.h>
+  #include <GL/glext.h>
 
   typedef enum {
       SHADER_NONE,

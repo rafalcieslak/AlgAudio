@@ -31,8 +31,10 @@ SDLException::SDLException(std::string t) :
 SDLHandle::SDLHandle(){
   if(reference_counter == 0){
     std::cout << "Starting SDL." << std::endl;
-    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
+    if(SDL_Init(SDL_INIT_EVENTS) != 0)
       throw SDLException("SDL_Init failed");
+    if(SDL_VideoInit(NULL) != 0)
+      throw SDLException("SDL_VideoInit failed");
     if(TTF_Init() != 0 )
       throw SDLException("TTF_Init failed");
   }
@@ -46,6 +48,7 @@ SDLHandle::~SDLHandle(){
   if(reference_counter ==0){
     std::cout << "Stopping SDL." << std::endl;
     TTF_Quit();
+    SDL_VideoQuit();
     SDL_Quit();
   }
 }
