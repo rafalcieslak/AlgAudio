@@ -30,6 +30,7 @@ std::shared_ptr<UILayered> UILayered::Create(std::weak_ptr<Window> w){
 
 void UILayered::Insert(const std::shared_ptr<UIWidget>& child){
   children.push_back(child); // copies the pointer
+  child->parent = shared_from_this();
   RecalculateSize();
   SetNeedsRedrawing();
 }
@@ -37,7 +38,8 @@ void UILayered::CustomDraw(DrawContext& c){
   // No need to adjust context size etc.
   // Just draw them all stacked each on another.
   for(auto& child : children)
-    child->Draw(c);
+    if(child->IsVisible())
+      child->Draw(c);
 }
 void UILayered::CustomResize(Size2D size){
   for(auto& child : children){
@@ -47,6 +49,9 @@ void UILayered::CustomResize(Size2D size){
 }
 void UILayered::OnChildRequestedSizeChanged(){
   RecalculateSize();
+}
+void UILayered::OnChildVisibilityChanged(){
+  SetNeedsRedrawing();
 }
 void UILayered::RecalculateSize(){
   int maxw = 0, maxh = 0;

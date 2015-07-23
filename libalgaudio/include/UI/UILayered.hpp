@@ -29,6 +29,7 @@ public:
   virtual void CustomDraw(DrawContext& c) override;
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
+  virtual void OnChildVisibilityChanged() override;
 private:
   UILayered(std::weak_ptr<Window> parent_window);
   std::list<std::shared_ptr<UIWidget>> children;

@@ -29,16 +29,22 @@ MainWindow::MainWindow() : Window("AlgAudio",900,600){
 
 void MainWindow::init(){
   auto mainvbox = UIVBox::Create(shared_from_this());
-  auto addbutton = UIButton::Create(shared_from_this()," A ");
+  auto addbutton = UIButton::Create(shared_from_this()," Add new ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
-  auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIt happens to be multiline!", 16);
+  auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
   auto label2 = UILabel::Create(shared_from_this(), "THIS IS ANOTHER", 10);
 
   toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
 
   layered->Insert(label1);
   layered->Insert(label2);
+  label2->SetVisible(false);
+  label2->SetClearColor(Color(0,0,0,128));
+
+  subscriptions += addbutton->on_clicked.Subscribe([=](){
+    label2->SetVisible(!label2->IsVisible());
+  });
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);

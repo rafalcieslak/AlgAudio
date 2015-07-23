@@ -30,7 +30,7 @@ namespace AlgAudio{
 
 struct UIWidget;
 
-class Window : public std::enable_shared_from_this<Window>{
+class Window : public SubscriptionsManager, public std::enable_shared_from_this<Window>{
 private:
   SDLHandle h;
 public:
