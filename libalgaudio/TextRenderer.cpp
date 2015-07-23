@@ -20,7 +20,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "SDLTexture.hpp"
-#include "Theme.hpp"
+#include "Utilities.hpp"
+#include "Window.hpp"
+#include "UI/DrawContext.hpp"
 #include <iostream>
 
 namespace AlgAudio{
@@ -40,28 +42,51 @@ TTF_Font* TextRenderer::Preload(FontParrams fp){
   fontbank[fp] = f;
   return f;
 }
-
-std::shared_ptr<SDLTextTexture> TextRenderer::RenderShaded(std::weak_ptr<Window> w,FontParrams fp, std::string text){
-  // Woarkaround for rendering empty strings
-  if(text == "") text = " ";
-
-  SDL_Surface* surf = TTF_RenderUTF8_Shaded(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255}, SDL_Color{0,0,0,0});
-  if(!surf)
-    std::cout << "Warning: TTF_RenderUTF8_Shaded failed " << TTF_GetError() << std::endl;
-  auto res = std::make_shared<SDLTextTexture>(w, surf);
-  SDL_FreeSurface(surf);
-  return res;
-}
 std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text){
   // Woarkaround for rendering empty strings
+  auto parent_window = w.lock();
   if(text == "") text = " ";
-
-  SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255});
-  if(!surf)
-    std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
-  SDLTexture::PremultiplySurface32RGBA(surf);
-  auto res = std::make_shared<SDLTextTexture>(w, surf);
-  SDL_FreeSurface(surf);
+  // Split the text into lines.
+  std::vector<std::string> lines = Utilities::SplitString(text,"\n");
+  // Buffers.
+  std::vector<SDL_Surface*> surfaces;
+  std::vector<std::shared_ptr<SDLTexture>> textures;
+  // For each line of text
+  for(auto& l : lines){
+    // Ask SDL_TTF to render a line
+    SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), l.c_str(), SDL_Color{255,255,255,255});
+    if(!surf){
+      std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
+      continue;
+    }
+    // Use SDLHack to premultiply alpha
+    SDLTexture::PremultiplySurface32RGBA(surf);
+    // Store the surface in buffer.
+    surfaces.push_back(surf);
+  }
+  int totalh = 0, maxw = 0;
+  // When all surfaces are ready, for each surface
+  for(auto& surf : surfaces){
+    // create corresponding texture.
+    textures.push_back(std::make_shared<SDLTextTexture>(w, surf));
+    SDL_FreeSurface(surf);
+    // Calculate total size
+    Size2D size = textures.back()->GetSize();
+    totalh += size.height;
+    if(size.width >= maxw) maxw = size.width;
+  }
+  // Prepare the result texture
+  auto res = std::make_shared<SDLTextTexture>(w,Size2D(maxw,totalh));
+  // Create a helper drawcontext
+  DrawContext dc(parent_window ->GetRenderer(), 0,0,maxw,totalh);
+  // We'll be drawing onto the result texture
+  dc.Push(res,maxw,totalh);
+  int currenty = 0;
+  for(auto& texture : textures){
+    dc.DrawTexture(texture,0,currenty);
+    currenty += texture->GetSize().height;
+  }
+  dc.Pop();
   return res;
 }
 } // namespace AlgAudio

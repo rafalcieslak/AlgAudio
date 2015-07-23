@@ -60,6 +60,25 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   size.height = surf->h;
 }
 
+
+SDLTexture::SDLTexture(SDLTexture&& other) :
+  handle(std::move(other.handle)),
+  texture(std::move(other.texture)),
+  valid(std::move(other.valid)),
+  parent(std::move(other.parent)),
+  size(std::move(other.size))
+{
+  other.valid = false;
+}
+SDLTexture& SDLTexture::operator=(SDLTexture&& other){
+  handle = std::move(other.handle);
+  texture = std::move(other.texture);
+  valid = std::move(other.valid);
+  parent = std::move(other.parent);
+  size = std::move(other.size);
+  return *this;
+}
+
 SDLTexture::~SDLTexture(){
   //std::cout << "Destroying a texture" << std::endl;
   if(valid) SDL_DestroyTexture(texture);
