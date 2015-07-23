@@ -39,6 +39,7 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
+  EnablePremiumBlending();
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
 void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int x_, int y_){
@@ -46,6 +47,7 @@ void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
+  EnablePremiumBlending();
   SDL_SetTextureColorMod(texture->texture, c.r, c.g, c.b);
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
   SDL_SetTextureColorMod(texture->texture, 255,255,255);
@@ -60,17 +62,19 @@ void DrawContext::Fill(){
 	SDL_RenderFillRect(renderer,NULL);
 }
 void DrawContext::Clear(){
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+  //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
   SetColor(Color(0,0,0,0));
   Fill();
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  EnablePremiumBlending();
 }
 void DrawContext::Clear(Color c){
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
+  //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
   SetColor(c);
   //Fill();
   SDL_RenderClear(renderer);
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  //SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  EnablePremiumBlending();
 }
 void DrawContext::Push(int x1, int y1, int width_, int height_){
   // Remember the previous state

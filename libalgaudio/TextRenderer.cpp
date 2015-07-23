@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "SDLTexture.hpp"
+#include "Theme.hpp"
 #include <iostream>
 
 namespace AlgAudio{
@@ -40,10 +41,6 @@ TTF_Font* TextRenderer::Preload(FontParrams fp){
   return f;
 }
 
-void FixSurface(SDL_Surface* s){
-  std::cout << "Examining surface" << std::endl;
-}
-
 std::shared_ptr<SDLTextTexture> TextRenderer::RenderShaded(std::weak_ptr<Window> w,FontParrams fp, std::string text){
   // Woarkaround for rendering empty strings
   if(text == "") text = " ";
@@ -62,7 +59,7 @@ std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,Fon
   SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), text.c_str(), SDL_Color{255,255,255,255});
   if(!surf)
     std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
-  FixSurface(surf);
+  SDLTexture::PremultiplySurface32RGBA(surf);
   auto res = std::make_shared<SDLTextTexture>(w, surf);
   SDL_FreeSurface(surf);
   return res;

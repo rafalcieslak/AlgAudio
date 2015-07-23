@@ -61,6 +61,8 @@ public:
   void Push(Point2D p, Size2D s);
   void Push(std::shared_ptr<SDLTexture>, int width, int height);
   void Pop();
+
+  void EnablePremiumBlending();
 private:
   int x,y;
   SDL_Renderer* renderer;
