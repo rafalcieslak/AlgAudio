@@ -24,6 +24,7 @@ namespace AlgAudio{
 
 std::map<unsigned int, std::shared_ptr<Window>> SDLMain::registered_windows;
 std::atomic_bool SDLMain::running;
+Signal<float> SDLMain::on_before_frame;
 int SDLMain::last_draw_time = -1000000;
 
 void SDLMain::Loop(){
@@ -41,10 +42,13 @@ void SDLMain::Step(){
   SDL_Delay(2);
   // Milliseconds from start
   int newtime = SDL_GetTicks();
-  if(newtime > last_draw_time + 30){
+  int delta = newtime - last_draw_time;
+  if(delta > 30){
     last_draw_time = newtime;
     // Process user input
     ProcessEvents();
+    // Process possible animations
+    on_before_frame.Happen(delta/1000.0);
     // Redraw registered windows
     for(auto& it : registered_windows){
       it.second->Render();

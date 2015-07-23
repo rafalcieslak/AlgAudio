@@ -50,6 +50,14 @@ struct Point2D{
   Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
 };
 
+// For text alignment, drawer orientation etc.
+typedef enum {
+  Direction_TOP,
+  Direction_RIGHT,
+  Direction_BOTTOM,
+  Direction_LEFT,
+} Direction;
+
 class Exception{
 public:
   Exception(std::string t) : text(t) {};

@@ -46,6 +46,11 @@ public:
   static void UnregisterAll();
   static unsigned int GetWindowNum() {return registered_windows.size();}
 
+  // Hook your code to this signal if you wish to perform animations.
+  // The float argument is the time delta (in seconds) from the time where
+  // the last frame was drawn.
+  static Signal<float> on_before_frame;
+
   static std::atomic_bool running;
 private:
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
