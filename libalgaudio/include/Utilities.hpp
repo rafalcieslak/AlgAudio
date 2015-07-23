@@ -58,6 +58,10 @@ public:
 protected:
   std::string text;
 };
+class UnimplementedException : public Exception{
+public:
+  UnimplementedException(std::string t) : Exception(t){}
+};
 
 class Utilities{
 private:
