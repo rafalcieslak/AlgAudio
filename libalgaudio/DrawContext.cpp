@@ -128,6 +128,7 @@ void DrawContext::UpdateClipRect(){
   //std::cout << "Clip set: " << x << " " << y << " " << width << " " << height << std::endl;
   SDL_Rect clip{x,y,width,height};
   SDL_RenderSetClipRect(renderer, &clip);
+  EnablePremiumClip();
 }
 
 void DrawContext::SetColor(short r, short g, short b, short a){

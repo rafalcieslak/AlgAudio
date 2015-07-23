@@ -63,6 +63,7 @@ public:
   void Pop();
 
   void EnablePremiumBlending();
+  void EnablePremiumClip();
 private:
   int x,y;
   SDL_Renderer* renderer;
