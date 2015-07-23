@@ -42,7 +42,6 @@ public:
   void Resize(Size2D size);
   Size2D GetSize() {return size;}
   friend class DrawContext;
-  static void PremultiplySurface32RGBA(SDL_Surface* surf);
 private:
   SDLHandle handle;
   SDL_Texture* texture;

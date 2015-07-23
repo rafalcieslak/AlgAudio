@@ -7,7 +7,7 @@ add_definitions(
 	-g
 )
 
-file(GLOB LIBALGAUDIO_SOURCES ./*.cpp ./UI/*.cpp)
+file(GLOB LIBALGAUDIO_SOURCES ./*.cpp ./UI/*.cpp ./SDLFix/*.cpp)
 file(GLOB LIBALGAUDIO_INCLUDES ./include/*.hpp)
 
 include_directories(

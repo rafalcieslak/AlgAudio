@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "DrawContext.hpp"
 #include "UI/UIWidget.hpp"
 #include "SDLMain.hpp"
+#include "SDLFix/SDLFix.hpp"
 
 namespace AlgAudio{
 
@@ -33,11 +34,11 @@ Window::Window(std::string t, int w, int h, bool centered) :
   window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE);
   if(!window) throw SDLException("Unable to create a window");
   renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+  if(!renderer) throw SDLException("Unable to create a renderer");
   SDL_RendererInfo r;
   SDL_GetRendererInfo(renderer,&r);
   std::cout << "New renderer: " << r.name << std::endl;
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-  if(!renderer) throw SDLException("Unable to create a renderer");
+  SDLFix::FixRenderer(renderer);
   id = SDL_GetWindowID(window);
 }
 

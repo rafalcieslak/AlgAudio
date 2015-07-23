@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include "SDLTexture.hpp"
+#include "SDLFix/SDLFix.hpp"
 #include "Utilities.hpp"
 #include "Window.hpp"
 #include "DrawContext.hpp"
@@ -59,8 +60,8 @@ std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,Fon
       std::cout << "Warning: TTF_RenderUTF8_Blended failed " << TTF_GetError() << std::endl;
       continue;
     }
-    // Use SDLHack to premultiply alpha
-    SDLTexture::PremultiplySurface32RGBA(surf);
+    // Use SDLFix to premultiply alpha
+    SDLFix::PremultiplySurface32RGBA(surf);
     // Store the surface in buffer.
     surfaces.push_back(surf);
   }

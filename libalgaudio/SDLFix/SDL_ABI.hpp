@@ -1,3 +1,7 @@
+#ifndef SDL_ABI
+#define SDL_ABI
+
+/*
 When accessing the internals of SDL in order to get native handles, it is
 necessary to know the offsets of several data fields in structures.
 Below are these structures compiled into on file for your convenience.
@@ -20,6 +24,9 @@ freely, subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
+
+*/
+
 
 /// =======================================
 /// ========== SDL structures =============
@@ -128,6 +135,7 @@ struct SDL_Renderer
 /// ======== DIRECT3D structures ==========
 /// =======================================
 
+#ifdef ENABLE_DX3D
 
 typedef struct
 {
@@ -137,11 +145,13 @@ typedef struct
   // There are more fields, but we'll just ignore them.
 } D3D_RenderData;
 
-
+#endif //ENABLE_DX3D
 
 /// =======================================
 /// ======== OPENGL structures ==========
 /// =======================================
+
+#ifdef ENABLE_OPENGL
 
 typedef enum {
     SHADER_NONE,
@@ -247,3 +257,7 @@ SDL_PROC(void, glLoadIdentity, (void))
   // This struct has more fields, but we'll ignore them.
 
 } GL_RenderData;
+
+#endif // ENABLE_OPENGL
+
+#endif //SDL_ABI
