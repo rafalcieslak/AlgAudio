@@ -29,6 +29,7 @@ public:
 private:
   MainWindow();
   void init();
+  bool flag = false;
 };
 
 } //namespace AlgAudio

@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UILayered.hpp"
 #include "UI/UILabel.hpp"
 #include "UI/UIPosition.hpp"
+#include "UI/UIAnimDrawer.hpp"
 
 namespace AlgAudio{
 
@@ -34,19 +35,26 @@ void MainWindow::init(){
   auto toolbarbox = UIHBox::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
-  auto label2 = UILabel::Create(shared_from_this(), "THIS IS ANOTHER", 10);
+  auto label2 = UILabel::Create(shared_from_this(), "THIS ONE SLIDES IN FROM THE LEFT!!!", 10);
   auto position = UIPosition::Create(shared_from_this());
+  auto drawer = UIAnimDrawer::Create(shared_from_this(), Direction_LEFT);
 
   toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
 
-  position->SetVisible(false);
   position->SetClearColor(Color(0,0,0,30));
   position->Insert(label2,Point2D(40,40));
   layered->Insert(label1);
-  layered->Insert(position);
+  layered->Insert(drawer);
+  drawer->Insert(position);
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
-    position->SetVisible(!position->IsVisible());
+    if(flag){
+      drawer->StartHide(1.0);
+      flag = false;
+    }else{
+      drawer->StartShow(1.0);
+      flag = true;
+    }
   });
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
