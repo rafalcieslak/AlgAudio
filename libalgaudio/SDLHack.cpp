@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/DrawContext.hpp"
+#include "DrawContext.hpp"
 #include "SDLMain.hpp"
 #include "SDLTexture.hpp"
 #include <SDL2/SDL.h>

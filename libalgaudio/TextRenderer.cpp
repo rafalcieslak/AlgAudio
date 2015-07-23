@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLTexture.hpp"
 #include "Utilities.hpp"
 #include "Window.hpp"
-#include "UI/DrawContext.hpp"
+#include "DrawContext.hpp"
 #include <iostream>
 
 namespace AlgAudio{

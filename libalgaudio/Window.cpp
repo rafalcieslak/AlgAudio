@@ -19,7 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Window.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
-#include "UI/DrawContext.hpp"
+#include "DrawContext.hpp"
 #include "UI/UIWidget.hpp"
 #include "SDLMain.hpp"
 
