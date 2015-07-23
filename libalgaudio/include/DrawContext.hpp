@@ -40,7 +40,6 @@ class DrawContext{
 public:
   DrawContext() {};
   DrawContext(SDL_Renderer* renderer, int x, int y, int width, int height);
-  int width, height;
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const Color&);
   void DrawLine(int x1, int y1, int x2, int y2);
@@ -62,6 +61,7 @@ public:
   void Push(std::shared_ptr<SDLTexture>, int width, int height);
   void Pop();
 private:
+  int width, height;
   int x,y;
   SDL_Renderer* renderer;
 

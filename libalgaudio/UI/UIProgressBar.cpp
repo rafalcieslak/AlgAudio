@@ -32,7 +32,7 @@ std::shared_ptr<UIProgressBar> UIProgressBar::Create(std::weak_ptr<Window> w){
 
 void UIProgressBar::CustomDraw(DrawContext& c){
   c.SetColor(Theme::Get("progress-bar"));
-  c.DrawRect(0,0, amount*c.width, c.height);
+  c.DrawRect(0,0, amount*c.Size().width, c.Size().height);
 }
 
 void UIProgressBar::SetAmount(double a){

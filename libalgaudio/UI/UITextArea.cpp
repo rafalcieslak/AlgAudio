@@ -41,12 +41,12 @@ void UITextArea::CustomDraw(DrawContext& c){
   const int spacing = 12;
   if(!bottom_alligned){
     unsigned int n = 0;
-    for(int y = 2; y < c.height && n < text.size(); y += spacing, n++){
+    for(int y = 2; y < c.Size().height && n < text.size(); y += spacing, n++){
       c.DrawText(textures[n], c_fg, 2, y);
     }
   }else{
     int n = text.size()-1;
-    for(int y = c.height-2-spacing; y > 0 - spacing && n >= 0; y -= spacing, n--){
+    for(int y = c.Size().height-2-spacing; y > 0 - spacing && n >= 0; y -= spacing, n--){
       c.DrawText(textures[n], c_fg, 2, y);
     }
   }

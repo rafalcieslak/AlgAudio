@@ -30,7 +30,7 @@ std::shared_ptr<UIMarginBox> UIMarginBox::Create(std::weak_ptr<Window> w, int t,
 }
 
 void UIMarginBox::CustomDraw(DrawContext& c){
-  c.Push(left, top, c.width - right - left, c.height - top - bottom);
+  c.Push(left, top, c.Size().width - right - left, c.Size().height - top - bottom);
   if(!c.HasZeroArea() && child)
     child->Draw(c);
   c.Pop();

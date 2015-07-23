@@ -53,24 +53,26 @@ Color UIButton::GetBgColor() const{
 
 void UIButton::CustomDraw(DrawContext& c){
   c.SetColor(GetBgColor());
-  c.DrawRect(0,0,c.width,c.height);
+  int w = c.Size().width;
+  int h = c.Size().height;
+  c.DrawRect(0,0,w,h);
 
   c.SetColor(bg_color.Darker(0.15));
-  c.DrawLine(0,0,c.width-1,0);
-  c.DrawLine(0,0,0,c.height-1);
-  c.DrawLine(c.width-1,0,c.width-1,c.height-1);
-  c.DrawLine(0,c.height-1,c.width-1,c.height-1);
-  c.DrawLine(1,1,c.width-2,1);
-  c.DrawLine(1,1,1,c.height-2);
-  c.DrawLine(c.width-2,1,c.width-2,c.height-2);
-  c.DrawLine(1,c.height-2,c.width-2,c.height-2);
+  c.DrawLine(0,0,w-1,0);
+  c.DrawLine(0,0,0,h-1);
+  c.DrawLine(w-1,0,w-1,h-1);
+  c.DrawLine(0,h-1,w-1,h-1);
+  c.DrawLine(1,1,w-2,1);
+  c.DrawLine(1,1,1,h-2);
+  c.DrawLine(w-2,1,w-2,h-2);
+  c.DrawLine(1,h-2,w-2,h-2);
 
   c.SetColor(text_color);
   c.DrawText(
     texture,
     text_color,
-    c.width/2  - texture->GetSize().width/2  + ((pressed)?2:0),
-    c.height/2 - texture->GetSize().height/2 + ((pressed)?1:0)
+    w/2  - texture->GetSize().width/2  + ((pressed)?2:0),
+    h/2 - texture->GetSize().height/2 + ((pressed)?1:0)
   );
 }
 

@@ -146,6 +146,8 @@ public:
     void SubscribeForever( std::function<void(Types...)> f ) { subscribers_forever.push_back(f); }
     void SubscribeOnce( std::function<void(Types...)> f ) { subscribers_once.push_back(f); }
     template<class C>
+    std::shared_ptr<Subscription> Subscribe( C* class_ptr, void (C::*member_ptr)(Types...) ) __attribute__((warn_unused_result));
+    template<class C>
     void SubscribeForever( C* class_ptr, void (C::*member_ptr)(Types...)) { subscribers_forever.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) ); }
     template<class C>
     void SubscribeOnce( C* class_ptr, void (C::*member_ptr)(Types...)) { subscribers_once.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) ); }
@@ -170,6 +172,12 @@ template <typename... Types>
 std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = f;
+  return std::shared_ptr<Subscription>(new Subscription(sub_id, my_id));
+}
+template <typename... Types> template <class C>
+std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C* class_ptr, void (C::*member_ptr)(Types...)  ) {
+  int sub_id = ++subscription_id_counter;
+  subscribers_with_id[sub_id] = std::bind(member_ptr,class_ptr,std::placeholders::_1);
   return std::shared_ptr<Subscription>(new Subscription(sub_id, my_id));
 }
 
