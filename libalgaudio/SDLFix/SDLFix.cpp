@@ -81,7 +81,8 @@ void SDLFix::FixRenderer(SDL_Renderer* renderer){
 #endif
 #ifdef ENABLE_OPENGL
   if(renderer_name == "opengl"){
-    // Fixes clip rect position
+    // Fixes clip rect position by setting function pointer to a custom modified
+    // function
     renderer->UpdateClipRect = GL_Fixed_UpdateClipRect;
     return;
   }
