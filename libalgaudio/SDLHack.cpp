@@ -31,6 +31,106 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
   #define ENABLE_OPENGL
 #endif
 
+
+typedef struct
+{
+    float x;
+    float y;
+} SDL_FPoint;
+
+typedef struct
+{
+    float x;
+    float y;
+    float w;
+    float h;
+} SDL_FRect;
+
+struct SDL_Renderer
+{
+    const void *magic;
+
+    void (*WindowEvent) (SDL_Renderer * renderer, const SDL_WindowEvent *event);
+    int (*GetOutputSize) (SDL_Renderer * renderer, int *w, int *h);
+    int (*CreateTexture) (SDL_Renderer * renderer, SDL_Texture * texture);
+    int (*SetTextureColorMod) (SDL_Renderer * renderer,
+                               SDL_Texture * texture);
+    int (*SetTextureAlphaMod) (SDL_Renderer * renderer,
+                               SDL_Texture * texture);
+    int (*SetTextureBlendMode) (SDL_Renderer * renderer,
+                                SDL_Texture * texture);
+    int (*UpdateTexture) (SDL_Renderer * renderer, SDL_Texture * texture,
+                          const SDL_Rect * rect, const void *pixels,
+                          int pitch);
+    int (*UpdateTextureYUV) (SDL_Renderer * renderer, SDL_Texture * texture,
+                            const SDL_Rect * rect,
+                            const Uint8 *Yplane, int Ypitch,
+                            const Uint8 *Uplane, int Upitch,
+                            const Uint8 *Vplane, int Vpitch);
+    int (*LockTexture) (SDL_Renderer * renderer, SDL_Texture * texture,
+                        const SDL_Rect * rect, void **pixels, int *pitch);
+    void (*UnlockTexture) (SDL_Renderer * renderer, SDL_Texture * texture);
+    int (*SetRenderTarget) (SDL_Renderer * renderer, SDL_Texture * texture);
+    int (*UpdateViewport) (SDL_Renderer * renderer);
+    int (*UpdateClipRect) (SDL_Renderer * renderer);
+    int (*RenderClear) (SDL_Renderer * renderer);
+    int (*RenderDrawPoints) (SDL_Renderer * renderer, const SDL_FPoint * points,
+                             int count);
+    int (*RenderDrawLines) (SDL_Renderer * renderer, const SDL_FPoint * points,
+                            int count);
+    int (*RenderFillRects) (SDL_Renderer * renderer, const SDL_FRect * rects,
+                            int count);
+    int (*RenderCopy) (SDL_Renderer * renderer, SDL_Texture * texture,
+                       const SDL_Rect * srcrect, const SDL_FRect * dstrect);
+    int (*RenderCopyEx) (SDL_Renderer * renderer, SDL_Texture * texture,
+                       const SDL_Rect * srcquad, const SDL_FRect * dstrect,
+                       const double angle, const SDL_FPoint *center, const SDL_RendererFlip flip);
+    int (*RenderReadPixels) (SDL_Renderer * renderer, const SDL_Rect * rect,
+                             Uint32 format, void * pixels, int pitch);
+    void (*RenderPresent) (SDL_Renderer * renderer);
+    void (*DestroyTexture) (SDL_Renderer * renderer, SDL_Texture * texture);
+
+    void (*DestroyRenderer) (SDL_Renderer * renderer);
+
+    int (*GL_BindTexture) (SDL_Renderer * renderer, SDL_Texture *texture, float *texw, float *texh);
+    int (*GL_UnbindTexture) (SDL_Renderer * renderer, SDL_Texture *texture);
+
+    /* The current renderer info */
+    SDL_RendererInfo info;
+
+    /* The window associated with the renderer */
+    SDL_Window *window;
+    SDL_bool hidden;
+
+    /* The logical resolution for rendering */
+    int logical_w;
+    int logical_h;
+    int logical_w_backup;
+    int logical_h_backup;
+
+    /* The drawable area within the window */
+    SDL_Rect viewport;
+    SDL_Rect viewport_backup;
+
+    /* The clip rectangle within the window */
+    SDL_Rect clip_rect;
+    SDL_Rect clip_rect_backup;
+
+    /* The render output coordinate scale */
+    SDL_FPoint scale;
+    SDL_FPoint scale_backup;
+
+    /* The list of textures */
+    SDL_Texture *textures;
+    SDL_Texture *target;
+
+    Uint8 r, g, b, a;                   /**< Color for drawing operations values */
+    SDL_BlendMode blendMode;            /**< The drawing blend mode */
+
+    void *driverdata;
+};
+
+
 #ifdef ENABLE_DX3D
   #include <windows.h>
   #include <d3dx9.h>
@@ -47,7 +147,6 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #ifdef ENABLE_OPENGL
 
   #include <GL/gl.h>
-  #include <GL/glext.h>
 
   typedef enum {
       SHADER_NONE,
@@ -157,7 +256,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-void DrawContext::EnablePremiumBlending(){
+void** GetDriverData(SDL_Renderer* renderer){
   // TODO: Check SDL version
 
   /*
@@ -188,13 +287,19 @@ void DrawContext::EnablePremiumBlending(){
   #error Unknown platform, SDLHack not implemented
 #endif
 
+  return (void**) ( (char*)renderer + offset );
+}
+
+void DrawContext::EnablePremiumBlending(){
+
+
   // Get SDL renderer info
   SDL_RendererInfo info;
   SDL_GetRendererInfo(renderer, &info);
   std::string renderer_name(info.name);
 
   // Calclulate where the driver data pointer inside this SDL_Renderer is.
-  void** driverdata_in_sdl_renderer = (void**) ( (char*)renderer + offset );
+  void** driverdata_in_sdl_renderer = GetDriverData(renderer);
 
 #ifdef ENABLE_DX3D
   if(renderer_name == "direct3d"){
@@ -226,6 +331,28 @@ void DrawContext::EnablePremiumBlending(){
     throw UnimplementedException("Sorry, the software renderer is not capable of required blendmodes");
   }
   throw UnimplementedException("Renderer '" + renderer_name + "' not recognized by SDLHack");
+}
+
+void DrawContext::EnablePremiumClip(){
+
+  // Get SDL renderer info
+  SDL_RendererInfo info;
+  SDL_GetRendererInfo(renderer, &info);
+  std::string renderer_name(info.name);
+
+  #ifdef ENABLE_OPENGL
+    if(renderer_name == "opengl"){
+      GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
+      const SDL_Rect *rect = &(renderer->clip_rect);
+      if (!SDL_RectEmpty(rect)) {
+          data->glEnable(GL_SCISSOR_TEST);
+          data->glScissor(rect->x, rect->y, rect->w, rect->h);
+      } else {
+          data->glDisable(GL_SCISSOR_TEST);
+      }
+      return;
+    }
+  #endif
 }
 
 void SDLTexture::PremultiplySurface32RGBA(SDL_Surface* surf){
