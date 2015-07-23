@@ -1,5 +1,5 @@
-#ifndef UIMARGINBOX_HPP
-#define UIMARGINBOX_HPP
+#ifndef UIPOSITION_HPP
+#define UIPOSITION_HPP
 /*
 This file is part of AlgAudio.
 
@@ -22,25 +22,25 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-class UIMarginBox : public UIWidget{
+class UIPosition: public UIWidget{
 public:
-  static std::shared_ptr<UIMarginBox> Create(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
+  static std::shared_ptr<UIPosition> Create(std::weak_ptr<Window> parent_window);
+  void Insert(std::shared_ptr<UIWidget> child, Point2D pos);
+  void Remove();
   virtual void CustomDraw(DrawContext& c) override;
-  virtual void CustomResize(Size2D s) override;
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
-  virtual void Insert(std::shared_ptr<UIWidget>);
   virtual void OnMouseButton(bool down, short b,Point2D) override;
   virtual void OnMotion(Point2D,Point2D) override;
   virtual void OnMotionEnter(Point2D) override;
   virtual void OnMotionLeave(Point2D) override;
 private:
-  UIMarginBox(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
+  UIPosition(std::weak_ptr<Window> parent_window);
   inline bool IsInside(Point2D) const;
-  int top, right, bottom, left;
+  Point2D position;
   std::shared_ptr<UIWidget> child;
 };
 
 } // namespace AlgAudio
 
-#endif // UIMARGINBOX_HPP
+#endif // UIPOSITIONS_HPP

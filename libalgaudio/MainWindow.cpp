@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIButton.hpp"
 #include "UI/UILayered.hpp"
 #include "UI/UILabel.hpp"
+#include "UI/UIPosition.hpp"
 
 namespace AlgAudio{
 
@@ -34,16 +35,18 @@ void MainWindow::init(){
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
   auto label2 = UILabel::Create(shared_from_this(), "THIS IS ANOTHER", 10);
+  auto position = UIPosition::Create(shared_from_this());
 
   toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
 
+  position->SetVisible(false);
+  position->SetClearColor(Color(0,0,0,30));
+  position->Insert(label2,Point2D(40,40));
   layered->Insert(label1);
-  layered->Insert(label2);
-  label2->SetVisible(false);
-  label2->SetClearColor(Color(0,0,0,128));
+  layered->Insert(position);
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
-    label2->SetVisible(!label2->IsVisible());
+    position->SetVisible(!position->IsVisible());
   });
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);

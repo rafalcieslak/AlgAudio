@@ -57,6 +57,13 @@ void UIMarginBox::OnChildRequestedSizeChanged(){
   Size2D s = child->GetRequestedSize();
   SetRequestedSize(Size2D(s.width + top + bottom, s.height + left + right));
 }
+void UIMarginBox::OnChildVisibilityChanged(){
+  Size2D s = child->GetRequestedSize();
+  //if(child->IsVisible())
+    SetRequestedSize(Size2D(s.width + top + bottom, s.height + left + right));
+  //else
+  //  SetRequestedSize(Size2D(top+bottom, left+right));
+}
 
 void UIMarginBox::OnMouseButton(bool down, short b,Point2D p){
   if(!child) return;

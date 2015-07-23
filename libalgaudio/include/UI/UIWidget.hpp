@@ -100,7 +100,7 @@ public:
   void SetVisible(bool);
   bool IsVisible(){return visible;}
 
-  const Size2D& GetRequestedSize() const{ return requested_size; }
+  Size2D GetRequestedSize() const{ return (visible)?requested_size:Size2D(0,0); }
 
   void SetClearColor(const Color& c){
     clear_color = c;
