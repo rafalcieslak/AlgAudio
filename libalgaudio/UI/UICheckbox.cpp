@@ -75,7 +75,7 @@ void UICheckbox::SetText(std::string t){
   child_label->SetText(t);
 }
 void UICheckbox::OnChildRequestedSizeChanged(){
-  SetRequestedSize(child_box->GetRequestedSize());
+  SetMinimalSize(child_box->GetRequestedSize());
 }
 
 

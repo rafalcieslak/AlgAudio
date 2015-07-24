@@ -36,10 +36,6 @@ protected:
     : window(parent_window) {
       cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
     };
-  UIWidget(){
-    // Useful for shadowing virtual inheritance. Never use this constructor.
-    std::cout << "FAIL: the Widget() constructor should never be used." << std::endl;
-  }
 public:
 /* It is recommended for widgets to implement Create static method,
    which returns a new shared_ptr of that object type, which simplifies
@@ -85,22 +81,25 @@ public:
 
 
   std::weak_ptr<UIWidget> parent;
-  /*
-  std::shared_ptr<UIWidget> GetRoot(){
-    auto p = parent.lock();
-    if(!p) return shared_from_this();
-    return p->GetRoot();
-  };
-  std::weak_ptr<Window> GetWindow(){
-    return GetRoot()->window;
-  };
-  void SetWindow(std::weak_ptr<Window> w){window = w;}
-  */
+
   // Toggles widget display
   void SetVisible(bool);
   bool IsVisible(){return visible;}
 
-  Size2D GetRequestedSize() const{ return (visible)?requested_size:Size2D(0,0); }
+  /* The requested size depends on both minimal size and custom size.
+     The minimal size is set by the particular widget implementation. For
+     example, a Box container will set it's minimal size just large enough
+     so that all it's children can be correctly drawn.
+     The custom size is set by the widget's user. It is used if you want a
+     widget to always take take the given area.
+     The requested size is a dimention-wise maximum of minimal and custom sizes.
+     Except for serval cases, a widget shall never be drawn smaller than its
+     requested size. */
+  Size2D GetRequestedSize() const;
+
+  /* If you want to unset a custom-size, simply set the desired dimension(s) to
+    0, so that minimal-size will always take precedence. */
+  void SetCustomSize(Size2D size);
 
   void SetClearColor(const Color& c){
     clear_color = c;
@@ -124,14 +123,14 @@ protected:
   std::weak_ptr<Window> window;
 
   /* If you are implementng a custom widget, you will want to use
-  SetRequestedSize a lot, to notify parent widgets what is the minimal area
+  SetMinimalSize a lot, to notify parent widgets what is the minimal area
   size that will be large enough for your widget to draw completely.
-  However, by no means should you use SetRequestedSize while inside
+  However, by no means should you use SetMinimalSize while inside
   CustomResize. This could lead to huge problems, including stack loops and
   undefined widget state. On the other hand, you are very welcome to
   Resize while reacting on child's requested size change in
   OnChildRequestedSizeChanged. */
-  void SetRequestedSize(Size2D);
+  void SetMinimalSize(Size2D);
 
   /* This method will be called by a child when it changes the desired size. */
   virtual void OnChildRequestedSizeChanged() {}
@@ -146,9 +145,10 @@ private:
   Color clear_color = Color(0,0,0,0);
   Color overlay_color = Color(0,0,0,0);
   bool needs_redrawing = true;
-  Size2D requested_size = Size2D(0,0);
+  Size2D minimal_size = Size2D(0,0);
+  Size2D custom_size = Size2D(0,0);
 
-  // This flag is used to track incorrect usage of SetRequestedSize()
+  // This flag is used to track incorrect usage of SetMinimalSize()
   bool in_custom_resize = false;
 
   bool visible = true;
@@ -157,6 +157,6 @@ private:
   void RedrawToCache(Size2D size);
 };
 
-} // namespace AlgAudio
 
+} // namespace AlgAudio
 #endif //UIWIDGET_HPP

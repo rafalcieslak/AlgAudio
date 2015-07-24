@@ -77,14 +77,30 @@ void UIWidget::SetVisible(bool v){
   if(p) p->OnChildVisibilityChanged();
 }
 
-void UIWidget::SetRequestedSize(Size2D s){
+void UIWidget::SetMinimalSize(Size2D s){
   if(in_custom_resize){
-    std::cout << "WARNING: A widget called SetRequestedSize while inside resize-chain. Change ignored." << std::endl;
+    std::cout << "WARNING: A widget called SetMinimalSize while inside resize-chain. Change ignored." << std::endl;
     return;
   }
-  requested_size = s;
+  minimal_size = s;
   auto p = parent.lock();
   if(p) p->OnChildRequestedSizeChanged();
+}
+void UIWidget::SetCustomSize(Size2D s){
+  if(in_custom_resize){
+    std::cout << "WARNING: A widget called SetMinimalSize while inside resize-chain. Change ignored." << std::endl;
+    return;
+  }
+  custom_size = s;
+  auto p = parent.lock();
+  if(p) p->OnChildRequestedSizeChanged();
+}
+Size2D UIWidget::GetRequestedSize() const{
+  if(!visible) return Size2D(0,0);
+  return Size2D(
+      std::max(minimal_size.width,  custom_size.width ),
+      std::max(minimal_size.height, custom_size.height)
+    );
 }
 
 } // namespace AlgAudio

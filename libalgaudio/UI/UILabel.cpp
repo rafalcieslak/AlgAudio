@@ -55,7 +55,7 @@ void UILabel::SetBold(bool b){
 }
 void UILabel::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams((bold)?"Dosis-Bold":"Dosis-Regular",fontsize), text);
-  SetRequestedSize(texture->GetSize() + Size2D(5,5));
+  SetMinimalSize(texture->GetSize() + Size2D(5,5));
   SetNeedsRedrawing();
 }
 

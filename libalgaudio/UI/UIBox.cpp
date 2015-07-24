@@ -57,7 +57,7 @@ void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
   w->parent = shared_from_this();
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
+  SetMinimalSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
 }
 
 void UIBox::RecalculateChildSizes(unsigned int available){
@@ -111,7 +111,7 @@ void UIBox::SetPadding(unsigned int p){
   padding = p;
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
+  SetMinimalSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
 }
 
 void UIBox::TriggerChildResizes(){
@@ -123,12 +123,12 @@ void UIBox::TriggerChildResizes(){
 void UIBox::OnChildRequestedSizeChanged(){
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(DirectionalSize2D(GetTotalSize(), GetChildMaxContra()));
+  SetMinimalSize(DirectionalSize2D(GetTotalSize(), GetChildMaxContra()));
 }
 void UIBox::OnChildVisibilityChanged(){
   RecalculateChildSizes(DirectionalDimension(current_size));
   TriggerChildResizes();
-  SetRequestedSize(DirectionalSize2D(GetTotalSize(), GetChildMaxContra()));
+  SetMinimalSize(DirectionalSize2D(GetTotalSize(), GetChildMaxContra()));
 }
 
 void UIBox::CustomResize(Size2D newsize){

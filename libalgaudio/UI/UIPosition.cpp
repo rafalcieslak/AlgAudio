@@ -49,11 +49,11 @@ void UIPosition::Insert(std::shared_ptr<UIWidget> ch, Point2D pos){
 void UIPosition::OnChildRequestedSizeChanged(){
   Size2D s = child->GetRequestedSize();
   child->Resize(s);
-  SetRequestedSize(s);
+  SetMinimalSize(s);
 }
 void UIPosition::OnChildVisibilityChanged(){
-  if(child->IsVisible()) SetRequestedSize(child->GetRequestedSize());
-  else SetRequestedSize(Size2D(0,0));
+  if(child->IsVisible()) SetMinimalSize(child->GetRequestedSize());
+  else SetMinimalSize(Size2D(0,0));
 }
 
 void UIPosition::OnMouseButton(bool down, short b,Point2D p){

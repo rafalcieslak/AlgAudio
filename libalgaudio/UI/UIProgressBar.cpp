@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 UIProgressBar::UIProgressBar(std::weak_ptr<Window> w) : UIWidget(w){
-  SetRequestedSize(Size2D(50,10));
+  SetMinimalSize(Size2D(50,10));
 }
 
 std::shared_ptr<UIProgressBar> UIProgressBar::Create(std::weak_ptr<Window> w){

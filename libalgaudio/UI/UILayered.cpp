@@ -60,7 +60,7 @@ void UILayered::RecalculateSize(){
     if(s.width > maxw) maxw = s.width;
     if(s.height > maxh) maxh = s.height;
   }
-  SetRequestedSize(Size2D(maxw,maxh));
+  SetMinimalSize(Size2D(maxw,maxh));
 }
 
 } // namespace AlgAudio

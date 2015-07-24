@@ -93,10 +93,10 @@ void UIAnimDrawer::Step(float delta){
 
 void UIAnimDrawer::UpdateRequestedSize(){
   Size2D s = child->GetRequestedSize();
-  if(direction == Direction_TOP)    SetRequestedSize(Size2D(0,phase*s.height));
-  if(direction == Direction_BOTTOM) SetRequestedSize(Size2D(0,phase*s.height));
-  if(direction == Direction_LEFT)   SetRequestedSize(Size2D(phase*s.width, 0));
-  if(direction == Direction_RIGHT)  SetRequestedSize(Size2D(phase*s.width, 0));
+  if(direction == Direction_TOP)    SetMinimalSize(Size2D(0,phase*s.height));
+  if(direction == Direction_BOTTOM) SetMinimalSize(Size2D(0,phase*s.height));
+  if(direction == Direction_LEFT)   SetMinimalSize(Size2D(phase*s.width, 0));
+  if(direction == Direction_RIGHT)  SetMinimalSize(Size2D(phase*s.width, 0));
 }
 
 void UIAnimDrawer::OnChildRequestedSizeChanged(){
