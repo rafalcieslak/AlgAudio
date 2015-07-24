@@ -132,7 +132,6 @@ void UIBox::OnChildVisibilityChanged(){
 }
 
 void UIBox::CustomResize(Size2D newsize){
-  std::cout << "Custom resize to " << newsize.ToString() << std::endl;
   RecalculateChildSizes(DirectionalDimension(newsize));
   current_size = newsize; // Manually setting this before triggerchildresizes
   TriggerChildResizes();
