@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 UIList::UIList(std::weak_ptr<Window> parent_window) : UIVBox(parent_window){
+  SetPadding(1);
 }
 
 std::shared_ptr<UIList> UIList::Create(std::weak_ptr<Window> parent_window){

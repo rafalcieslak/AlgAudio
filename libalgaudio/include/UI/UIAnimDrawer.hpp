@@ -44,6 +44,7 @@ private:
 
   void Step(float delta);
   Point2D GetCurrentOffset() const;
+  Size2D GetInnerSize() const;
   void UpdateRequestedSize();
 
   Direction direction;

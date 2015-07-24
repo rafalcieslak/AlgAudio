@@ -44,8 +44,8 @@ void MainWindow::init(){
 
   layered->Insert(label1);
   layered->Insert(selectorbox);
-  selectorbox->Insert(list,UIBox::PackMode::TIGHT);
-  //drawer->Insert(position);
+  selectorbox->Insert(drawer,UIBox::PackMode::TIGHT);
+  drawer->Insert(list);
 
   list->SetBackColor(Color(0,0,0,90));
   list->AddItem("id1", "First position");
@@ -61,10 +61,10 @@ void MainWindow::init(){
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
     if(flag){
-      //drawer->StartHide(1.0);
+      drawer->StartHide(0.15);
       flag = false;
     }else{
-      //drawer->StartShow(1.0);
+      drawer->StartShow(0.15);
       flag = true;
     }
   });

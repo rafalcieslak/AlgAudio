@@ -40,23 +40,32 @@ void UIAnimDrawer::Insert(std::shared_ptr<UIWidget> ch){
   child->parent = shared_from_this();
 }
 
+Size2D UIAnimDrawer::GetInnerSize() const{
+  Size2D s = child->GetRequestedSize();
+  if(direction == Direction_TOP  || direction == Direction_BOTTOM) return Size2D(current_size.width, s.height);
+  if(direction == Direction_LEFT || direction == Direction_RIGHT ) return Size2D(s.width, current_size.height);
+  return Size2D(0,0);
+}
 Point2D UIAnimDrawer::GetCurrentOffset() const{
-  if(direction == Direction_TOP)    return Point2D(0,(-1.0 + phase)*current_size.height);
-  if(direction == Direction_BOTTOM) return Point2D(0,( 2.0 - phase)*current_size.height);
-  if(direction == Direction_LEFT)   return Point2D((-1.0 + phase)*current_size.width, 0);
-  if(direction == Direction_RIGHT)  return Point2D(( 2.0 - phase)*current_size.width, 0);
+  Size2D in_size = GetInnerSize();
+  if(direction == Direction_TOP)    return Point2D(0,(-1.0 + phase)*in_size.height);
+  if(direction == Direction_BOTTOM) return Point2D(0,( 2.0 - phase)*in_size.height);
+  if(direction == Direction_LEFT)   return Point2D((-1.0 + phase)*in_size.width, 0);
+  if(direction == Direction_RIGHT)  return Point2D(( 2.0 - phase)*in_size.width, 0);
   return Point2D(0,0);
 }
 
 void UIAnimDrawer::CustomDraw(DrawContext& c){
   if(!child) return;
-  c.Push(GetCurrentOffset(), c.Size());
+  Size2D in_size = GetInnerSize();
+  c.Push(GetCurrentOffset(),in_size);
   child->Draw(c);
   c.Pop();
 }
 void UIAnimDrawer::CustomResize(Size2D s){
   if(!child) return;
-  child->Resize(s);
+  current_size = s;
+  child->Resize(GetInnerSize());
 }
 void UIAnimDrawer::StartShow(float t){
   anim->Release();
