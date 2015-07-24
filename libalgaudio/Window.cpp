@@ -63,7 +63,6 @@ void Window::Render(){
 #else
   if(!needs_redrawing) return;
 #endif
-  std::cout << "Redrawing window" << std::endl;
   Size2D size = GetSize();
   DrawContext c(renderer, 0, 0, size.width, size.height); // Full window DC
   c.SetColor(Theme::Get("bg-main"));
