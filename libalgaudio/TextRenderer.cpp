@@ -44,9 +44,7 @@ TTF_Font* TextRenderer::Preload(FontParrams fp){
   return f;
 }
 std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text){
-  // Woarkaround for rendering empty strings
   auto parent_window = w.lock();
-  if(text == "") text = " ";
   // Split the text into lines.
   std::vector<std::string> lines = Utilities::SplitString(text,"\n");
   // Buffers.
@@ -54,6 +52,8 @@ std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,Fon
   std::vector<std::shared_ptr<SDLTexture>> textures;
   // For each line of text
   for(auto& l : lines){
+    // Workaround for rendering empty strings
+    if(l == "") l = " ";
     // Ask SDL_TTF to render a line
     SDL_Surface* surf = TTF_RenderUTF8_Blended(GetFont(fp), l.c_str(), SDL_Color{255,255,255,255});
     if(!surf){
