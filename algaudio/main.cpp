@@ -136,9 +136,16 @@ int main(int argc, char *argv[]){
     testbutton->on_clicked.SubscribeForever([&](){
       testbutton->SetVisible(false);
       
+      mainwindow = MainWindow::Create();
+      mainwindow->on_close.SubscribeForever([&](){
+        // Let closing the main window close the whole app.
+        SDLMain::Quit();
+      });
+      SDLMain::UnregisterWindow(configwindow);
+      configwindow = nullptr; // loose reference
+      SDLMain::RegisterWindow(mainwindow);
+
       if(!main_canvas) return;
-
-
       Sync s(2);
       LateAssign(module2, ModuleFactory::CreateNewInstance("base/stereoout")).ThenSync(s);
       LateAssign(module1, ModuleFactory::CreateNewInstance("base/sine")).ThenSync(s);
