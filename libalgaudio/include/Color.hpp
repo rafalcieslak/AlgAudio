@@ -60,6 +60,24 @@ private:
   explicit operator HSL() const;
 };
 
+class ColorString{
+public:
+  ColorString(const ColorString& other) : formula(other.formula), color(other.color) {}
+  ColorString(const std::string& s) : formula(s) {Parse(); }
+  ColorString(const char* s) : formula(s) {Parse(); }
+  ColorString(const Color& c) : color(c) {Unparse(); }
+  inline operator Color() const {return color; }
+  inline operator std::string() const {return formula; }
+  ColorString& operator=(const ColorString& other) {formula = other.formula; color = other.color; return *this;}
+private:
+  std::string formula;
+  Color color;
+  // Sets the color according to formula
+  void Parse();
+  // Sets the formula according to color
+  void Unparse();
+};
+
 } // namespace AlgAudio
 
 #endif // COLOR_HPP
