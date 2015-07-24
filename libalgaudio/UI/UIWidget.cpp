@@ -25,9 +25,14 @@ namespace AlgAudio{
 void UIWidget::Draw(DrawContext& c){
   if(visible){
     const Size2D drawsize = c.Size();
+    if(drawsize.IsEmpty()){
+      needs_redrawing = false;
+      return;
+    }
     if(drawsize != current_size){
       std::cout << "WARNING: Implicitly calling Resize, because the draw"
       "context size is incoherent with widget size!" << std::endl;
+      throw Exception("");
       Resize(drawsize);
     }
     if(needs_redrawing){

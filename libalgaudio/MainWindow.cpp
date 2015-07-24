@@ -36,6 +36,7 @@ void MainWindow::init(){
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
 
+  addbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
   toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
 
   layered->Insert(label1);

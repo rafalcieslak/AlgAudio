@@ -88,8 +88,8 @@ void ModuleSelector::Expose(){
   lvl1_selection = "";
   SetVisible(true);
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
-    description_label->SetVisible(true);
   });
+    description_label->SetVisible(true);
   drawerlvl1->StartShow(0.15);
 }
 void ModuleSelector::Hide(){

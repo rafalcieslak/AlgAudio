@@ -37,6 +37,8 @@ void UIList::AddItem(std::string id, std::string text){
   auto new_button = UIButton::Create(window, text);
   ids_to_buttons[id] = new_button;
   new_button->SetBorder(false);
+  new_button->SetFontSize(14);
+  new_button->SetInnerMargin(3);
   new_button->on_clicked.SubscribeForever([=](){
     on_clicked.Happen(id);
   });

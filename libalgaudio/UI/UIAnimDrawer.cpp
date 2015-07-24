@@ -72,6 +72,7 @@ void UIAnimDrawer::StartShow(float t){
   if(phase > 0.999 || t < 0.002){ // instant show
     phase = 1.0;
     on_show_complete.Happen();
+    UpdateRequestedSize();
     return;
   }
   state = 1;
@@ -83,6 +84,7 @@ void UIAnimDrawer::StartHide(float t){
   if(phase < 0.001 || t < 0.002){ // instant hide
     phase = 0.0;
     on_hide_complete.Happen();
+    UpdateRequestedSize();
     return;
   }
   state = -1;
@@ -105,7 +107,6 @@ void UIAnimDrawer::Step(float delta){
     on_hide_complete.Happen();
   }
   UpdateRequestedSize();
-  SetNeedsRedrawing();
 }
 
 void UIAnimDrawer::UpdateRequestedSize(){
