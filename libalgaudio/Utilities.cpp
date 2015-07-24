@@ -28,6 +28,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
   #include <windows.h>
 #endif
 
+#define SILLY_GDB
+
 namespace AlgAudio {
 
 #ifdef __unix__
@@ -39,6 +41,14 @@ namespace AlgAudio {
 #endif
 
 Signal<> Utilities::global_idle;
+
+Exception::Exception(std::string t) : text(t){
+#ifdef SILLY_GDB
+  // if your GDB cannot break
+  std::cout << "SIGSEGVing self to mark exception creation stack." << std::endl;
+  *((int*)nullptr) = 0;
+#endif // SILLY_GDB
+}
 
 void Utilities::Wait(int ms){
   SDL_Delay(ms);

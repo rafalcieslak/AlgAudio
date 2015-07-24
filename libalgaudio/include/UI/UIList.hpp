@@ -19,19 +19,18 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UIButton.hpp"
+#include "UIBox.hpp"
 
 namespace AlgAudio{
 
-class UIList : public UIWidget{
+class UIList : public UIVBox{
 public:
   static std::shared_ptr<UIList> Create(std::weak_ptr<Window> parent_window);
-  virtual void CustomDraw(DrawContext& c) override;
   void AddItem(std::string id, std::string text);
   Signal<std::string> on_pointed;
   Signal<std::string> on_clicked;
 private:
   UIList(std::weak_ptr<Window> parent_window);
-  void UpdateMinimalSize();
   std::map<std::string, std::shared_ptr<UIButton>> ids_to_buttons;
 };
 

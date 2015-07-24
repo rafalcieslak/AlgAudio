@@ -60,7 +60,7 @@ typedef enum {
 
 class Exception{
 public:
-  Exception(std::string t) : text(t) {};
+  Exception(std::string t);
   virtual std::string what() {return text;}
   virtual ~Exception() {}
 protected:
