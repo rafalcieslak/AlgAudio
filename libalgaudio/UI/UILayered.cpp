@@ -63,4 +63,30 @@ void UILayered::RecalculateSize(){
   SetMinimalSize(Size2D(maxw,maxh));
 }
 
+
+std::shared_ptr<UIWidget> UILayered::GetTopChild() const{
+  for(auto it = children.rbegin(); it != children.rend(); it++)
+    if((*it)->IsVisible()) return *it;
+  return nullptr;
+}
+
+void UILayered::OnMouseButton(bool down, short b,Point2D p){
+  auto w = GetTopChild();
+  if(w) w->OnMouseButton(down, b, p);
+}
+
+void UILayered::OnMotionEnter(Point2D p){
+  auto w = GetTopChild();
+  if(w) w->OnMotionEnter(p);
+}
+
+void UILayered::OnMotionLeave(Point2D p){
+  auto w = GetTopChild();
+  if(w) w->OnMotionLeave(p);
+}
+void UILayered::OnMotion(Point2D p1, Point2D p2){
+  auto w = GetTopChild();
+  if(w) w->OnMotion(p1,p2);
+}
+
 } // namespace AlgAudio
