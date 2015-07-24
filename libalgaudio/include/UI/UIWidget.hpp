@@ -101,11 +101,11 @@ public:
     0, so that minimal-size will always take precedence. */
   void SetCustomSize(Size2D size);
 
-  void SetClearColor(const Color& c){
+  void SetBackColor(const Color& c){
     clear_color = c;
     SetNeedsRedrawing();
   }
-  void SetOverlayColor(const Color& c){
+  void SetFrontColor(const Color& c){
     overlay_color = c;
     SetNeedsRedrawing();
   }

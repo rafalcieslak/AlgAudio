@@ -40,14 +40,14 @@ void MainWindow::init(){
   auto drawer = UIAnimDrawer::Create(shared_from_this(), Direction_LEFT);
   auto list = UIList::Create(shared_from_this());
 
-  toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
+  toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
 
   layered->Insert(label1);
   layered->Insert(selectorbox);
   selectorbox->Insert(list,UIBox::PackMode::TIGHT);
   //drawer->Insert(position);
 
-  list->SetClearColor(Color(0,0,0,90));
+  list->SetBackColor(Color(0,0,0,90));
   list->AddItem("id1", "First position");
   list->AddItem("id2", "Another position");
   list->AddItem("id3", "One more position");

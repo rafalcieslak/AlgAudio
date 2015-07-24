@@ -51,7 +51,7 @@ void UICheckbox::Init(){
   child_button->SetInnerMargin(2);
   child_box->SetPadding(8);
 
-  SetClearColor(Theme::Get("bg-main"));
+  SetBackColor(Theme::Get("bg-main"));
   on_clicked.SubscribeForever([&](){
     if(active){
       active = false;
@@ -76,10 +76,10 @@ void UICheckbox::UpdateColors(){
   else       button_bg = Theme::Get("bg-button-neutral");
 
   if(pointed){
-    SetClearColor(Theme::Get("bg-main").Lighter(0.04));
+    SetBackColor(Theme::Get("bg-main").Lighter(0.04));
     button_bg = button_bg.Lighter(0.07);
   }else{
-    SetClearColor(Theme::Get("bg-main"));
+    SetBackColor(Theme::Get("bg-main"));
   }
   child_button->SetColors(Theme::Get("text-button"), button_bg);
 }
