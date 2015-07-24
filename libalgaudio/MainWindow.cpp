@@ -52,6 +52,12 @@ void MainWindow::init(){
   list->AddItem("id2", "Another position");
   list->AddItem("id3", "One more position");
   list->AddItem("id4", "Last list position");
+  subscriptions += list->on_clicked.Subscribe([](std::string id){
+    std::cout << "CLICKED " << id << std::endl;
+  });
+  subscriptions += list->on_pointed.Subscribe([](std::string id){
+    std::cout << "POINTED " << id << std::endl;
+  });
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
     if(flag){

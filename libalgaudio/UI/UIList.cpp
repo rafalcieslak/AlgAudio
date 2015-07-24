@@ -39,8 +39,9 @@ void UIList::AddItem(std::string id, std::string text){
   new_button->on_clicked.SubscribeForever([=](){
     on_clicked.Happen(id);
   });
-  new_button->on_pointed.SubscribeForever([=](bool){
-    on_pointed.Happen(id);
+  new_button->on_pointed.SubscribeForever([=](bool pointed){
+    if(pointed) on_pointed.Happen(id);
+    else on_pointed.Happen("");
   });
   Insert(new_button,UIVBox::PackMode::TIGHT);
 }
