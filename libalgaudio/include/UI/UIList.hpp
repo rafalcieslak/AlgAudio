@@ -27,6 +27,7 @@ class UIList : public UIVBox{
 public:
   static std::shared_ptr<UIList> Create(std::weak_ptr<Window> parent_window);
   void AddItem(std::string id, std::string text);
+  void Clear();
   Signal<std::string> on_pointed;
   Signal<std::string> on_clicked;
 private:

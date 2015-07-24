@@ -71,6 +71,7 @@ private:
 public:
   static std::shared_ptr<ModuleCollection> GetCollectionByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
+  static const std::map<std::string, std::shared_ptr<ModuleCollection>>& GetCollections();
   static void InstallDir(std::string dirpath);
   static std::string ListInstalledTemplates();
   static LateReturn<> InstallAllTemplatesIntoSC();

@@ -60,6 +60,14 @@ void UIBox::Insert(std::shared_ptr<UIWidget> w, PackMode m){
   SetMinimalSize(DirectionalSize2D(GetTotalSize(),GetChildMaxContra()));
 }
 
+void UIBox::Clear(){
+  // Make your children orphans
+  for(unsigned int n = 0; n < children.size(); n++)
+    children[n].child->parent.reset();
+  children.clear();
+  SetMinimalSize(Size2D(0,0));
+}
+
 void UIBox::RecalculateChildSizes(unsigned int available){
   // Begin by removing the space taken up by padding.
   available -= padding*(children.size() - 1);

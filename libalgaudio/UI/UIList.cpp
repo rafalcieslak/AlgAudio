@@ -47,4 +47,9 @@ void UIList::AddItem(std::string id, std::string text){
   Insert(new_button,UIVBox::PackMode::TIGHT);
 }
 
+void UIList::Clear(){
+  ids_to_buttons.clear();
+  UIBox::Clear();
+}
+
 } // namespace AlgAudio

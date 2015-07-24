@@ -209,5 +209,8 @@ LateReturn<> ModuleCollectionBase::InstallAllTemplatesIntoSC(){
   return r.GetLateReturn();
 }
 
+const std::map<std::string, std::shared_ptr<ModuleCollection>>& ModuleCollectionBase::GetCollections(){
+  return collections_by_id;
+}
 
 } // namespace AlgAudio

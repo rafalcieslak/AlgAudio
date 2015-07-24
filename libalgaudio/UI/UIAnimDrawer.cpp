@@ -69,20 +69,28 @@ void UIAnimDrawer::CustomResize(Size2D s){
 }
 void UIAnimDrawer::StartShow(float t){
   anim->Release();
-  if(phase > 0.999) return;
+  if(phase > 0.999 || t < 0.002){ // instant show
+    phase = 1.0;
+    on_show_complete.Happen();
+    return;
+  }
   state = 1;
   time_to_finish = t;
   anim = SDLMain::on_before_frame.Subscribe(this, &UIAnimDrawer::Step);
 }
 void UIAnimDrawer::StartHide(float t){
   anim->Release();
-  if(phase < 0.001) return;
+  if(phase < 0.001 || t < 0.002){ // instant hide
+    phase = 0.0;
+    on_hide_complete.Happen();
+    return;
+  }
   state = -1;
   time_to_finish = t;
   anim = SDLMain::on_before_frame.Subscribe(this, &UIAnimDrawer::Step);
 }
 void UIAnimDrawer::Step(float delta){
-  if(state == 0) std::cout << "Warning! Step should be never called with delta = 0." << std::endl;
+  if(state == 0) std::cout << "Warning! Step should be never called with state = 0." << std::endl;
   float phasedelta = delta/time_to_finish;
   phase += phasedelta*state;
   if(state == 1 && phase > 0.999){

@@ -36,6 +36,7 @@ public:
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
+  void Clear();
   void SetPadding(unsigned int padding);
   virtual void OnMouseButton(bool down, short b,Point2D) override;
   virtual void OnMotion(Point2D p1, Point2D p2) override;

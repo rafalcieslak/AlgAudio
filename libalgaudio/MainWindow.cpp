@@ -17,13 +17,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "MainWindow.hpp"
+#include "ModuleSelector.hpp"
 #include "UI/UIBox.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UILayered.hpp"
 #include "UI/UILabel.hpp"
-#include "UI/UIPosition.hpp"
-#include "UI/UIAnimDrawer.hpp"
-#include "UI/UIList.hpp"
 
 namespace AlgAudio{
 
@@ -34,37 +32,23 @@ void MainWindow::init(){
   auto mainvbox = UIVBox::Create(shared_from_this());
   auto addbutton = UIButton::Create(shared_from_this()," Add new ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
-  auto selectorbox = UIHBox::Create(shared_from_this());
+  auto selector = ModuleSelector::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
-  auto drawer = UIAnimDrawer::Create(shared_from_this(), Direction_LEFT);
-  auto list = UIList::Create(shared_from_this());
 
   toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
 
   layered->Insert(label1);
-  layered->Insert(selectorbox);
-  selectorbox->Insert(drawer,UIBox::PackMode::TIGHT);
-  drawer->Insert(list);
+  layered->Insert(selector);
 
-  list->SetBackColor(Color(0,0,0,90));
-  list->AddItem("id1", "First position");
-  list->AddItem("id2", "Another position");
-  list->AddItem("id3", "One more position");
-  list->AddItem("id4", "Last list position");
-  subscriptions += list->on_clicked.Subscribe([](std::string id){
-    std::cout << "CLICKED " << id << std::endl;
-  });
-  subscriptions += list->on_pointed.Subscribe([](std::string id){
-    std::cout << "POINTED " << id << std::endl;
-  });
+  selector->Populate();
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
     if(flag){
-      drawer->StartHide(0.15);
+      selector->Hide();
       flag = false;
     }else{
-      drawer->StartShow(0.15);
+      selector->Expose();
       flag = true;
     }
   });
