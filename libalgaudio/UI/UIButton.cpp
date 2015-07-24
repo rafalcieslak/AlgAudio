@@ -57,16 +57,18 @@ void UIButton::CustomDraw(DrawContext& c){
   int h = c.Size().height;
   c.DrawRect(0,0,w,h);
 
-  c.SetColor(bg_color.Darker(0.15));
-  c.DrawLine(0,0,w-1,0);
-  c.DrawLine(0,0,0,h-1);
-  c.DrawLine(w-1,0,w-1,h-1);
-  c.DrawLine(0,h-1,w-1,h-1);
-  c.DrawLine(1,1,w-2,1);
-  c.DrawLine(1,1,1,h-2);
-  c.DrawLine(w-2,1,w-2,h-2);
-  c.DrawLine(1,h-2,w-2,h-2);
-
+  if(border_enabled){
+    c.SetColor(bg_color.Darker(0.15));
+    c.DrawLine(0,0,w-1,0);
+    c.DrawLine(0,0,0,h-1);
+    c.DrawLine(w-1,0,w-1,h-1);
+    c.DrawLine(0,h-1,w-1,h-1);
+    c.DrawLine(1,1,w-2,1);
+    c.DrawLine(1,1,1,h-2);
+    c.DrawLine(w-2,1,w-2,h-2);
+    c.DrawLine(1,h-2,w-2,h-2);
+  }
+  
   c.SetColor(text_color);
   c.DrawText(
     texture,
@@ -96,6 +98,11 @@ void UIButton::UpdateTexture(){
   // Todo: Blended render, so that the same text texture can be used for any BG
   texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text);
   SetRequestedSize(texture->GetSize() + Size2D(10,10));
+  SetNeedsRedrawing();
+}
+
+void UIButton::SetBorder(bool enabled){
+  border_enabled = enabled;
   SetNeedsRedrawing();
 }
 

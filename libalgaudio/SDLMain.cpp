@@ -43,7 +43,7 @@ void SDLMain::Step(){
   // Milliseconds from start
   int newtime = SDL_GetTicks();
   int delta = newtime - last_draw_time;
-  if(delta > 20){
+  if(delta > 15){
     last_draw_time = newtime;
     // Process user input
     ProcessEvents();

@@ -46,6 +46,8 @@ void UICheckbox::Init(){
   child_box->Insert(child_button, UIBox::PackMode::TIGHT);
   child_box->Insert(child_label, UIBox::PackMode::WIDE);
 
+  child_button->SetBorder(false);
+
   SetClearColor(Theme::Get("bg-main"));
   on_clicked.SubscribeForever([&](){
     if(active){
