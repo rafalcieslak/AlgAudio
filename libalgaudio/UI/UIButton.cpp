@@ -97,12 +97,17 @@ void UIButton::SetFontSize(int fs){
 void UIButton::UpdateTexture(){
   // Todo: Blended render, so that the same text texture can be used for any BG
   texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text);
-  SetMinimalSize(texture->GetSize() + Size2D(10,10));
+  SetMinimalSize(texture->GetSize() + Size2D(2*inner_margin,2*inner_margin));
   SetNeedsRedrawing();
 }
 
 void UIButton::SetBorder(bool enabled){
   border_enabled = enabled;
+  SetNeedsRedrawing();
+}
+void UIButton::SetInnerMargin(int m){
+  inner_margin = m;
+  SetMinimalSize(texture->GetSize() + Size2D(2*inner_margin,2*inner_margin));
   SetNeedsRedrawing();
 }
 

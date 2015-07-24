@@ -42,21 +42,25 @@ void UICheckbox::Init(){
   child_box = UIHBox::Create(window);
   child_box->parent = shared_from_this();
   child_button = UIButton::Create(window,"   ");
-  child_label = UILabel::Create(window,text);
+  child_label = UILabel::Create(window,text,12);
   child_box->Insert(child_button, UIBox::PackMode::TIGHT);
   child_box->Insert(child_label, UIBox::PackMode::TIGHT);
 
   child_button->SetBorder(false);
+  child_button->SetCustomSize(Size2D(20,20));
+  child_button->SetInnerMargin(2);
   child_box->SetPadding(8);
 
   SetClearColor(Theme::Get("bg-main"));
   on_clicked.SubscribeForever([&](){
     if(active){
-      child_button->SetText("   ");
+      child_button->SetText(" ");
+      child_button->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-neutral"));
       on_toggled.Happen(false);
       active = false;
     }else{
-      child_button->SetText(" X ");
+      child_button->SetText("X");
+      child_button->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
       on_toggled.Happen(true);
       active = true;
     };

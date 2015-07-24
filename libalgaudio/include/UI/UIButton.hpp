@@ -31,11 +31,13 @@ public:
   virtual void CustomDraw(DrawContext& c) override;
   void SetFontSize(int fontsize);
   void SetBorder(bool enabled);
+  void SetInnerMargin(int m);
 private:
   UIButton(std::weak_ptr<Window> parent_window, std::string text);
   std::string text;
   int fontsize = 16;
   bool border_enabled = true;
+  int inner_margin = 5;
   std::shared_ptr<SDLTextTexture> texture;
   Color bg_color;
   Color text_color;

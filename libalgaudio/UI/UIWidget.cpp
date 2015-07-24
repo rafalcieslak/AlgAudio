@@ -88,7 +88,7 @@ void UIWidget::SetMinimalSize(Size2D s){
 }
 void UIWidget::SetCustomSize(Size2D s){
   if(in_custom_resize){
-    std::cout << "WARNING: A widget called SetMinimalSize while inside resize-chain. Change ignored." << std::endl;
+    std::cout << "WARNING: A widget called SetCustomSize while inside resize-chain. Change ignored." << std::endl;
     return;
   }
   custom_size = s;
