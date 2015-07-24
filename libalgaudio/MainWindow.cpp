@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UILabel.hpp"
 #include "UI/UIPosition.hpp"
 #include "UI/UIAnimDrawer.hpp"
+#include "UI/UIList.hpp"
 
 namespace AlgAudio{
 
@@ -33,26 +34,31 @@ void MainWindow::init(){
   auto mainvbox = UIVBox::Create(shared_from_this());
   auto addbutton = UIButton::Create(shared_from_this()," Add new ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
+  auto selectorbox = UIHBox::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
-  auto label2 = UILabel::Create(shared_from_this(), "THIS ONE SLIDES IN FROM THE LEFT!!!", 10);
-  auto position = UIPosition::Create(shared_from_this());
   auto drawer = UIAnimDrawer::Create(shared_from_this(), Direction_LEFT);
+  auto list = UIList::Create(shared_from_this());
 
   toolbarbox->SetClearColor(Theme::Get("bg-main-alt"));
 
-  position->SetClearColor(Color(0,0,0,30));
-  position->Insert(label2,Point2D(40,40));
   layered->Insert(label1);
-  layered->Insert(drawer);
-  drawer->Insert(position);
+  layered->Insert(selectorbox);
+  selectorbox->Insert(list,UIBox::PackMode::TIGHT);
+  //drawer->Insert(position);
+
+  list->SetClearColor(Color(0,0,0,90));
+  list->AddItem("id1", "First position");
+  list->AddItem("id2", "Another position");
+  list->AddItem("id3", "One more position");
+  list->AddItem("id4", "Last list position");
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
     if(flag){
-      drawer->StartHide(1.0);
+      //drawer->StartHide(1.0);
       flag = false;
     }else{
-      drawer->StartShow(1.0);
+      //drawer->StartShow(1.0);
       flag = true;
     }
   });
