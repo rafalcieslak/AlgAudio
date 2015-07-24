@@ -54,21 +54,34 @@ void UICheckbox::Init(){
   SetClearColor(Theme::Get("bg-main"));
   on_clicked.SubscribeForever([&](){
     if(active){
-      child_button->SetText(" ");
-      child_button->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-neutral"));
-      on_toggled.Happen(false);
       active = false;
+      child_button->SetText(" ");
+      UpdateColors();
+      on_toggled.Happen(false);
     }else{
-      child_button->SetText("X");
-      child_button->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
-      on_toggled.Happen(true);
       active = true;
+      child_button->SetText("X");
+      UpdateColors();
+      on_toggled.Happen(true);
     };
   });
-  on_pointed.SubscribeForever([&](bool p){
-    if(p) SetOverlayColor(Color(255,255,255,20));
-    else SetOverlayColor(Color(0,0,0,0));
+  on_pointed.SubscribeForever([&](bool){
+    UpdateColors();
   });
+}
+
+void UICheckbox::UpdateColors(){
+  Color button_bg;
+  if(active) button_bg = Theme::Get("bg-button-positive");
+  else       button_bg = Theme::Get("bg-button-neutral");
+
+  if(pointed){
+    SetClearColor(Theme::Get("bg-main").Lighter(0.04));
+    button_bg = button_bg.Lighter(0.07);
+  }else{
+    SetClearColor(Theme::Get("bg-main"));
+  }
+  child_button->SetColors(Theme::Get("text-button"), button_bg);
 }
 
 void UICheckbox::CustomResize(Size2D s){

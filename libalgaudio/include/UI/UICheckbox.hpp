@@ -39,6 +39,7 @@ public:
 private:
   UICheckbox(std::weak_ptr<Window> parent_window, std::string text);
   void Init();
+  void UpdateColors();
   std::string text;
   std::shared_ptr<UIHBox> child_box;
   std::shared_ptr<UIButton> child_button;
