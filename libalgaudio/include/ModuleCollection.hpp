@@ -70,6 +70,7 @@ private:
   static LateReturn<> InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from);
 public:
   static std::shared_ptr<ModuleCollection> GetCollectionByID(std::string id);
+  static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string id);
   static std::shared_ptr<ModuleCollection> InstallFile(std::string filepath);
   static const std::map<std::string, std::shared_ptr<ModuleCollection>>& GetCollections();
   static void InstallDir(std::string dirpath);

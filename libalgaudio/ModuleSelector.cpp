@@ -69,6 +69,21 @@ void ModuleSelector::init(){
       lvl1_selection = "";
     }
   });
+
+  subscriptions += listlvl2->on_pointed.Subscribe([=](std::string id){
+    if(id == ""){
+      description_label->SetText("Select a module to add.");
+      return;
+    }
+    id = lvl1_selection + "/" + id;
+    auto templ = ModuleCollectionBase::GetTemplateByID(id);
+    if(!templ){
+      std::cout << "ERROR: pointed at an unregistered module `" + id + "`" << std::endl;
+      return;
+    }
+    if(templ->description == "") description_label->SetText("(this module has no description available)");
+    else description_label->SetText( templ->description );
+  });
 }
 
 void ModuleSelector::PopulateLvl1(){

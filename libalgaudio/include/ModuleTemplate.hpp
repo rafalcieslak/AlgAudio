@@ -51,6 +51,7 @@ struct ModuleTemplate{
   std::string GetFullID() const;
   std::string id;
   std::string name;
+  std::string description = "";
   bool has_sc_code = false;
   std::string sc_code;
   bool has_class = false;

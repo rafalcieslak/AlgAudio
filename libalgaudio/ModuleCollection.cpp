@@ -137,6 +137,14 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetCollectionByID(std::s
   else return it->second;
 }
 
+std::shared_ptr<ModuleTemplate> ModuleCollectionBase::GetTemplateByID(std::string id){
+  auto ids = Utilities::SplitString(id, "/");
+  if(ids.size() < 2) return nullptr;
+  auto collection = GetCollectionByID(ids[0]);
+  if(!collection) return nullptr;
+  return collection->GetTemplateByID(ids[1]);
+}
+
 std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string filepath){
   std::cout << "Loading collection from file '" << filepath << "'..." << std::endl;
   std::ifstream file(filepath);

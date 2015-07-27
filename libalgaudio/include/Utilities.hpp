@@ -109,6 +109,7 @@ public:
   static std::vector<std::string> SplitString(std::string str, std::string delimiter);
   static std::string JoinString(std::vector<std::string> str, std::string c);
   static void Replace(std::string& str, const std::string& from, const std::string& to);
+  static std::string TrimAllLines(std::string);
 };
 
 } // namespace AlgAudio

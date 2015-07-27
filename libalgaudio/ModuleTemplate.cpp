@@ -65,6 +65,9 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
     }
   }
 
+  xml_node<>* desc_node = node->first_node("description");
+  if(desc_node) description = Utilities::TrimAllLines(desc_node->value());
+
   if(!has_class && !has_sc_code) throw ModuleParseException(id, "Module must have either SC code, class name, or both.");
 
 }
