@@ -131,10 +131,6 @@ protected:
   virtual void OnChildVisibilityChanged() {}
 
 private:
-   // The 0,0,0,0 color is white on Linux. This may be because SDL interprets
-   // this color as no-saturation no-alpha, but that's unclear and might be
-   // worth investigating. Using 1,0,0,0 as a workaround, the clearcolor
-   // should not be visible anyway.
   Color clear_color = Color(0,0,0,0);
   Color overlay_color = Color(0,0,0,0);
   bool needs_redrawing = true;
