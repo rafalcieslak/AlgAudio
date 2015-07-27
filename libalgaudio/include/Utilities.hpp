@@ -57,6 +57,16 @@ typedef enum {
   Direction_BOTTOM,
   Direction_LEFT,
 } Direction;
+typedef enum {
+  HorizAlignment_LEFT,
+  HorizAlignment_CENTERED,
+  HorizAlignment_RIGHT
+} HorizAlignment;
+typedef enum {
+  VertAlignment_TOP,
+  VertAlignment_CENTERED,
+  VertAlignment_BOTTOM
+} VertAlignment;
 
 class Exception{
 public:
@@ -91,6 +101,9 @@ public:
   static std::string ConvertUnipathToOSPath(const std::string& unipath);
   static std::string ConvertOSpathToUniPath(const std::string& ospath);
   static void CopyToClipboard(std::string);
+
+  // Point/size operations
+  static Point2D Align(HorizAlignment, VertAlignment, Size2D inner, Size2D outer);
 
   // String operations
   static std::vector<std::string> SplitString(std::string str, std::string delimiter);

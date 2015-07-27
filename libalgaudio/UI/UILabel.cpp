@@ -34,7 +34,8 @@ std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string te
 }
 
 void UILabel::CustomDraw(DrawContext& c){
-  c.DrawText(texture, Theme::Get(color), c.Size().width/2 - texture->GetSize().width/2, c.Size().height/2 - texture->GetSize().height/2);
+  Point2D pos = Utilities::Align(horiz_alignment, vert_alignment, texture->GetSize(), c.Size());
+  c.DrawText(texture, Theme::Get(color), pos.x, pos.y);
 }
 
 void UILabel::SetText(std::string t){
@@ -52,6 +53,11 @@ void UILabel::SetTextSize(int size){
 void UILabel::SetBold(bool b){
   bold = b;
   UpdateTexture();
+}
+void UILabel::SetAlignment(HorizAlignment h, VertAlignment v){
+  horiz_alignment = h;
+  vert_alignment = v;
+  SetNeedsRedrawing();
 }
 void UILabel::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams((bold)?"Dosis-Bold":"Dosis-Regular",fontsize), text);

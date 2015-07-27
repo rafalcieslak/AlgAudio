@@ -136,4 +136,20 @@ void Utilities::Replace(std::string& str, const std::string& from, const std::st
     }
 }
 
+Point2D Utilities::Align(HorizAlignment h, VertAlignment v, Size2D inner, Size2D outer){
+  int x, y;
+
+  if(h == HorizAlignment_LEFT) x = 0;
+  else if(h == HorizAlignment_RIGHT) x = outer.width - inner.width;
+  else if(h == HorizAlignment_CENTERED) x = outer.width/2 - inner.width/2;
+  else x = 0;
+
+  if(v == VertAlignment_TOP) y = 0;
+  else if(v == VertAlignment_BOTTOM) y = outer.height - inner.height;
+  else if(v == VertAlignment_CENTERED) y = outer.height/2 - inner.height/2;
+  else y = 0;
+
+  return Point2D(x,y);
+}
+
 } // namespace AlgAudio

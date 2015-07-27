@@ -29,11 +29,14 @@ public:
   void SetTextColor(std::string colorname);
   void SetTextSize(int fontsize);
   void SetBold(bool);
+  void SetAlignment(HorizAlignment h, VertAlignment v = VertAlignment_CENTERED);
   virtual void CustomDraw(DrawContext& c) override;
 private:
   UILabel(std::weak_ptr<Window> parent_window, std::string text, int size = 16, std::string color = "text-generic");
   std::string text;
   std::string color;
+  HorizAlignment horiz_alignment = HorizAlignment_CENTERED;
+  VertAlignment vert_alignment = VertAlignment_CENTERED;
   int fontsize;
   bool bold = false;
   std::shared_ptr<SDLTextTexture> texture;

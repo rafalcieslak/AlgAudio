@@ -41,6 +41,7 @@ void ModuleSelector::init(){
   description_label = UILabel::Create(window,"Eventually, this label will contain useful text\nabout pointed module, including the description.\n\nThis is currently just a placeholder.");
   description_label->SetVisible(false);
   description_label->SetBackColor(Color(0,0,0,150));
+  description_label->SetAlignment(HorizAlignment_LEFT, VertAlignment_TOP);
   Insert(description_label, PackMode::WIDE);
   listlvl1->SetBackColor(Color(0,0,0,150));
   listlvl2->SetBackColor(Color(0,0,0,150));
