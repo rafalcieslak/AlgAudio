@@ -20,52 +20,13 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include "ModuleCollection.hpp"
 #include "ModuleFactory.hpp"
-#include "SDLMain.hpp"
-#include "UI/UIButton.hpp"
-#include "UI/UIMarginBox.hpp"
-#include "UI/UITextArea.hpp"
-#include "UI/UIBox.hpp"
-#include "UI/UILabel.hpp"
-#include "SCLang.hpp"
-#include "Theme.hpp"
-#include "Canvas.hpp"
-#include "UI/UICheckbox.hpp"
-#include "UI/UIProgressBar.hpp"
-#include "LateReturn.hpp"
+#include "LaunchConfigWindow.hpp"
 #include "MainWindow.hpp"
+#include "SDLMain.hpp"
+#include "SCLang.hpp"
 
 using namespace AlgAudio;
 
-#ifdef __unix__
-  static const std::string sclang_path = "/usr/bin/sclang";
-  static const std::string scsynth_path = "/usr/bin/scsynth";
-#else
-  static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
-  static const std::string scsynth_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\scsynth.exe";
-#endif
-
-void TestSubscriptions(){
-  Signal<> signal1;
-  signal1.SubscribeForever([](){
-    std::cout << "1 for" << std::endl;
-  });
-  {
-    auto s = signal1.Subscribe([](){
-      std::cout << "1 temporary" << std::endl;
-    });
-    signal1.Happen();
-  }
-  signal1.Happen();
-}
-
-void TestSync(){
-  Sync s(2);
-  s.WhenAll([](){
-    std::cout << "All!" << std::endl;
-  });
-  s.Trigger();
-  s.Trigger();
-}
 
 int main(int argc, char *argv[]){
   (void)argc;
@@ -75,8 +36,6 @@ int main(int argc, char *argv[]){
     //TestSync(); return 0;
     Theme::Init();
 
-    std::shared_ptr<MainWindow> mainwindow = nullptr;
-
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     std::shared_ptr<Module> module1, module2, console_module;
@@ -85,57 +44,14 @@ int main(int argc, char *argv[]){
       console_module = mod;
     });
 
-    auto configwindow = Window::Create("AlgAudio config",280,400);
-    auto marginbox = configwindow->Create<UIMarginBox>(10,10,10,10);
-    auto startbutton = configwindow->Create<UIButton>("Start SCLang");
-    auto testbutton = configwindow->Create<UIButton>("Test button");
-    auto quitbutton = configwindow->Create<UIButton>("Quit App");
-    auto titlelabel = configwindow->Create<UILabel>("AlgAudio",52);
-    auto configlabel = configwindow->Create<UILabel>("This place is left for config.");
-    auto chkbox = configwindow->Create<UICheckbox>("Enable OSC debugging");
-    auto supernovachkbox = configwindow->Create<UICheckbox>("Enable Supernova mode");
-    auto mainvbox = UIVBox::Create(configwindow);
-    auto buttonhbox = UIHBox::Create(configwindow);
-    auto progressbar = UIProgressBar::Create(configwindow);
-    auto statustext = UILabel::Create(configwindow,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
-
-    //mainvbox->SetPadding(10);
-    configwindow->Insert(marginbox);
-    marginbox->Insert(mainvbox);
-    mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
-    mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
-    mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
-    mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
-    mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
-    mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
-    mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
-    buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
-    buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
-    buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
-
-    startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
-    quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
-
-    startbutton->on_clicked.SubscribeForever([&](){
-      if(!SCLang::IsRunning()){
-        SCLang::Start(sclang_path, supernovachkbox->active);
-        startbutton->SetText("Stop SCLang");
-      }else{
-        SCLang::Stop();
-        progressbar->SetAmount(0.0);
-        statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
-        startbutton->SetText("Start SCLang");
-      }
-      statustext->SetTextColor("text-generic");
-      statustext->SetBold(false);
+    std::shared_ptr<MainWindow> mainwindow = nullptr;
+    auto configwindow = LaunchConfigWindow::Create();
+    configwindow->on_close.SubscribeForever([&](){
+      // Let closing the config window close the whole app.
+      SDLMain::Quit();
     });
-    SCLang::on_start_progress.SubscribeForever([&](int n, std::string msg){
-      progressbar->SetAmount(n/10.0);
-      statustext->SetText(msg);
-    });
-    testbutton->on_clicked.SubscribeForever([&](){
-      testbutton->SetVisible(false);
-      
+    configwindow->on_complete.SubscribeForever([&](){
+      // When the config was completed, create the main window.
       mainwindow = MainWindow::Create();
       mainwindow->on_close.SubscribeForever([&](){
         // Let closing the main window close the whole app.
@@ -144,48 +60,6 @@ int main(int argc, char *argv[]){
       SDLMain::UnregisterWindow(configwindow);
       configwindow = nullptr; // loose reference
       SDLMain::RegisterWindow(mainwindow);
-
-      if(!main_canvas) return;
-      Sync s(2);
-      LateAssign(module2, ModuleFactory::CreateNewInstance("base/stereoout")).ThenSync(s);
-      LateAssign(module1, ModuleFactory::CreateNewInstance("base/sine")).ThenSync(s);
-      s.WhenAll([&](){
-        std::cout << "Both modules ready" << std::endl;
-        main_canvas->InsertModule(module1);
-        main_canvas->InsertModule(module2);
-        //module1->SetParram("amp", 0.3);
-        Module::Connect(module1->outlets[0], module2->inlets[0]);
-        //Module::Connect(module1->outlets[0], module2->inlets[1]);
-      });
-
-    });
-    quitbutton->on_clicked.SubscribeForever([&](){
-      SDLMain::Quit();
-    });
-    chkbox->on_toggled.SubscribeForever([&](bool state){
-      SCLang::SetOSCDebug(state);
-    });
-    configwindow->on_close.SubscribeForever([&](){
-      // Let closing the config window close the whole app.
-      SDLMain::Quit();
-    });
-    SCLang::on_start_completed.SubscribeForever([&](bool success, std::string message){
-      if(success){
-        main_canvas = Canvas::CreateEmpty();
-        mainwindow = MainWindow::Create();
-        mainwindow->on_close.SubscribeForever([&](){
-          // Let closing the main window close the whole app.
-          SDLMain::Quit();
-        });
-        SDLMain::UnregisterWindow(configwindow);
-        configwindow = nullptr; // loose reference
-        SDLMain::RegisterWindow(mainwindow);
-      }else{
-        statustext->SetText(message);
-        statustext->SetBold(true);
-        statustext->SetTextColor("text-error");
-        progressbar->SetAmount(0);
-      }
     });
 
     Utilities::global_idle.SubscribeForever([&](){
