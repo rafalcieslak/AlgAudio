@@ -49,16 +49,14 @@ void MainWindow::init(){
   selector->Populate();
 
   subscriptions += addbutton->on_clicked.Subscribe([=](){
-    if(flag){
+    if(selector->IsExposed()){
       selector->Hide();
-      flag = false;
     }else{
       selector->Expose();
-      flag = true;
     }
   });
   //subscriptions += quitbutton->on_clicked.Subscribe([=](){
-  subscriptions += quitbutton->on_clicked.Subscribe([&](){
+  subscriptions += quitbutton->on_clicked.Subscribe([=](){
     on_close.Happen();
   });
 
@@ -68,6 +66,12 @@ void MainWindow::init(){
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   Insert(mainvbox);
+
+  subscriptions += selector->on_complete.Subscribe([=](std::string id){
+    selector->Hide();
+    if(id == "") return;
+    std::cout << "Selected " << id << std::endl;
+  });
 }
 
 std::shared_ptr<MainWindow> MainWindow::Create(){

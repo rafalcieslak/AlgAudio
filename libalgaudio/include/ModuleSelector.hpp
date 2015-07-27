@@ -25,21 +25,28 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIList.hpp"
 #include "UI/UILabel.hpp"
 #include "UI/UIMarginBox.hpp"
+#include "UI/UISeparator.hpp"
 
 namespace AlgAudio{
 
 class ModuleSelector : public UIHBox, public SubscriptionsManager{
 public:
   static std::shared_ptr<ModuleSelector> Create(std::weak_ptr<Window> parent_window);
+  // Argument: selected template full ID, or empty string if none.
+  // The event happens both when user selects a module, or when resigns by
+  // clicking outside the menu.
+  Signal<std::string> on_complete;
   void Populate() {PopulateLvl1();}
   void Expose();
   void Hide();
+  bool IsExposed() {return exposed; }
 private:
   ModuleSelector(std::weak_ptr<Window> parent_window);
   void PopulateLvl1();
   void PopulateLvl2();
   void ShowLvl2();
   void init();
+  bool exposed = false;
   std::shared_ptr<UIHBox> drawersbox;
   std::shared_ptr<UIAnimDrawer> drawerlvl1;
   std::shared_ptr<UIAnimDrawer> drawerlvl2;
@@ -47,6 +54,10 @@ private:
   std::shared_ptr<UIList> listlvl2;
   std::shared_ptr<UIMarginBox> description_box;
   std::shared_ptr<UILabel> description_label;
+  std::shared_ptr<UISeparator> lvl1_separator;
+  std::shared_ptr<UISeparator> lvl2_separator;
+  std::shared_ptr<UIVBox> lvl1_box;
+  std::shared_ptr<UIVBox> lvl2_box;
 
   std::shared_ptr<Subscription> lvl1_anim_end_wait;
   std::shared_ptr<Subscription> lvl2_anim_end_wait;

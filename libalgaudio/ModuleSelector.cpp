@@ -37,12 +37,20 @@ void ModuleSelector::init(){
   drawersbox->Insert(drawerlvl1, PackMode::TIGHT);
   drawersbox->Insert(drawerlvl2, PackMode::TIGHT);
   Insert(drawersbox, PackMode::TIGHT);
+  lvl1_box = UIVBox::Create(window);
+  lvl2_box = UIVBox::Create(window);
+  drawerlvl1->Insert(lvl1_box);
+  drawerlvl2->Insert(lvl2_box);
   listlvl1 = UIList::Create(window);
   listlvl2 = UIList::Create(window);
-  drawerlvl1->Insert(listlvl1);
-  drawerlvl2->Insert(listlvl2);
   listlvl1->SetColors(Theme::Get("selector-button-normal"),Theme::Get("selector-button-highlight"));
   listlvl2->SetColors(Theme::Get("selector-button-normal"),Theme::Get("selector-button-highlight"));
+  lvl1_box->Insert(listlvl1, PackMode::TIGHT);
+  lvl2_box->Insert(listlvl2, PackMode::TIGHT);
+  lvl1_separator = UISeparator::Create(window);
+  lvl2_separator = UISeparator::Create(window);
+  lvl1_box->Insert(lvl1_separator, PackMode::WIDE);
+  lvl2_box->Insert(lvl2_separator, PackMode::WIDE);
   description_box = UIMarginBox::Create(window,20,0,0,20);
   description_box->SetVisible(false);
   description_label = UILabel::Create(window,"Eventually, this label will contain useful text\nabout pointed module, including the description.\n\nThis is currently just a placeholder.");
@@ -53,6 +61,7 @@ void ModuleSelector::init(){
   description_box->SetBackColor(Color(0,0,0,150));
 
   subscriptions += listlvl1->on_clicked.Subscribe([=](std::string id){
+    std::cout << id << std::endl;
     if(lvl1_selection != id){
       lvl1_selection = id;
       listlvl1->SetHighlight(id);
@@ -84,6 +93,13 @@ void ModuleSelector::init(){
     if(templ->description == "") description_label->SetText("(this module has no description available)");
     else description_label->SetText( templ->description );
   });
+  auto emptycomplete = [=](){ on_complete.Happen("");};
+  subscriptions += description_box->on_clicked.Subscribe(emptycomplete);
+  subscriptions += lvl1_separator->on_clicked.Subscribe(emptycomplete);
+  subscriptions += description_box->on_clicked.Subscribe(emptycomplete);
+  subscriptions += listlvl2->on_clicked.Subscribe([&](std::string id){
+    on_complete.Happen(lvl1_selection + "/" + id);
+  });
 }
 
 void ModuleSelector::PopulateLvl1(){
@@ -109,6 +125,7 @@ void ModuleSelector::PopulateLvl2(){
 
 
 void ModuleSelector::Expose(){
+  exposed = true;
   lvl1_selection = "";
   listlvl1->SetHighlight("");
   SetVisible(true);
@@ -118,6 +135,7 @@ void ModuleSelector::Expose(){
   drawerlvl1->StartShow(0.15);
 }
 void ModuleSelector::Hide(){
+  exposed = false;
   description_box->SetVisible(false);
   lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([=](){
     lvl1_anim_end_wait = drawerlvl1->on_hide_complete.Subscribe([=](){
