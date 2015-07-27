@@ -42,6 +42,7 @@ void SDLMain::Loop(){
     // If any event has arrived, deal with it.
     if (SDL_WaitEventTimeout(&ev, 5)){
       ProcessEvent(ev);
+      while(SDL_PollEvent(&ev)) ProcessEvent(ev);
     }
     // Regardless of whether there was an event or not, we redraw all windows
     // from time to time.
