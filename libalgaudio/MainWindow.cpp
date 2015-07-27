@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UILayered.hpp"
 #include "UI/UILabel.hpp"
 #include "UI/UISeparator.hpp"
+#include "CanvasView.hpp"
 
 namespace AlgAudio{
 
@@ -37,13 +38,14 @@ void MainWindow::init(){
   auto toolbar_separator = UISeparator::Create(shared_from_this());
   auto selector = ModuleSelector::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
-  auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
+  //auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
+  auto canvasview = CanvasView::CreateEmpty(shared_from_this());
 
   addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
   toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
 
-  layered->Insert(label1);
+  layered->Insert(canvasview);
   layered->Insert(selector);
 
   selector->Populate();
@@ -55,7 +57,6 @@ void MainWindow::init(){
       selector->Expose();
     }
   });
-  //subscriptions += quitbutton->on_clicked.Subscribe([=](){
   subscriptions += quitbutton->on_clicked.Subscribe([=](){
     on_close.Happen();
   });

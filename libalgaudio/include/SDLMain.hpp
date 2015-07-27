@@ -24,12 +24,20 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "Window.hpp"
 
+union SDL_Event;
+
 namespace AlgAudio{
 
 class SDLMain{
 private:
   SDLMain() = delete; // static class
+  enum CustomEventCodes{
+    NOTIFY_SUBPROCESS,
+    NOTIFY_OSC
+  };
 public:
+  // Must be caled before event queue is used.
+  static void Init();
   static void Quit();
   // Loop is not re-entrant!
   // Also, it will block for at least until Quit is called.
@@ -51,10 +59,18 @@ public:
   // the last frame was drawn.
   static Signal<float> on_before_frame;
 
+  // These two funcitions are used by i/o threads to notify the main loop that
+  // there is some input ready to be processed. These functions are thread-safe.
+  // They send a custom SDL_UserEvent to the main event queue, effectivelly
+  // waking up the main thread.
+  static void PushNotifySubprocessEvent();
+  static void PushNotifyOSCEvent();
+  static std::atomic<int> notify_event_id;
+
   static std::atomic_bool running;
 private:
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
-  static void ProcessEvents();
+  static void ProcessEvent(const SDL_Event&);
   static int last_draw_time;
 };
 

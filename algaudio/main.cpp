@@ -32,9 +32,8 @@ int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
   try{
-    //TestSubscriptions(); return 0;
-    //TestSync(); return 0;
     Theme::Init();
+    SDLMain::Init();
 
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
@@ -60,10 +59,6 @@ int main(int argc, char *argv[]){
       SDLMain::UnregisterWindow(configwindow);
       configwindow = nullptr; // loose reference
       SDLMain::RegisterWindow(mainwindow);
-    });
-
-    Utilities::global_idle.SubscribeForever([&](){
-      SCLang::Poll();
     });
 
     SDLMain::RegisterWindow(configwindow);

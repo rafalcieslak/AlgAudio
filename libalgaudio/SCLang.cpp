@@ -139,8 +139,10 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, cons
   return r;
 }
 
-void SCLang::Poll(){
+void SCLang::PollSubprocess(){
   if(subprocess) subprocess->TriggerSignals();
+}
+void SCLang::PollOSC(){
   if(osc) osc->TriggerReplies();
 }
 void SCLang::SetOSCDebug(bool enabled){

@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLMain.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
+#include "SCLang.hpp"
 
 namespace AlgAudio{
 
@@ -26,77 +27,103 @@ std::map<unsigned int, std::shared_ptr<Window>> SDLMain::registered_windows;
 std::atomic_bool SDLMain::running;
 Signal<float> SDLMain::on_before_frame;
 int SDLMain::last_draw_time = -1000000;
+std::atomic<int> SDLMain::notify_event_id;
+
+void SDLMain::Init(){
+  notify_event_id = SDL_RegisterEvents(1);
+}
 
 void SDLMain::Loop(){
   running = true;
   while(running){
-    Step();
-  }
-}
-
-void SDLMain::Step(){
-  // Temporary CPU limiter.
-  // Eventually this will have to be rewritten to waiting on a conditional variable
-  // guarding a global events (sdl, osc, subprocess) queue, so that the main loop
-  // only wakes up when it's needed.
-  SDL_Delay(2);
-  // Milliseconds from start
-  int newtime = SDL_GetTicks();
-  int delta = newtime - last_draw_time;
-  if(delta > 15){
-    last_draw_time = newtime;
-    // Process user input
-    ProcessEvents();
-    // Process possible animations
-    on_before_frame.Happen(delta/1000.0);
-    // Redraw registered windows
-    for(auto& it : registered_windows){
-      it.second->Render();
+    SDL_Event ev;
+    // Sleep at most 5ms for new events, be it SDL event, or a custom
+    // OSC/Subprocess notify messsage.
+    // If any event has arrived, deal with it.
+    if (SDL_WaitEventTimeout(&ev, 5)){
+      ProcessEvent(ev);
     }
-    // Temporarily, by default, stop the main loop if there are no registered
-    // windows left.
-    if(registered_windows.size() == 0) Quit();
-  }
-  // Call the global idle, allowing all subsribers to do whatever they need
-  Utilities::global_idle.Happen();
-}
+    // Regardless of whether there was an event or not, we redraw all windows
+    // from time to time.
 
-void SDLMain::ProcessEvents(){
-  SDL_Event ev;
-  while(SDL_PollEvent(&ev)){
-    if(ev.type == SDL_QUIT){
-      Quit();
-      return;
-    }
-
-
-    unsigned int window_id = ev.window.windowID;
-    auto it = registered_windows.find(window_id);
-    if(it == registered_windows.end()){
-      // TODO: Events for unregistered windows should be passed to an externally
-      // visible signal, so that modules can subscribe to it.
-      std::cout << "Warning: Received an event for an unregistered window " << window_id << std::endl;
-      continue;
-    }
-    auto window = it->second;
-    if(ev.type == SDL_WINDOWEVENT){
-      if(ev.window.event == SDL_WINDOWEVENT_CLOSE){
-        window->ProcessCloseEvent();
-      }else if(ev.window.event == SDL_WINDOWEVENT_ENTER){
-        window->ProcessEnterEvent();
-      }else if(ev.window.event == SDL_WINDOWEVENT_LEAVE){
-        window->ProcessLeaveEvent();
-      }else if(ev.window.event == SDL_WINDOWEVENT_RESIZED){
-        window->ProcessResizeEvent();
+    // Milliseconds from start
+    int newtime = SDL_GetTicks();
+    int delta = newtime - last_draw_time;
+    if(delta > 15){ // FPS limiter
+      last_draw_time = newtime;
+      // Process possible animations
+      on_before_frame.Happen(delta/1000.0);
+      // Redraw registered windows
+      for(auto& it : registered_windows){
+        it.second->Render();
       }
-    }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
-      window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, Point2D(ev.button.x, ev.button.y));
-    }else if(ev.type == SDL_MOUSEMOTION){
-      window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
-    } // if(ev.type = ...)
-  } // while PollEvent
+      // Temporarily, by default, stop the main loop if there are no registered
+      // windows left.
+      if(registered_windows.size() == 0) Quit();
+    }
+  }
 }
 
+void SDLMain::ProcessEvent(const SDL_Event& ev){
+  if(ev.type == SDL_QUIT){
+    Quit();
+    return;
+  }
+
+  if(ev.type == (unsigned int)notify_event_id){
+    if(ev.user.code == NOTIFY_SUBPROCESS){
+      SCLang::PollSubprocess();
+    }else if(ev.user.code == NOTIFY_OSC){
+      SCLang::PollOSC();
+    }
+    return;
+  }
+
+  unsigned int window_id = ev.window.windowID;
+  auto it = registered_windows.find(window_id);
+  if(it == registered_windows.end()){
+    // TODO: Events for unregistered windows should be passed to an externally
+    // visible signal, so that modules can subscribe to it.
+    std::cout << "Warning: Received an event for an unregistered window " << window_id << std::endl;
+    return;
+  }
+  std::shared_ptr<Window> window = it->second;
+
+  if(ev.type == SDL_WINDOWEVENT){
+    if(ev.window.event == SDL_WINDOWEVENT_CLOSE){
+      window->ProcessCloseEvent();
+    }else if(ev.window.event == SDL_WINDOWEVENT_ENTER){
+      window->ProcessEnterEvent();
+    }else if(ev.window.event == SDL_WINDOWEVENT_LEAVE){
+      window->ProcessLeaveEvent();
+    }else if(ev.window.event == SDL_WINDOWEVENT_RESIZED){
+      window->ProcessResizeEvent();
+    }
+  }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
+    window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, Point2D(ev.button.x, ev.button.y));
+  }else if(ev.type == SDL_MOUSEMOTION){
+    window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
+  }
+}
+
+void SDLMain::PushNotifySubprocessEvent(){
+  SDL_Event event;
+  SDL_zero(event);
+  event.type = notify_event_id;
+  event.user.code = NOTIFY_SUBPROCESS;
+  event.user.data1 = nullptr;
+  event.user.data2 = nullptr;
+  SDL_PushEvent(&event);
+}
+void SDLMain::PushNotifyOSCEvent(){
+  SDL_Event event;
+  SDL_zero(event);
+  event.type = notify_event_id;
+  event.user.code = NOTIFY_OSC;
+  event.user.data1 = nullptr;
+  event.user.data2 = nullptr;
+  SDL_PushEvent(&event);
+}
 
 void SDLMain::Quit(){
   running = false;

@@ -43,7 +43,12 @@ public:
   static void Restart(std::string command);
   static void Stop();
   static bool IsRunning() { return subprocess != nullptr; }
-  static void Poll();
+  // These function will process any subprocess or OSC input. They shall be
+  // called only by the main thread. The main thread is notified about
+  // awaiting input by an SDL_UserEvent send to the main queue. When
+  // corresponding event is taken from the queue, the
+  static void PollSubprocess();
+  static void PollOSC();
   static Signal<std::string> on_line_received;
   // Arg: bool: success, string: message
   static Signal<bool, std::string> on_start_completed;

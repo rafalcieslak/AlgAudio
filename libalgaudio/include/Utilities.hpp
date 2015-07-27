@@ -85,12 +85,6 @@ class Utilities{
 private:
   Utilities() = delete; // static
 public:
-  // This signal is called by the main thread whenever it has some spare time.
-  // This is roughly once per frame (possibly a skipped frame). When subscribing
-  // to this signal, make sure your callee does not take much time to return,
-  // or whole app's performance may decrease. By no means subscribe with a
-  // blocking callee!
-  static Signal<> global_idle;
   static void Wait(int ms);
   static void WaitOS(int ms);
   static bool GetFileExists(std::string name);

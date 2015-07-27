@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "OSC.hpp"
+#include "SDLMain.hpp"
 #include <iostream>
 
 namespace AlgAudio{
@@ -45,6 +46,7 @@ OSC::OSC(std::string address, std::string port) : addr(""){
       return;
     }
     replies_to_call.push_back( std::bind( it->second, lo::Message(msg) ) );
+    SDLMain::PushNotifyOSCEvent();
     waiting_for_reply.erase(it);
   });
 

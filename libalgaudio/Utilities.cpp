@@ -40,8 +40,6 @@ namespace AlgAudio {
   const std::string Utilities::OSLibSuffix = ".dll";
 #endif
 
-Signal<> Utilities::global_idle;
-
 Exception::Exception(std::string t) : text(t){
 #ifdef SILLY_GDB
   // if your GDB cannot break

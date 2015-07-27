@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "SCLangSubprocess.hpp"
 #include "Color.hpp"
+#include "SDLMain.hpp"
 #include "Utilities.hpp"
 #include <iostream>
 #include <algorithm>
@@ -69,12 +70,15 @@ void SCLangSubprocess::Step(){
   //instructions.clear();
   io_mutex.unlock();
 
+  bool anything = false;
   for(auto& p : instructions_actions_copy){
     std::string reply = WaitForReply(p.first);
     io_mutex.lock();
     replies.push_back(std::bind(p.second,reply));
     io_mutex.unlock();
+    anything = true;
   }
+  if(anything) SDLMain::PushNotifySubprocessEvent();
 
   PollOutput();
 }
@@ -151,6 +155,7 @@ void SCLangSubprocess::ProcessBuffer(){
   for(auto& l : vs){
     io_mutex.lock();
     lines_received.push_back(l);
+    SDLMain::PushNotifySubprocessEvent();
     io_mutex.unlock();
     if(l.length() >= 5 && l.substr(0,5) == "sc3> "){
       // prompt
@@ -167,6 +172,7 @@ void SCLangSubprocess::ProcessBuffer(){
     io_mutex.lock();
     lines_received.push_back("sc3> "); // Pretend it is full output (flush)
     io_mutex.unlock();
+    SDLMain::PushNotifySubprocessEvent();
     buffer = buffer.substr(5);
     prompts++;
   }
