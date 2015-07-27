@@ -60,8 +60,6 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   }
   // Create SC instance
   if(templ->has_sc_code){
-    // TODO: Return a late replay, so that init happens after the instance was
-    // successfully created on SC side
     if(!SCLang::ready){
       std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
     }else{
