@@ -35,7 +35,7 @@ class UIWidget : public UIMouseEventsBase, public std::enable_shared_from_this<U
 protected:
   UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {
-      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
+      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(0,0));
     };
 public:
 /* It is recommended for widgets to implement Create static method,
