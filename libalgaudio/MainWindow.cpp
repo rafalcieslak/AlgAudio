@@ -72,6 +72,7 @@ void MainWindow::init(){
     selector->Hide();
     if(id == "") return;
     std::cout << "Selected " << id << std::endl;
+    canvasview->AddModule(id,Point2D(50,50));
   });
 }
 

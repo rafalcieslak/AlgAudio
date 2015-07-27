@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "UI/UIWidget.hpp"
+#include "UI/ModuleGUI.hpp"
 #include "Canvas.hpp"
 
 namespace AlgAudio{
@@ -28,10 +29,11 @@ class CanvasView : public UIWidget{
 public:
   static std::shared_ptr<CanvasView> CreateEmpty(std::shared_ptr<Window> parent);
   virtual void CustomDraw(DrawContext& c);
-  LateReturn<> AddModule(std::string id);
+  LateReturn<> AddModule(std::string id, Point2D position);
 private:
   CanvasView(std::shared_ptr<Window> parent);
   std::shared_ptr<Canvas> canvas;
+  std::list<std::shared_ptr<ModuleGUI>> module_guis;
 };
 
 } // namespace AlgAudio

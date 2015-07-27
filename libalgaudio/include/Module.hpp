@@ -28,6 +28,7 @@ namespace AlgAudio{
 
 class ModuleTemplate;
 class Canvas;
+class ModuleGUI;
 
 // A wrapper for SC buses.
 class Bus{
@@ -49,7 +50,6 @@ public:
   virtual void on_init() {};
   std::shared_ptr<ModuleTemplate> templ;
   int sc_id = -1;
-  std::weak_ptr<Canvas> canvas;
 
   // TODO: Common base class
   class Outlet{
@@ -77,13 +77,36 @@ public:
   void SetParram(std::string name, int value);
   void SetParram(std::string name, double value);
 
+  // TODO: Move these functions to Canvas
   static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);
+  static void Connect(std::shared_ptr<Module> a, std::shared_ptr<Module> b);
 
+  // Returns a reference to the ModuleGUI that represents this particular module
+  // instance. If the GUI was not yet build, or was already deleted, this
+  // function will return nullptr.
+  std::shared_ptr<ModuleGUI> GetGUI();
+
+  // This function is used to create a new ModuleGUI that will represent this
+  // module instance in a CanvasView. Custom modules can override this function
+  // with anything they desire, as long as it returns any ModuleGUI. It can be
+  // a custom class that derives from ModuleGUI. However, there is no
+  // necessity to override this method - the default implementation will create
+  // the GUI hierarchy according to the description from collection XML. The
+  // only argument to this function is the value of "type" attribute of xml's
+  // "gui" node.
+  // Whoever calls this function claims the ownership of the returned pointer,
+  // it will not be owned by the module instance.
+  virtual std::shared_ptr<ModuleGUI> BuildGUI(std::string type);
+
+  // Creates and allocates Inlets and Outlets for this instance, according to
+  // the data in template info.
   LateReturn<> CreateIOFromTemplate();
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
 
-  static void Connect(std::shared_ptr<Module> a, std::shared_ptr<Module> b);
+  std::weak_ptr<Canvas> canvas;
+private:
+  std::weak_ptr<ModuleGUI> modulegui;
 };
 
 } // namespace AlgAudio

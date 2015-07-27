@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
+#include "ModuleFactory.hpp"
 
 namespace AlgAudio{
 
@@ -28,13 +29,31 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
   return std::shared_ptr<CanvasView>( new CanvasView(parent) );
 }
 
-LateReturn<> CanvasView::AddModule(std::string id){
+LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
-
+  ModuleFactory::CreateNewInstance(id).Then([&](std::shared_ptr<Module> m){
+    canvas->InsertModule(m);
+    auto modulegui = m->BuildGUI(m->templ->guitype);
+    if(!modulegui){
+      std::cout << "Failed to build gui" << std::endl;
+      r.Return();
+      return;
+    }
+    modulegui->position = pos;
+    module_guis.push_back(modulegui);
+    SetNeedsRedrawing();
+    r.Return();
+  });
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
-
+  // For each modulegui, draw the modulegui.
+  for(auto& modulegui : module_guis){
+    c.Push(modulegui->position, modulegui->GetRequestedSize());
+    modulegui->Draw(c);
+    c.Pop();
+  }
+  // Then draw all the connections...
 }
 
 } // namespace AlgAudio
