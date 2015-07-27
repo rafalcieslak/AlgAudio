@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIAnimDrawer.hpp"
 #include "UI/UIList.hpp"
 #include "UI/UILabel.hpp"
+#include "UI/UIMarginBox.hpp"
 
 namespace AlgAudio{
 
@@ -39,10 +40,12 @@ private:
   void PopulateLvl2();
   void ShowLvl2();
   void init();
+  std::shared_ptr<UIHBox> drawersbox;
   std::shared_ptr<UIAnimDrawer> drawerlvl1;
   std::shared_ptr<UIAnimDrawer> drawerlvl2;
   std::shared_ptr<UIList> listlvl1;
   std::shared_ptr<UIList> listlvl2;
+  std::shared_ptr<UIMarginBox> description_box;
   std::shared_ptr<UILabel> description_label;
 
   std::shared_ptr<Subscription> lvl1_anim_end_wait;

@@ -30,21 +30,25 @@ std::shared_ptr<ModuleSelector> ModuleSelector::Create(std::weak_ptr<Window> w){
 }
 void ModuleSelector::init(){
   SetVisible(false);
+  drawersbox = UIHBox::Create(window);
+  drawersbox->SetPadding(2);
   drawerlvl1 = UIAnimDrawer::Create(window, Direction_LEFT);
   drawerlvl2 = UIAnimDrawer::Create(window, Direction_LEFT);
-  Insert(drawerlvl1, PackMode::TIGHT);
-  Insert(drawerlvl2, PackMode::TIGHT);
+  drawersbox->Insert(drawerlvl1, PackMode::TIGHT);
+  drawersbox->Insert(drawerlvl2, PackMode::TIGHT);
+  Insert(drawersbox, PackMode::TIGHT);
   listlvl1 = UIList::Create(window);
   listlvl2 = UIList::Create(window);
   drawerlvl1->Insert(listlvl1);
   drawerlvl2->Insert(listlvl2);
+  description_box = UIMarginBox::Create(window,20,0,0,20);
+  description_box->SetVisible(false);
   description_label = UILabel::Create(window,"Eventually, this label will contain useful text\nabout pointed module, including the description.\n\nThis is currently just a placeholder.");
-  description_label->SetVisible(false);
-  description_label->SetBackColor(Color(0,0,0,150));
   description_label->SetAlignment(HorizAlignment_LEFT, VertAlignment_TOP);
-  Insert(description_label, PackMode::WIDE);
-  listlvl1->SetBackColor(Color(0,0,0,150));
-  listlvl2->SetBackColor(Color(0,0,0,150));
+  description_box->Insert(description_label);
+  Insert(description_box, PackMode::WIDE);
+  drawersbox->SetBackColor(Color(0,0,0,150));
+  description_box->SetBackColor(Color(0,0,0,150));
 
   subscriptions += listlvl1->on_clicked.Subscribe([=](std::string id){
     if(lvl1_selection != id){
@@ -89,12 +93,12 @@ void ModuleSelector::Expose(){
   lvl1_selection = "";
   SetVisible(true);
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
+    description_box->SetVisible(true);
   });
-    description_label->SetVisible(true);
   drawerlvl1->StartShow(0.15);
 }
 void ModuleSelector::Hide(){
-  description_label->SetVisible(false);
+  description_box->SetVisible(false);
   lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([=](){
     lvl1_anim_end_wait = drawerlvl1->on_hide_complete.Subscribe([=](){
       SetVisible(false);
