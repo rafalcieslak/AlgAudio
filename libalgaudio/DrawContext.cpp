@@ -37,6 +37,7 @@ void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
 
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
+  if(!texture->valid) return; // Silently skip null textures.
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};
@@ -46,6 +47,7 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
 }
 void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int x_, int y_){
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
+  if(!texture->valid) return; // Silently skip null textures.
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + x_, y + y_, texture_size.width, texture_size.height};

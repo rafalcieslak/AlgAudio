@@ -61,7 +61,6 @@ void ModuleSelector::init(){
   description_box->SetBackColor(Color(0,0,0,150));
 
   subscriptions += listlvl1->on_clicked.Subscribe([=](std::string id){
-    std::cout << id << std::endl;
     if(lvl1_selection != id){
       lvl1_selection = id;
       listlvl1->SetHighlight(id);
