@@ -4,7 +4,7 @@
 
 DIR=package-windows
 
-mkdir -f $DIR
+mkdir -p $DIR
 cp algaudio.exe libalgaudio.dll liblo-7.dll $DIR
 cp -r fonts sc $DIR
 mkdir $DIR/modules
