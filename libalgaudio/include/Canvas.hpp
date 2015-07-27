@@ -29,15 +29,11 @@ namespace AlgAudio{
 class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   virtual ~Canvas() {};
-  void InsertModule(std::shared_ptr<Module>, Point2D p = Point2D(0,0));
+  void InsertModule(std::shared_ptr<Module>);
   static std::shared_ptr<Canvas> CreateEmpty();
 private:
   Canvas();
-  struct ModuleData{
-    std::shared_ptr<Module> m;
-    Point2D pos;
-  };
-  std::vector<ModuleData> modules;
+  std::vector<std::shared_ptr<Module>> modules;
 };
 
 } // namespace AlgAudio

@@ -28,8 +28,8 @@ std::shared_ptr<Canvas> Canvas::CreateEmpty(){
   return std::shared_ptr<Canvas>( new Canvas() );
 }
 
-void Canvas::InsertModule(std::shared_ptr<Module> m, Point2D pos){
-  modules.emplace_back(ModuleData{m,pos});
+void Canvas::InsertModule(std::shared_ptr<Module> m){
+  modules.emplace_back(m);
   m->canvas = shared_from_this();
 }
 
