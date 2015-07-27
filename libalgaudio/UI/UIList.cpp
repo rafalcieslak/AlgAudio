@@ -39,6 +39,7 @@ void UIList::AddItem(std::string id, std::string text){
   new_button->SetBorder(false);
   new_button->SetFontSize(14);
   new_button->SetInnerMargin(3);
+  new_button->SetColor(standard_color);
   new_button->on_clicked.SubscribeForever([=](){
     on_clicked.Happen(id);
   });
@@ -52,6 +53,29 @@ void UIList::AddItem(std::string id, std::string text){
 void UIList::Clear(){
   ids_to_buttons.clear();
   UIBox::Clear();
+}
+
+void UIList::SetColors(Color standard, Color highlight){
+  standard_color = standard;
+  highlight_color = highlight;
+  for(auto& it : ids_to_buttons){
+    it.second->SetColor(standard_color);
+  }
+  if(highlighted) highlighted->SetColor(highlight_color);
+}
+void UIList::SetHighlight(std::string id){
+  if(id == ""){
+    // Reset highlight
+    if(!highlighted) return;
+    highlighted->SetColor(standard_color);
+    highlighted = nullptr;
+  }else{
+    auto it = ids_to_buttons.find(id);
+    if(it == ids_to_buttons.end()) return;
+    if(highlighted) highlighted->SetColor(standard_color);
+    highlighted = it->second;
+    highlighted->SetColor(highlight_color);
+  }
 }
 
 } // namespace AlgAudio

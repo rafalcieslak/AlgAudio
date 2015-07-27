@@ -88,6 +88,10 @@ void UIButton::SetColors(Color text, Color background){
   bg_color = background;
   UpdateTexture();
 }
+void UIButton::SetColor(Color background){
+  bg_color = background;
+  SetNeedsRedrawing();
+}
 
 void UIButton::SetFontSize(int fs){
   fontsize = fs;

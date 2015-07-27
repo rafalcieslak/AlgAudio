@@ -28,11 +28,16 @@ public:
   static std::shared_ptr<UIList> Create(std::weak_ptr<Window> parent_window);
   void AddItem(std::string id, std::string text);
   void Clear();
+  void SetColors(Color standard, Color highlight);
+  void SetHighlight(std::string id);
   Signal<std::string> on_pointed;
   Signal<std::string> on_clicked;
 private:
   UIList(std::weak_ptr<Window> parent_window);
   std::map<std::string, std::shared_ptr<UIButton>> ids_to_buttons;
+  std::shared_ptr<UIButton> highlighted = nullptr;
+  Color standard_color = Theme::Get("bg-button-neutral");
+  Color highlight_color = Theme::Get("bg-button-positive");
 };
 
 } // namespace AlgAudio

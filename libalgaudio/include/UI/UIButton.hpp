@@ -27,6 +27,7 @@ class UIButton : public UIClickable{
 public:
   static std::shared_ptr<UIButton> Create(std::weak_ptr<Window> parent_window, std::string text);
   void SetText(std::string);
+  void SetColor(Color background);
   void SetColors(Color text, Color background);
   virtual void CustomDraw(DrawContext& c) override;
   void SetFontSize(int fontsize);

@@ -41,6 +41,8 @@ void ModuleSelector::init(){
   listlvl2 = UIList::Create(window);
   drawerlvl1->Insert(listlvl1);
   drawerlvl2->Insert(listlvl2);
+  listlvl1->SetColors(Theme::Get("selector-button-normal"),Theme::Get("selector-button-highlight"));
+  listlvl2->SetColors(Theme::Get("selector-button-normal"),Theme::Get("selector-button-highlight"));
   description_box = UIMarginBox::Create(window,20,0,0,20);
   description_box->SetVisible(false);
   description_label = UILabel::Create(window,"Eventually, this label will contain useful text\nabout pointed module, including the description.\n\nThis is currently just a placeholder.");
@@ -53,6 +55,7 @@ void ModuleSelector::init(){
   subscriptions += listlvl1->on_clicked.Subscribe([=](std::string id){
     if(lvl1_selection != id){
       lvl1_selection = id;
+      listlvl1->SetHighlight(id);
       lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([=](){
         PopulateLvl2();
         drawerlvl2->StartShow(0.15);
@@ -62,6 +65,7 @@ void ModuleSelector::init(){
       // Same id. Hide the lvl2 drawer
       lvl2_anim_end_wait->Release();
       drawerlvl2->StartHide(0.15);
+      listlvl1->SetHighlight("");
       lvl1_selection = "";
     }
   });
@@ -91,6 +95,7 @@ void ModuleSelector::PopulateLvl2(){
 
 void ModuleSelector::Expose(){
   lvl1_selection = "";
+  listlvl1->SetHighlight("");
   SetVisible(true);
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
     description_box->SetVisible(true);

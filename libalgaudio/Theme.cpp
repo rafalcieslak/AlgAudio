@@ -31,11 +31,14 @@ void Theme::Init(){
   thememap["bg-button-positive"] = Color(0x5c786cff);
   thememap["bg-button-negative"] = Color(0x785c6aff);
   thememap["bg-button-neutral"] = Color(0x415a8aff);
+  //thememap["bg-button-neutral"] = Color(0x3d4f67ff);
   thememap["mg_main"] = Color(0x5c6878ff);
   thememap["text-generic"] = Color(0xaaaeb8ff);
   thememap["text-button"] = Color(0x212227ff);
   thememap["text-error"] = Color(0xdc8c96ff);
   thememap["progress-bar"] = Color(0x346d97ff);
+  thememap["selector-button-normal"] = Color(0x52607cff);
+  thememap["selector-button-highlight"] = Color(0x415a8aff);
 }
 
 const Color& Theme::Get(const std::string& id){
