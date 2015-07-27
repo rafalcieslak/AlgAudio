@@ -125,21 +125,21 @@ void UIAnimDrawer::OnChildVisibilityChanged(){
 }
 
 // TODO: Animated pointing over moving elements?
-void UIAnimDrawer::OnMouseButton(bool down, short b,Point2D pos){
+void UIAnimDrawer::CustomMousePress(bool down, short b,Point2D pos){
   if(!child || phase < 0.999) return;
-  child->OnMouseButton(down,b,pos);
+  child->OnMousePress(down,b,pos);
 }
-void UIAnimDrawer::OnMotion(Point2D p1,Point2D p2){
+void UIAnimDrawer::CustomMouseMotion(Point2D p1,Point2D p2){
   if(!child || phase < 0.999) return;
-  child->OnMotion(p1,p2);
+  child->OnMouseMotion(p1,p2);
 }
-void UIAnimDrawer::OnMotionEnter(Point2D p2){
+void UIAnimDrawer::CustomMouseEnter(Point2D p2){
   if(!child || phase < 0.999) return;
-  child->OnMotionEnter(p2);
+  child->OnMouseEnter(p2);
 }
-void UIAnimDrawer::OnMotionLeave(Point2D p1){
+void UIAnimDrawer::CustomMouseLeave(Point2D p1){
   if(!child || phase < 0.999) return;
-  child->OnMotionLeave(p1);
+  child->OnMouseLeave(p1);
 }
 
 } // namespace AlgAudio

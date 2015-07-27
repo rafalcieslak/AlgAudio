@@ -56,10 +56,10 @@ void UIPosition::OnChildVisibilityChanged(){
   else SetMinimalSize(Size2D(0,0));
 }
 
-void UIPosition::OnMouseButton(bool down, short b,Point2D p){
+void UIPosition::CustomMousePress(bool down, short b,Point2D p){
   if(!child) return;
   if(IsInside(p))
-    child->OnMouseButton(down,b,p - position);
+    child->OnMousePress(down,b,p - position);
 }
 
 bool UIPosition::IsInside(Point2D p) const{
@@ -68,27 +68,27 @@ bool UIPosition::IsInside(Point2D p) const{
   else return true;
 }
 
-void UIPosition::OnMotion(Point2D p1, Point2D p2){
+void UIPosition::CustomMouseMotion(Point2D p1, Point2D p2){
   if(!child) return;
-  if(IsInside(p1) && IsInside(p2)) child->OnMotion(p1 - position, p2 - position);
+  if(IsInside(p1) && IsInside(p2)) child->OnMouseMotion(p1 - position, p2 - position);
   else if(IsInside(p1)){
     // start inside, end ouside
-    child->OnMotionLeave(p1 - position);
+    child->OnMouseLeave(p1 - position);
   }else if(IsInside(p2)){
     // start outside, enter outside
-    child->OnMotionEnter(p2 - position);
+    child->OnMouseEnter(p2 - position);
   }else{
     // both outside, ignore
   }
 }
 
-void UIPosition::OnMotionEnter(Point2D p){
+void UIPosition::CustomMouseEnter(Point2D p){
   if(!child) return;
-  if(IsInside(p)) child->OnMotionEnter(p - position);
+  if(IsInside(p)) child->OnMouseEnter(p - position);
 }
-void UIPosition::OnMotionLeave(Point2D p){
+void UIPosition::CustomMouseLeave(Point2D p){
   if(!child) return;
-  if(IsInside(p)) child->OnMotionLeave(p - position);
+  if(IsInside(p)) child->OnMouseLeave(p - position);
 }
 
 

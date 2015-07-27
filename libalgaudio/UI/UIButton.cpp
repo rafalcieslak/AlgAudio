@@ -23,12 +23,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIClickable(w), text(t){
+UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t){
   bg_color = Theme::Get("bg-button-neutral");
   text_color = Theme::Get("text-button");
   UpdateTexture();
 
-  // UIClickable events
+  // UIMouseEventsBase events
   on_pointed.SubscribeForever([&](bool){
     SetNeedsRedrawing();
   });

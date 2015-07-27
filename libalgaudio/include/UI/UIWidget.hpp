@@ -24,13 +24,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Signal.hpp"
 #include "Color.hpp"
 #include "SDLTexture.hpp"
+#include "UIMouseEventsBase.hpp"
 
 namespace AlgAudio{
 
 class Window;
 
 // shared_from_this is required for proper parent tracking
-class UIWidget : public std::enable_shared_from_this<UIWidget>{
+class UIWidget : public UIMouseEventsBase, public std::enable_shared_from_this<UIWidget>{
 protected:
   UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {
@@ -71,14 +72,6 @@ public:
   // Starts the downward resize-chain without actually changing size.
   // Useful for propagating size to a newly inserted child.
   void TriggerFakeResize() { CustomResize(current_size); }
-
-  // Arguments: down, button, position
-  virtual void OnMouseButton(bool, short, Point2D) {}
-  // Arguments: from, to
-  virtual void OnMotion(Point2D, Point2D) {}
-  virtual void OnMotionLeave(Point2D) {}
-  virtual void OnMotionEnter(Point2D) {}
-
 
   std::weak_ptr<UIWidget> parent;
 

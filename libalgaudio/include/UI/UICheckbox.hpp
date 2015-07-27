@@ -18,7 +18,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UIClickable.hpp"
+#include "UIWidget.hpp"
 #include "Theme.hpp"
 
 namespace AlgAudio{
@@ -27,7 +27,7 @@ class UIHBox;
 class UILabel;
 class UIButton;
 
-class UICheckbox : public UIClickable{
+class UICheckbox : public UIWidget{
 public:
   static std::shared_ptr<UICheckbox> Create(std::weak_ptr<Window> parent_window, std::string text);
   Signal<bool> on_toggled;

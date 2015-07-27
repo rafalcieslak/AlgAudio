@@ -65,10 +65,10 @@ void UIMarginBox::OnChildVisibilityChanged(){
   //  SetMinimalSize(Size2D(top+bottom, left+right));
 }
 
-void UIMarginBox::OnMouseButton(bool down, short b,Point2D p){
+void UIMarginBox::CustomMousePress(bool down, short b,Point2D p){
   if(!child) return;
   if(IsInside(p))
-    child->OnMouseButton(down,b,p - Point2D(left,top));
+    child->OnMousePress(down,b,p - Point2D(left,top));
 }
 
 bool UIMarginBox::IsInside(Point2D p) const{
@@ -76,27 +76,27 @@ bool UIMarginBox::IsInside(Point2D p) const{
   else return true;
 }
 
-void UIMarginBox::OnMotion(Point2D p1, Point2D p2){
+void UIMarginBox::CustomMouseMotion(Point2D p1, Point2D p2){
   if(!child) return;
-  if(IsInside(p1) && IsInside(p2)) child->OnMotion(p1 - Point2D(left,top), p2 - Point2D(left,top));
+  if(IsInside(p1) && IsInside(p2)) child->OnMouseMotion(p1 - Point2D(left,top), p2 - Point2D(left,top));
   else if(IsInside(p1)){
     // start inside, end ouside
-    child->OnMotionLeave(p1 - Point2D(left,top));
+    child->OnMouseLeave(p1 - Point2D(left,top));
   }else if(IsInside(p2)){
     // start outside, enter outside
-    child->OnMotionEnter(p2 - Point2D(left,top));
+    child->OnMouseEnter(p2 - Point2D(left,top));
   }else{
     // both outside, ignore
   }
 }
 
-void UIMarginBox::OnMotionEnter(Point2D p){
+void UIMarginBox::CustomMouseEnter(Point2D p){
   if(!child) return;
-  if(IsInside(p)) child->OnMotionEnter(p - Point2D(left,top));
+  if(IsInside(p)) child->OnMouseEnter(p - Point2D(left,top));
 }
-void UIMarginBox::OnMotionLeave(Point2D p){
+void UIMarginBox::CustomMouseLeave(Point2D p){
   if(!child) return;
-  if(IsInside(p)) child->OnMotionLeave(p - Point2D(left,top));
+  if(IsInside(p)) child->OnMouseLeave(p - Point2D(left,top));
 }
 
 

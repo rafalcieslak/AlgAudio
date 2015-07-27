@@ -30,10 +30,10 @@ public:
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
   virtual void Insert(std::shared_ptr<UIWidget>);
-  virtual void OnMouseButton(bool down, short b,Point2D) override;
-  virtual void OnMotion(Point2D,Point2D) override;
-  virtual void OnMotionEnter(Point2D) override;
-  virtual void OnMotionLeave(Point2D) override;
+  virtual void CustomMousePress(bool down, short b,Point2D) override;
+  virtual void CustomMouseMotion(Point2D,Point2D) override;
+  virtual void CustomMouseEnter(Point2D) override;
+  virtual void CustomMouseLeave(Point2D) override;
 private:
   UIMarginBox(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
   inline bool IsInside(Point2D) const;

@@ -30,10 +30,10 @@ public:
   virtual void CustomDraw(DrawContext& c) override;
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
-  virtual void OnMouseButton(bool down, short b,Point2D) override;
-  virtual void OnMotion(Point2D,Point2D) override;
-  virtual void OnMotionEnter(Point2D) override;
-  virtual void OnMotionLeave(Point2D) override;
+  virtual void CustomMousePress(bool down, short b,Point2D) override;
+  virtual void CustomMouseMotion(Point2D,Point2D) override;
+  virtual void CustomMouseEnter(Point2D) override;
+  virtual void CustomMouseLeave(Point2D) override;
 private:
   UIPosition(std::weak_ptr<Window> parent_window);
   inline bool IsInside(Point2D) const;

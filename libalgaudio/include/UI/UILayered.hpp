@@ -30,10 +30,10 @@ public:
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
-  virtual void OnMouseButton(bool,short,Point2D) override;
-  virtual void OnMotionEnter(Point2D) override;
-  virtual void OnMotionLeave(Point2D) override;
-  virtual void OnMotion(Point2D p1, Point2D p2) override;
+  virtual void CustomMousePress(bool,short,Point2D) override;
+  virtual void CustomMouseEnter(Point2D) override;
+  virtual void CustomMouseLeave(Point2D) override;
+  virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;
 private:
   UILayered(std::weak_ptr<Window> parent_window);
   std::list<std::shared_ptr<UIWidget>> children;

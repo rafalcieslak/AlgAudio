@@ -186,45 +186,45 @@ int UIBox::InWhich(Point2D p){
   return -1;
 }
 
-void UIBox::OnMouseButton(bool down, short b,Point2D p){
+void UIBox::CustomMousePress(bool down, short b,Point2D p){
   int n = InWhich(p);
   if(n<0) return;
-  children[n].child->OnMouseButton(down,b,p - GetChildLocation(n));
+  children[n].child->OnMousePress(down,b,p - GetChildLocation(n));
 }
 
-void UIBox::OnMotion(Point2D p1, Point2D p2){
+void UIBox::CustomMouseMotion(Point2D p1, Point2D p2){
   int n1 = InWhich(p1);
   int n2 = InWhich(p2);
   if(n1 < 0 && n2 < 0){
     // Ignore.
   }else if(n1 < 0 && n2 >= 0){
     // Start outside, end inside
-    children[n2].child->OnMotionEnter(p2 - GetChildLocation(n2));
+    children[n2].child->OnMouseEnter(p2 - GetChildLocation(n2));
   }else if(n1 >= 0 && n2 < 0){
     // Start inside, end outside
-    children[n1].child->OnMotionLeave(p1 - GetChildLocation(n1));
+    children[n1].child->OnMouseLeave(p1 - GetChildLocation(n1));
   }else if(n1 >= 0 && n2 >= 0){
     // Both inside
     if(n1 == n2){
       // Movement inside a widget
-      children[n1].child->OnMotion(p1 - GetChildLocation(n1), p2 - GetChildLocation(n1));
+      children[n1].child->OnMouseMotion(p1 - GetChildLocation(n1), p2 - GetChildLocation(n1));
     }else{
       // Movement from a widget to another
-      children[n1].child->OnMotionLeave(p1 - GetChildLocation(n1));
-      children[n2].child->OnMotionEnter(p2 - GetChildLocation(n2));
+      children[n1].child->OnMouseLeave(p1 - GetChildLocation(n1));
+      children[n2].child->OnMouseEnter(p2 - GetChildLocation(n2));
     }
   }
 }
 
-void UIBox::OnMotionEnter(Point2D p){
+void UIBox::CustomMouseEnter(Point2D p){
   int n = InWhich(p);
   if(n < 0) return;
-  children[n].child->OnMotionEnter(p - GetChildLocation(n));
+  children[n].child->OnMouseEnter(p - GetChildLocation(n));
 }
-void UIBox::OnMotionLeave(Point2D p){
+void UIBox::CustomMouseLeave(Point2D p){
   int n = InWhich(p);
   if(n < 0) return;
-  children[n].child->OnMotionLeave(p - GetChildLocation(n));
+  children[n].child->OnMouseLeave(p - GetChildLocation(n));
 }
 
 } // namespace AlgAudio

@@ -1,3 +1,5 @@
+#ifndef UIMOUSEEVENTSBASE_HPP
+#define UIMOUSEEVENTSBASE_HPP
 /*
 This file is part of AlgAudio.
 
@@ -16,39 +18,29 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/UIClickable.hpp"
-#include <SDL2/SDL.h>
+#include "Utilities.hpp"
 
 namespace AlgAudio{
 
-UIClickable::UIClickable(std::weak_ptr<Window> w) : UIWidget(w){
-}
-
-void UIClickable::OnMouseButton(bool down, short b,Point2D){
-  if(down == true && b == SDL_BUTTON_LEFT){
-    pressed = true;
-    on_pressed.Happen(true);
-  }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
-    pressed = false;
-    on_pressed.Happen(false);
-    on_clicked.Happen();
-  }
-}
-
-void UIClickable::OnMotionEnter(Point2D){
-  pointed = true;
-  on_pointed.Happen(true);
-}
-
-void UIClickable::OnMotionLeave(Point2D){
-  if(pressed){
-    pressed = false;
-    on_pressed.Happen(false);
-  }
-  if(pointed){
-    pointed = false;
-    on_pointed.Happen(false);
-  }
-}
+class UIMouseEventsBase{
+public:
+  Signal<> on_clicked;
+  Signal<bool> on_pointed;
+  Signal<bool> on_pressed;
+  void OnMousePress(bool,short,Point2D);
+  void OnMouseEnter(Point2D);
+  void OnMouseLeave(Point2D);
+  void OnMouseMotion(Point2D,Point2D);
+  virtual void CustomMousePress(bool,short,Point2D) {}
+  virtual void CustomMouseEnter(Point2D) {}
+  virtual void CustomMouseLeave(Point2D) {}
+  virtual void CustomMouseMotion(Point2D,Point2D) {}
+protected:
+  UIMouseEventsBase() {} // Only construcible when inherited
+  bool pressed = false;
+  bool pointed = false;
+};
 
 } // namespace AlgAudio
+
+#endif // UIMOUSEEVENTSBASE_HPP

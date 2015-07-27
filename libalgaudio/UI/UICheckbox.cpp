@@ -25,7 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UICheckbox::UICheckbox(std::weak_ptr<Window> w, std::string t) : UIClickable(w), text(t){
+UICheckbox::UICheckbox(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t){
 }
 
 std::shared_ptr<UICheckbox> UICheckbox::Create(std::weak_ptr<Window> w, std::string text){

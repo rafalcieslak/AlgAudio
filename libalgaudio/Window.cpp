@@ -101,10 +101,10 @@ void Window::ProcessEnterEvent(){
 void Window::ProcessMotionEvent(Point2D p){
   if(child){
     if(mouse_just_entered){
-      child->OnMotionEnter(p);
+      child->OnMouseEnter(p);
       mouse_just_entered = false;
     }
-    child->OnMotion(prev_motion, p);
+    child->OnMouseMotion(prev_motion, p);
   }
   prev_motion = p;
 }
@@ -114,7 +114,7 @@ void Window::ProcessLeaveEvent(){
   if(!child) return;
   // The SDL leave event has no mouse position, but is always preceded by a
   // motion event
-  child->OnMotionLeave(prev_motion);
+  child->OnMouseLeave(prev_motion);
 }
 
 void Window::ProcessResizeEvent(){
@@ -125,7 +125,7 @@ void Window::ProcessResizeEvent(){
 
 void Window::ProcessMouseButtonEvent(bool d, short b, Point2D p){
   if(child)
-    child->OnMouseButton(d,b,p);
+    child->OnMousePress(d,b,p);
 }
 
 Size2D Window::GetSize() const{
