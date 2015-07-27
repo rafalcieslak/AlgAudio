@@ -61,7 +61,7 @@ void UILabel::SetAlignment(HorizAlignment h, VertAlignment v){
 }
 void UILabel::UpdateTexture(){
   texture = TextRenderer::Render(window, FontParrams((bold)?"Dosis-Bold":"Dosis-Regular",fontsize), text);
-  SetMinimalSize(texture->GetSize() + Size2D(5,5));
+  SetMinimalSize(texture->GetSize());
   SetNeedsRedrawing();
 }
 
