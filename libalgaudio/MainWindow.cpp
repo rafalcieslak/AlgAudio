@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIButton.hpp"
 #include "UI/UILayered.hpp"
 #include "UI/UILabel.hpp"
+#include "UI/UISeparator.hpp"
 
 namespace AlgAudio{
 
@@ -31,12 +32,15 @@ MainWindow::MainWindow() : Window("AlgAudio",900,600){
 void MainWindow::init(){
   auto mainvbox = UIVBox::Create(shared_from_this());
   auto addbutton = UIButton::Create(shared_from_this()," Add new ");
+  auto quitbutton = UIButton::Create(shared_from_this()," Quit ");
   auto toolbarbox = UIHBox::Create(shared_from_this());
+  auto toolbar_separator = UISeparator::Create(shared_from_this());
   auto selector = ModuleSelector::Create(shared_from_this());
   auto layered = UILayered::Create(shared_from_this());
   auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
 
-  addbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
+  addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
+  quitbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
   toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
 
   layered->Insert(label1);
@@ -53,8 +57,14 @@ void MainWindow::init(){
       flag = true;
     }
   });
+  //subscriptions += quitbutton->on_clicked.Subscribe([=](){
+  subscriptions += quitbutton->on_clicked.Subscribe([&](){
+    on_close.Happen();
+  });
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(toolbar_separator, UIBox::PackMode::WIDE);
+  toolbarbox->Insert(quitbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   Insert(mainvbox);
