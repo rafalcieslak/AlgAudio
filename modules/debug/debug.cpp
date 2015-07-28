@@ -70,7 +70,12 @@ public:
     subscriptions += clipboard_button->on_clicked.Subscribe([=](){
       AlgAudio::Utilities::CopyToClipboard(textarea->GetAllText());
     });
-    console_window->on_close.SubscribeForever([=](){
+    // When subscribing to signals, be careful not to create shared_ptr loops.
+    // In the example below, if console_window was captured by value, it would
+    // copy the shared_ptr, increase refcount and store it INSIDE console window
+    // (lambda stored inside signal), and in such case the shared_ptr would
+    // never free.
+    console_window->on_close.SubscribeForever([&](){
       AlgAudio::SDLMain::UnregisterWindow(console_window);
     });
     AlgAudio::SDLMain::RegisterWindow(console_window);

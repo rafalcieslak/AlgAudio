@@ -25,19 +25,20 @@ int SignalBase::subscription_id_counter = 1;
 
 void Subscription::Release(){
   if(!IsEmpty()){
-    std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
+    //std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
     if(target)
       target->RemoveSubscriptionByID(id);
     target = nullptr;
-    std::cout << "Relased." << std::endl;
+    //std::cout << "Relased." << std::endl;
   }
 }
 
 SignalBase::SignalBase(){
+  //std::cout << "Created signal " <<  this << std::endl;
 }
 
 SignalBase::~SignalBase(){
-  std::cout << "Destroying signal " <<  this << std::endl;
+  //std::cout << "Destroying signal " <<  this << std::endl;
   for(auto& p : subscriptions) p->target = nullptr;
 }
 

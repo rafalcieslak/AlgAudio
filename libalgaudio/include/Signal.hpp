@@ -87,10 +87,11 @@ public:
     : id(std::move(other.id)),
       target(std::move(other.target)) {
     other.id = 0;
+    other.target = nullptr;
   }
   Subscription& operator=(Subscription&& other) {
-    id = std::move(other.id);
-    target = std::move(other.target);
+    std::swap(id, other.id);
+    std::swap(target, other.target);
     other.id = 0;
     return *this;
   }
@@ -137,7 +138,7 @@ private:
       if(it == subscribers_with_id.end()){
         std::cout << "WARNING: removing an unexisting subscription!" << std::endl;
       }else{
-        std::cout << "WARNING: Erasing sub with id " << id << " size = "<< subscribers_with_id.size() << std::endl;
+        //std::cout << "WARNING: Erasing sub with id " << id << " size = "<< subscribers_with_id.size() << std::endl;
         subscribers_with_id.erase(it);
       }
     }
@@ -178,7 +179,7 @@ template <typename... Types>
 std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = f;
-  std::cout << "New SUB registered " << sub_id << std::endl;
+  //std::cout << "New SUB registered " << sub_id << std::endl;
   auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
   subscriptions.push_back(p);
   return p;
@@ -187,7 +188,7 @@ template <typename... Types> template <class C>
 std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C* class_ptr, void (C::*member_ptr)(Types...)  ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = std::bind(member_ptr,class_ptr,std::placeholders::_1);
-  std::cout << "New SUB registered " << sub_id << std::endl;
+  //std::cout << "New SUB registered " << sub_id << std::endl;
   auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
   subscriptions.push_back(p);
   return p;
