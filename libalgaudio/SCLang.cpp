@@ -150,11 +150,11 @@ void SCLang::SetOSCDebug(bool enabled){
   else SendInstruction("OSCFunc.trace(false);");
   osc_debug = enabled;
 }
-LateReturn<> SCLang::InstallTemplate(const ModuleTemplate& t){
+LateReturn<> SCLang::InstallTemplate(const std::shared_ptr<ModuleTemplate> t){
   auto r = Relay<>::Create();
-  if(!t.has_sc_code) return r.Return();
-  SendOSCWithEmptyReply("/algaudioSC/installtemplate", "ss", t.GetFullID().c_str(), t.sc_code.c_str()).Then([=](){
-    installed_templates.insert(t.GetFullID());
+  if(!t->has_sc_code) return r.Return();
+  SendOSCWithEmptyReply("/algaudioSC/installtemplate", "ss", t->GetFullID().c_str(), t->sc_code.c_str()).Then([=](){
+    installed_templates.insert(t->GetFullID());
     std::cout << "Got install reply!" << std::endl;
     r.Return();
   });

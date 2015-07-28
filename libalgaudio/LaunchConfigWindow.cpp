@@ -17,16 +17,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "LaunchConfigWindow.hpp"
-#include "UI/UIButton.hpp"
-#include "UI/UIMarginBox.hpp"
-#include "UI/UITextArea.hpp"
-#include "UI/UIBox.hpp"
-#include "UI/UILabel.hpp"
 #include "SCLang.hpp"
 #include "Theme.hpp"
 #include "Canvas.hpp"
-#include "UI/UICheckbox.hpp"
-#include "UI/UIProgressBar.hpp"
 #include "MainWindow.hpp"
 
 namespace AlgAudio{
@@ -44,18 +37,18 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 }
 
 void LaunchConfigWindow::init(){
-  auto marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
-  auto startbutton = UIButton::Create(shared_from_this(),"Start SCLang");
-  auto testbutton = UIButton::Create(shared_from_this(),"Test button");
-  auto quitbutton = UIButton::Create(shared_from_this(),"Quit App");
-  auto titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
-  auto configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
-  auto chkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
-  auto supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
-  auto mainvbox = UIVBox::Create(shared_from_this());
-  auto buttonhbox = UIHBox::Create(shared_from_this());
-  auto progressbar = UIProgressBar::Create(shared_from_this());
-  auto statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
+  marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
+  startbutton = UIButton::Create(shared_from_this(),"Start SCLang");
+  testbutton = UIButton::Create(shared_from_this(),"Test button");
+  quitbutton = UIButton::Create(shared_from_this(),"Quit App");
+  titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
+  configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
+  chkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
+  supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
+  mainvbox = UIVBox::Create(shared_from_this());
+  buttonhbox = UIHBox::Create(shared_from_this());
+  progressbar = UIProgressBar::Create(shared_from_this());
+  statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
 
   //mainvbox->SetPadding(10);
   Insert(marginbox);
