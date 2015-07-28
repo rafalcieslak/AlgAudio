@@ -43,7 +43,7 @@ public:
   Size2D GetSize() {return size;}
   friend class DrawContext;
 private:
-  //SDLHandle handle;
+  SDLHandle handle;
   SDL_Texture* texture;
   // Creating a textire of 0 size will mark it as invalid.
   bool valid = true;

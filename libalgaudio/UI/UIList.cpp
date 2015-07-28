@@ -40,10 +40,10 @@ void UIList::AddItem(std::string id, std::string text){
   new_button->SetFontSize(14);
   new_button->SetInnerMargin(3);
   new_button->SetColor(standard_color);
-  new_button->on_clicked.SubscribeForever([=](){
+  new_button->on_clicked.SubscribeForever([this, id](){
     on_clicked.Happen(id);
   });
-  new_button->on_pointed.SubscribeForever([=](bool pointed){
+  new_button->on_pointed.SubscribeForever([this, id](bool pointed){
     if(pointed) on_pointed.Happen(id);
     else on_pointed.Happen("");
   });

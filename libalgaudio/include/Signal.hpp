@@ -113,7 +113,7 @@ protected:
   SignalBase& operator=(const SignalBase&) = delete;
   std::list< Subscription* > subscriptions;
   void SubscriptionAddressChanged(Subscription* old, Subscription* n);
-  virtual void RemoveSubscriptionByID(int) = 0;
+  virtual void RemoveSubscriptionByID(int, Subscription*) = 0;
   static int subscription_id_counter;
   friend class Subscription;
 };
@@ -124,7 +124,7 @@ private:
     std::list< std::function<void(Types...)> > subscribers_forever;
     std::map< int, std::function<void(Types...)> > subscribers_with_id;
     std::list< std::function<void(Types...)> > subscribers_once;
-    void RemoveSubscriptionByID(int id) override{
+    void RemoveSubscriptionByID(int id, Subscription* ptr) override{
       auto it = subscribers_with_id.find(id);
       if(it == subscribers_with_id.end()){
         std::cout << "WARNING: removing an unexisting subscription!" << std::endl;
@@ -132,6 +132,7 @@ private:
         //std::cout << "WARNING: Erasing sub with id " << id << " size = "<< subscribers_with_id.size() << std::endl;
         subscribers_with_id.erase(it);
       }
+      subscriptions.remove(ptr);
     }
 public:
     Signal<Types...>() {}

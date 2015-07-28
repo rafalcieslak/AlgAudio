@@ -17,13 +17,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "MainWindow.hpp"
-#include "ModuleSelector.hpp"
-#include "UI/UIBox.hpp"
-#include "UI/UIButton.hpp"
-#include "UI/UILayered.hpp"
-#include "UI/UILabel.hpp"
-#include "UI/UISeparator.hpp"
-#include "CanvasView.hpp"
 
 namespace AlgAudio{
 
@@ -31,15 +24,14 @@ MainWindow::MainWindow() : Window("AlgAudio",900,600){
 }
 
 void MainWindow::init(){
-  auto mainvbox = UIVBox::Create(shared_from_this());
-  auto addbutton = UIButton::Create(shared_from_this()," Add new ");
-  auto quitbutton = UIButton::Create(shared_from_this()," Quit ");
-  auto toolbarbox = UIHBox::Create(shared_from_this());
-  auto toolbar_separator = UISeparator::Create(shared_from_this());
-  auto selector = ModuleSelector::Create(shared_from_this());
-  auto layered = UILayered::Create(shared_from_this());
-  //auto label1 = UILabel::Create(shared_from_this(), "This is one label\nIdeally, it would be multiline!", 16);
-  auto canvasview = CanvasView::CreateEmpty(shared_from_this());
+  mainvbox = UIVBox::Create(shared_from_this());
+  addbutton = UIButton::Create(shared_from_this()," Add new ");
+  quitbutton = UIButton::Create(shared_from_this()," Quit ");
+  toolbarbox = UIHBox::Create(shared_from_this());
+  toolbar_separator = UISeparator::Create(shared_from_this());
+  selector = ModuleSelector::Create(shared_from_this());
+  layered = UILayered::Create(shared_from_this());
+  canvasview = CanvasView::CreateEmpty(shared_from_this());
 
   addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
@@ -50,14 +42,14 @@ void MainWindow::init(){
 
   selector->Populate();
 
-  subscriptions += addbutton->on_clicked.Subscribe([=](){
+  subscriptions += addbutton->on_clicked.Subscribe([this](){
     if(selector->IsExposed()){
       selector->Hide();
     }else{
       selector->Expose();
     }
   });
-  subscriptions += quitbutton->on_clicked.Subscribe([=](){
+  subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
 
@@ -68,7 +60,7 @@ void MainWindow::init(){
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   Insert(mainvbox);
 
-  subscriptions += selector->on_complete.Subscribe([=](std::string id){
+  subscriptions += selector->on_complete.Subscribe([this](std::string id){
     selector->Hide();
     if(id == "") return;
     std::cout << "Selected " << id << std::endl;

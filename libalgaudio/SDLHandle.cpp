@@ -43,7 +43,7 @@ SDLHandle::SDLHandle(){
 }
 
 SDLHandle::~SDLHandle(){
-  std::cout << "Destroying an SDLHandle " << reference_counter << std::endl;
+  //std::cout << "Destroying an SDLHandle " << reference_counter << std::endl;
   reference_counter--;
   if(reference_counter ==0){
     std::cout << "Stopping SDL." << std::endl;

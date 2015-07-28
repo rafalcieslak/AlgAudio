@@ -62,7 +62,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
 
 
 SDLTexture::SDLTexture(SDLTexture&& other) :
-  //handle(std::move(other.handle)),
+  handle(std::move(other.handle)),
   texture(std::move(other.texture)),
   valid(std::move(other.valid)),
   parent(std::move(other.parent)),
@@ -71,7 +71,7 @@ SDLTexture::SDLTexture(SDLTexture&& other) :
   other.valid = false;
 }
 SDLTexture& SDLTexture::operator=(SDLTexture&& other){
-  //handle = std::move(other.handle);
+  handle = std::move(other.handle);
   texture = std::move(other.texture);
   valid = std::move(other.valid);
   parent = std::move(other.parent);

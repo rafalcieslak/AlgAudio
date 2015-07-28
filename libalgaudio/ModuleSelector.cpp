@@ -78,7 +78,7 @@ void ModuleSelector::init(){
     }
   });
 
-  subscriptions += listlvl2->on_pointed.Subscribe([=](std::string id){
+  subscriptions += listlvl2->on_pointed.Subscribe([this](std::string id){
     if(id == ""){
       description_label->SetText("Select a module to add.");
       return;
@@ -92,10 +92,10 @@ void ModuleSelector::init(){
     if(templ->description == "") description_label->SetText("(this module has no description available)");
     else description_label->SetText( templ->description );
   });
-  auto emptycomplete = [=](){ on_complete.Happen("");};
+  auto emptycomplete = [this](){ on_complete.Happen("");};
   subscriptions += description_box->on_clicked.Subscribe(emptycomplete);
   subscriptions += lvl1_separator->on_clicked.Subscribe(emptycomplete);
-  subscriptions += description_box->on_clicked.Subscribe(emptycomplete);
+  subscriptions += lvl2_separator->on_clicked.Subscribe(emptycomplete);
   subscriptions += listlvl2->on_clicked.Subscribe([&](std::string id){
     on_complete.Happen(lvl1_selection + "/" + id);
   });
@@ -128,7 +128,7 @@ void ModuleSelector::Expose(){
   lvl1_selection = "";
   listlvl1->SetHighlight("");
   SetVisible(true);
-  lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
+  lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([this](){
     description_box->SetVisible(true);
   });
   lvl2_anim_end_wait.Release();

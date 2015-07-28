@@ -20,6 +20,13 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Window.hpp"
+#include "ModuleSelector.hpp"
+#include "UI/UIBox.hpp"
+#include "UI/UIButton.hpp"
+#include "UI/UILayered.hpp"
+#include "UI/UILabel.hpp"
+#include "UI/UISeparator.hpp"
+#include "CanvasView.hpp"
 
 namespace AlgAudio{
 
@@ -30,6 +37,15 @@ public:
 private:
   MainWindow();
   void init();
+
+  std::shared_ptr<UIVBox> mainvbox;
+  std::shared_ptr<UIButton> addbutton;
+  std::shared_ptr<UIButton> quitbutton;
+  std::shared_ptr<UIHBox> toolbarbox;
+  std::shared_ptr<UISeparator> toolbar_separator;
+  std::shared_ptr<ModuleSelector> selector;
+  std::shared_ptr<UILayered> layered;
+  std::shared_ptr<CanvasView> canvasview;
 };
 
 } //namespace AlgAudio

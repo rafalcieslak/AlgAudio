@@ -67,7 +67,7 @@ void LaunchConfigWindow::init(){
   startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
 
-  subscriptions += startbutton->on_clicked.Subscribe([=](){
+  subscriptions += startbutton->on_clicked.Subscribe([this](){
     if(!SCLang::IsRunning()){
       SCLang::Start(sclang_path, supernovachkbox->active);
       startbutton->SetText("Stop SCLang");
@@ -80,21 +80,21 @@ void LaunchConfigWindow::init(){
     statustext->SetTextColor("text-generic");
     statustext->SetBold(false);
   });
-  subscriptions += SCLang::on_start_progress.Subscribe([=](int n, std::string msg){
+  subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
     progressbar->SetAmount(n/10.0);
     statustext->SetText(msg);
   });
-  subscriptions += testbutton->on_clicked.Subscribe([=](){
+  subscriptions += testbutton->on_clicked.Subscribe([this](){
     std::cout << "COMPLETE" << std::endl;
     on_complete.Happen();
   });
-  subscriptions += quitbutton->on_clicked.Subscribe([=](){
+  subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
   subscriptions += chkbox->on_toggled.Subscribe([](bool state){
     SCLang::SetOSCDebug(state);
   });
-  subscriptions += SCLang::on_start_completed.Subscribe([=](bool success, std::string message){
+  subscriptions += SCLang::on_start_completed.Subscribe([this](bool success, std::string message){
     if(success){
       on_complete.Happen();
     }else{
