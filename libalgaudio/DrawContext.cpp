@@ -81,14 +81,6 @@ void DrawContext::Clear(Color c){
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
   SDLFix::CorrectBlendMode(renderer);
 }
-void DrawContext::Push(int x1, int y1, int width_, int height_){
-  // Remember the previous state
-  context_stack.push(DCLevel(current_target, x, y, width, height));
-  // Set new state
-  x = x1; y = y1;
-  width = width_; height = height_;
-  UpdateClipRect();
-}
 void DrawContext::Push(Point2D p, Size2D s){
   // Remember the previous state
   context_stack.push(DCLevel(current_target, x, y, width, height));

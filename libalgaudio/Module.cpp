@@ -80,4 +80,21 @@ void Module::SetParram(std::string name, double value){
   SCLang::SendOSC("/algaudioSC/setparram", "isd", sc_id, name.c_str(), value);
 }
 
+std::shared_ptr<ModuleGUI> Module::GetGUI(){
+  return modulegui.lock();
+}
+
+std::shared_ptr<ModuleGUI> Module::BuildGUI(std::string type){
+  // Parse the module gui from template as XML data
+  // Check type. Accept only "standard" or "standard auto"
+  // Create a new standarbox instance
+  // Fill the standardbox with data from XML
+
+  // Temporarily: show message about GUI not yet being supported
+  std::cout << "Sorry, GUI building not yet implemented" << std::endl;
+
+  return nullptr;
+  // !!!!! store!!!! modulegui = result;
+}
+
 } // namespace AlgAudio

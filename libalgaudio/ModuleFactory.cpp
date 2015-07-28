@@ -60,21 +60,20 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   }
   // Create SC instance
   if(templ->has_sc_code){
-    // TODO: Return a late replay, so that init happens after the instance was
-    // successfully created on SC side
     if(!SCLang::ready){
       std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
+    }else{
+      SCLang::SendOSCWithReply<int>("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
+        .Then([=](int id){
+          std::cout << "On id " << id << std::endl;
+          res->sc_id = id;
+          res->CreateIOFromTemplate().Then([=](){
+            res->on_init();
+            r.Return(res);
+          });
+          }
+        );
     }
-    SCLang::SendOSCWithReply<int>("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
-      .Then([=](int id){
-        std::cout << "On id " << id << std::endl;
-        res->sc_id = id;
-        res->CreateIOFromTemplate().Then([=](){
-          res->on_init();
-          r.Return(res);
-        });
-      }
-    );
   }else{
     res->on_init();
     r.Return(res);

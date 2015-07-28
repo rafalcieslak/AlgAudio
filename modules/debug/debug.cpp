@@ -70,7 +70,7 @@ public:
     subscriptions += clipboard_button->on_clicked.Subscribe([=](){
       AlgAudio::Utilities::CopyToClipboard(textarea->GetAllText());
     });
-    console_window->on_close.SubscribeForever([&](){
+    console_window->on_close.SubscribeForever([=](){
       AlgAudio::SDLMain::UnregisterWindow(console_window);
     });
     AlgAudio::SDLMain::RegisterWindow(console_window);

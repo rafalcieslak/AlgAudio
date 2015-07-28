@@ -35,7 +35,7 @@ class UIWidget : public UIMouseEventsBase, public std::enable_shared_from_this<U
 protected:
   UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {
-      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(1,1));
+      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(0,0));
     };
 public:
 /* It is recommended for widgets to implement Create static method,
@@ -131,10 +131,6 @@ protected:
   virtual void OnChildVisibilityChanged() {}
 
 private:
-   // The 0,0,0,0 color is white on Linux. This may be because SDL interprets
-   // this color as no-saturation no-alpha, but that's unclear and might be
-   // worth investigating. Using 1,0,0,0 as a workaround, the clearcolor
-   // should not be visible anyway.
   Color clear_color = Color(0,0,0,0);
   Color overlay_color = Color(0,0,0,0);
   bool needs_redrawing = true;

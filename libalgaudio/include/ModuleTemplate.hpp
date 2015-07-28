@@ -53,6 +53,8 @@ public:
   std::string id;
   std::string name;
   std::string description = "";
+  std::string guitype = "";
+  std::string guitree = "";
   bool has_sc_code = false;
   std::string sc_code;
   bool has_class = false;

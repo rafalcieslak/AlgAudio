@@ -55,7 +55,7 @@ arg in1, out1, delay = 0.2, decay = 4;
 var input = In.ar(in1);
 Out.ar(out1, CombN.ar(input, 0.5, delay, decay, 1, input));
     </sc>
-    <gui type="standard" mode="auto"/>
+    <gui type="standard auto"/>
   </module>
 
   <!-- This module has a class associated; it will be loaded from the shared

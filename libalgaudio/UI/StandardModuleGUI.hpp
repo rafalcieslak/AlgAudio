@@ -1,5 +1,3 @@
-#ifndef MAINWINDOW_HPP
-#define MAINWINDOW_HPP
 /*
 This file is part of AlgAudio.
 
@@ -18,19 +16,8 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
+#include "StandardModuleGUI.hpp"
 
-#include "Window.hpp"
-
-namespace AlgAudio{
-
-// TODO: Singleton?
-class MainWindow : public Window{
-public:
-  static std::shared_ptr<MainWindow> Create();
-private:
-  MainWindow();
-  void init();
-};
-
-} //namespace AlgAudio
-#endif // MAINWINDOW_HPP
+std::shared_ptr<StandardModuleGUI> StandardModuleGUI::Create(std::shared_ptr<Window> w){
+  return std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI() );
+}

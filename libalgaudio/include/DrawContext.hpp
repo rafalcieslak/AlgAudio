@@ -52,10 +52,7 @@ public:
   void Clear();
   void Clear(Color);
   Size2D Size() {return Size2D(width,height);}
-  bool HasZeroArea();
-
-  // TODO: Depracate
-  void Push(int x1, int y1, int width, int height);
+bool HasZeroArea();
 
   void Push(Point2D p, Size2D s);
   void Push(std::shared_ptr<SDLTexture>, int width, int height);
