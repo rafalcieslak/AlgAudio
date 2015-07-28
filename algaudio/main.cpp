@@ -30,11 +30,11 @@ using namespace AlgAudio;
 
 void TestSignals(){
   Signal<> s1;
-  std::shared_ptr<Subscription> ss1 = s1.Subscribe([&](){
+  Subscription ss1 = s1.Subscribe([&](){
     auto ss2 = s1.Subscribe([](){
       std::cout << "Hola!" << std::endl;
     });
-    ss1->Release();
+    ss1.Release();
     s1.Happen();
   });
   s1.Happen();

@@ -68,7 +68,7 @@ void UIAnimDrawer::CustomResize(Size2D s){
   child->Resize(GetInnerSize());
 }
 void UIAnimDrawer::StartShow(float t){
-  anim->Release();
+  anim.Release();
   if(phase > 0.999 || t < 0.002){ // instant show
     phase = 1.0;
     on_show_complete.Happen();
@@ -80,7 +80,7 @@ void UIAnimDrawer::StartShow(float t){
   anim = SDLMain::on_before_frame.Subscribe(this, &UIAnimDrawer::Step);
 }
 void UIAnimDrawer::StartHide(float t){
-  anim->Release();
+  anim.Release();
   if(phase < 0.001 || t < 0.002){ // instant hide
     phase = 0.0;
     on_hide_complete.Happen();
@@ -98,12 +98,12 @@ void UIAnimDrawer::Step(float delta){
   if(state == 1 && phase > 0.999){
     state = 0;
     phase = 1.0;
-    anim->Release();
+    anim.Release();
     on_show_complete.Happen();
   }else if(state == -1 && phase < 0.001){
     state = 0;
     phase = 0.0;
-    anim->Release();
+    anim.Release();
     on_hide_complete.Happen();
   }
   UpdateRequestedSize();

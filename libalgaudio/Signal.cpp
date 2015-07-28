@@ -18,18 +18,39 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Signal.hpp"
 #include <iostream>
+#include <algorithm>
 
 namespace AlgAudio{
 
 int SignalBase::subscription_id_counter = 1;
 
+Subscription::Subscription(Subscription&& other)
+  : id(std::move(other.id)),
+    target(std::move(other.target)) {
+  other.id = 0;
+  other.target = nullptr;
+  if(target) target->SubscriptionAddressChanged(&other,this);
+}
+
+Subscription& Subscription::operator=(Subscription&& other) {
+  //std::swap(id, other.id);
+  //std::swap(target, other.target);
+  if(!IsEmpty()) Release();
+  id = std::move(other.id);
+  target = std::move(other.target);
+  other.id = 0;
+  other.target = nullptr;
+  if(target) target->SubscriptionAddressChanged(&other,this);
+  return *this;
+}
+
 void Subscription::Release(){
   if(!IsEmpty()){
-    //std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
+    std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
     if(target)
       target->RemoveSubscriptionByID(id);
     target = nullptr;
-    //std::cout << "Relased." << std::endl;
+    std::cout << "Relased." << std::endl;
   }
 }
 
@@ -40,6 +61,11 @@ SignalBase::SignalBase(){
 SignalBase::~SignalBase(){
   //std::cout << "Destroying signal " <<  this << std::endl;
   for(auto& p : subscriptions) p->target = nullptr;
+}
+
+
+void SignalBase::SubscriptionAddressChanged(Subscription* old, Subscription* n){
+  std::replace (subscriptions.begin(), subscriptions.end(), old, n);
 }
 
 

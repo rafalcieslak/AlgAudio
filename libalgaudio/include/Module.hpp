@@ -41,11 +41,12 @@ private:
   int id;
 };
 
-class Module : public DynamicallyLoadableClass, public SubscriptionsManager{
+class Module : public DynamicallyLoadableClass, public SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
   Module(){};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
   Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
+  Module(const Module& other) = delete;
   virtual ~Module() {};
   virtual void on_init() {};
   std::shared_ptr<ModuleTemplate> templ;
@@ -58,21 +59,21 @@ public:
     Module& mod;
     // The outlet is not the owner of a bus.
     std::weak_ptr<Bus> bus;
-    static std::shared_ptr<Outlet> Create(std::string id, Module& mod);
+    static std::shared_ptr<Outlet> Create(std::string id, std::shared_ptr<Module> mod);
   private:
-    Outlet(std::string i, Module& m) : id(i), mod(m) {
+    Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {
       mod.SetParram(id, 999999999);
     }
   };
   class Inlet{
   public:
-    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, Module& mod);
+    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, std::shared_ptr<Module> mod);
     std::string id;
     Module& mod;
     // The inlet is the owner of a bus.
     std::shared_ptr<Bus> bus;
   private:
-    Inlet(std::string i, Module& m, std::shared_ptr<Bus> b) : id(i), mod(m), bus(b) {}
+    Inlet(std::string i, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), mod(*m.get()), bus(b) {}
   };
   void SetParram(std::string name, int value);
   void SetParram(std::string name, double value);

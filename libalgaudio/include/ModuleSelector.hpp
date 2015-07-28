@@ -59,8 +59,8 @@ private:
   std::shared_ptr<UIVBox> lvl1_box;
   std::shared_ptr<UIVBox> lvl2_box;
 
-  std::shared_ptr<Subscription> lvl1_anim_end_wait;
-  std::shared_ptr<Subscription> lvl2_anim_end_wait;
+  Subscription lvl1_anim_end_wait;
+  Subscription lvl2_anim_end_wait;
 
   std::string lvl1_selection = "";
 };

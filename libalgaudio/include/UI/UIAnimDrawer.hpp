@@ -52,7 +52,7 @@ private:
   // 0 = stationary, 1 - showing, -1 - hiding
   int state = 0;
   float time_to_finish;
-  std::shared_ptr<Subscription> anim = std::make_shared<Subscription>();
+  Subscription anim;
 
   std::shared_ptr<UIWidget> child;
 };

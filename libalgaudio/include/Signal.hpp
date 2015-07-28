@@ -83,20 +83,10 @@ class SignalBase;
 class Subscription{
 public:
   Subscription() : id(0), target(nullptr) {}
-  Subscription(Subscription&& other)
-    : id(std::move(other.id)),
-      target(std::move(other.target)) {
-    other.id = 0;
-    other.target = nullptr;
-  }
-  Subscription& operator=(Subscription&& other) {
-    std::swap(id, other.id);
-    std::swap(target, other.target);
-    other.id = 0;
-    return *this;
-  }
+  Subscription(Subscription&& other);
+  Subscription& operator=(Subscription&& other);
   ~Subscription(){ Release(); }
-  inline bool IsEmpty() const { return id == 0;}
+  inline bool IsEmpty() const { return target == nullptr;}
   void Release();
   template <typename...>
   friend class Signal;
@@ -121,7 +111,8 @@ protected:
   SignalBase(const SignalBase&) = delete;
   virtual ~SignalBase();
   SignalBase& operator=(const SignalBase&) = delete;
-  std::list< std::shared_ptr<Subscription> > subscriptions;
+  std::list< Subscription* > subscriptions;
+  void SubscriptionAddressChanged(Subscription* old, Subscription* n);
   virtual void RemoveSubscriptionByID(int) = 0;
   static int subscription_id_counter;
   friend class Subscription;
@@ -149,11 +140,11 @@ public:
     Signal(Signal&& other) = delete;
     Signal& operator=(const Signal& other) = delete;
     Signal& operator=(Signal&& other) = delete;
-    std::shared_ptr<Subscription> Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
+    Subscription Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
     void SubscribeForever( std::function<void(Types...)> f ) { subscribers_forever.push_back(f); }
     void SubscribeOnce( std::function<void(Types...)> f ) { subscribers_once.push_back(f); }
     template<class C>
-    std::shared_ptr<Subscription> Subscribe( C* class_ptr, void (C::*member_ptr)(Types...) ) __attribute__((warn_unused_result));
+    Subscription Subscribe( C* class_ptr, void (C::*member_ptr)(Types...) ) __attribute__((warn_unused_result));
     template<class C>
     void SubscribeForever( C* class_ptr, void (C::*member_ptr)(Types...)) { subscribers_forever.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) ); }
     template<class C>
@@ -173,24 +164,25 @@ public:
         for(auto f : list_to_call) f(t...);
     }
     friend class Subscription;
+    unsigned int Count(){return subscribers_forever.size() + subscribers_once.size() + subscribers_with_id.size();}
 };
 
 template <typename... Types>
-std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
+Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = f;
   //std::cout << "New SUB registered " << sub_id << std::endl;
-  auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
-  subscriptions.push_back(p);
+  auto p = Subscription(sub_id, this);
+  subscriptions.push_back(&p);
   return p;
 }
 template <typename... Types> template <class C>
-std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C* class_ptr, void (C::*member_ptr)(Types...)  ) {
+Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C* class_ptr, void (C::*member_ptr)(Types...)  ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = std::bind(member_ptr,class_ptr,std::placeholders::_1);
   //std::cout << "New SUB registered " << sub_id << std::endl;
-  auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
-  subscriptions.push_back(p);
+  auto p = Subscription(sub_id, this);
+  subscriptions.push_back(&p);
   return p;
 }
 
@@ -198,10 +190,11 @@ class SubscriptionsManager{
 public:
   class SubscriptionList{
   public:
-    std::list<std::shared_ptr<Subscription>> list;
+    SubscriptionList(const SubscriptionList& other) = delete;
+    std::list<Subscription> list;
     void ReleaseAll() { list.clear(); }
-    SubscriptionList& operator+=(std::shared_ptr<Subscription>&& s) {
-      list.emplace_back(std::move(s));
+    SubscriptionList& operator+=(Subscription&& s) {
+      list.push_back(std::move(s));
       return *this;
     }
     SubscriptionList() : list(0){}

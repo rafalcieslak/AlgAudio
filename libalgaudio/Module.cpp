@@ -36,14 +36,14 @@ LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   return r;
 }
 
-std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, Module& mod){
+std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::shared_ptr<Module> mod){
   return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, mod));
 }
 
-LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, Module& mod){
+LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::shared_ptr<Module> mod){
   auto r = Relay<std::shared_ptr<Module::Inlet>>::Create();
   Bus::CreateNew().Then([=](std::shared_ptr<Bus> b)mutable{
-    mod.SetParram(id, b->GetID());
+    mod->SetParram(id, b->GetID());
     r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, b)));
   });
   return r;
@@ -58,14 +58,14 @@ LateReturn<> Module::CreateIOFromTemplate(){
   auto r = Relay<>::Create();
   Sync s(templ->inlets.size());
   for(std::string id : templ->inlets){
-    Inlet::Create(id,*this).Then([=](std::shared_ptr<Inlet> inlet_ptr){
+    Inlet::Create(id,shared_from_this()).Then([=](std::shared_ptr<Inlet> inlet_ptr){
       inlets.emplace_back(inlet_ptr);
       s.Trigger();
     });
   }
   // Meanwhile, create outlets. These own no bus, so creation is instant.
   for(std::string id : templ->outlets)
-    outlets.emplace_back(Outlet::Create(id,*this));
+    outlets.emplace_back(Outlet::Create(id,shared_from_this()));
   s.WhenAll([=](){
     std::cout << "All IO READY!" << std::endl;
     r.Return();

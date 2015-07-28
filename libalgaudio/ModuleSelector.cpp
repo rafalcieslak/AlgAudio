@@ -60,18 +60,18 @@ void ModuleSelector::init(){
   drawersbox->SetBackColor(Color(0,0,0,150));
   description_box->SetBackColor(Color(0,0,0,150));
 
-  subscriptions += listlvl1->on_clicked.Subscribe([=](std::string id){
+  subscriptions += listlvl1->on_clicked.Subscribe([this](std::string id){
     if(lvl1_selection != id){
       lvl1_selection = id;
       listlvl1->SetHighlight(id);
-      lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([=](){
+      lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([this](){
         PopulateLvl2();
         drawerlvl2->StartShow(0.15);
       });
       drawerlvl2->StartHide(0.15);
     }else{
       // Same id. Hide the lvl2 drawer
-      lvl2_anim_end_wait->Release();
+      lvl2_anim_end_wait.Release();
       drawerlvl2->StartHide(0.15);
       listlvl1->SetHighlight("");
       lvl1_selection = "";
@@ -124,20 +124,27 @@ void ModuleSelector::PopulateLvl2(){
 
 
 void ModuleSelector::Expose(){
+  std::cout << "Expose!" << std::endl;
   exposed = true;
   lvl1_selection = "";
   listlvl1->SetHighlight("");
   SetVisible(true);
+  std::cout << "show_complete count " << drawerlvl1->on_show_complete.Count() << " "  << std::endl;
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
+    std::cout << "Complete" << std::endl;
     description_box->SetVisible(true);
   });
+  lvl2_anim_end_wait.Release();
+  std::cout << "show_complete AFTER count " << drawerlvl1->on_show_complete.Count() << std::endl;
   drawerlvl1->StartShow(0.15);
+  drawerlvl2->StartHide(0.0);
 }
 void ModuleSelector::Hide(){
+  std::cout << "Hide!" << std::endl;
   exposed = false;
   description_box->SetVisible(false);
-  lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([=](){
-    lvl1_anim_end_wait = drawerlvl1->on_hide_complete.Subscribe([=](){
+  lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([this](){
+    this->lvl1_anim_end_wait = drawerlvl1->on_hide_complete.Subscribe([this](){
       SetVisible(false);
     });
     drawerlvl1->StartHide(0.08);
