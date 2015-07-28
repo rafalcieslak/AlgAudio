@@ -124,23 +124,18 @@ void ModuleSelector::PopulateLvl2(){
 
 
 void ModuleSelector::Expose(){
-  std::cout << "Expose!" << std::endl;
   exposed = true;
   lvl1_selection = "";
   listlvl1->SetHighlight("");
   SetVisible(true);
-  std::cout << "show_complete count " << drawerlvl1->on_show_complete.Count() << " "  << std::endl;
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([=](){
-    std::cout << "Complete" << std::endl;
     description_box->SetVisible(true);
   });
   lvl2_anim_end_wait.Release();
-  std::cout << "show_complete AFTER count " << drawerlvl1->on_show_complete.Count() << std::endl;
   drawerlvl1->StartShow(0.15);
   drawerlvl2->StartHide(0.0);
 }
 void ModuleSelector::Hide(){
-  std::cout << "Hide!" << std::endl;
   exposed = false;
   description_box->SetVisible(false);
   lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([this](){

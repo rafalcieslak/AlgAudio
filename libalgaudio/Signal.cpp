@@ -46,11 +46,11 @@ Subscription& Subscription::operator=(Subscription&& other) {
 
 void Subscription::Release(){
   if(!IsEmpty()){
-    std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
+    //std::cout << "Releasing subscribtion " << id << " targetting " << target << std::endl;
     if(target)
       target->RemoveSubscriptionByID(id);
     target = nullptr;
-    std::cout << "Relased." << std::endl;
+    //std::cout << "Relased." << std::endl;
   }
 }
 
