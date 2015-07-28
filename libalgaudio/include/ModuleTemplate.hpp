@@ -45,7 +45,8 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
-struct ModuleTemplate{
+class ModuleTemplate{
+public:
   ModuleTemplate(ModuleCollection& collection);
   ModuleTemplate(ModuleCollection& collection, rapidxml::xml_node<char>* node);
   std::string GetFullID() const;

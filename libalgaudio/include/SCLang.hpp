@@ -61,9 +61,9 @@ public:
   static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
-  static void SendOSC(const std::string& path, const std::string &tag, ...);
+  static void SendOSC(const std::string& path, std::string tag, ...);
   static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path);
-  static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path, const std::string& tag, ...);
+  static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path, std::string tag, ...);
   template <typename... Q, typename... Rest>
   inline static LateReturn<Q...> SendOSCWithReply(const std::string& path, Rest... args);
   // The above function cannot be partially speciallised... Thus we need to use another name for the case

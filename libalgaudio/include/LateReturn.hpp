@@ -104,15 +104,15 @@ private:
   bool stored = false;
 };
 
-template <typename T> constexpr
+template <typename T>
 std::function<void()> bind_tuple(std::function<void(T)> f, std::tuple<T> t){
   return std::bind(f, std::get<0>(t));
 }
-template <typename T, typename S> constexpr
+template <typename T, typename S>
 std::function<void()> bind_tuple(std::function<void(T, S)> f, std::tuple<T, S> t){
   return std::bind(f, std::get<0>(t), std::get<1>(t));
 }
-template <typename T, typename S, typename R> constexpr
+template <typename T, typename S, typename R>
 std::function<void()> bind_tuple(std::function<void(T, S, R)> f, std::tuple<T, S, R> t){
   return std::bind(f, std::get<0>(t), std::get<1>(t), std::get<2>(t));
 }
@@ -142,7 +142,7 @@ public:
     }
   }
   void ThenSync(Sync& s) const{
-    Then([=](Types... args)mutable{
+    Then([=](Types...)mutable{
       s.Trigger();
     });
   }

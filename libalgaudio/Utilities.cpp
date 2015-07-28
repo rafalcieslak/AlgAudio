@@ -43,8 +43,9 @@ namespace AlgAudio {
 Exception::Exception(std::string t) : text(t){
 #ifdef SILLY_GDB
   // if your GDB cannot break
-  std::cout << "SIGSEGVing self to mark exception creation stack for exception: `" << text << "`" << std::endl;
-  *((int*)nullptr) = 0;
+  std::cout << "Builtin trap to mark exception creation stack for exception: `" << text << "`" << std::endl;
+  // *((int*)nullptr) = 0;
+  __builtin_trap();
 #endif // SILLY_GDB
 }
 

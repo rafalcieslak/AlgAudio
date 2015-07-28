@@ -115,7 +115,7 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   }, m);
   return r;
 }
-void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
+void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 {
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
@@ -125,7 +125,7 @@ void SCLang::SendOSC(const std::string &path, const std::string &tag, ...)
   m.add_varargs(t, q);
   osc->Send(path, m);
 }
-LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, const std::string &tag, ...){
+LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, std::string tag, ...){
   auto r = Relay<lo::Message>::Create();
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;

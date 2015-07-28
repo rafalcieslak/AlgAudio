@@ -28,7 +28,7 @@ struct SDL_Renderer;
 
 namespace AlgAudio{
 
-struct UIWidget;
+class UIWidget;
 
 class Window : public SubscriptionsManager, public std::enable_shared_from_this<Window>{
 private:

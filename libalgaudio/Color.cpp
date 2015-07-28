@@ -25,7 +25,11 @@ namespace AlgAudio{
 
 SDL_Color Color::SDL() const{
   std::cout << "Used." << std::endl;
-  return SDL_Color{r*(alpha/255.0),g*(alpha/255.0),b*(alpha/255.0),alpha};
+  return SDL_Color{
+    (unsigned char)(r*(alpha/255.0)),
+    (unsigned char)(g*(alpha/255.0)),
+    (unsigned char)(b*(alpha/255.0)),
+    alpha};
 }
 
 Color::operator SDL_Color() const{
@@ -62,6 +66,9 @@ Color::operator HSL() const{
             h = (bd - rd) / d + 2;
         } else if (max == bd) {
             h = (rd - gd) / d + 4;
+        } else {
+          // unreachable. Setting h to silence uninitialized variable warning.
+          h = 0;
         }
         h /= 6;
     }
