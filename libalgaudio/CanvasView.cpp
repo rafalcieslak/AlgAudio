@@ -33,7 +33,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
   ModuleFactory::CreateNewInstance(id).Then([&](std::shared_ptr<Module> m){
     canvas->InsertModule(m);
-    auto modulegui = m->BuildGUI(m->templ->guitype);
+    auto modulegui = m->BuildGUI(window.lock(), m->templ->guitype);
     if(!modulegui){
       std::cout << "Failed to build gui" << std::endl;
       r.Return();

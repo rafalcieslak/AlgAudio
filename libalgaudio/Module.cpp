@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Module.hpp"
 #include "ModuleTemplate.hpp"
 #include "SCLang.hpp"
+#include "UI/StandardModuleGUI.hpp"
 
 namespace AlgAudio{
 
@@ -84,17 +85,22 @@ std::shared_ptr<ModuleGUI> Module::GetGUI(){
   return modulegui.lock();
 }
 
-std::shared_ptr<ModuleGUI> Module::BuildGUI(std::string type){
-  // Parse the module gui from template as XML data
-  // Check type. Accept only "standard" or "standard auto"
-  // Create a new standarbox instance
-  // Fill the standardbox with data from XML
-
-  // Temporarily: show message about GUI not yet being supported
-  std::cout << "Sorry, GUI building not yet implemented" << std::endl;
-
-  return nullptr;
-  // !!!!! store!!!! modulegui = result;
+std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_window, std::string type){
+  std::shared_ptr<ModuleGUI> gui;
+  if(templ->guitype == "standard"){
+    gui = StandardModuleGUI::CreateFromXML(parent_window, templ->guitree);
+  }else if(templ->guitype == "standard auto"){
+    std::cout << "Sorry, auto GUI building not yet implemented" << std::endl;
+    gui = nullptr;
+  }else if(templ->guitype == ""){
+    std::cout << "This module has no gui defined" << std::endl;
+    gui = nullptr;
+  }else{
+    std::cout << "Module gui type '" << templ->guitype << "' was not recognized" << std::endl;
+    gui = nullptr;
+  }
+  modulegui = gui;
+  return gui;
 }
 
 } // namespace AlgAudio

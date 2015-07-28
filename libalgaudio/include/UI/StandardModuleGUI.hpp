@@ -20,16 +20,21 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/UIWidget.hpp"
 #include "Module.hpp"
+#include "ModuleGUI.hpp"
 
 namespace AlgAudio{
 
 class StandardModuleGUI : public ModuleGUI{
 public:
-  std::shared_ptr<StandardModuleGUI> Create(std::shared_ptr<Window> w);
+  static std::shared_ptr<StandardModuleGUI> CreateEmpty(std::shared_ptr<Window> w);
+  static std::shared_ptr<StandardModuleGUI> CreateFromXML(std::shared_ptr<Window> w, std::string xml_data);
+  void CustomDraw(DrawContext& c) override;
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w) : ModuleGUI(w){}
+private:
+  void LoadFromXML(std::string xml_data);
 };
 
 } // namespace AlgAudio
 
-#endif //MODULEGUI_HPP
+#endif //STANDARDMODULEGUI_HPP

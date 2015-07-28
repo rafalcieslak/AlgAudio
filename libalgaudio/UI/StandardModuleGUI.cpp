@@ -16,8 +16,25 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "StandardModuleGUI.hpp"
+#include "UI/StandardModuleGUI.hpp"
 
-std::shared_ptr<StandardModuleGUI> StandardModuleGUI::Create(std::shared_ptr<Window> w){
-  return std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI() );
+namespace AlgAudio{
+
+std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateEmpty(std::shared_ptr<Window> w){
+  return std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w) );
+}
+std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromXML(std::shared_ptr<Window> w, std::string xml_data){
+  auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w) );
+  ptr->LoadFromXML(xml_data);
+  return ptr;
+}
+
+void StandardModuleGUI::LoadFromXML(std::string xml_data){
+  std::cout << "Loading data from XML " << std::endl;
+}
+
+void StandardModuleGUI::CustomDraw(DrawContext& c){
+
+}
+
 }
