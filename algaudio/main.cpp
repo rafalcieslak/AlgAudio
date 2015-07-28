@@ -31,6 +31,9 @@ using namespace AlgAudio;
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
+
+  
+
   try{
     Theme::Init();
     SDLMain::Init();

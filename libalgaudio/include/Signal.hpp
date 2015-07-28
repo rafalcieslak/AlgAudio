@@ -78,17 +78,19 @@ field, where new subscriptions can be added with a += operator:
 */
 namespace AlgAudio{
 
+class SignalBase;
+
 class Subscription{
 public:
-  Subscription() : id(0), parent_signal_id(0) {}
+  Subscription() : id(0), target(nullptr) {}
   Subscription(Subscription&& other)
     : id(std::move(other.id)),
-      parent_signal_id(std::move(other.parent_signal_id)) {
+      target(std::move(other.target)) {
     other.id = 0;
   }
   Subscription& operator=(Subscription&& other) {
     id = std::move(other.id);
-    parent_signal_id = std::move(other.parent_signal_id);
+    target = std::move(other.target);
     other.id = 0;
     return *this;
   }
@@ -99,15 +101,17 @@ public:
   friend class Signal;
   Subscription(const Subscription& other) = delete; // no copy-constructing
   Subscription& operator=(const Subscription& other) = delete; // no copy assignment
+  friend class SignalBase;
 private:
-  Subscription(int id_, int parent) : id(id_), parent_signal_id(parent) {}
+  Subscription(int id_, SignalBase* parent) : id(id_), target(parent) {}
   int id;
   // This field is used to track who is my parent, and who where should I
   // unsubscribe from when releasing. This cannot be a pointer, because the
   // signal might have been already destroyed and we would be left with an
   // invalid pointer. Therefore we store all signals in a global list, and
   // remove then when they are destroyed.
-  int parent_signal_id;
+  // int parent_signal_id;
+  SignalBase* target = nullptr;
 };
 
 class SignalBase{
@@ -116,11 +120,9 @@ protected:
   SignalBase(const SignalBase&) = delete;
   virtual ~SignalBase();
   SignalBase& operator=(const SignalBase&) = delete;
-  int my_id;
+  std::list< std::shared_ptr<Subscription> > subscriptions;
   virtual void RemoveSubscriptionByID(int) = 0;
-  static int id_counter;
   static int subscription_id_counter;
-  static std::map<int, SignalBase*>& all_signals();
   friend class Subscription;
 };
 
@@ -130,18 +132,22 @@ private:
     std::list< std::function<void(Types...)> > subscribers_forever;
     std::map< int, std::function<void(Types...)> > subscribers_with_id;
     std::list< std::function<void(Types...)> > subscribers_once;
-    std::list< Subscription* > subscriptions;
     void RemoveSubscriptionByID(int id) override{
       auto it = subscribers_with_id.find(id);
       if(it == subscribers_with_id.end()){
         std::cout << "WARNING: removing an unexisting subscription!" << std::endl;
       }else{
+        std::cout << "WARNING: Erasing sub with id " << id << " size = "<< subscribers_with_id.size() << std::endl;
         subscribers_with_id.erase(it);
       }
     }
 public:
     Signal<Types...>() {}
     ~Signal(){}
+    Signal(const Signal& other) = delete;
+    Signal(Signal&& other) = delete;
+    Signal& operator=(const Signal& other) = delete;
+    Signal& operator=(Signal&& other) = delete;
     std::shared_ptr<Subscription> Subscribe( std::function<void(Types...)> f ) __attribute__((warn_unused_result));
     void SubscribeForever( std::function<void(Types...)> f ) { subscribers_forever.push_back(f); }
     void SubscribeOnce( std::function<void(Types...)> f ) { subscribers_once.push_back(f); }
@@ -172,13 +178,19 @@ template <typename... Types>
 std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( std::function<void(Types...)> f ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = f;
-  return std::shared_ptr<Subscription>(new Subscription(sub_id, my_id));
+  std::cout << "New SUB registered " << sub_id << std::endl;
+  auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
+  subscriptions.push_back(p);
+  return p;
 }
 template <typename... Types> template <class C>
 std::shared_ptr<Subscription> __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C* class_ptr, void (C::*member_ptr)(Types...)  ) {
   int sub_id = ++subscription_id_counter;
   subscribers_with_id[sub_id] = std::bind(member_ptr,class_ptr,std::placeholders::_1);
-  return std::shared_ptr<Subscription>(new Subscription(sub_id, my_id));
+  std::cout << "New SUB registered " << sub_id << std::endl;
+  auto p = std::shared_ptr<Subscription>(new Subscription(sub_id, this));
+  subscriptions.push_back(p);
+  return p;
 }
 
 class SubscriptionsManager{
