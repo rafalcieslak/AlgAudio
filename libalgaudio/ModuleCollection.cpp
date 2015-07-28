@@ -116,7 +116,7 @@ LateReturn<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, s
     return r.Return();
   };
   std::cout << "Installing template " << (from->second)->name << std::endl;
-  SCLang::InstallTemplate(*(from->second)).Then([=]()mutable{
+  SCLang::InstallTemplate(from->second).Then([=]()mutable{
     from++;
     InstallAllTemplatesIntoSC(from).Then([=](){
       r.Return();

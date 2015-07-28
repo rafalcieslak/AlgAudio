@@ -56,7 +56,7 @@ public:
   static Signal<bool> on_server_started;
   static Signal<int,std::string> on_start_progress;
   static void SendInstruction(std::string);
-  static LateReturn<> InstallTemplate(const ModuleTemplate&);
+  static LateReturn<> InstallTemplate(const std::shared_ptr<ModuleTemplate> templ);
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
   static void SetOSCDebug(bool enabled);
