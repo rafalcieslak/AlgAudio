@@ -33,7 +33,7 @@ void MainWindow::init(){
   layered = UILayered::Create(shared_from_this());
   canvasview = CanvasView::CreateEmpty(shared_from_this());
   layered_alert = UILayered::Create(shared_from_this());
-  marginbox_alert = UIMarginBox::Create(shared_from_this(),50,50,50,50);
+  centered_alert = UICentered::Create(shared_from_this());
   alert = UIAlert::Create(shared_from_this(),"");
 
   addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
@@ -62,9 +62,9 @@ void MainWindow::init(){
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   layered_alert->Insert(mainvbox);
-  layered_alert->Insert(marginbox_alert);
-  marginbox_alert->Insert(alert);
-  marginbox_alert->SetBackColor(Color(0,0,0,150));
+  layered_alert->Insert(centered_alert);
+  centered_alert->Insert(alert);
+  centered_alert->SetBackColor(Color(0,0,0,150));
   Insert(layered_alert);
 
   subscriptions += selector->on_complete.Subscribe([this](std::string id){

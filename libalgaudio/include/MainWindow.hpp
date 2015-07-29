@@ -28,6 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UISeparator.hpp"
 #include "UI/UIAlert.hpp"
 #include "UI/UISeparator.hpp"
+#include "UI/UICentered.hpp"
 #include "CanvasView.hpp"
 
 namespace AlgAudio{
@@ -48,7 +49,7 @@ private:
   std::shared_ptr<ModuleSelector> selector;
   std::shared_ptr<UILayered> layered;
   std::shared_ptr<UILayered> layered_alert;
-  std::shared_ptr<UIMarginBox> marginbox_alert;
+  std::shared_ptr<UICentered> centered_alert;
   std::shared_ptr<UIAlert> alert;
   std::shared_ptr<CanvasView> canvasview;
 };
