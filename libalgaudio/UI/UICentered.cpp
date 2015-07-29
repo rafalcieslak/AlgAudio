@@ -54,11 +54,13 @@ void UICentered::Insert(std::shared_ptr<UIWidget> ch){
 
 void UICentered::OnChildRequestedSizeChanged(){
   current_child_size = child->GetRequestedSize();
+  current_child_pos = Point2D(current_size.width/2 - current_child_size.width/2, current_size.height/2 - current_child_size.height/2);
   child->Resize(current_child_size);
   SetMinimalSize(current_child_size);
 }
 void UICentered::OnChildVisibilityChanged(){
   current_child_size = child->GetRequestedSize();
+  current_child_pos = Point2D(current_size.width/2 - current_child_size.width/2, current_size.height/2 - current_child_size.height/2);
   child->Resize(current_child_size);
   SetMinimalSize(current_child_size);
 }
@@ -97,5 +99,10 @@ void UICentered::CustomMouseLeave(Point2D p){
   if(IsInside(p)) child->OnMouseLeave(p - current_child_pos);
 }
 
+void UICentered::RemoveChild(){
+  if(!child) return;
+  child->parent.reset();
+  child = nullptr;
+}
 
 } // namespace AlgAudio

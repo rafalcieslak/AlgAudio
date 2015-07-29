@@ -29,29 +29,34 @@ class UIVBox;
 class UILabel;
 class UIButton;
 
+#undef IGNORE
+
+enum class ButtonID : int{
+  OK,
+  CANCEL,
+  YES,
+  NO,
+  QUIT,
+  IGNORE,
+  CUSTOM1,
+  CUSTOM2,
+};
+
 class UIAlert : public UIVBox{
 public:
   static std::shared_ptr<UIAlert> Create(std::weak_ptr<Window> parent_window, std::string text);
   void SetText(std::string);
   // Arg: pressed button id
-  Signal<int> on_button_pressed;
+  Signal<ButtonID> on_button_pressed;
   struct ButtonData{
     std::string name;
-    int id;
+    ButtonID id;
     Color color;
-    ButtonData(std::string t, int id_, Color c = Theme::Get("bg-button-neutral"))
+    ButtonData(std::string t, ButtonID id_, Color c = Theme::Get("bg-button-neutral"))
       : name(t), id(id_), color(c)
       {}
   };
   void SetButtons(std::initializer_list<ButtonData>);
-  enum ButtonID{
-    BUTTONID_OK,
-    BUTTONID_CANCEL,
-    BUTTONID_YES,
-    BUTTONID_NO,
-    BUTTONID_QUIT,
-    BUTTONID_IGNORE
-  };
 private:
   UIAlert(std::weak_ptr<Window> parent_window);
   void Init(std::string);

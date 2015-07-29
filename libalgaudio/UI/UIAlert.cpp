@@ -32,7 +32,7 @@ void UIAlert::Init(std::string text){
   child_buttons_box = UIHBox::Create(window);
   child_buttons_box->SetPadding(4);
   child_label = UILabel::Create(window, text, 14);
-  Insert(child_label, PackMode::TIGHT);
+  Insert(child_label, PackMode::WIDE);
   Insert(child_buttons_box, PackMode::TIGHT);
   SetBackColor(Theme::Get("bg-alert"));
   SetCustomSize(Size2D(300,160));
@@ -47,9 +47,11 @@ std::shared_ptr<UIAlert> UIAlert::Create(std::weak_ptr<Window> parent_window, st
 
 void UIAlert::SetButtons(std::initializer_list<ButtonData> list){
   buttons.clear();
+  child_buttons_box->Clear();
   for(ButtonData bd : list){
     auto button = UIButton::Create(window,bd.name);
     button->SetColor(bd.color);
+    child_buttons_box->Insert(button, PackMode::WIDE);
     button->on_clicked.SubscribeForever([id = bd.id,this](){
       on_button_pressed.Happen(id);
     });

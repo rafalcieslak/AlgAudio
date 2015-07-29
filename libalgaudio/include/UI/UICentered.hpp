@@ -34,6 +34,7 @@ public:
   virtual void CustomMouseMotion(Point2D,Point2D) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
+  void RemoveChild();
 private:
   UICentered(std::weak_ptr<Window> parent_window);
   inline bool IsInside(Point2D) const;

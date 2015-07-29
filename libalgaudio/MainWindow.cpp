@@ -34,7 +34,7 @@ void MainWindow::init(){
   canvasview = CanvasView::CreateEmpty(shared_from_this());
   layered_alert = UILayered::Create(shared_from_this());
   centered_alert = UICentered::Create(shared_from_this());
-  alert = UIAlert::Create(shared_from_this(),"");
+  //alert = UIAlert::Create(shared_from_this(),"");
 
   addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
@@ -63,8 +63,9 @@ void MainWindow::init(){
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
   layered_alert->Insert(mainvbox);
   layered_alert->Insert(centered_alert);
-  centered_alert->Insert(alert);
+  //centered_alert->Insert(alert);
   centered_alert->SetBackColor(Color(0,0,0,150));
+  centered_alert->SetVisible(false);
   Insert(layered_alert);
 
   subscriptions += selector->on_complete.Subscribe([this](std::string id){
@@ -72,6 +73,10 @@ void MainWindow::init(){
     if(id == "") return;
     std::cout << "Selected " << id << std::endl;
     canvasview->AddModule(id,Point2D(50,50));
+    ShowSimpleAlert("You have added a new module to the canvas!", "Cool!", "Meh.").Then([](int i){
+      if(i == 0) std::cout << "Cool indeed!" << std::endl;
+      if(i == 1) std::cout << "Yay." << std::endl;
+    });
   });
 }
 
@@ -79,6 +84,26 @@ std::shared_ptr<MainWindow> MainWindow::Create(){
   auto res = std::shared_ptr<MainWindow>( new MainWindow());
   res->init();
   return res;
+}
+
+LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string button1_text, std::string button2_text, Color button1_color, Color button2_color){
+  auto r = Relay<int>::Create();
+  if(alert){
+    std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
+  }
+  alert = UIAlert::Create(shared_from_this(),message);
+  alert->SetButtons({UIAlert::ButtonData(button1_text, ButtonID::CUSTOM1, button1_color),
+                     UIAlert::ButtonData(button2_text, ButtonID::CUSTOM2, button2_color)});
+  centered_alert->SetVisible(true);
+  centered_alert->Insert(alert);
+  sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
+    centered_alert->SetVisible(false);
+    centered_alert->RemoveChild();
+    alert = nullptr; // loose reference
+    if(id == ButtonID::CUSTOM1) r.Return(0);
+    if(id == ButtonID::CUSTOM2) r.Return(1);
+  });
+  return r;
 }
 
 } // namespace AlgAudio
