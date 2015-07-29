@@ -12,6 +12,7 @@ arg inbus, outbus;
 var in = In.ar(inbus);
 Out.ar(outbus,in);
     </sc>
+    <gui type="standard auto"/>
   </module>
   <module id="simpleout" name="Simple output">
     <parrams>
@@ -22,6 +23,9 @@ arg inbus;
 var in = In.ar(inbus);
 Out.ar(0,in);
     </sc>
+    <gui type="standard">
+      <inlet id="inbus"/>
+    </gui>
   </module>
   <module id="simplein" name="Simple input">
     <parrams>
@@ -45,6 +49,10 @@ arg inbus1, inbus2;
 Out.ar(0,In.ar(inbus1));
 Out.ar(1,In.ar(inbus2));
     </sc>
+    <gui type="standard">
+      <inlet id="inbus1"/>
+      <inlet id="inbus2"/>
+    </gui>
   </module>
 
 

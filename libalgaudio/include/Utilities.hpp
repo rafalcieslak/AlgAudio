@@ -33,7 +33,7 @@ struct Size2D{
   int width, height;
   bool operator==(const Size2D& other) const{ return (width == other.width && height == other.height); }
   bool operator!=(const Size2D& other) const{ return !(*this == other); }
-  std::string ToString() {return "{" + std::to_string(width) + ", " + std::to_string(height) + " }"; }
+  std::string ToString() const {return "{" + std::to_string(width) + ", " + std::to_string(height) + " }"; }
   Size2D operator+(const Size2D& other) const { return Size2D(width + other.width, height + other.height);}
   Size2D operator-(const Size2D& other) const { return Size2D(width - other.width, height - other.height);}
 };
@@ -45,7 +45,7 @@ struct Point2D{
   int x, y;
   bool operator==(const Point2D& other) const{ return (x == other.x && y == other.y); }
   bool operator!=(const Point2D& other) const{ return !(*this == other); }
-  std::string ToString() {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
+  std::string ToString() const {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
   Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y);}
   Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
 };

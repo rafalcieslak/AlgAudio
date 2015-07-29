@@ -166,7 +166,8 @@ public:
     auto it = LateReturnEntryBase::entries.find(id);
     //std::cout << "Returning " << id << std::endl;
     if(it == LateReturnEntryBase::entries.end()){
-      std::cout << "ERROR: Return() used on the same relay twice!" << std::endl;
+      std::cout << "ERROR: Return() used on the same relay " << id << " twice!" << std::endl;
+      std::cout << "Did you remember to capture the relay by-value?" << std::endl;
       return *this;
     }
     LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
@@ -189,8 +190,9 @@ public:
     return Relay(newid);
   }
   friend class LateReturn<Types...>;
-  const int id;
+  int GetID() const {return id;}
 private:
+  const int id = -12;
   Relay(int i) : id(i) {};
 };
 

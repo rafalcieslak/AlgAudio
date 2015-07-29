@@ -62,6 +62,11 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   if(templ->has_sc_code){
     if(!SCLang::ready){
       std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
+      // TODO: Do not return an unlinked module reference! This is a temporary
+      // trick which allows to quickly test GUI without starting the SC server.
+      // Happen a global error signal instead.
+      res->on_init(); // temporary!
+      r.Return(res);
     }else{
       SCLang::SendOSCWithReply<int>("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
         .Then([=](int id){

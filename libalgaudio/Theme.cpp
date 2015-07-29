@@ -39,6 +39,11 @@ void Theme::Init(){
   thememap["progress-bar"] = Color(0x346d97ff);
   thememap["selector-button-normal"] = Color(0x52607cff);
   thememap["selector-button-highlight"] = Color(0x415a8aff);
+
+  thememap["standardbox-bg"] = Color(0x3e4f6cff);
+  thememap["standardbox-border"] = Color(0x293b53ff);
+  thememap["standardbox-caption"] = Color(0x94acccff);
+
 }
 
 const Color& Theme::Get(const std::string& id){

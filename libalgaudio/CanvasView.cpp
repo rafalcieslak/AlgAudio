@@ -31,7 +31,7 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
-  ModuleFactory::CreateNewInstance(id).Then([&](std::shared_ptr<Module> m){
+  ModuleFactory::CreateNewInstance(id).Then([=](std::shared_ptr<Module> m){
     canvas->InsertModule(m);
     auto modulegui = m->BuildGUI(window.lock(), m->templ->guitype);
     if(!modulegui){
@@ -40,6 +40,8 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       return;
     }
     modulegui->position = pos;
+    std::cout << pos.ToString() << std::endl;
+    modulegui->Resize(modulegui->GetRequestedSize());
     module_guis.push_back(modulegui);
     SetNeedsRedrawing();
     r.Return();

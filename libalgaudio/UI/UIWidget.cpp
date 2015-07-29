@@ -30,9 +30,10 @@ void UIWidget::Draw(DrawContext& c){
       return;
     }
     if(drawsize != current_size){
-      std::cout << "WARNING: Implicitly calling Resize, because the draw"
-      "context size is incoherent with widget size!" << std::endl;
-      throw Exception("");
+      std::cout << "WARNING: Implicitly calling Resize, because the draw "
+      "context size " << drawsize.ToString() << " is incoherent with widget "
+      "stored size " << current_size.ToString() << "!" << std::endl;
+      //throw Exception("");
       Resize(drawsize);
     }
     if(needs_redrawing){

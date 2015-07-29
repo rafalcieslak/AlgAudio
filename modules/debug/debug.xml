@@ -25,19 +25,25 @@ Out.ar(outbus,in);
   </module>
   <module id="debugsrc" name="Debug sound source">
     <parrams>
-      <inlet id="aaa"/>
+      <outlet id="out"/>
     </parrams>
     <description> Example SC sound source </description>
     <sc>
-Out.ar(0,SinOsc.ar(500,0,1));
-Out.ar([0,1], In.ar(10,1));
+arg out;
+Out.ar(out, WhiteNoise.ar());
     </sc>
+    <gui type="standard auto"/>
   </module>
   <module id="debugout" name="Debug sound output">
     <description> Example SC sound output </description>
+    <parrams>
+       <inlet id="in"/>
+    </parrams>
     <sc>
+arg in;
 Out.ar(1,SinOsc.ar(440,0,1));
-Out.ar(10,WhiteNoise.ar(0.5));
+Out.ar(0,In.ar(in));
     </sc>
+    <gui type="standard auto"/>
   </module>
 </collection>
