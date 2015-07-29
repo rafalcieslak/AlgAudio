@@ -34,6 +34,7 @@ void UIAlert::Init(std::string text){
   child_label = UILabel::Create(window, text, 14);
   Insert(child_label, PackMode::TIGHT);
   Insert(child_buttons_box, PackMode::TIGHT);
+  SetBackColor(Theme::Get("bg-alert"));
 }
 
 std::shared_ptr<UIAlert> UIAlert::Create(std::weak_ptr<Window> parent_window, std::string text){

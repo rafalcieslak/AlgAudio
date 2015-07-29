@@ -44,6 +44,8 @@ void Theme::Init(){
   thememap["standardbox-border"] = Color(0x293b53ff);
   thememap["standardbox-caption"] = Color(0x94acccff);
 
+  thememap["bg-alert"] = Color(0x52607cff);
+
 }
 
 const Color& Theme::Get(const std::string& id){
