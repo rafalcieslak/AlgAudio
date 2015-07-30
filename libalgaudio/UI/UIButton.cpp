@@ -29,10 +29,10 @@ UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t
   UpdateTexture();
 
   // UIMouseEventsBase events
-  on_pointed.SubscribeForever([&](bool){
+  on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
-  on_pressed.SubscribeForever([&](bool){
+  on_pressed.Subscribe([this](bool){
     SetNeedsRedrawing();
   });
 }

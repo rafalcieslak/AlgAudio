@@ -125,7 +125,7 @@ void CanvasView::RemoveSelected(){
   auto m = module_guis[selected_id]->module.lock();
   canvas->RemoveModule(m);
   module_guis.erase(module_guis.begin() + selected_id);
-  Select(-1);
+  selected_id = -1; // Warning: Do not use Select() here, because the selected module just stopped existing!
   drag_in_progress = false;
   SetNeedsRedrawing();
 }

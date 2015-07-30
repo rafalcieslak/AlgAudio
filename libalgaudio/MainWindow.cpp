@@ -109,7 +109,6 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
     centered_alert->SetVisible(false);
-    centered_alert->RemoveChild();
     alert = nullptr; // loose reference
     if(id == ButtonID::CUSTOM1) r.Return(0);
     if(id == ButtonID::CUSTOM2) r.Return(1);
@@ -129,7 +128,12 @@ LateReturn<> MainWindow::ShowErrorAlert(std::string message, std::string button_
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
     centered_alert->SetVisible(false);
-    centered_alert->RemoveChild();
+    // Cannot remove the child at this point. This is because the button_pressed signal
+    // is called by a chain of CustomMousePresses. One of them is the UICentered,
+    // and it calls code from it's child. If we remove ALL references to the child,
+    // including the one owned by the UICentered, then it'll be destructed while
+    // it's code is still being executed!
+    // centered_alert->RemoveChild();
     alert = nullptr; // loose reference
     if(id == ButtonID::OK) r.Return();
   });
