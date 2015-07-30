@@ -54,6 +54,7 @@ private:
 
   std::shared_ptr<UIVBox> mainvbox;
   std::shared_ptr<UIButton> addbutton;
+  std::shared_ptr<UIButton> removebutton;
   std::shared_ptr<UIButton> quitbutton;
   std::shared_ptr<UIHBox> toolbarbox;
   std::shared_ptr<UISeparator> toolbar_separator;

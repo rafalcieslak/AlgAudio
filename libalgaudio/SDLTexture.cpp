@@ -80,7 +80,7 @@ SDLTexture& SDLTexture::operator=(SDLTexture&& other){
 }
 
 SDLTexture::~SDLTexture(){
-  //std::cout << "Destroying a texture" << std::endl;
+  //std::cout << "Destroying a texture" << texture << std::endl;
   if(valid) SDL_DestroyTexture(texture);
 }
 

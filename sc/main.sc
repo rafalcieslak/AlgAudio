@@ -68,6 +68,7 @@ OSCdef.new( 'removeinstance', {
 		arg msg;
 		var id = msg[1];
 		("Removing instance \"" ++ id.asString ++ "\".").postln;
+		~minstances[id].free;
 		~minstances.removeAt( id );
 		~addr.sendMsg("/algaudio/reply", msg[msg.size-1]);
 	}, '/algaudioSC/removeinstance'

@@ -101,6 +101,7 @@ std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_windo
   }else{
     throw GUIBuildException("Module gui type '" + templ->guitype + "' was not recognized");
   }
+  gui->module = shared_from_this();
   modulegui = gui;
   return gui;
 }

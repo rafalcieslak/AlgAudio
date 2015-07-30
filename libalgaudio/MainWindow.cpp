@@ -26,6 +26,7 @@ MainWindow::MainWindow() : Window("AlgAudio",900,600){
 void MainWindow::init(){
   mainvbox = UIVBox::Create(shared_from_this());
   addbutton = UIButton::Create(shared_from_this()," Add new ");
+  removebutton = UIButton::Create(shared_from_this(),"Remove selected");
   quitbutton = UIButton::Create(shared_from_this()," Quit ");
   toolbarbox = UIHBox::Create(shared_from_this());
   toolbar_separator = UISeparator::Create(shared_from_this());
@@ -52,11 +53,15 @@ void MainWindow::init(){
       selector->Expose();
     }
   });
+  subscriptions += removebutton->on_clicked.Subscribe([this](){
+    canvasview->RemoveSelected();
+  });
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(removebutton, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(toolbar_separator, UIBox::PackMode::WIDE);
   toolbarbox->Insert(quitbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);

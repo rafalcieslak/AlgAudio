@@ -41,6 +41,7 @@ LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
 }
 
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
+  if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
   modules.erase(std::remove(modules.begin(), modules.end(), m), modules.end());
   ModuleFactory::DestroyInstance(m);
 }

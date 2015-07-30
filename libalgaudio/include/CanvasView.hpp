@@ -35,6 +35,7 @@ public:
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
   virtual void CustomMouseMotion(Point2D,Point2D);
+  void RemoveSelected();
 private:
   CanvasView(std::shared_ptr<Window> parent);
   std::shared_ptr<Canvas> canvas;

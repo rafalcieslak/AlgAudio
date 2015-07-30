@@ -32,7 +32,7 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
-  canvas->CreateModule(id).Then([=](std::shared_ptr<Module> m){
+  canvas->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
     try{
       auto modulegui = m->BuildGUI(window.lock());
       modulegui->position = pos;
@@ -40,6 +40,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       std::cout << pos.ToString() << std::endl;
       modulegui->Resize(modulegui->GetRequestedSize());
       module_guis.push_back(modulegui);
+      Select(module_guis.size()-1); // Select the just-added module
       SetNeedsRedrawing();
       r.Return();
     }catch(GUIBuildException ex){
@@ -113,6 +114,16 @@ void CanvasView::CustomMouseMotion(Point2D,Point2D to){
       dragged_id = press_id;
     }
   }
+}
+
+void CanvasView::RemoveSelected(){
+  if(selected_id < 0) return;
+  auto m = module_guis[selected_id]->module.lock();
+  canvas->RemoveModule(m);
+  module_guis.erase(module_guis.begin() + selected_id);
+  Select(-1);
+  drag_in_progress = false;
+  SetNeedsRedrawing();
 }
 
 } // namespace AlgAudio
