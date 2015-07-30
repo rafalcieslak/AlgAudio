@@ -209,6 +209,33 @@ LateReturn<> LateAssign(T& to_set, LateReturn<T> lr){
 }
 
 
+template <typename T> struct identity
+{
+  typedef T type;
+};
+template <typename... X>
+void operator>>=(LateReturn<X...>&& first, typename identity<std::function<void(X...)>>::type then){
+  first.Then(then);
+}
+
+template <typename... X, typename Y>
+LateReturn<Y> operator>>=(LateReturn<X...>&& first, typename identity<std::function<Y(X...)>>::type then){
+  auto r = Relay<Y>::Create();
+  first.Then([=](X... args){
+    r.Return( then(args...) );
+  });
+  return r;
+}
+
+template <typename... X, typename... Y>
+LateReturn<Y...> operator>>=(LateReturn<X...>&& first, typename identity<std::function<LateReturn<Y...>(X...)>>::type then){
+  auto r = Relay<Y...>::Create();
+  first.Then([=](X... args){
+    then(args...).ThenReturn(r);
+  });
+  return r;
+}
+
 } // namespace AlgAudio
 
 #endif // LATEREPLY_HPP
