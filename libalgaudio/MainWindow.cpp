@@ -74,7 +74,7 @@ void MainWindow::init(){
     std::cout << "Selected " << id << std::endl;
     canvasview->AddModule(id,Point2D(50,50));
 
-    ShowSimpleAlert("You have added a new module to the canvas!", "Cool!", "Meh.")
+    ShowSimpleAlert("You have added a new module to the canvas!", "Cool!", "Meh.", AlertType::INFO)
       >>=
     [](int i) {
     if(i == 0) std::cout << "Cool indeed!" << std::endl;
@@ -89,7 +89,7 @@ std::shared_ptr<MainWindow> MainWindow::Create(){
   return res;
 }
 
-LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string button1_text, std::string button2_text, Color button1_color, Color button2_color){
+LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string button1_text, std::string button2_text, AlertType type, Color button1_color, Color button2_color){
   auto r = Relay<int>::Create();
   if(alert){
     std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
@@ -97,6 +97,7 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
   alert = UIAlert::Create(shared_from_this(),message);
   alert->SetButtons({UIAlert::ButtonData(button1_text, ButtonID::CUSTOM1, button1_color),
                      UIAlert::ButtonData(button2_text, ButtonID::CUSTOM2, button2_color)});
+  alert->SetType(type);
   centered_alert->SetVisible(true);
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){

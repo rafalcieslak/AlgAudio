@@ -34,8 +34,9 @@ public:
   virtual void CustomMouseMotion(Point2D,Point2D) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
-private:
+protected:
   UIMarginBox(std::weak_ptr<Window> parent_window, int top, int right, int bottom, int left);
+private:
   inline bool IsInside(Point2D) const;
   int top, right, bottom, left;
   std::shared_ptr<UIWidget> child;

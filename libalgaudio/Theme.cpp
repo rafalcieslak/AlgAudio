@@ -45,6 +45,10 @@ void Theme::Init(){
   thememap["standardbox-caption"] = Color(0x94acccff);
 
   thememap["bg-alert"] = Color(0x52607cff);
+  thememap["alert-border-none"] = Color(0x52607cff);
+  thememap["alert-border-info"] = Color(0x527c63ff);
+  thememap["alert-border-warning"] = Color(0x99975aff);
+  thememap["alert-border-error"] = Color(0x7c5252ff);
 
 }
 

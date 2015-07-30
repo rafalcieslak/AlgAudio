@@ -38,7 +38,14 @@ class MainWindow : public Window{
 public:
   static std::shared_ptr<MainWindow> Create();
   // Returns 0 if the first button was clicked, 1, if the second.
-  LateReturn<int> ShowSimpleAlert(std::string message, std::string button1_text, std::string button2_text, Color button1_color = Theme::Get("bg-button-neutral"), Color button2_color = Theme::Get("bg-button-neutral"));
+  LateReturn<int> ShowSimpleAlert(
+    std::string message,
+    std::string button1_text,
+    std::string button2_text,
+    AlertType type = AlertType::NONE,
+    Color button1_color = Theme::Get("bg-button-neutral"),
+    Color button2_color = Theme::Get("bg-button-neutral")
+  );
 private:
   MainWindow();
   void init();

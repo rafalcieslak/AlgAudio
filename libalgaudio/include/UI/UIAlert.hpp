@@ -20,7 +20,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UIWidget.hpp"
 #include "UIBox.hpp"
+#include "UIMarginBox.hpp"
 #include "Theme.hpp"
+#include "Window.hpp"
 
 namespace AlgAudio{
 
@@ -42,10 +44,19 @@ enum class ButtonID : int{
   CUSTOM2,
 };
 
-class UIAlert : public UIVBox{
+#undef ERROR
+enum class AlertType : int{
+  NONE,
+  INFO,
+  WARNING,
+  ERROR,
+};
+
+class UIAlert : public UIMarginBox{
 public:
   static std::shared_ptr<UIAlert> Create(std::weak_ptr<Window> parent_window, std::string text);
   void SetText(std::string);
+  void SetType(AlertType);
   // Arg: pressed button id
   Signal<ButtonID> on_button_pressed;
   struct ButtonData{
@@ -60,6 +71,7 @@ public:
 private:
   UIAlert(std::weak_ptr<Window> parent_window);
   void Init(std::string);
+  std::shared_ptr<UIVBox> main_box;
   std::shared_ptr<UIHBox> child_buttons_box;
   std::shared_ptr<UILabel> child_label;
   std::vector<std::shared_ptr<UIButton>> buttons;
