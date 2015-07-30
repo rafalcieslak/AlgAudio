@@ -62,6 +62,17 @@ OSCdef.new( 'newinstance', {
 	}, '/algaudioSC/newinstance'
 ).postln;
 
+// 1 argument: the template id
+// reply value: instance id
+OSCdef.new( 'removeinstance', {
+		arg msg;
+		var id = msg[1];
+		("Removing instance \"" ++ id.asString ++ "\".").postln;
+		~minstances.removeAt( id );
+		~addr.sendMsg("/algaudio/reply", msg[msg.size-1]);
+	}, '/algaudioSC/removeinstance'
+).postln;
+
 // reply value: bus instance id
 OSCdef.new( 'newbus', {
 		arg msg;

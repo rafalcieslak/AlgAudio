@@ -27,6 +27,7 @@ Bus::Bus(int i) : id(i) {}
 
 Bus::~Bus(){
   /// TODO: Ask SC to remove the bus
+  std::cout << "Bus freed" << std::endl;
 }
 
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
@@ -49,6 +50,10 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
   });
   return r;
 }
+
+Module::~Module() {
+  if(enabled_by_factory) std::cout << "WARNING: a module " << templ->GetFullID() << " reference is lost, but it was not destroyed by the factory." << std::endl;
+};
 
 void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::Inlet> i){
   o->bus = i->bus;

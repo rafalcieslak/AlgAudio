@@ -66,6 +66,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       // trick which allows to quickly test GUI without starting the SC server.
       // Happen a global error signal instead.
       res->on_init(); // temporary!
+      res->enabled_by_factory = true;
       r.Return(res);
     }else{
       SCLang::SendOSCWithReply<int>("/algaudioSC/newinstance", "s", templ->GetFullID().c_str())
@@ -73,6 +74,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
           std::cout << "On id " << id << std::endl;
           res->sc_id = id;
           res->CreateIOFromTemplate().Then([=](){
+            res->enabled_by_factory = true;
             res->on_init();
             r.Return(res);
           });
@@ -80,6 +82,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
         );
     }
   }else{
+    res->enabled_by_factory = true;
     res->on_init();
     r.Return(res);
   }
@@ -95,6 +98,32 @@ std::shared_ptr<ModuleTemplate> ModuleFactory::GetTemplateByID(std::string id){
   auto coll = ModuleCollectionBase::GetCollectionByID(v[0]);
   if(!coll) return nullptr;
   return coll->GetTemplateByID(v[1]);
+}
+
+LateReturn<> ModuleFactory::DestroyInstance(std::shared_ptr<Module> m){
+  Relay<> r;
+  m->on_destroy();
+  if(m->templ->has_sc_code){
+    // Remove IO
+    m->inlets.clear();
+    m->outlets.clear();
+    try{
+      SCLang::SendOSCWithEmptyReply("/algaudioSC/removeinstance", "i", m->sc_id).Then([r,m](){
+        m->enabled_by_factory = false;
+        r.Return();
+      });
+    }catch(SCLangException){
+      // Failed to send osc message? If we are unable to remove the instance
+      // because SC or OSC is dead, then we won't be able to clean the instance
+      // anyway.
+      m->enabled_by_factory = false;
+      r.Return();
+    }
+  }else{
+    m->enabled_by_factory = false;
+    r.Return();
+  }
+  return r;
 }
 
 }

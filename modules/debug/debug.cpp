@@ -34,6 +34,9 @@ public:
   void on_init(){
     std::cout << "~~~ Hello world! ~~~" << std::endl;
   }
+  void on_destroy(){
+    std::cout << "~~~ Bye world! ~~~" << std::endl;
+  }
 };
 
 //
@@ -43,6 +46,10 @@ public:
     my_window = AlgAudio::Window::Create("My window!", 500, 50);
     AlgAudio::SDLMain::RegisterWindow(my_window);
   }
+  void on_destroy(){
+    AlgAudio::SDLMain::UnregisterWindow(my_window);
+    my_window = nullptr;
+  }
   std::shared_ptr<AlgAudio::Window> my_window;
 };
 
@@ -51,8 +58,9 @@ public:
 
 class Console : public AlgAudio::Module{
 public:
+  std::shared_ptr<AlgAudio::Window> console_window;
   void on_init(){
-    auto console_window = AlgAudio::Window::Create("SCLang console", 500, 400, false);
+    console_window = AlgAudio::Window::Create("SCLang console", 500, 400, false);
     auto mainvbox = AlgAudio::UIVBox::Create(console_window);
     auto textarea = AlgAudio::UITextArea::Create(console_window, AlgAudio::Color(255,255,255), AlgAudio::Color(0,0,0));
     auto clipboard_button = AlgAudio::UIButton::Create(console_window, "Copy console output to clipboard");
@@ -64,7 +72,7 @@ public:
     mainvbox->Insert(clipboard_button, AlgAudio::UIBox::PackMode::TIGHT);
     console_window->Insert(mainvbox);
 
-    subscriptions += AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
+    console_window->subscriptions += AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
       textarea->PushLine(line);
     });
     subscriptions += clipboard_button->on_clicked.Subscribe([=](){
@@ -79,6 +87,10 @@ public:
       AlgAudio::SDLMain::UnregisterWindow(console_window);
     });
     AlgAudio::SDLMain::RegisterWindow(console_window);
+  }
+  void on_destroy(){
+    AlgAudio::SDLMain::UnregisterWindow(console_window);
+    console_window = nullptr;
   }
 };
 // ------------------------------

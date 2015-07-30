@@ -34,6 +34,7 @@ private:
 public:
   static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ);
   static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id);
+  static LateReturn<> DestroyInstance(std::shared_ptr<Module>);
   static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string);
 };
 

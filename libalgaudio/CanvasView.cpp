@@ -18,7 +18,6 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
 #include <SDL2/SDL.h>
-#include "ModuleFactory.hpp"
 #include "Window.hpp"
 
 namespace AlgAudio{
@@ -33,8 +32,7 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
-  ModuleFactory::CreateNewInstance(id).Then([=](std::shared_ptr<Module> m){
-    canvas->InsertModule(m);
+  canvas->CreateModule(id).Then([=](std::shared_ptr<Module> m){
     try{
       auto modulegui = m->BuildGUI(window.lock());
       modulegui->position = pos;
@@ -46,7 +44,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       r.Return();
     }catch(GUIBuildException ex){
       // TODO: Module removing
-      // canvas->RemoveModule(m);
+      canvas->RemoveModule(m);
       window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
       r.Return();
       return;

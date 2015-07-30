@@ -162,6 +162,11 @@ private:
 template <typename... Types>
 class Relay{
 public:
+  Relay(){
+    int newid = LateReturnEntryBase::id_counter++;
+    LateReturnEntryBase::entries[newid] = new LateReturnEntry<Types...>();
+    id = newid;
+  }
   const Relay& Return(Types... args) const{
     auto it = LateReturnEntryBase::entries.find(id);
     //std::cout << "Returning " << id << std::endl;
@@ -192,7 +197,7 @@ public:
   friend class LateReturn<Types...>;
   int GetID() const {return id;}
 private:
-  const int id = -12;
+  int id = -42;
   Relay(int i) : id(i) {};
 };
 

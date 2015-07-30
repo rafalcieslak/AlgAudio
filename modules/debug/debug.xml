@@ -2,6 +2,10 @@
   <name>Debug utilities</name>
   <defaultlib file="debug.aa"/>
   <module id="pipe" name="Pipe">
+    <parrams>
+      <inlet id="inbus"/>
+      <outlet id="outbus"/>
+    </parrams>
     <sc>
 arg inbus, outbus;
 var in = In.ar(inbus);

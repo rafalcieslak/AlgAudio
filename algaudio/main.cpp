@@ -55,9 +55,7 @@ int main(int argc, char *argv[]){
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
     std::shared_ptr<Module> module1, module2, console_module;
     std::shared_ptr<Canvas> main_canvas;
-    ModuleFactory::CreateNewInstance("debug/console").Then([&](auto mod){
-      console_module = mod;
-    });
+    LateAssign(console_module, ModuleFactory::CreateNewInstance("debug/console"));
 
     std::shared_ptr<MainWindow> mainwindow = nullptr;
     auto configwindow = LaunchConfigWindow::Create();
@@ -81,6 +79,8 @@ int main(int argc, char *argv[]){
 
     SDLMain::Loop();
 
+    ModuleFactory::DestroyInstance(console_module);
+    
     SCLang::Stop();
     // SDL seems to have problems when the destroy functions are called from
     // the DLL destroy call. Thus, we explicitly free all our window pointers

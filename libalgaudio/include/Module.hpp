@@ -44,14 +44,33 @@ private:
 
 class Module : public DynamicallyLoadableClass, public SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
-  Module(){};
+  Module() {};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
   Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
   Module(const Module& other) = delete;
-  virtual ~Module() {};
+  virtual ~Module();
+
+  // Custom module implementations will prefer to override on_init and
+  // on_destroy, instead of creating a custom constructor/destructor. on_init
+  // is guaranteed to run when the module is ready to work - the corresponding
+  // SC instance was created etc. Similarly, on_destroy is called before the SC
+  // instance is removed, while the buses still exist etc.
   virtual void on_init() {};
+  virtual void on_destroy() {};
+
+  // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;
+
+  // The id of the supercollider synth instance this Module represents and
+  // manages.
   int sc_id = -1;
+
+
+  // This flag marks whether this module was initialized by ModuleFactory.
+  // When ModuleFactory destoys a module, this flag is set back to false.
+  // This way it's easy to detect whether the module was correctly created,
+  // and when it's destructed witout havning been destroyed by the factory.
+  bool enabled_by_factory = false;
 
   // TODO: Common base class
   class Outlet{
@@ -61,6 +80,9 @@ public:
     // The outlet is not the owner of a bus.
     std::weak_ptr<Bus> bus;
     static std::shared_ptr<Outlet> Create(std::string id, std::shared_ptr<Module> mod);
+    ~Outlet(){
+      std::cout << "Outlet freed" << std::endl;
+    }
   private:
     Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {
       mod.SetParram(id, 999999999);

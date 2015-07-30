@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Canvas.hpp"
+#include "ModuleFactory.hpp"
 #include <algorithm>
 
 namespace AlgAudio{
@@ -29,13 +30,23 @@ std::shared_ptr<Canvas> Canvas::CreateEmpty(){
   return std::shared_ptr<Canvas>( new Canvas() );
 }
 
-void Canvas::InsertModule(std::shared_ptr<Module> m){
-  modules.emplace_back(m);
-  m->canvas = shared_from_this();
+LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
+  Relay<std::shared_ptr<Module>> r;
+  ModuleFactory::CreateNewInstance(id).Then([this,r](std::shared_ptr<Module> m){
+    modules.emplace_back(m);
+    m->canvas = shared_from_this();
+    r.Return(m);
+  });
+  return r;
 }
 
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
   modules.erase(std::remove(modules.begin(), modules.end(), m), modules.end());
+  ModuleFactory::DestroyInstance(m);
+}
+
+Canvas::~Canvas(){
+  for(auto& m : modules) ModuleFactory::DestroyInstance(m);
 }
 
 } // namespace AlgAudio
