@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
 #include "ModuleFactory.hpp"
+#include <SDL2/SDL.h>
 
 namespace AlgAudio{
 
@@ -40,6 +41,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       return;
     }
     modulegui->position = pos;
+    modulegui->parent = shared_from_this();
     std::cout << pos.ToString() << std::endl;
     modulegui->Resize(modulegui->GetRequestedSize());
     module_guis.push_back(modulegui);
@@ -56,6 +58,59 @@ void CanvasView::CustomDraw(DrawContext& c){
     c.Pop();
   }
   // Then draw all the connections...
+}
+
+int CanvasView::InWhich(Point2D p){
+  for(int i = module_guis.size() - 1; i >= 0; i--){
+    if(p.IsInside(module_guis[i]->position, module_guis[i]->GetRequestedSize()) )
+      return i;
+  }
+  return -1;
+}
+
+void CanvasView::CustomMousePress(bool down,short b,Point2D pos){
+  if(down == true && b == SDL_BUTTON_LEFT){
+    pressed = true;
+    press_position = pos;
+    press_id = InWhich(pos);
+    if(press_id >= 0){
+      press_offset = pos - module_guis[press_id]->position;
+    }
+    Select(press_id);
+  }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
+    pressed = false;
+    if(drag_in_progress){
+      drag_in_progress = false;
+    }
+  }
+}
+void CanvasView::Select(int id){
+  if(selected_id != -1){
+    module_guis[selected_id]->SetHighlight(false);
+  }
+  selected_id = id;
+  if(selected_id != -1){
+    module_guis[selected_id]->SetHighlight(true);
+  }
+}
+
+void CanvasView::CustomMouseEnter(Point2D){
+}
+void CanvasView::CustomMouseLeave(Point2D){
+  if(pressed) pressed = false;
+  if(drag_in_progress) drag_in_progress = false;
+}
+void CanvasView::CustomMouseMotion(Point2D,Point2D to){
+  if(drag_in_progress){
+    module_guis[dragged_id]->position = to - drag_offset;
+    SetNeedsRedrawing();
+  }else{
+    if(pressed && press_id >=0 && Point2D::Distance(press_position, to) > 5){
+      drag_offset = press_offset;
+      drag_in_progress = true;
+      dragged_id = press_id;
+    }
+  }
 }
 
 } // namespace AlgAudio

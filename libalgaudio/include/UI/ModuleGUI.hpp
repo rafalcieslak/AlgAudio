@@ -30,6 +30,7 @@ class ModuleGUI : public UIWidget{
 public:
   std::weak_ptr<Module> module;
   Point2D position;
+  virtual void SetHighlight(bool) = 0;
 protected:
   ModuleGUI(std::shared_ptr<Window> w) : UIWidget(w){}
 };

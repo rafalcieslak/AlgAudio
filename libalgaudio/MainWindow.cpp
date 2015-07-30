@@ -73,13 +73,14 @@ void MainWindow::init(){
     if(id == "") return;
     std::cout << "Selected " << id << std::endl;
     canvasview->AddModule(id,Point2D(50,50));
-
+/*
     ShowSimpleAlert("You have added a new module to the canvas!", "Cool!", "Meh.", AlertType::INFO)
       >>=
     [](int i) {
     if(i == 0) std::cout << "Cool indeed!" << std::endl;
     else       std::cout << "Yay." << std::endl;
     };
+    */
   });
 }
 

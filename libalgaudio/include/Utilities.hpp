@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <string>
 #include <vector>
+#include <cmath>
 #include "Signal.hpp"
 
 struct SDL_Color;
@@ -48,6 +49,8 @@ struct Point2D{
   std::string ToString() const {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
   Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y);}
   Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
+  bool IsInside(Point2D r, Size2D s){ return (x >= r.x) && (x <= r.x + s.width) && (y >= r.y) && (y <= r.y + s.height);}
+  static float Distance(Point2D a, Point2D b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}
 };
 
 // For text alignment, drawer orientation etc.

@@ -32,12 +32,13 @@ public:
   static std::shared_ptr<StandardModuleGUI> CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<ModuleTemplate> templ);
   void CustomDraw(DrawContext& c) override;
   void CustomResize(Size2D s) override;
+  void SetHighlight(bool) override;
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w) : ModuleGUI(w){}
 private:
   void LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ);
   void LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ);
-
+  bool highlight = false;
   std::shared_ptr<UILabel> caption;
 };
 

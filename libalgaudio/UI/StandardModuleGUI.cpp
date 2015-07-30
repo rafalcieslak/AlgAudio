@@ -55,12 +55,15 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   // TODO: Store the color instead of getting it every time
   Color bg_color = Theme::Get("standardbox-bg");
   Color border_color = Theme::Get("standardbox-border");
-  c.SetColor(bg_color);
+
+  if(highlight) c.SetColor(bg_color.Lighter(0.03));
+  else c.SetColor(bg_color);
   int w = c.Size().width;
   int h = c.Size().height;
   c.DrawRect(0,0,w,h);
 
-  c.SetColor(border_color);
+  if(highlight) c.SetColor(border_color.Lighter(0.2));
+  else c.SetColor(border_color);
   c.DrawLine(0,0,w-1,0);
   c.DrawLine(0,0,0,h-1);
   c.DrawLine(w-1,0,w-1,h-1);
@@ -77,6 +80,11 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
 
 void StandardModuleGUI::CustomResize(Size2D s){
   caption->Resize(Size2D(s.width-16, caption->GetRequestedSize().height));
+}
+
+void StandardModuleGUI::SetHighlight(bool h){
+  highlight = h;
+  SetNeedsRedrawing();
 }
 
 }
