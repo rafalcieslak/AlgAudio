@@ -30,6 +30,7 @@ class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   virtual ~Canvas() {};
   void InsertModule(std::shared_ptr<Module>);
+  void RemoveModule(std::shared_ptr<Module>);
   static std::shared_ptr<Canvas> CreateEmpty();
 private:
   Canvas();

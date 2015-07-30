@@ -28,7 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
   #include <windows.h>
 #endif
 
-#define SILLY_GDB
+// #define SILLY_GDB
 
 namespace AlgAudio {
 

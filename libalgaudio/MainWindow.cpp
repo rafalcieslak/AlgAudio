@@ -99,6 +99,7 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
   alert->SetButtons({UIAlert::ButtonData(button1_text, ButtonID::CUSTOM1, button1_color),
                      UIAlert::ButtonData(button2_text, ButtonID::CUSTOM2, button2_color)});
   alert->SetType(type);
+  centered_alert->RemoveChild();
   centered_alert->SetVisible(true);
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
@@ -110,5 +111,25 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
   });
   return r;
 }
+LateReturn<> MainWindow::ShowErrorAlert(std::string message, std::string button_text){
+  auto r = Relay<>::Create();
+  if(alert){
+    std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
+  }
+  alert = UIAlert::Create(shared_from_this(),message);
+  alert->SetButtons({UIAlert::ButtonData(button_text, ButtonID::OK, Theme::Get("bg-button-neutral"))});
+  alert->SetType(AlertType::ERROR);
+  centered_alert->RemoveChild();
+  centered_alert->SetVisible(true);
+  centered_alert->Insert(alert);
+  sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
+    centered_alert->SetVisible(false);
+    centered_alert->RemoveChild();
+    alert = nullptr; // loose reference
+    if(id == ButtonID::OK) r.Return();
+  });
+  return r;
+}
+
 
 } // namespace AlgAudio

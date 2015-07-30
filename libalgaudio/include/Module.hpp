@@ -98,7 +98,7 @@ public:
   // "gui" node.
   // Whoever calls this function claims the ownership of the returned pointer,
   // it will not be owned by the module instance.
-  virtual std::shared_ptr<ModuleGUI> BuildGUI(std::shared_ptr<Window> parent_window, std::string type);
+  virtual std::shared_ptr<ModuleGUI> BuildGUI(std::shared_ptr<Window> parent_window);
 
   // Creates and allocates Inlets and Outlets for this instance, according to
   // the data in template info.

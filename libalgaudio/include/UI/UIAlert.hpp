@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UIBox.hpp"
 #include "UIMarginBox.hpp"
 #include "Theme.hpp"
-#include "Window.hpp"
+#include "Alertable.hpp"
 
 namespace AlgAudio{
 
@@ -30,27 +30,7 @@ class UIHBox;
 class UIVBox;
 class UILabel;
 class UIButton;
-
-#undef IGNORE
-
-enum class ButtonID : int{
-  OK,
-  CANCEL,
-  YES,
-  NO,
-  QUIT,
-  IGNORE,
-  CUSTOM1,
-  CUSTOM2,
-};
-
-#undef ERROR
-enum class AlertType : int{
-  NONE,
-  INFO,
-  WARNING,
-  ERROR,
-};
+class Window;
 
 class UIAlert : public UIMarginBox{
 public:

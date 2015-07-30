@@ -1,5 +1,5 @@
-#ifndef Window_HPP
-#define Window_HPP
+#ifndef WINDOW_HPP
+#define WINDOW_HPP
 /*
 This file is part of AlgAudio.
 
@@ -22,6 +22,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLHandle.hpp"
 #include "Signal.hpp"
 #include "Theme.hpp"
+#include "LateReturn.hpp"
+#include "Alertable.hpp"
 
 struct SDL_Window;
 struct SDL_Renderer;
@@ -30,7 +32,7 @@ namespace AlgAudio{
 
 class UIWidget;
 
-class Window : public SubscriptionsManager, public std::enable_shared_from_this<Window>{
+class Window : public SubscriptionsManager, public IAlertable, public std::enable_shared_from_this<Window>{
 private:
   SDLHandle h;
 public:
@@ -64,6 +66,12 @@ public:
   unsigned int GetID() const {return id;}
   Size2D GetSize() const;
   SDL_Renderer* GetRenderer() const {return renderer;}
+
+  // Empty implementation.
+  virtual LateReturn<int> ShowSimpleAlert( std::string,std::string,std::string,AlertType,Color,Color)
+  {throw AlertableException("This window is not capable of displaying alerts.");}
+  virtual LateReturn<> ShowErrorAlert(std::string, std::string)
+  {throw  AlertableException("This window is not capable of displaying alerts.");}
 protected:
   Window(std::string title, int w, int h, bool centered = true);
 private:
@@ -83,4 +91,4 @@ private:
 };
 
 } //namespace AlgAudio
-#endif // Window_HPP
+#endif // WINDOW_HPP

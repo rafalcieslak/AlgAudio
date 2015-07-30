@@ -85,18 +85,16 @@ std::shared_ptr<ModuleGUI> Module::GetGUI(){
   return modulegui.lock();
 }
 
-std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_window, std::string type){
+std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_window){
   std::shared_ptr<ModuleGUI> gui;
   if(templ->guitype == "standard"){
     gui = StandardModuleGUI::CreateFromXML(parent_window, templ->guitree, templ);
   }else if(templ->guitype == "standard auto"){
     gui = StandardModuleGUI::CreateFromTemplate(parent_window, templ);
   }else if(templ->guitype == ""){
-    std::cout << "This module has no gui defined" << std::endl;
-    gui = nullptr;
+    throw GUIBuildException("This module has no gui defined");
   }else{
-    std::cout << "Module gui type '" << templ->guitype << "' was not recognized" << std::endl;
-    gui = nullptr;
+    throw GUIBuildException("Module gui type '" + templ->guitype + "' was not recognized");
   }
   modulegui = gui;
   return gui;

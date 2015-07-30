@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIWidget.hpp"
 #include "UI/ModuleGUI.hpp"
 #include "Canvas.hpp"
+#include "Alertable.hpp"
 
 namespace AlgAudio{
 

@@ -30,6 +30,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UISeparator.hpp"
 #include "UI/UICentered.hpp"
 #include "CanvasView.hpp"
+#include "Alertable.hpp"
 
 namespace AlgAudio{
 
@@ -45,7 +46,8 @@ public:
     AlertType type = AlertType::NONE,
     Color button1_color = Theme::Get("bg-button-neutral"),
     Color button2_color = Theme::Get("bg-button-neutral")
-  );
+  ) override;
+  LateReturn<> ShowErrorAlert(std::string message, std::string button_text) override;
 private:
   MainWindow();
   void init();

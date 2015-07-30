@@ -17,8 +17,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
-#include "ModuleFactory.hpp"
 #include <SDL2/SDL.h>
+#include "ModuleFactory.hpp"
+#include "Window.hpp"
 
 namespace AlgAudio{
 
@@ -34,19 +35,22 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
   ModuleFactory::CreateNewInstance(id).Then([=](std::shared_ptr<Module> m){
     canvas->InsertModule(m);
-    auto modulegui = m->BuildGUI(window.lock(), m->templ->guitype);
-    if(!modulegui){
-      std::cout << "Failed to build gui" << std::endl;
+    try{
+      auto modulegui = m->BuildGUI(window.lock());
+      modulegui->position = pos;
+      modulegui->parent = shared_from_this();
+      std::cout << pos.ToString() << std::endl;
+      modulegui->Resize(modulegui->GetRequestedSize());
+      module_guis.push_back(modulegui);
+      SetNeedsRedrawing();
+      r.Return();
+    }catch(GUIBuildException ex){
+      // TODO: Module removing
+      // canvas->RemoveModule(m);
+      window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
       r.Return();
       return;
     }
-    modulegui->position = pos;
-    modulegui->parent = shared_from_this();
-    std::cout << pos.ToString() << std::endl;
-    modulegui->Resize(modulegui->GetRequestedSize());
-    module_guis.push_back(modulegui);
-    SetNeedsRedrawing();
-    r.Return();
   });
   return r;
 }
