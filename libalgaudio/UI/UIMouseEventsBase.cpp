@@ -36,11 +36,13 @@ void UIMouseEventsBase::OnMousePress(bool down, short b,Point2D p){
 void UIMouseEventsBase::OnMouseEnter(Point2D p){
   CustomMouseEnter(p);
   pointed = true;
+  last_mouse_pos = p;
   on_pointed.Happen(true);
 }
 
 void UIMouseEventsBase::OnMouseLeave(Point2D p){
   CustomMouseLeave(p);
+  last_mouse_pos = p;
   if(pressed){
     pressed = false;
     on_pressed.Happen(false);
@@ -53,6 +55,7 @@ void UIMouseEventsBase::OnMouseLeave(Point2D p){
 
 void UIMouseEventsBase::OnMouseMotion(Point2D p1, Point2D p2){
   CustomMouseMotion(p1,p2);
+  last_mouse_pos = p2;
 }
 
 } // namespace AlgAudio

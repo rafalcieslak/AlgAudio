@@ -35,6 +35,7 @@ public:
   virtual void CustomMouseEnter(Point2D) {}
   virtual void CustomMouseLeave(Point2D) {}
   virtual void CustomMouseMotion(Point2D,Point2D) {}
+  Point2D last_mouse_pos;
 protected:
   UIMouseEventsBase() {} // Only construcible when inherited
   bool pressed = false;

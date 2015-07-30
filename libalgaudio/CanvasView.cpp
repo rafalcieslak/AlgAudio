@@ -35,12 +35,16 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   canvas->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
     try{
       auto modulegui = m->BuildGUI(window.lock());
-      modulegui->position = pos;
+      Size2D guisize = modulegui->GetRequestedSize();
+      modulegui->position = pos - guisize/2;
       modulegui->parent = shared_from_this();
-      std::cout << pos.ToString() << std::endl;
-      modulegui->Resize(modulegui->GetRequestedSize());
+      modulegui->Resize(guisize);
       module_guis.push_back(modulegui);
-      Select(module_guis.size()-1); // Select the just-added module
+      int id = module_guis.size()-1;
+      Select(id); // Select the just-added module
+      dragged_id = id;
+      drag_in_progress = true;
+      drag_offset = (guisize/2).ToPoint();
       SetNeedsRedrawing();
       r.Return();
     }catch(GUIBuildException ex){

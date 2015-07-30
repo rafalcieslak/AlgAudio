@@ -77,7 +77,7 @@ void MainWindow::init(){
     selector->Hide();
     if(id == "") return;
     std::cout << "Selected " << id << std::endl;
-    canvasview->AddModule(id,Point2D(50,50));
+    canvasview->AddModule(id,layered->last_mouse_pos);
 /*
     ShowSimpleAlert("You have added a new module to the canvas!", "Cool!", "Meh.", AlertType::INFO)
       >>=

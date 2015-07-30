@@ -27,6 +27,8 @@ struct SDL_Color;
 
 namespace AlgAudio{
 
+struct Point2D;
+
 struct Size2D{
   Size2D(int w = 0, int h = 0) : width(w), height(h) {}
   bool Fits(const Size2D& other) const{ return (width >= other.width && height >= other.height); }
@@ -37,6 +39,8 @@ struct Size2D{
   std::string ToString() const {return "{" + std::to_string(width) + ", " + std::to_string(height) + " }"; }
   Size2D operator+(const Size2D& other) const { return Size2D(width + other.width, height + other.height);}
   Size2D operator-(const Size2D& other) const { return Size2D(width - other.width, height - other.height);}
+  Size2D operator/(const int& i) const {return Size2D(width/i, height/i);}
+  Point2D ToPoint() const;
 };
 
 // Same as size2d, but never interchangable. TODO: Turn both into a common base class.
@@ -49,9 +53,13 @@ struct Point2D{
   std::string ToString() const {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
   Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y);}
   Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
+  Point2D operator/(const int& i) const {return Point2D(x/i, y/i);}
+  Point2D operator+(const Size2D& other) const { return Point2D(x + other.width, y + other.height);}
+  Point2D operator-(const Size2D& other) const { return Point2D(x - other.width, y - other.height);}
   bool IsInside(Point2D r, Size2D s){ return (x >= r.x) && (x <= r.x + s.width) && (y >= r.y) && (y <= r.y + s.height);}
   static float Distance(Point2D a, Point2D b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}
 };
+inline Point2D Size2D::ToPoint() const{ return Point2D(width,height);}
 
 // For text alignment, drawer orientation etc.
 typedef enum {
