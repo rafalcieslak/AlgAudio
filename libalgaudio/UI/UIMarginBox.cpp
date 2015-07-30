@@ -38,7 +38,7 @@ void UIMarginBox::CustomDraw(DrawContext& c){
 
 void UIMarginBox::CustomResize(Size2D s){
   if(!child) return;
-  child->Resize(Size2D(s.width - top - bottom, s.height - left - right));
+  child->Resize(Size2D(s.width - left - right, s.height - top - bottom));
 }
 
 void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
@@ -55,12 +55,12 @@ void UIMarginBox::Insert(std::shared_ptr<UIWidget> ch){
 
 void UIMarginBox::OnChildRequestedSizeChanged(){
   Size2D s = child->GetRequestedSize();
-  SetMinimalSize(Size2D(s.width + top + bottom, s.height + left + right));
+  SetMinimalSize(Size2D(s.width + right + left, s.height + top + bottom));
 }
 void UIMarginBox::OnChildVisibilityChanged(){
   Size2D s = child->GetRequestedSize();
   //if(child->IsVisible())
-    SetMinimalSize(Size2D(s.width + top + bottom, s.height + left + right));
+    SetMinimalSize(Size2D(s.width + right + left, s.height + top + bottom));
   //else
   //  SetMinimalSize(Size2D(top+bottom, left+right));
 }

@@ -36,34 +36,69 @@ std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromTemplate(std::sh
   return ptr;
 }
 
-void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ){
-  std::cout << "Building GUI from XML " << std::endl;
-  caption = UILabel::Create(window, templ->name, 16);
+void StandardModuleGUI::CommonInit(){
+  main_margin = UIMarginBox::Create(window,0,6,0,6);
+  main_box = UIVBox::Create(window);
+  inlets_box = UIHBox::Create(window);
+  outlets_box = UIHBox::Create(window);
+  caption = UILabel::Create(window, "", 16);
   caption->SetTextColor("standardbox-caption");
-  caption->parent = shared_from_this();
-  SetMinimalSize(caption->GetRequestedSize() + Size2D(16,16));
+
+  main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);
+  main_box->Insert(caption, UIBox::PackMode::TIGHT);
+  main_box->Insert(outlets_box, UIBox::PackMode::TIGHT);
+  main_margin->Insert(main_box);
+  main_margin->parent = shared_from_this();
+
+   inlets_box->SetCustomSize(Size2D(0,4));
+  outlets_box->SetCustomSize(Size2D(0,4));
+
+  SetBackColor(Theme::Get("standardbox-bg"));
+}
+
+void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ){
+  CommonInit();
+  std::cout << "Building GUI from XML " << std::endl;
+  caption->SetText(templ->name);
+  UpdateMinimalSize();
 }
 void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
+  CommonInit();
   std::cout << "Building GUI from template" << std::endl;
-  caption = UILabel::Create(window, templ->name, 16);
-  caption->SetTextColor("standardbox-caption");
-  caption->parent = shared_from_this();
-  SetMinimalSize(caption->GetRequestedSize() + Size2D(16,16));
+  caption->SetText(templ->name);
+
+  for(auto& i : templ->inlets){
+    auto inlet = IOConn::Create(window, i, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+    inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
+    inlets.push_back(inlet);
+  }
+  for(auto& o : templ->outlets){
+    auto outlet = IOConn::Create(window, o, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+    outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
+    outlets.push_back(outlet);
+  }
+  UpdateMinimalSize();
+}
+
+void StandardModuleGUI::OnChildRequestedSizeChanged(){
+  UpdateMinimalSize();
+}
+void StandardModuleGUI::OnChildVisibilityChanged(){
+  UpdateMinimalSize();
+}
+
+void StandardModuleGUI::UpdateMinimalSize(){
+  SetMinimalSize(main_margin->GetRequestedSize());
 }
 
 void StandardModuleGUI::CustomDraw(DrawContext& c){
   // TODO: Store the color instead of getting it every time
-  Color bg_color = Theme::Get("standardbox-bg");
   Color border_color = Theme::Get("standardbox-border");
-
-  if(highlight) c.SetColor(bg_color.Lighter(0.03));
-  else c.SetColor(bg_color);
-  int w = c.Size().width;
-  int h = c.Size().height;
-  c.DrawRect(0,0,w,h);
 
   if(highlight) c.SetColor(border_color.Lighter(0.2));
   else c.SetColor(border_color);
+  int w = c.Size().width;
+  int h = c.Size().height;
   c.DrawLine(0,0,w-1,0);
   c.DrawLine(0,0,0,h-1);
   c.DrawLine(w-1,0,w-1,h-1);
@@ -73,17 +108,54 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   c.DrawLine(w-2,1,w-2,h-2);
   c.DrawLine(1,h-2,w-2,h-2);
 
-  c.Push(Point2D(8,8),Size2D(c.Size().width-16, caption->GetRequestedSize().height));
-  caption->Draw(c);
+  c.Push(Point2D(0,0),c.Size());
+  main_margin->Draw(c);
   c.Pop();
 }
 
 void StandardModuleGUI::CustomResize(Size2D s){
-  caption->Resize(Size2D(s.width-16, caption->GetRequestedSize().height));
+  main_margin->Resize(s);
 }
 
 void StandardModuleGUI::SetHighlight(bool h){
   highlight = h;
+
+  if(highlight) SetBackColor(Theme::Get("standardbox-bg").Lighter(0.03));
+  else  SetBackColor(Theme::Get("standardbox-bg"));
+
+  Color border_color = Theme::Get("standardbox-border");
+  if(highlight) border_color = border_color.Lighter(0.2);
+  for(auto& i :  inlets) i->SetBorderColor(border_color);
+  for(auto& o : outlets) o->SetBorderColor(border_color);
+
+  SetNeedsRedrawing();
+}
+
+std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std::weak_ptr<Window> w, std::string id, VertAlignment align, Color c){
+  return std::shared_ptr<IOConn>( new IOConn(w, id, align, c) );
+}
+
+StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
+  : UIWidget(w), id(id_), align(align_), main_color(c), border_color(c){
+  SetMinimalSize(Size2D(20,12));
+};
+
+void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){
+  int x = c.Size().width/2 - 10;
+  int y = 0;
+  if(align == VertAlignment_TOP) y = 0;
+  if(align == VertAlignment_CENTERED) y = c.Size().height/2 - 6;
+  if(align == VertAlignment_BOTTOM) y = c.Size().height - 12;
+  c.SetColor(main_color);
+  c.DrawRect(x,y,20,12);
+  c.SetColor(border_color);
+  if(align != VertAlignment_TOP) c.DrawLine(x,y,x+20,y);
+  c.DrawLine(x,y,x,y+12);
+  c.DrawLine(x+20,y,x+20,y+12);
+  if(align != VertAlignment_BOTTOM) c.DrawLine(x,y+11,x+20,y+11);
+}
+void StandardModuleGUI::IOConn::SetBorderColor(Color c){
+  border_color = c;
   SetNeedsRedrawing();
 }
 

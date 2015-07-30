@@ -49,7 +49,7 @@ arg inbus1, inbus2;
 Out.ar(0,In.ar(inbus1));
 Out.ar(1,In.ar(inbus2));
     </sc>
-    <gui type="standard">
+    <gui type="standard auto">
       <inlet id="inbus1"/>
       <inlet id="inbus2"/>
     </gui>

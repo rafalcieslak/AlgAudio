@@ -43,6 +43,8 @@ void Theme::Init(){
   thememap["standardbox-bg"] = Color(0x3e4f6cff);
   thememap["standardbox-border"] = Color(0x293b53ff);
   thememap["standardbox-caption"] = Color(0x94acccff);
+  thememap["standardbox-inlet"] = Color(0x52607cff);
+  thememap["standardbox-outlet"] = Color(0x52607cff);
 
   thememap["bg-alert"] = Color(0x52607cff);
   thememap["alert-border-none"] = Color(0x52607cff);

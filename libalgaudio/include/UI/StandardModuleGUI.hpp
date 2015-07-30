@@ -21,6 +21,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIWidget.hpp"
 #include "Module.hpp"
 #include "ModuleGUI.hpp"
+#include "UI/UIMarginBox.hpp"
+#include "UIBox.hpp"
 #include "UI/UILabel.hpp"
 
 namespace AlgAudio{
@@ -33,13 +35,40 @@ public:
   void CustomDraw(DrawContext& c) override;
   void CustomResize(Size2D s) override;
   void SetHighlight(bool) override;
+  void OnChildRequestedSizeChanged() override;
+  void OnChildVisibilityChanged() override;
+
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w) : ModuleGUI(w){}
 private:
   void LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ);
   void LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ);
+  void UpdateMinimalSize();
+  void CommonInit();
   bool highlight = false;
   std::shared_ptr<UILabel> caption;
+
+  std::shared_ptr<UIMarginBox> main_margin;
+  std::shared_ptr<UIVBox> main_box;
+  std::shared_ptr<UIHBox> inlets_box;
+  std::shared_ptr<UIHBox> outlets_box;
+
+  class IOConn : public UIWidget{
+  public:
+    std::string id;
+    VertAlignment align;
+    Color main_color;
+    Color border_color;
+    static std::shared_ptr<IOConn> Create(std::weak_ptr<Window> w, std::string id, VertAlignment align, Color c);
+    void CustomDraw(DrawContext& c) override;
+    void SetBorderColor(Color c);
+  private:
+    void Init();
+    IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c);
+  };
+
+  std::vector<std::shared_ptr<IOConn>> inlets;
+  std::vector<std::shared_ptr<IOConn>> outlets;
 };
 
 } // namespace AlgAudio
