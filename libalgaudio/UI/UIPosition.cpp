@@ -56,10 +56,11 @@ void UIPosition::OnChildVisibilityChanged(){
   else SetMinimalSize(Size2D(0,0));
 }
 
-void UIPosition::CustomMousePress(bool down, short b,Point2D p){
-  if(!child) return;
+bool UIPosition::CustomMousePress(bool down, short b,Point2D p){
+  if(!child) return false;
   if(IsInside(p))
-    child->OnMousePress(down,b,p - position);
+    return child->OnMousePress(down,b,p - position);
+  return false;
 }
 
 bool UIPosition::IsInside(Point2D p) const{

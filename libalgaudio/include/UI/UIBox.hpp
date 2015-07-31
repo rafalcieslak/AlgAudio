@@ -38,7 +38,7 @@ public:
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
   void Clear();
   void SetPadding(unsigned int padding);
-  virtual void CustomMousePress(bool down, short b,Point2D) override;
+  virtual bool CustomMousePress(bool down, short b,Point2D) override;
   virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;

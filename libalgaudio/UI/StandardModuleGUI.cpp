@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/StandardModuleGUI.hpp"
 #include "ModuleTemplate.hpp"
+#include <SDL2/SDL.h>
 #include "Theme.hpp"
 
 namespace AlgAudio{
@@ -70,11 +71,17 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   for(auto& i : templ->inlets){
     auto inlet = IOConn::Create(window, i, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
     inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
+    inlet->on_press.SubscribeForever([this, i](bool b){
+      on_inlet_pressed.Happen(i, b);
+    });
     inlets.push_back(inlet);
   }
   for(auto& o : templ->outlets){
     auto outlet = IOConn::Create(window, o, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
     outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
+    outlet->on_press.SubscribeForever([this, o](bool b){
+      on_outlet_pressed.Happen(o, b);
+    });
     outlets.push_back(outlet);
   }
   UpdateMinimalSize();
@@ -157,6 +164,14 @@ Point2D StandardModuleGUI::IOConn::GetRectPos() const{
   if(align == VertAlignment_CENTERED) y = current_size.height/2 - 6;
   if(align == VertAlignment_BOTTOM) y = current_size.height - 12;
   return Point2D(x,y);
+}
+
+bool StandardModuleGUI::IOConn::CustomMousePress(bool down, short b,Point2D pos){
+  if(b == SDL_BUTTON_LEFT && pos.IsInside(GetRectPos(),Size2D(20,12))){
+    on_press.Happen(down);
+    return true;
+  }
+  return false;
 }
 
 void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){

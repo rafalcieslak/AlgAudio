@@ -65,10 +65,11 @@ void UICentered::OnChildVisibilityChanged(){
   SetMinimalSize(current_child_size);
 }
 
-void UICentered::CustomMousePress(bool down, short b,Point2D p){
-  if(!child) return;
+bool UICentered::CustomMousePress(bool down, short b,Point2D p){
+  if(!child) return false;
   if(IsInside(p))
-    child->OnMousePress(down,b,p - current_child_pos);
+    return child->OnMousePress(down,b,p - current_child_pos);
+  return false;
 }
 
 bool UICentered::IsInside(Point2D p) const{

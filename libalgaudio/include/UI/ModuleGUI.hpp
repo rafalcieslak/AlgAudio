@@ -32,6 +32,8 @@ struct GUIBuildException : public Exception{
 // from this class and writing a custom Module::BuildGUI.
 class ModuleGUI : public UIWidget{
 public:
+  Signal<std::string, bool> on_inlet_pressed;
+  Signal<std::string, bool> on_outlet_pressed;
   std::weak_ptr<Module> module;
   Point2D position;
   virtual void SetHighlight(bool) = 0;

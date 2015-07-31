@@ -37,7 +37,7 @@ public:
   void SetHighlight(bool) override;
   void OnChildRequestedSizeChanged() override;
   void OnChildVisibilityChanged() override;
-  virtual void CustomMousePress(bool down, short b,Point2D pos) override {main_margin->OnMousePress(down,b,pos);}
+  virtual bool CustomMousePress(bool down, short b,Point2D pos) override {return main_margin->OnMousePress(down,b,pos);}
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override {main_margin->OnMouseMotion(pos1,pos2);}
   virtual void CustomMouseEnter(Point2D pos) override {main_margin->OnMouseEnter(pos);}
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
@@ -63,12 +63,14 @@ private:
     VertAlignment align;
     Color main_color;
     Color border_color;
+    Signal<bool> on_press;
     // This flag is set iff the mouse pointer is not only pointing at this
     // widget, but also is inside the inlet/outlet rect.
     bool inside = false;
     static std::shared_ptr<IOConn> Create(std::weak_ptr<Window> w, std::string id, VertAlignment align, Color c);
     void CustomDraw(DrawContext& c) override;
     void SetBorderColor(Color c);
+    virtual bool CustomMousePress(bool down, short b,Point2D pos) override;
   private:
     void Init();
     IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c);

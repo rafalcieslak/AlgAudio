@@ -31,7 +31,7 @@ public:
   static std::shared_ptr<CanvasView> CreateEmpty(std::shared_ptr<Window> parent);
   virtual void CustomDraw(DrawContext& c);
   LateReturn<> AddModule(std::string id, Point2D position);
-  virtual void CustomMousePress(bool,short,Point2D);
+  virtual bool CustomMousePress(bool,short,Point2D);
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
   virtual void CustomMouseMotion(Point2D,Point2D);
@@ -41,13 +41,30 @@ private:
   std::shared_ptr<Canvas> canvas;
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
   int InWhich(Point2D);
-  bool pressed = false;
-  Point2D press_position;
-  int press_id = -1;
-  Point2D press_offset, drag_offset;
+  bool mouse_down = false;
+  enum MouseDownMode{
+    ModeNone,
+    ModeModuleBody,
+    ModeCaptured,
+    ModeInlet,
+    ModeOutlet,
+  };
+  MouseDownMode mouse_down_mode;
+  std::string mouse_down_inletid, mouse_down_outletid;
+  Point2D mouse_down_position;
+  int mouse_down_id = -1;
+  Point2D mouse_down_offset, drag_offset;
   int selected_id = -1;
   bool drag_in_progress = false;
+  enum DragMode{
+    DragModeMove,
+    DragModeConnectFromInlet,
+    DragModeConnectFromOutlet,
+  };
+  DragMode drag_mode;
   int dragged_id = -1;
+  std::string drag_connection_io_start;
+  void FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id);
   // Use -1 to unselect
   void Select(int id);
 };

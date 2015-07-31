@@ -75,22 +75,75 @@ int CanvasView::InWhich(Point2D p){
   return -1;
 }
 
-void CanvasView::CustomMousePress(bool down,short b,Point2D pos){
+bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
+  int id = InWhich(pos);
+  Point2D offset;
+  if(id >=0 ){
+    offset = pos - module_guis[id]->position;
+  }
   if(down == true && b == SDL_BUTTON_LEFT){
-    pressed = true;
-    press_position = pos;
-    press_id = InWhich(pos);
-    if(press_id >= 0){
-      press_offset = pos - module_guis[press_id]->position;
-    }
-    Select(press_id);
-  }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
-    pressed = false;
-    if(drag_in_progress){
-      drag_in_progress = false;
+    // Mouse button down
+    mouse_down = true;
+    mouse_down_position = pos;
+    mouse_down_id = id;
+    mouse_down_mode = ModeNone;
+    if(id < 0){
+      // Mouse buton down on an empty space
+      if(down == true && b == SDL_BUTTON_LEFT){
+        Select(-1);
+      }
+    }else{
+      // Mouse button down on some module
+      mouse_down_offset = offset;
+      mouse_down_inletid = mouse_down_outletid = "";
+      // This subscription will be deleted just when this scope ends.
+      Subscription temp_sub1 = module_guis[id]-> on_inlet_pressed.Subscribe([this](std::string i, bool ){  mouse_down_inletid = i; });
+      Subscription temp_sub2 = module_guis[id]->on_outlet_pressed.Subscribe([this](std::string o, bool ){ mouse_down_outletid = o; });
+      bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
+      if(!captured) mouse_down_mode = ModeModuleBody;
+      else if( mouse_down_inletid != "") mouse_down_mode =  ModeInlet;
+      else if(mouse_down_outletid != "") mouse_down_mode = ModeOutlet;
+      else mouse_down_mode = ModeCaptured;
+
+      if(mouse_down_mode == ModeModuleBody) Select(id);
     }
   }
+  if(down == false && b == SDL_BUTTON_LEFT){
+    // Mouse button down
+    mouse_down = false;
+
+    if(id >=0 ){
+      // Mouse button released on some module
+
+      // This subscription will be deleted just when this scope ends.
+      std::string outlet, inlet;
+      Subscription temp_sub1 = module_guis[id]-> on_inlet_pressed.Subscribe( [&inlet](std::string i, bool ){  inlet = i; });
+      Subscription temp_sub2 = module_guis[id]->on_outlet_pressed.Subscribe([&outlet](std::string o, bool ){ outlet = o; });
+      bool captured = module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
+
+      if(drag_in_progress){
+        drag_in_progress = false;
+        if(drag_mode == DragModeConnectFromInlet && captured && outlet != ""){
+            FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, outlet);
+        }else if(drag_mode == DragModeConnectFromOutlet && captured && inlet != ""){
+            FinalizeConnectingDrag(id, inlet, mouse_down_id, mouse_down_outletid);
+        }
+      }
+
+    }else{
+      // Mouse button released on an empty space
+      if(drag_in_progress){
+        drag_in_progress = false;
+      }
+    }
+  }
+  return true;
 }
+
+void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id){
+  std::cout << "Finalizing drag from " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
+}
+
 void CanvasView::Select(int id){
   if(selected_id != -1){
     module_guis[selected_id]->SetHighlight(false);
@@ -108,7 +161,7 @@ void CanvasView::CustomMouseEnter(Point2D pos){
   }
 }
 void CanvasView::CustomMouseLeave(Point2D pos){
-  if(pressed) pressed = false;
+  if(mouse_down) mouse_down = false;
   if(drag_in_progress) drag_in_progress = false;
   int id = InWhich(pos);
   if(id != -1){
@@ -116,28 +169,43 @@ void CanvasView::CustomMouseLeave(Point2D pos){
   }
 }
 void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
-  if(drag_in_progress){
+  if(drag_in_progress && drag_mode == DragModeMove){
     module_guis[dragged_id]->position = to - drag_offset;
     SetNeedsRedrawing();
-  }else{
-    if(pressed && press_id >=0 && Point2D::Distance(press_position, to) > 5){
-      drag_offset = press_offset;
-      drag_in_progress = true;
-      dragged_id = press_id;
-    }else{
-      // standard motion?
-      int id1 = InWhich(from), id2 = InWhich(to);
-      Point2D offset1, offset2;
-      if(id1 != -1) offset1 = from - module_guis[id1]->position;
-      if(id2 != -1) offset2 = to   - module_guis[id2]->position;
-      if(id1 != id2){
-        if(id1 != -1) module_guis[id1]->OnMouseLeave(offset1);
-        if(id2 != -1) module_guis[id2]->OnMouseEnter(offset2);
-      }else if(id1 == id2 && id1 != -1){
-        module_guis[id1]->OnMouseMotion(offset1,offset2);
-      }
+  }else if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
+    // Draw line
+  }else if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
+    // Draw line
+  }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5){
+    drag_in_progress = true;
+    drag_offset = mouse_down_offset;
+    dragged_id = mouse_down_id;
+    if(mouse_down_mode == ModeModuleBody){
+      drag_mode = DragModeMove;
+    }else if(mouse_down_mode == ModeInlet){
+      drag_mode = DragModeConnectFromInlet;
+      drag_connection_io_start = mouse_down_inletid;
+      std::cout << "Starting connect-drag from inlet " << drag_connection_io_start << std::endl;
+    }else if(mouse_down_mode == ModeOutlet){
+      drag_mode = DragModeConnectFromOutlet;
+      drag_connection_io_start = mouse_down_outletid;
+      std::cout << "Starting connect-drag from outlet " << drag_connection_io_start << std::endl;
     }
   }
+
+  // standard motion?
+  int id1 = InWhich(from), id2 = InWhich(to);
+  Point2D offset1, offset2;
+  if(id1 != -1) offset1 = from - module_guis[id1]->position;
+  if(id2 != -1) offset2 = to   - module_guis[id2]->position;
+  if(id1 != id2){
+    if(id1 != -1) module_guis[id1]->OnMouseLeave(offset1);
+    if(id2 != -1) module_guis[id2]->OnMouseEnter(offset2);
+  }else if(id1 == id2 && id1 != -1){
+    module_guis[id1]->OnMouseMotion(offset1,offset2);
+  }
+
+
 }
 
 void CanvasView::RemoveSelected(){

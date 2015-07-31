@@ -21,16 +21,20 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-void UIMouseEventsBase::OnMousePress(bool down, short b,Point2D p){
-  CustomMousePress(down,b,p);
+bool UIMouseEventsBase::OnMousePress(bool down, short b,Point2D p){
+  bool result = CustomMousePress(down,b,p);
+  if(result) return true; // The custom handler captured the event
+  // In other case, execute our own code
   if(down == true && b == SDL_BUTTON_LEFT){
     pressed = true;
-    on_pressed.Happen(true);
+    return on_pressed.Happen(true);
   }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
     pressed = false;
-    on_pressed.Happen(false);
-    on_clicked.Happen();
+    result = on_pressed.Happen(false);
+    if(result) return true;
+    return on_clicked.Happen();
   }
+  return false;
 }
 
 void UIMouseEventsBase::OnMouseEnter(Point2D p){

@@ -70,9 +70,10 @@ std::shared_ptr<UIWidget> UILayered::GetTopChild() const{
   return nullptr;
 }
 
-void UILayered::CustomMousePress(bool down, short b,Point2D p){
+bool UILayered::CustomMousePress(bool down, short b,Point2D p){
   auto w = GetTopChild();
-  if(w) w->OnMousePress(down, b, p);
+  if(w) return w->OnMousePress(down, b, p);
+  return false;
 }
 
 void UILayered::CustomMouseEnter(Point2D p){

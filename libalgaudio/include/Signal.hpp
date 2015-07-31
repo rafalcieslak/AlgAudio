@@ -150,7 +150,8 @@ public:
     void SubscribeForever( C* class_ptr, void (C::*member_ptr)(Types...)) { subscribers_forever.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) ); }
     template<class C>
     void SubscribeOnce( C* class_ptr, void (C::*member_ptr)(Types...)) { subscribers_once.push_back( std::bind(member_ptr,class_ptr,std::placeholders::_1) ); }
-    void Happen(Types... t) {
+    // Returns true, if anyone was called.
+    bool Happen(Types... t) {
         // First, gather the list of all stuff to call. It has to be a temporary
         // local list, because the calees may modify some of the lists by
         // inserting new subscriptions.
@@ -163,6 +164,7 @@ public:
         subscribers_once.clear();
         // Call everybody.
         for(auto f : list_to_call) f(t...);
+        return !list_to_call.empty();
     }
     friend class Subscription;
     unsigned int Count(){return subscribers_forever.size() + subscribers_once.size() + subscribers_with_id.size();}
