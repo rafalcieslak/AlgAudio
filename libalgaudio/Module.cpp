@@ -17,6 +17,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Module.hpp"
+#include <algorithm>
 #include "ModuleTemplate.hpp"
 #include "SCLang.hpp"
 #include "UI/StandardModuleGUI.hpp"
@@ -51,13 +52,28 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
   return r;
 }
 
+void Module::Outlet::ConnectToInlet(std::shared_ptr<Module::Inlet> i){
+  buses.push_back(i->bus);
+  // TODO: Set a list of parrams, linking the output to ALL buses
+  mod.SetParram(id, i->bus->GetID());
+}
+void Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
+  auto b = i->bus;
+  buses.remove_if([b](std::weak_ptr<Bus> p){
+    std::shared_ptr<Bus> a = p.lock();
+    if(a) return a == b;
+    return false;
+  });
+  // TODO: Set a list of parrams, linking the output to ALL buses
+}
+
+
 Module::~Module() {
   if(enabled_by_factory) std::cout << "WARNING: a module " << templ->GetFullID() << " reference is lost, but it was not destroyed by the factory." << std::endl;
 };
 
 void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::Inlet> i){
-  o->bus = i->bus;
-  o->mod.SetParram(o->id, i->bus->GetID());
+  o->ConnectToInlet(i);
 }
 
 LateReturn<> Module::CreateIOFromTemplate(){
@@ -104,6 +120,17 @@ std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_windo
   gui->module = shared_from_this();
   modulegui = gui;
   return gui;
+}
+
+std::shared_ptr<Module::Inlet> Module::GetInletByID(std::string id) const{
+  for(auto& i : inlets)
+    if(i->id == id) return i;
+  return nullptr;
+}
+std::shared_ptr<Module::Outlet> Module::GetOutletByID(std::string id) const{
+  for(auto& o : outlets)
+    if(o->id == id) return o;
+  return nullptr;
 }
 
 } // namespace AlgAudio

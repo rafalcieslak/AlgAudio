@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <memory>
-#include <vector>
+#include <set>
 #include "Module.hpp"
 #include "Utilities.hpp"
 
@@ -32,9 +32,25 @@ public:
   LateReturn<std::shared_ptr<Module>> CreateModule(std::string id);
   void RemoveModule(std::shared_ptr<Module>);
   static std::shared_ptr<Canvas> CreateEmpty();
+
+  // This structure is simply a pair of module pointer and inlet/outlet id.
+  // It's simpler to use them then just a reference to the inlet/outlet,
+  // because quite often we'll want to search for connections by module.
+  struct IOID{
+    std::shared_ptr<Module> module;
+    std::string iolet;
+    bool operator<(const IOID& other) const {return (module==other.module)?(iolet<other.iolet):(module<other.module);}
+  };
+  std::shared_ptr<Module::Inlet >  GetInletByIOID(IOID) const;
+  std::shared_ptr<Module::Outlet> GetOutletByIOID(IOID) const;
+  void RemoveAllConnectionsFrom(std::shared_ptr<Module>);
+  void RemoveAllConnectionsTo(std::shared_ptr<Module>);
+  void Connect(IOID from, IOID to);
+  void Disconnect(IOID from, IOID to);
 private:
   Canvas();
-  std::vector<std::shared_ptr<Module>> modules;
+  std::map<IOID, std::list<IOID>> connections;
+  std::set<std::shared_ptr<Module>> modules;
 };
 
 } // namespace AlgAudio

@@ -33,7 +33,7 @@ std::shared_ptr<Canvas> Canvas::CreateEmpty(){
 LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
   Relay<std::shared_ptr<Module>> r;
   ModuleFactory::CreateNewInstance(id).Then([this,r](std::shared_ptr<Module> m){
-    modules.emplace_back(m);
+    modules.emplace(m);
     m->canvas = shared_from_this();
     r.Return(m);
   });
@@ -42,8 +42,40 @@ LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
 
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
   if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
-  modules.erase(std::remove(modules.begin(), modules.end(), m), modules.end());
+  modules.erase(m);
   ModuleFactory::DestroyInstance(m);
+}
+
+std::shared_ptr<Module::Inlet>  Canvas::GetInletByIOID(IOID i) const{
+  return i.module->GetInletByID(i.iolet);
+}
+std::shared_ptr<Module::Outlet>  Canvas::GetOutletByIOID(IOID i) const{
+  return i.module->GetOutletByID(i.iolet);
+}
+
+void Canvas::Connect(IOID from, IOID to){
+  std::shared_ptr<Module::Outlet> outlet = GetOutletByIOID(from);
+  std::shared_ptr<Module::Inlet >  inlet = GetInletByIOID (to);
+  if(!(inlet) || !(outlet)){
+    std::cout << "WARNING: Invalid connection between unexisting inlet/outlet." << std::endl;
+    return;
+  }
+
+  // TODO: check if creating connection does not create a loop!
+
+  std::cout << "Connecting" << std::endl;
+  outlet->ConnectToInlet(inlet);
+
+  auto it = connections.find(from);
+  if(it == connections.end()){
+    // First connection from this inlet
+    std::list<IOID> tmp;
+    tmp.push_back(to);
+    connections[from] = tmp;
+  }else{
+    it->second.push_back(to);
+  }
+
 }
 
 Canvas::~Canvas(){

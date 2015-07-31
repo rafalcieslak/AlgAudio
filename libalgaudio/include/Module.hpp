@@ -72,13 +72,17 @@ public:
   // and when it's destructed witout havning been destroyed by the factory.
   bool enabled_by_factory = false;
 
+  class Inlet; // Forward decl
+
   // TODO: Common base class
   class Outlet{
   public:
     std::string id;
     Module& mod;
-    // The outlet is not the owner of a bus.
-    std::weak_ptr<Bus> bus;
+    // The outlet is not the owner of the buses.
+    std::list<std::weak_ptr<Bus>> buses;
+    void ConnectToInlet(std::shared_ptr<Inlet> i);
+    void DetachFromInlet(std::shared_ptr<Inlet> i);
     static std::shared_ptr<Outlet> Create(std::string id, std::shared_ptr<Module> mod);
     ~Outlet(){
       std::cout << "Outlet freed" << std::endl;
@@ -127,6 +131,9 @@ public:
   LateReturn<> CreateIOFromTemplate();
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
+
+  std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
+  std::shared_ptr<Outlet> GetOutletByID(std::string id) const;
 
   std::weak_ptr<Canvas> canvas;
 private:

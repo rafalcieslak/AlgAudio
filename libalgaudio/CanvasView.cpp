@@ -142,6 +142,13 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
 
 void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id){
   std::cout << "Finalizing drag from " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
+  std::shared_ptr<Module> from = module_guis[outlet_module_id]->module.lock();
+  std::shared_ptr<Module> to   =  module_guis[inlet_module_id]->module.lock();
+  if(!from || !to){
+    window.lock()->ShowErrorAlert("Failed to create connection, one of the corresponding modules does not exist." , "Cancel");
+    return;
+  }
+  canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
 }
 
 void CanvasView::Select(int id){
