@@ -27,6 +27,7 @@ public:
   Signal<> on_clicked;
   Signal<bool> on_pointed;
   Signal<bool> on_pressed;
+  Signal<Point2D> on_motion;
   void OnMousePress(bool,short,Point2D);
   void OnMouseEnter(Point2D);
   void OnMouseLeave(Point2D);

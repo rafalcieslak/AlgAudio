@@ -101,13 +101,21 @@ void CanvasView::Select(int id){
   }
 }
 
-void CanvasView::CustomMouseEnter(Point2D){
+void CanvasView::CustomMouseEnter(Point2D pos){
+  int id = InWhich(pos);
+  if(id != -1){
+    module_guis[id]->OnMouseEnter(pos);
+  }
 }
-void CanvasView::CustomMouseLeave(Point2D){
+void CanvasView::CustomMouseLeave(Point2D pos){
   if(pressed) pressed = false;
   if(drag_in_progress) drag_in_progress = false;
+  int id = InWhich(pos);
+  if(id != -1){
+    module_guis[id]->OnMouseLeave(pos);
+  }
 }
-void CanvasView::CustomMouseMotion(Point2D,Point2D to){
+void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
   if(drag_in_progress){
     module_guis[dragged_id]->position = to - drag_offset;
     SetNeedsRedrawing();
@@ -116,6 +124,18 @@ void CanvasView::CustomMouseMotion(Point2D,Point2D to){
       drag_offset = press_offset;
       drag_in_progress = true;
       dragged_id = press_id;
+    }else{
+      // standard motion?
+      int id1 = InWhich(from), id2 = InWhich(to);
+      Point2D offset1, offset2;
+      if(id1 != -1) offset1 = from - module_guis[id1]->position;
+      if(id2 != -1) offset2 = to   - module_guis[id2]->position;
+      if(id1 != id2){
+        if(id1 != -1) module_guis[id1]->OnMouseLeave(offset1);
+        if(id2 != -1) module_guis[id2]->OnMouseEnter(offset2);
+      }else if(id1 == id2 && id1 != -1){
+        module_guis[id1]->OnMouseMotion(offset1,offset2);
+      }
     }
   }
 }

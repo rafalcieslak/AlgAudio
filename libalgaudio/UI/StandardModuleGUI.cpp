@@ -138,15 +138,32 @@ std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std
 StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
   : UIWidget(w), id(id_), align(align_), main_color(c), border_color(c){
   SetMinimalSize(Size2D(20,12));
+  on_pointed.SubscribeForever([this](bool){
+    SetNeedsRedrawing();
+  });
+  on_motion.SubscribeForever([this](Point2D pos){
+    bool new_inside = pos.IsInside(GetRectPos(),Size2D(20,12));
+    if(inside != new_inside){
+      inside = new_inside;
+      SetNeedsRedrawing();
+    }
+  });
 };
 
-void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){
-  int x = c.Size().width/2 - 10;
+Point2D StandardModuleGUI::IOConn::GetRectPos() const{
+  int x = current_size.width/2 - 10;
   int y = 0;
   if(align == VertAlignment_TOP) y = 0;
-  if(align == VertAlignment_CENTERED) y = c.Size().height/2 - 6;
-  if(align == VertAlignment_BOTTOM) y = c.Size().height - 12;
-  c.SetColor(main_color);
+  if(align == VertAlignment_CENTERED) y = current_size.height/2 - 6;
+  if(align == VertAlignment_BOTTOM) y = current_size.height - 12;
+  return Point2D(x,y);
+}
+
+void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){
+  Point2D p = GetRectPos();
+  const int x = p.x, y = p.y;
+  if(pointed && inside) c.SetColor(main_color.Lighter(0.2));
+  else c.SetColor(main_color);
   c.DrawRect(x,y,20,12);
   c.SetColor(border_color);
   if(align != VertAlignment_TOP) c.DrawLine(x,y,x+20,y);

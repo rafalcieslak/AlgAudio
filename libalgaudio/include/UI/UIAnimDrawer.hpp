@@ -48,7 +48,7 @@ private:
   void UpdateRequestedSize();
 
   Direction direction;
-  float phase;
+  float phase = 0.0;
   // 0 = stationary, 1 - showing, -1 - hiding
   int state = 0;
   float time_to_finish;

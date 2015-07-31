@@ -80,7 +80,7 @@ int main(int argc, char *argv[]){
     SDLMain::Loop();
 
     ModuleFactory::DestroyInstance(console_module);
-    
+
     SCLang::Stop();
     // SDL seems to have problems when the destroy functions are called from
     // the DLL destroy call. Thus, we explicitly free all our window pointers
