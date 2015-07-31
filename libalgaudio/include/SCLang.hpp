@@ -62,6 +62,7 @@ public:
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
   static void SendOSC(const std::string& path, std::string tag, ...);
+  static void SendOSCCustom(const std::string& path, const lo::Message& m);
   static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path);
   static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path, std::string tag, ...);
   template <typename... Q, typename... Rest>

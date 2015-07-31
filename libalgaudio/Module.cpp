@@ -54,8 +54,7 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
 
 void Module::Outlet::ConnectToInlet(std::shared_ptr<Module::Inlet> i){
   buses.push_back(i->bus);
-  // TODO: Set a list of parrams, linking the output to ALL buses
-  mod.SetParram(id, i->bus->GetID());
+  SendConnections();
 }
 void Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
   auto b = i->bus;
@@ -64,7 +63,12 @@ void Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
     if(a) return a == b;
     return false;
   });
-  // TODO: Set a list of parrams, linking the output to ALL buses
+  SendConnections();
+}
+void Module::Outlet::SendConnections(){
+  std::list<int> ids;
+  for(auto& b : buses) ids.push_back(b.lock()->GetID());
+  mod.SetParram(id, ids);
 }
 
 
@@ -97,6 +101,13 @@ LateReturn<> Module::CreateIOFromTemplate(){
 
 void Module::SetParram(std::string name, int value){
   SCLang::SendOSC("/algaudioSC/setparram", "isi", sc_id, name.c_str(), value);
+}
+void Module::SetParram(std::string name, std::list<int> values){
+  lo::Message m;
+  m.add_int32(sc_id);
+  m.add_string(name);
+  for(int i : values) m.add_int32(i);
+  SCLang::SendOSCCustom("/algaudioSC/setparramlist", m);
 }
 void Module::SetParram(std::string name, double value){
   SCLang::SendOSC("/algaudioSC/setparram", "isd", sc_id, name.c_str(), value);

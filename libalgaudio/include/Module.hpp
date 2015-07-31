@@ -88,6 +88,7 @@ public:
       std::cout << "Outlet freed" << std::endl;
     }
   private:
+    void SendConnections();
     Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {
       mod.SetParram(id, 999999999);
     }
@@ -104,6 +105,7 @@ public:
   };
   void SetParram(std::string name, int value);
   void SetParram(std::string name, double value);
+  void SetParram(std::string name, std::list<int> values);
 
   // TODO: Move these functions to Canvas
   static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);

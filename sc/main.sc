@@ -99,6 +99,22 @@ OSCdef.new( 'setparram', {
 	}, '/algaudioSC/setparram'
 ).postln;
 
+// Args: instance id, parram name, values
+OSCdef.new( 'setparramlist', {
+		arg msg;
+		var list = msg[3..(msg.size-2)];
+		if((msg[1] == -1),{
+			("Not setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to a list, because it's not a valid instance!").postln;
+		});
+		("Setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ list).postln;
+		~minstances[msg[1]].set(
+			msg[2].asString,
+			list
+		);
+	}, '/algaudioSC/setparramlist'
+).postln;
+
+
 // A dummy helper for listing all installed synthdefs
 OSCdef.new( 'listall', {
 		SynthDescLib.global.synthDescs.do { |desc|
