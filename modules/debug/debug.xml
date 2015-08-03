@@ -50,4 +50,23 @@ Out.ar(0,In.ar(in));
     </sc>
     <gui type="standard auto"/>
   </module>
+
+  <module id="fork4" name="Fork   ">
+    <parrams>
+      <inlet id="in"/>
+      <outlet id="outbus1"/>
+      <outlet id="outbus2"/>
+      <outlet id="outbus3"/>
+      <outlet id="outbus4"/>
+    </parrams>
+    <description> A simple fork. </description>
+    <sc>
+arg in, outbus1, outbus2, outbus3, outbus4;
+Out.ar(outbus1, In.ar(in));
+Out.ar(outbus2, In.ar(in));
+Out.ar(outbus3, In.ar(in));
+Out.ar(outbus4, In.ar(in));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
 </collection>

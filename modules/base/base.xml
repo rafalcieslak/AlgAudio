@@ -65,4 +65,29 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
     <gui type="standard auto"/>
   </module>
 
+  <module id="exvco" name="Example VCO">
+    <parrams>
+      <inlet id="in"/>
+      <outlet id="out"/>
+    </parrams>
+    <description> A simple ~440Hz voltage controlled oscillator. </description>
+    <sc>
+arg in, out;
+Out.ar(out, SinOsc.ar((in*50)+440, 0, 1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="exlfo" name="Example LFO">
+    <parrams>
+      <outlet id="out"/>
+    </parrams>
+    <description> A simple low frequency oscillator. </description>
+    <sc>
+arg out;
+Out.ar(out, SinOsc.ar(1, 0, 1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>

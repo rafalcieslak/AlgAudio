@@ -44,6 +44,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       Select(id); // Select the just-added module
       dragged_id = id;
       drag_in_progress = true;
+      drag_mode = DragModeMove;
       drag_offset = (guisize/2).ToPoint();
       SetNeedsRedrawing();
       r.Return();
