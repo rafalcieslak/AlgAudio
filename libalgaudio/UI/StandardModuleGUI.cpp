@@ -74,7 +74,7 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
     inlet->on_press.SubscribeForever([this, i](bool b){
       on_inlet_pressed.Happen(i, b);
     });
-    inlets.push_back(inlet);
+    inlets[i] = inlet;
   }
   for(auto& o : templ->outlets){
     auto outlet = IOConn::Create(window, o, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
@@ -82,7 +82,7 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
     outlet->on_press.SubscribeForever([this, o](bool b){
       on_outlet_pressed.Happen(o, b);
     });
-    outlets.push_back(outlet);
+    outlets[o] = outlet;
   }
   UpdateMinimalSize();
 }
@@ -132,8 +132,8 @@ void StandardModuleGUI::SetHighlight(bool h){
 
   Color border_color = Theme::Get("standardbox-border");
   if(highlight) border_color = border_color.Lighter(0.2);
-  for(auto& i :  inlets) i->SetBorderColor(border_color);
-  for(auto& o : outlets) o->SetBorderColor(border_color);
+  for(auto& i :  inlets) i.second->SetBorderColor(border_color);
+  for(auto& o : outlets) o.second->SetBorderColor(border_color);
 
   SetNeedsRedrawing();
 }
@@ -189,6 +189,32 @@ void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){
 void StandardModuleGUI::IOConn::SetBorderColor(Color c){
   border_color = c;
   SetNeedsRedrawing();
+}
+Point2D StandardModuleGUI::IOConn::GetCenterPos() const{
+  return GetRectPos() + Point2D(20,12)/2;
+}
+
+Point2D StandardModuleGUI::WhereIsInlet(std::string id){
+  auto it = inlets.find(id);
+  if(it == inlets.end()){
+    std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
+    return Point2D(0,0);
+  }
+  return main_margin->GetChildPos()
+       + main_box->GetChildPos(inlets_box)
+       + inlets_box->GetChildPos(it->second)
+       + it->second->GetCenterPos();
+}
+Point2D StandardModuleGUI::WhereIsOutlet(std::string id){
+  auto it = outlets.find(id);
+  if(it == outlets.end()){
+    std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
+    return Point2D(0,0);
+  }
+  return main_margin->GetChildPos()
+       + main_box->GetChildPos(outlets_box)
+       + outlets_box->GetChildPos(it->second)
+       + it->second->GetCenterPos();
 }
 
 }

@@ -66,6 +66,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       // trick which allows to quickly test GUI without starting the SC server.
       // Happen a global error signal instead.
       res->on_init(); // temporary!
+      res->CreateIOFromTemplate(true); // Create fake io
       res->enabled_by_factory = true;
       r.Return(res);
     }else{

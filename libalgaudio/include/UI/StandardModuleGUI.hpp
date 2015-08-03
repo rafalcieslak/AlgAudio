@@ -41,7 +41,8 @@ public:
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override {main_margin->OnMouseMotion(pos1,pos2);}
   virtual void CustomMouseEnter(Point2D pos) override {main_margin->OnMouseEnter(pos);}
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
-
+  virtual Point2D WhereIsInlet(std::string inlet);
+  virtual Point2D WhereIsOutlet(std::string outlet);
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w) : ModuleGUI(w){}
 private:
@@ -71,14 +72,15 @@ private:
     void CustomDraw(DrawContext& c) override;
     void SetBorderColor(Color c);
     virtual bool CustomMousePress(bool down, short b,Point2D pos) override;
+    Point2D GetCenterPos() const;
   private:
     void Init();
     IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c);
     Point2D GetRectPos() const;
   };
 
-  std::vector<std::shared_ptr<IOConn>> inlets;
-  std::vector<std::shared_ptr<IOConn>> outlets;
+  std::map<std::string, std::shared_ptr<IOConn>> inlets;
+  std::map<std::string, std::shared_ptr<IOConn>> outlets;
 };
 
 } // namespace AlgAudio

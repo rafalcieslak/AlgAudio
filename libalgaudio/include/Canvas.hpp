@@ -47,10 +47,11 @@ public:
   void RemoveAllConnectionsTo(std::shared_ptr<Module>);
   void Connect(IOID from, IOID to);
   void Disconnect(IOID from, IOID to);
-private:
-  Canvas();
+  
   std::map<IOID, std::list<IOID>> connections;
   std::set<std::shared_ptr<Module>> modules;
+private:
+  Canvas();
 };
 
 } // namespace AlgAudio

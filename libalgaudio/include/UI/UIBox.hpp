@@ -42,6 +42,7 @@ public:
   virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
+  Point2D GetChildPos(std::shared_ptr<UIWidget>) const;
 private:
   struct PackData{
     std::shared_ptr<UIWidget> child;
@@ -50,15 +51,15 @@ private:
   };
   std::vector<PackData> children;
   unsigned int padding = 0;
-  Size2D GetChildSize(unsigned int n);
+  Size2D GetChildSize(unsigned int n) const;
   void TriggerChildResizes();
   void RecalculateChildSizes(unsigned int available_space);
-  Point2D GetChildLocation(unsigned int n);
-  unsigned int GetTotalSize();
-  unsigned int GetChildMaxContra();
+  Point2D GetChildLocation(unsigned int n) const;
+  unsigned int GetTotalSize() const;
+  unsigned int GetChildMaxContra() const;
   // For given coordinates, this function returns the child number inside which
   // the point is, or -1 if none.
-  int InWhich(Point2D);
+  int InWhich(Point2D) const;
 protected:
   UIBox(std::weak_ptr<Window> parent_window);
   // These functions provide access to width/height from Size2D in an abstract
@@ -75,10 +76,10 @@ protected:
 };
 
 class UIVBox : public UIBox{
-protected:
-  UIVBox(std::weak_ptr<Window> parent_window);
 public:
   static std::shared_ptr<UIVBox> Create(std::weak_ptr<Window> parent_window);
+protected:
+  UIVBox(std::weak_ptr<Window> parent_window);
   // Specify what a vertical direction is
   inline virtual int DirectionalDimension(Size2D s) const override {return s.height;}
   inline virtual int ContradirectionalDimension(Size2D s) const override {return s.width;}
@@ -88,10 +89,10 @@ public:
   inline virtual Point2D DirectionalPoint2D(int direction, int contra) const override {return Point2D(contra, direction);}
 };
 class UIHBox : public UIBox{
-protected:
-  UIHBox(std::weak_ptr<Window> parent_window);
 public:
   static std::shared_ptr<UIHBox> Create(std::weak_ptr<Window> parent_window);
+protected:
+  UIHBox(std::weak_ptr<Window> parent_window);
   // Specify what a horizontal direction is
   inline virtual int DirectionalDimension(Size2D s) const override {return s.width;}
   inline virtual int ContradirectionalDimension(Size2D s) const override {return s.height;}

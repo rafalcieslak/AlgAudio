@@ -38,13 +38,22 @@ LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   });
   return r;
 }
+std::shared_ptr<Bus> Bus::CreateFake(){
+  return std::shared_ptr<Bus>(new Bus(-42));
+}
 
 std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::shared_ptr<Module> mod){
   return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, mod));
 }
 
-LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::shared_ptr<Module> mod){
+LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::shared_ptr<Module> mod, bool fake){
   auto r = Relay<std::shared_ptr<Module::Inlet>>::Create();
+
+  if(fake){
+    r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, Bus::CreateFake())));
+    return r;
+  }
+
   Bus::CreateNew().Then([=](std::shared_ptr<Bus> b)mutable{
     mod->SetParram(id, b->GetID());
     r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, b)));
@@ -80,14 +89,22 @@ void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::
   o->ConnectToInlet(i);
 }
 
-LateReturn<> Module::CreateIOFromTemplate(){
+LateReturn<> Module::CreateIOFromTemplate(bool fake){
   auto r = Relay<>::Create();
   Sync s(templ->inlets.size());
   for(std::string id : templ->inlets){
-    Inlet::Create(id,shared_from_this()).Then([=](std::shared_ptr<Inlet> inlet_ptr){
-      inlets.emplace_back(inlet_ptr);
-      s.Trigger();
-    });
+    if(!fake){
+      Inlet::Create(id,shared_from_this()).Then([=](std::shared_ptr<Inlet> inlet_ptr){
+        inlets.emplace_back(inlet_ptr);
+        s.Trigger();
+      });
+    }else{
+      // Create a fake inlet
+      Inlet::Create(id,shared_from_this(), true).Then([=](std::shared_ptr<Inlet> inlet_ptr){
+        inlets.emplace_back(inlet_ptr);
+        s.Trigger();
+      });
+    }
   }
   // Meanwhile, create outlets. These own no bus, so creation is instant.
   for(std::string id : templ->outlets)

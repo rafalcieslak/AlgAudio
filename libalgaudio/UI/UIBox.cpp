@@ -68,6 +68,14 @@ void UIBox::Clear(){
   SetMinimalSize(Size2D(0,0));
 }
 
+Point2D UIBox::GetChildPos(std::shared_ptr<UIWidget> w) const{
+  for(unsigned int n = 0; n < children.size(); n++)
+    if(children[n].child == w) return GetChildLocation(n);
+  // Child not found:
+  std::cout << "WARNING: Queried position of an unexisting child" << std::endl;
+  return Point2D(0,0);
+}
+
 void UIBox::RecalculateChildSizes(unsigned int available){
   // Begin by removing the space taken up by padding.
   available -= padding*(children.size() - 1);
@@ -111,7 +119,7 @@ void UIBox::RecalculateChildSizes(unsigned int available){
   }
 }
 
-Size2D UIBox::GetChildSize(unsigned int n){
+Size2D UIBox::GetChildSize(unsigned int n) const{
   return DirectionalSize2D(children[n].size, ContradirectionalDimension(current_size));
 }
 
@@ -146,7 +154,7 @@ void UIBox::CustomResize(Size2D newsize){
   // DO NOT set requested size here!
 }
 
-unsigned int UIBox::GetTotalSize(){
+unsigned int UIBox::GetTotalSize() const{
   unsigned int total = 0;
   for(unsigned int n = 0; n < children.size(); n++){
     total += children[n].size;
@@ -155,7 +163,7 @@ unsigned int UIBox::GetTotalSize(){
   return total - padding;
 }
 
-unsigned int UIBox::GetChildMaxContra(){
+unsigned int UIBox::GetChildMaxContra() const{
   unsigned int max = 0;
   for(unsigned int n = 0; n < children.size(); n++){
     unsigned int w = ContradirectionalDimension(children[n].child->GetRequestedSize());
@@ -164,7 +172,7 @@ unsigned int UIBox::GetChildMaxContra(){
   return max;
 }
 
-Point2D UIBox::GetChildLocation(unsigned int m){
+Point2D UIBox::GetChildLocation(unsigned int m) const{
   unsigned int total = 0;
   for(unsigned int n = 0; n < m; n++){
     total += children[n].size;
@@ -173,7 +181,7 @@ Point2D UIBox::GetChildLocation(unsigned int m){
   return DirectionalPoint2D(total, 0);
 }
 
-int UIBox::InWhich(Point2D p){
+int UIBox::InWhich(Point2D p) const{
   int q = DirectionalDimension(p);
   int totaly = 0;
   if(q < totaly) return -1;

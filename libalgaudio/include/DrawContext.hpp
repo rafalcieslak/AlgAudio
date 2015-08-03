@@ -42,7 +42,8 @@ public:
   DrawContext(SDL_Renderer* renderer, int x, int y, int width, int height);
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const Color&);
-  void DrawLine(int x1, int y1, int x2, int y2);
+  /* TODO: depracate */ void DrawLine(int x1, int y1, int x2, int y2);
+void DrawLine(Point2D from, Point2D to);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   // Draws the text texture onto a clear cache. Does not blend anything, this is useful

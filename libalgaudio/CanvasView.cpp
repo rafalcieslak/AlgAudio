@@ -65,6 +65,20 @@ void CanvasView::CustomDraw(DrawContext& c){
     c.Pop();
   }
   // Then draw all the connections...
+  // TODO: Connection ending offsets should be cached. Asking each module gui
+  // about the io position every time when redrawing is not going to be
+  // efficient when there are 100+ modules present.
+  c.SetColor(Theme::Get("canvas-connection"));
+  for(auto it : canvas->connections){
+    Canvas::IOID from = it.first;
+    Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutlet(from.iolet);
+    // For each target of this outlet
+    std::list<Canvas::IOID> to_list = it.second;
+    for(auto to : to_list){
+      Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
+      c.DrawLine(from_pos, to_pos);
+    }
+  }
 }
 
 int CanvasView::InWhich(Point2D p){
@@ -149,6 +163,7 @@ void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_i
     return;
   }
   canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
+  SetNeedsRedrawing();
 }
 
 void CanvasView::Select(int id){

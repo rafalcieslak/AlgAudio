@@ -49,10 +49,7 @@ arg inbus1, inbus2;
 Out.ar(0,In.ar(inbus1));
 Out.ar(1,In.ar(inbus2));
     </sc>
-    <gui type="standard auto">
-      <inlet id="inbus1"/>
-      <inlet id="inbus2"/>
-    </gui>
+    <gui type="standard auto"/>
   </module>
 
 
@@ -65,6 +62,7 @@ Out.ar(1,In.ar(inbus2));
 arg freq=440, amp=1, outbus;
 Out.ar(outbus, SinOsc.ar(freq,0,amp));
     </sc>
+    <gui type="standard auto"/>
   </module>
 
 </collection>

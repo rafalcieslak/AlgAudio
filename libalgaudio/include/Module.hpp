@@ -36,6 +36,7 @@ class Bus{
 public:
   int GetID() const {return id;}
   static LateReturn<std::shared_ptr<Bus>> CreateNew();
+  static std::shared_ptr<Bus> CreateFake();
   ~Bus();
 private:
   Bus(int id);
@@ -95,7 +96,8 @@ public:
   };
   class Inlet{
   public:
-    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, std::shared_ptr<Module> mod);
+    // If fake is set to true, this inlet will have no corresponding bus. Pointless to use, great for debugging.
+    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, std::shared_ptr<Module> mod, bool fake = false);
     std::string id;
     Module& mod;
     // The inlet is the owner of a bus.
@@ -130,7 +132,7 @@ public:
 
   // Creates and allocates Inlets and Outlets for this instance, according to
   // the data in template info.
-  LateReturn<> CreateIOFromTemplate();
+  LateReturn<> CreateIOFromTemplate(bool fake = false);
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
 

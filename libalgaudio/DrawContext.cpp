@@ -34,6 +34,9 @@ DrawContext::DrawContext(SDL_Renderer* r, int x_, int y_, int w, int h) :
 void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
   SDL_RenderDrawLine(renderer, x+x1, y+y1, x+x2, y+y2);
 }
+void DrawContext::DrawLine(Point2D from, Point2D to){
+  SDL_RenderDrawLine(renderer, x+from.x, y+from.y, x+to.x, y+to.y);
+}
 
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
