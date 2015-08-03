@@ -51,7 +51,7 @@ private:
   };
   MouseDownMode mouse_down_mode;
   std::string mouse_down_inletid, mouse_down_outletid;
-  Point2D mouse_down_position;
+  Point2D mouse_down_position, drag_position;
   int mouse_down_id = -1;
   Point2D mouse_down_offset, drag_offset;
   int selected_id = -1;

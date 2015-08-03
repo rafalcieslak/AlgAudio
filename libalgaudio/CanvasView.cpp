@@ -79,6 +79,14 @@ void CanvasView::CustomDraw(DrawContext& c){
       c.DrawLine(from_pos, to_pos);
     }
   }
+  // Then draw the currently dragged line...
+  if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
+    Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
+    c.DrawLine(p, drag_position);
+  }else  if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
+    Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
+    c.DrawLine(p, drag_position);
+  }
 }
 
 int CanvasView::InWhich(Point2D p){
@@ -148,6 +156,8 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       // Mouse button released on an empty space
       if(drag_in_progress){
         drag_in_progress = false;
+        // Redrawing to clear the drag-wire.
+        SetNeedsRedrawing();
       }
     }
   }
@@ -195,13 +205,16 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
     module_guis[dragged_id]->position = to - drag_offset;
     SetNeedsRedrawing();
   }else if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
-    // Draw line
+    drag_position = to;
+    SetNeedsRedrawing();
   }else if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
-    // Draw line
+    drag_position = to;
+    SetNeedsRedrawing();
   }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5){
     drag_in_progress = true;
     drag_offset = mouse_down_offset;
     dragged_id = mouse_down_id;
+    drag_position = to;
     if(mouse_down_mode == ModeModuleBody){
       drag_mode = DragModeMove;
     }else if(mouse_down_mode == ModeInlet){
