@@ -57,9 +57,23 @@ OSCdef.new( 'newinstance', {
 		var id = ~instanceid;
 		~instanceid = ~instanceid + 1;
 		("Creating new \"" ++ name ++ "\" instance " ++ id.asString).postln;
-		~minstances.add( id -> Synth.new(name)); // TODO: default args
+		~minstances.add( id -> Synth.new(name));
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newinstance'
+).postln;
+
+// args: the template name + a list of parrams and values
+// reply value: instance id
+OSCdef.new( 'newinstanceparrams', {
+		arg msg;
+		var name = "aa/" ++ msg[1];
+		var id = ~instanceid;
+		var parrams = msg[2..(msg.size-2)];
+		~instanceid = ~instanceid + 1;
+		("Creating new \"" ++ name ++ "\" instance " ++ id.asString ++ " with " ++ parrams.asString ).postln;
+		~minstances.add( id -> Synth.new(name, parrams));
+		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
+	}, '/algaudioSC/newinstanceparrams'
 ).postln;
 
 // 1 argument: the template id

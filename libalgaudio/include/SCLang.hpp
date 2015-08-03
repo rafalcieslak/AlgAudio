@@ -65,8 +65,11 @@ public:
   static void SendOSCCustom(const std::string& path, const lo::Message& m);
   static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path);
   static LateReturn<lo::Message> SendOSCWithLOReply(const std::string& path, std::string tag, ...);
+  static LateReturn<lo::Message> SendOSCCustomWithLOReply(const std::string& path, const lo::Message& m);
   template <typename... Q, typename... Rest>
   inline static LateReturn<Q...> SendOSCWithReply(const std::string& path, Rest... args);
+  template <typename... Q>
+  inline static LateReturn<Q...> SendOSCCustomWithReply(const std::string& path, const lo::Message& m);
   // The above function cannot be partially speciallised... Thus we need to use another name for the case
   // when Q = {}.
   template <typename... Rest>
@@ -92,6 +95,15 @@ inline LateReturn<Q...> SCLang::SendOSCWithReply(const std::string& path, Rest..
   static_assert(is_nonempty<Q...>::value, "If you wish to use SendOSCWithReply with no return types, use SendOSCWithEmptyReply instead.");
   auto r = Relay<Q...>::Create();
   SendOSCWithLOReply(path,args...).Then([=](lo::Message msg){
+    r.Return( UnpackLOMessage<Q...>(msg,0) );
+  });
+  return r;
+}
+template <typename... Q>
+inline LateReturn<Q...> SCLang::SendOSCCustomWithReply(const std::string& path, const lo::Message &m){
+  static_assert(is_nonempty<Q...>::value, "If you wish to use SendOSCWithReply with no return types, use SendOSCWithEmptyReply instead.");
+  auto r = Relay<Q...>::Create();
+  SendOSCCustomWithLOReply(path,m).Then([=](lo::Message msg){
     r.Return( UnpackLOMessage<Q...>(msg,0) );
   });
   return r;

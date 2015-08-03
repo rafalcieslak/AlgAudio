@@ -119,6 +119,14 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   }, m);
   return r;
 }
+LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path, const lo::Message &m){
+  auto r = Relay<lo::Message>::Create();
+  if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
+  osc->Send(path, [=](lo::Message msg){
+    r.Return(msg);
+  }, m);
+  return r;
+}
 void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 {
   if(!osc) throw SCLangException("Failed to send OSC message to server, OSC not yet ready");

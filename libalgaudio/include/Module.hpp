@@ -90,9 +90,7 @@ public:
     }
   private:
     void SendConnections();
-    Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {
-      mod.SetParram(id, 999999999);
-    }
+    Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {}
   };
   class Inlet{
   public:
