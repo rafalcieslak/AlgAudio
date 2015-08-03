@@ -40,6 +40,7 @@ public:
     std::shared_ptr<Module> module;
     std::string iolet;
     bool operator<(const IOID& other) const {return (module==other.module)?(iolet<other.iolet):(module<other.module);}
+    bool operator==(const IOID& other) const {return (module==other.module)?(iolet==other.iolet):false;}
   };
   std::shared_ptr<Module::Inlet >  GetInletByIOID(IOID) const;
   std::shared_ptr<Module::Outlet> GetOutletByIOID(IOID) const;
@@ -47,7 +48,7 @@ public:
   void RemoveAllConnectionsTo(std::shared_ptr<Module>);
   void Connect(IOID from, IOID to);
   void Disconnect(IOID from, IOID to);
-  
+
   std::map<IOID, std::list<IOID>> connections;
   std::set<std::shared_ptr<Module>> modules;
 private:

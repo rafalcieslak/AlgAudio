@@ -73,7 +73,7 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
     <description> A simple ~440Hz voltage controlled oscillator. </description>
     <sc>
 arg in, out;
-Out.ar(out, SinOsc.ar((in*50)+440, 0, 1));
+Out.ar(out, SinOsc.ar((In.ar(in)*50.0)+300.0, 0, 1));
     </sc>
     <gui type="standard auto"/>
   </module>

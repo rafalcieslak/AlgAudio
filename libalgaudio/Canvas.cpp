@@ -42,6 +42,28 @@ LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
 
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
   if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
+  // First, remove all connections that start at this module.
+  for(std::string &outid : m->templ->outlets){
+    auto it = connections.find(IOID{m, outid});
+    if(it != connections.end()){
+      GetOutletByIOID(IOID{m, outid})->DetachFromAll();
+      connections.erase(it);
+    }
+  }
+  // Next, erase all connections that end at this module.
+  for(std::string &inid : m->templ->inlets){
+    for(auto& it : connections){
+      IOID from = it.first;
+      auto from_outlet = GetOutletByIOID(from);
+      std::list<IOID>& tolist = it.second;
+      for(IOID &to : tolist)
+        if(to.iolet == inid)
+          from_outlet->DetachFromInlet(GetInletByIOID(to));
+      tolist.remove(IOID{m,inid});
+    }
+  }
+
+  // Then, erase the module and destroy it via ModuleFactory.
   modules.erase(m);
   ModuleFactory::DestroyInstance(m);
 }

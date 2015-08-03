@@ -74,9 +74,14 @@ void Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
   });
   SendConnections();
 }
+void Module::Outlet::DetachFromAll(){
+  buses.clear();
+  SendConnections();
+}
 void Module::Outlet::SendConnections(){
   std::list<int> ids;
   for(auto& b : buses) ids.push_back(b.lock()->GetID());
+  if(ids.size() == 0) ids.push_back(99999999);
   mod.SetParram(id, ids);
 }
 

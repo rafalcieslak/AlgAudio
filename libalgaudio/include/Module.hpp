@@ -84,6 +84,7 @@ public:
     std::list<std::weak_ptr<Bus>> buses;
     void ConnectToInlet(std::shared_ptr<Inlet> i);
     void DetachFromInlet(std::shared_ptr<Inlet> i);
+    void DetachFromAll();
     static std::shared_ptr<Outlet> Create(std::string id, std::shared_ptr<Module> mod);
     ~Outlet(){
       std::cout << "Outlet freed" << std::endl;
