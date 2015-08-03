@@ -25,10 +25,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-DrawContext::DrawContext(SDL_Renderer* r, int x_, int y_, int w, int h) :
-  width(w), height(h), x(x_), y(y_), renderer(r)
+DrawContext::DrawContext(SDL_Renderer* r, SDL_GLContext* c, int x_, int y_, int w, int h) :
+  width(w), height(h), x(x_), y(y_), renderer(r), context(c)
 {
-    UpdateClipRect();
+
+  UpdateClipRect();
 }
 
 void DrawContext::DrawLine(int x1, int y1, int x2, int y2){

@@ -79,7 +79,7 @@ std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,Fon
   // Prepare the result texture
   auto res = std::make_shared<SDLTextTexture>(w,Size2D(maxw,totalh));
   // Create a helper drawcontext
-  DrawContext dc(parent_window ->GetRenderer(), 0,0,maxw,totalh);
+  DrawContext dc(parent_window ->GetRenderer(), nullptr, 0,0,maxw,totalh);
   // We'll be drawing onto the result texture
   dc.Push(res,maxw,totalh);
   int currenty = 0;

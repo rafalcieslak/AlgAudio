@@ -28,6 +28,7 @@ struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Color;
 struct SDL_Rect;
+typedef void* SDL_GLContext;
 
 namespace AlgAudio{
 
@@ -39,7 +40,7 @@ class SDLTextTexture;
 class DrawContext{
 public:
   DrawContext() {};
-  DrawContext(SDL_Renderer* renderer, int x, int y, int width, int height);
+  DrawContext(SDL_Renderer* renderer, SDL_GLContext* cont, int x, int y, int width, int height);
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const Color&);
   /* TODO: depracate */ void DrawLine(int x1, int y1, int x2, int y2);
@@ -62,6 +63,7 @@ private:
   int width, height;
   int x,y;
   SDL_Renderer* renderer;
+  SDL_GLContext* context;
 
   std::shared_ptr<SDLTexture> current_target = nullptr;
   struct DCLevel{

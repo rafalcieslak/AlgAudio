@@ -19,6 +19,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLHandle.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
 #include <iostream>
 
 namespace AlgAudio{
@@ -35,6 +37,8 @@ SDLHandle::SDLHandle(){
       throw SDLException("SDL_Init failed");
     if(SDL_VideoInit(NULL) != 0)
       throw SDLException("SDL_VideoInit failed");
+    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
+    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,16);
     if(TTF_Init() != 0 )
       throw SDLException("TTF_Init failed");
   }

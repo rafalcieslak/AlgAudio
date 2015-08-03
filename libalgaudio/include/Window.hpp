@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <memory>
+#include <SDL2/SDL.h>
 #include "SDLHandle.hpp"
 #include "Signal.hpp"
 #include "Theme.hpp"
@@ -81,6 +82,7 @@ private:
   unsigned int id;
   SDL_Window* window;
   SDL_Renderer* renderer;
+  SDL_GLContext context;
 
   Point2D prev_motion = Point2D(-1,-1);
   bool mouse_just_entered = false;
