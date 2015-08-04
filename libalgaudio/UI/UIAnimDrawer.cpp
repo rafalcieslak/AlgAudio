@@ -92,12 +92,12 @@ void UIAnimDrawer::StartHide(float t){
   anim = SDLMain::on_before_frame.Subscribe(this, &UIAnimDrawer::Step);
 }
 void UIAnimDrawer::Step(float delta){
-  std::cout << "Step! " << delta << std::endl;
+  //std::cout << "Step! " << delta << std::endl;
   if(state == 0) std::cout << "Warning! Step should be never called with state = 0." << std::endl;
   float phasedelta = delta/time_to_finish;
   //std::cout << "phasedelta! " << phasedelta << std::endl;
   phase += phasedelta*state;
-  std::cout << "phase! " << phase << std::endl;
+  //std::cout << "phase! " << phase << std::endl;
   if(state == 1 && phase > 0.999){
     state = 0;
     phase = 1.0;

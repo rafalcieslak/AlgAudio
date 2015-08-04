@@ -115,7 +115,7 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
   for(std::string id : templ->outlets)
     outlets.emplace_back(Outlet::Create(id,shared_from_this()));
   s.WhenAll([=](){
-    std::cout << "All IO READY!" << std::endl;
+    //std::cout << "All IO READY!" << std::endl;
     r.Return();
   });
   return r;
