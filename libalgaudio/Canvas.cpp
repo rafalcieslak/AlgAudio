@@ -54,15 +54,21 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
     }
   }
   // Next, erase all connections that end at this module.
-  for(std::string &inid : m->templ->inlets){
-    for(auto& it : connections){
-      IOID from = it.first;
+  for(const std::string &inid : m->templ->inlets){
+    for(auto it = connections.begin(); it != connections.end(); /*--*/){
+      IOID from = it->first;
       auto from_outlet = GetOutletByIOID(from);
-      std::list<IOID>& tolist = it.second;
+      std::list<IOID>& tolist = it->second;
       for(IOID &to : tolist)
         if(to.iolet == inid)
           from_outlet->DetachFromInlet(GetInletByIOID(to));
       tolist.remove(IOID{m,inid});
+      if(tolist.empty()){
+        // That was the last connection from that outlet.
+        connections.erase(it++);
+      }else{
+        it++;
+      }
     }
   }
 
