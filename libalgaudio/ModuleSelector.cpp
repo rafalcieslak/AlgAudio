@@ -53,7 +53,7 @@ void ModuleSelector::init(){
   lvl2_box->Insert(lvl2_separator, PackMode::WIDE);
   description_box = UIMarginBox::Create(window,20,0,0,20);
   description_box->SetVisible(false);
-  description_label = UILabel::Create(window,"Eventually, this label will contain useful text\nabout pointed module, including the description.\n\nThis is currently just a placeholder.");
+  description_label = UILabel::Create(window,"To add a new module, select a collection from the list on the left.\nThen click a module name to add it.\n\nPoint a module to see its description.");
   description_label->SetAlignment(HorizAlignment_LEFT, VertAlignment_TOP);
   description_box->Insert(description_label);
   Insert(description_box, PackMode::WIDE);

@@ -38,8 +38,8 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 
 void LaunchConfigWindow::init(){
   marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
-  startbutton = UIButton::Create(shared_from_this(),"Start SCLang");
-  testbutton = UIButton::Create(shared_from_this(),"Test button");
+  startbutton = UIButton::Create(shared_from_this(),"Start AlgAudio");
+  //testbutton = UIButton::Create(shared_from_this(),"Test button");
   quitbutton = UIButton::Create(shared_from_this(),"Quit App");
   titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
   configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
@@ -61,7 +61,7 @@ void LaunchConfigWindow::init(){
   mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
   mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
   buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
-  buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
+  //buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
   buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
 
   startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
@@ -84,10 +84,12 @@ void LaunchConfigWindow::init(){
     progressbar->SetAmount(n/10.0);
     statustext->SetText(msg);
   });
+  /*
   subscriptions += testbutton->on_clicked.Subscribe([this](){
     std::cout << "COMPLETE" << std::endl;
     on_complete.Happen();
   });
+  */
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });

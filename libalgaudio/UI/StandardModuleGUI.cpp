@@ -144,7 +144,7 @@ std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std
 
 StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
   : UIWidget(w), id(id_), align(align_), main_color(c), border_color(c){
-  SetMinimalSize(Size2D(20,12));
+  SetMinimalSize(Size2D(22,12));
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
