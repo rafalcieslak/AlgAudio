@@ -19,23 +19,33 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "DrawContext.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <GL/gl.h>
+#include <GL/glext.h>
 #include "SDLTexture.hpp"
 #include "Color.hpp"
 #include "SDLFix/SDLFix.hpp"
 
+#undef DrawText
+
 namespace AlgAudio{
 
-DrawContext::DrawContext(SDL_Renderer* r, SDL_GLContext* c, int x_, int y_, int w, int h) :
-  width(w), height(h), x(x_), y(y_), renderer(r), context(c)
+DrawContext::DrawContext(SDL_Window* win, SDL_Renderer* r, SDL_GLContext c, int x_, int y_, int w, int h) :
+  width(w), height(h), x(x_), y(y_), window(win), renderer(r), context(c)
 {
 
   UpdateClipRect();
 }
-
-void DrawContext::DrawLine(int x1, int y1, int x2, int y2){
-  SDL_RenderDrawLine(renderer, x+x1, y+y1, x+x2, y+y2);
-}
-void DrawContext::DrawLine(Point2D from, Point2D to){
+void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
+  //std::cout << "Making current " << context << std::endl;
+  //SDL_GL_MakeCurrent(window, context);
+  if(smooth){
+    std::cout << "SMOOTH" << std::endl;
+    glEnable( GL_LINE_SMOOTH );
+    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+  }else{
+    glDisable( GL_LINE_SMOOTH );
+    glHint( GL_LINE_SMOOTH_HINT, GL_FASTEST );
+  }
   SDL_RenderDrawLine(renderer, x+from.x, y+from.y, x+to.x, y+to.y);
 }
 

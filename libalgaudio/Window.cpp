@@ -24,23 +24,16 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLMain.hpp"
 #include "SDLFix/SDLFix.hpp"
 
-  #include <GL/gl.h>
-  #include <GL/glext.h>
-
 namespace AlgAudio{
 
 Window::Window(std::string t, int w, int h, bool centered) :
   title(t), width(w), height(h)
 {
   //std::cout << "Creating a new window" << std::endl;
-  // TODO: investigate SDL_WINDOW_INPUT_GRABBED
   window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if(!window) throw SDLException("Unable to create a window");
   context = SDL_GL_CreateContext(window);
   renderer = SDL_CreateRenderer(window, SDL_VIDEO_RENDER_OGL, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
-  glEnable( GL_LINE_SMOOTH );
-  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
-  //glEnable (GL_MULTISAMPLE);
   if(!renderer) throw SDLException("Unable to create a renderer");
   SDL_RendererInfo r;
   SDL_GetRendererInfo(renderer,&r);
@@ -71,17 +64,11 @@ void Window::Render(){
   if(!needs_redrawing) return;
 #endif
   Size2D size = GetSize();
-  DrawContext c(renderer, &context, 0, 0, size.width, size.height); // Full window DC
+  DrawContext c(window, renderer, context, 0, 0, size.width, size.height); // Full window DC
   c.SetColor(Theme::Get("bg-main"));
 	SDL_RenderClear(renderer);
   if(child) child->Draw(c);
 	SDL_RenderPresent(renderer);
-/*
-  SDL_GL_MakeCurrent(window,context);
-  glClearColor(100,0,0,1);
-  glClear(GL_COLOR_BUFFER_BIT);
-  SDL_GL_SwapWindow(window);
-*/
   needs_redrawing = false;
 }
 

@@ -67,6 +67,7 @@ public:
   unsigned int GetID() const {return id;}
   Size2D GetSize() const;
   SDL_Renderer* GetRenderer() const {return renderer;}
+  SDL_Window* GetWindow() const {return window;}
 
   // Empty implementation.
   virtual LateReturn<int> ShowSimpleAlert( std::string,std::string,std::string,AlertType,Color,Color)
@@ -82,6 +83,7 @@ private:
   unsigned int id;
   SDL_Window* window;
   SDL_Renderer* renderer;
+  // Note: SDL_GLContext is defined as a typedef for void*, so it's a pointer type.
   SDL_GLContext context;
 
   Point2D prev_motion = Point2D(-1,-1);

@@ -28,6 +28,7 @@ struct SDL_Renderer;
 struct SDL_Texture;
 struct SDL_Color;
 struct SDL_Rect;
+struct SDL_Window;
 typedef void* SDL_GLContext;
 
 namespace AlgAudio{
@@ -40,11 +41,11 @@ class SDLTextTexture;
 class DrawContext{
 public:
   DrawContext() {};
-  DrawContext(SDL_Renderer* renderer, SDL_GLContext* cont, int x, int y, int width, int height);
+  DrawContext(SDL_Window* w, SDL_Renderer* renderer, SDL_GLContext cont, int x, int y, int width, int height);
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const Color&);
-  /* TODO: depracate */ void DrawLine(int x1, int y1, int x2, int y2);
-void DrawLine(Point2D from, Point2D to);
+  void DrawLine(int x1, int y1, int x2, int y2) {DrawLine(Point2D(x1,y1),Point2D(x2,y2));}
+  void DrawLine(Point2D from, Point2D to, bool smooth=false);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   // Draws the text texture onto a clear cache. Does not blend anything, this is useful
@@ -62,8 +63,9 @@ bool HasZeroArea();
 private:
   int width, height;
   int x,y;
+  SDL_Window* window;
   SDL_Renderer* renderer;
-  SDL_GLContext* context;
+  SDL_GLContext context;
 
   std::shared_ptr<SDLTexture> current_target = nullptr;
   struct DCLevel{

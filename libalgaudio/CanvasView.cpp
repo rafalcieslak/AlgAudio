@@ -77,16 +77,16 @@ void CanvasView::CustomDraw(DrawContext& c){
     std::list<Canvas::IOID> to_list = it.second;
     for(auto to : to_list){
       Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
-      c.DrawLine(from_pos, to_pos);
+      c.DrawLine(from_pos, to_pos, true);
     }
   }
   // Then draw the currently dragged line...
   if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
-    c.DrawLine(p, drag_position);
+    c.DrawLine(p, drag_position, true);
   }else  if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
-    c.DrawLine(p, drag_position);
+    c.DrawLine(p, drag_position, true);
   }
 }
 
