@@ -19,6 +19,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include "ModuleFactory.hpp"
 #include <algorithm>
+#include <queue>
+#include <unordered_set>
 
 namespace AlgAudio{
 
@@ -83,7 +85,8 @@ void Canvas::Connect(IOID from, IOID to){
     return;
   }
 
-  // TODO: check if creating connection does not create a loop!
+  if(TestNewConnectionForLoop(from, to))
+    throw LoopingConnectionException("");
 
   std::cout << "Connecting" << std::endl;
   outlet->ConnectToInlet(inlet);
@@ -101,6 +104,58 @@ void Canvas::Connect(IOID from, IOID to){
   }
 
 }
+
+bool Canvas::TestNewConnectionForLoop(IOID from, IOID to){
+  // DFS search starting in TO. If we find FROM, then the new connection would
+  // create a loop. If we don't, then the new connection is okay.
+
+  // Usually the connection graph is VERY sparse, multiple connections to
+  // an inlet are usually rare. Therefore, when traversing the graph, we should
+  // end up visiting only a very small number of vertices (modules). Thus it
+  // might be inefficient to prepare a large bitmask and use it to mark whether
+  // a module was already visited or not, instead we'll use an unordered set
+  // which will gather visited vertices. Access to the set should be O(1) on
+  // average.
+
+  if(to.module == from.module) // Loop of size 0
+    return true;
+
+  std::unordered_set<std::shared_ptr<Module>> visited;
+  std::queue<std::shared_ptr<Module>> frontier;
+
+  frontier.push(to.module);
+
+  while(!frontier.empty()){
+    std::shared_ptr<Module> current = frontier.front(); frontier.pop();
+    // Mark as visited.
+    visited.insert(current);
+    std::list<std::shared_ptr<Module>> next_list = GetConnectedModules(current);
+    // For each module that is connected to current:
+    for(const std::shared_ptr<Module>& next_module : next_list){
+      // If that's the one we are looking for, end the search.
+      if(next_module == from.module) return true;
+      // If already visited, ignore this vertex.
+      if(visited.find(next_module) != visited.end()) continue;
+      // Finally, add the new module to frontier.
+      frontier.push(next_module);
+    }
+  }
+  return false;
+}
+
+std::list<std::shared_ptr<Module>> Canvas::GetConnectedModules(std::shared_ptr<Module> m){
+  std::list<std::shared_ptr<Module>> result;
+  for(const std::string& outletid : m->templ->outlets){
+    // For each outlet, get the list of connections from it
+    auto it = connections.find(IOID{m,outletid});
+    if(it == connections.end()) continue; // No connections from this outlet.
+    for(const IOID& inlet : it->second){
+      result.push_back(inlet.module);
+    }
+  }
+  return result;
+}
+
 
 Canvas::~Canvas(){
   for(auto& m : modules) ModuleFactory::DestroyInstance(m);
