@@ -95,6 +95,8 @@ void Canvas::Connect(IOID from, IOID to){
     tmp.push_back(to);
     connections[from] = tmp;
   }else{
+    // Not the first connectin from this inlet.
+    throw MultipleConnectionsException("");
     it->second.push_back(to);
   }
 

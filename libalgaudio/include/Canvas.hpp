@@ -26,6 +26,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+struct MultipleConnectionsException : public Exception{
+  MultipleConnectionsException(std::string t) : Exception(t) {}
+};
+
 class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   virtual ~Canvas();

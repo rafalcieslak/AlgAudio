@@ -39,7 +39,6 @@ void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
   //std::cout << "Making current " << context << std::endl;
   //SDL_GL_MakeCurrent(window, context);
   if(smooth){
-    std::cout << "SMOOTH" << std::endl;
     glEnable( GL_LINE_SMOOTH );
     glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
   }else{

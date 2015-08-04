@@ -173,7 +173,11 @@ void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_i
     window.lock()->ShowErrorAlert("Failed to create connection, one of the corresponding modules does not exist." , "Cancel");
     return;
   }
-  canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
+  try{
+    canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
+  }catch(MultipleConnectionsException){
+    window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
+  }
   SetNeedsRedrawing();
 }
 
