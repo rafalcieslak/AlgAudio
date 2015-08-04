@@ -17,10 +17,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Canvas.hpp"
-#include "ModuleFactory.hpp"
 #include <algorithm>
 #include <queue>
 #include <unordered_set>
+#include "ModuleFactory.hpp"
+#include "SCLang.hpp"
 
 namespace AlgAudio{
 
@@ -156,7 +157,6 @@ void Canvas::RecalculateOrder(){
     for(const std::shared_ptr<Module>& m : next_list)
       if( --indegrees[m]  == 0) // Decrease the indeg, also it it's zero, then add the module to frontier.
         frontier.push(m);
-
   }
 
   if(ordering.size() != modules.size()){
@@ -166,10 +166,18 @@ void Canvas::RecalculateOrder(){
     throw ConnectionLoopException("");
   }
 
+/*
   // For debugging purposes, demonstrate when the computed odrer is.
   std::cout << "New synth ordering:" << std::endl;
   for(const std::shared_ptr<Module> &m : ordering)
     std::cout << "   \"" << m->templ->name << "\"" << std::endl;
+*/
+
+  // Send the ordering to SC.
+  lo::Message msg;
+  for(const std::shared_ptr<Module> &m : ordering)
+    msg.add_int32(m->sc_id);
+  SCLang::SendOSCCustom("/algaudioSC/ordering", msg);
 
 }
 

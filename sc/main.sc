@@ -128,6 +128,18 @@ OSCdef.new( 'setparramlist', {
 	}, '/algaudioSC/setparramlist'
 ).postln;
 
+// This is the helper method that realizes a synth ordering.
+OSCdef.new( 'ordering', {
+		arg msg;
+		var first = msg[1];
+		var all = msg[1..(msg.size-2)];
+		("Applying ordering: " ++ all.asString).postln;
+		~minstances[first].moveToHead(~minstances[first].group);
+		for(1,msg.size-3,{ arg i;
+			~minstances[all[i]].moveAfter(~minstances[all[i-1]]);
+		});
+	}, '/algaudioSC/ordering'
+).postln;
 
 // A dummy helper for listing all installed synthdefs
 OSCdef.new( 'listall', {
