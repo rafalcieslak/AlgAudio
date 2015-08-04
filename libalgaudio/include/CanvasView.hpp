@@ -41,6 +41,7 @@ private:
   std::shared_ptr<Canvas> canvas;
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
   int InWhich(Point2D);
+  int CurveStrengthFunc(Point2D a, Point2D b);
   bool mouse_down = false;
   enum MouseDownMode{
     ModeNone,

@@ -78,17 +78,24 @@ void CanvasView::CustomDraw(DrawContext& c){
     std::list<Canvas::IOID> to_list = it.second;
     for(auto to : to_list){
       Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
-      c.DrawCubicBezier(from_pos, from_pos + Point2D(0,70), to_pos + Point2D(0, -70), to_pos);
+      int strength = CurveStrengthFunc(from_pos, to_pos);
+      c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos);
     }
   }
   // Then draw the currently dragged line...
   if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
-    c.DrawCubicBezier(p, p + Point2D(0,70), drag_position + Point2D(0, -50), drag_position);
+    int strength = CurveStrengthFunc(p, drag_position);
+    c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
   }else  if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
-    c.DrawCubicBezier(p, p + Point2D(0,-70), drag_position + Point2D(0, 50), drag_position);
+    int strength = CurveStrengthFunc(p, drag_position);
+    c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);
   }
+}
+
+int CanvasView::CurveStrengthFunc(Point2D a, Point2D b){
+  return std::min(std::abs(a.x - b.x) + std::abs(a.y - b.y)/3, 90);
 }
 
 int CanvasView::InWhich(Point2D p){
