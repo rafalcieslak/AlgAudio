@@ -46,6 +46,7 @@ public:
   void SetColor(const Color&);
   void DrawLine(int x1, int y1, int x2, int y2) {DrawLine(Point2D(x1,y1),Point2D(x2,y2));}
   void DrawLine(Point2D from, Point2D to, bool smooth=false);
+  void DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines = 15);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   // Draws the text texture onto a clear cache. Does not blend anything, this is useful

@@ -27,7 +27,10 @@ struct SDL_Color;
 
 namespace AlgAudio{
 
-struct Point2D;
+template <typename T=int>
+struct Point2D_;
+
+typedef Point2D_<int> Point2D;
 
 struct Size2D{
   Size2D(int w = 0, int h = 0) : width(w), height(h) {}
@@ -44,22 +47,31 @@ struct Size2D{
 };
 
 // Same as size2d, but never interchangable. TODO: Turn both into a common base class.
-struct Point2D{
-  Point2D(int x_ = 0, int y_ = 0) : x(x_), y(y_) {}
-  bool Fits(const Point2D& other) const{ return (x >= other.x && y >= other.y); }
-  int x, y;
-  bool operator==(const Point2D& other) const{ return (x == other.x && y == other.y); }
-  bool operator!=(const Point2D& other) const{ return !(*this == other); }
+template <typename T>
+struct Point2D_{
+  Point2D_(T x_ = 0, T y_ = 0) : x(x_), y(y_) {}
+  template <typename Q>
+  Point2D_(const Point2D_<Q> &other) : x(other.x), y(other.y) {}
+  bool Fits(const Point2D_<T>& other) const{ return (x >= other.x && y >= other.y); }
+  T x, y;
+  bool operator==(const Point2D_<T>& other) const{ return (x == other.x && y == other.y); }
+  bool operator!=(const Point2D_<T>& other) const{ return !(*this == other); }
   std::string ToString() const {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
-  Point2D operator+(const Point2D& other) const { return Point2D(x + other.x, y + other.y);}
-  Point2D operator-(const Point2D& other) const { return Point2D(x - other.x, y - other.y);}
-  Point2D operator/(const int& i) const {return Point2D(x/i, y/i);}
-  Point2D operator+(const Size2D& other) const { return Point2D(x + other.width, y + other.height);}
-  Point2D operator-(const Size2D& other) const { return Point2D(x - other.width, y - other.height);}
-  bool IsInside(Point2D r, Size2D s){ return (x >= r.x) && (x <= r.x + s.width) && (y >= r.y) && (y <= r.y + s.height);}
-  static float Distance(Point2D a, Point2D b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}
+  Point2D_<T> operator+(const Point2D_<T>& other) const { return Point2D_<T>(x + other.x, y + other.y);}
+  Point2D_<T> operator-(const Point2D_<T>& other) const { return Point2D_<T>(x - other.x, y - other.y);}
+  Point2D_<T> operator/(const T& t) const {return Point2D_<T>(x/t, y/t);}
+  Point2D_<T> operator*(const T& t) const {return Point2D_<T>(x*t, y*t);}
+  Point2D_<T> operator+(const Size2D& other) const { return Point2D_<T>(x + other.width, y + other.height);}
+  Point2D_<T> operator-(const Size2D& other) const { return Point2D_<T>(x - other.width, y - other.height);}
+  bool IsInside(Point2D_<T> r, Size2D s){ return (x >= r.x) && (x <= r.x + s.width) && (y >= r.y) && (y <= r.y + s.height);}
+  static float Distance(Point2D_<T> a, Point2D_<T> b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}
 };
 inline Point2D Size2D::ToPoint() const{ return Point2D(width,height);}
+
+template <typename T>
+Point2D_<T> operator*(const T& t, const Point2D_<T>& a) {
+  return Point2D_<T>(a.x*t, a.y*t);
+}
 
 // For text alignment, drawer orientation etc.
 typedef enum {

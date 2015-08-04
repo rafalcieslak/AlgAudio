@@ -48,6 +48,36 @@ void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
   SDL_RenderDrawLine(renderer, x+from.x, y+from.y, x+to.x, y+to.y);
 }
 
+SDL_FPoint PointToSDL(Point2D_<float> p){
+  return {p.x, p.y};
+}
+
+void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines){
+  // TODO :: De casteljeu
+
+  glEnable( GL_LINE_SMOOTH );
+  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+
+  unsigned int count = lines + 1;
+  Point2D_<float> a1 = p1, a2 = p2, a3 = p3, a4 = p4;
+  SDL_FPoint points[count];
+
+  for(unsigned int i = 0; i < lines; i++){
+    float t = (1.0f / (lines)) * i;
+    float q = (1.0f - t);
+    Point2D_<float> x0 =   q*q*q* a1;
+    Point2D_<float> x1 = 3*q*q*t* a2;
+    Point2D_<float> x2 = 3*q*t*t* a3;
+    Point2D_<float> x3 =   t*t*t* a4;
+    Point2D_<float> p = x0 + x1 + x2 + x3;
+    points[i] = PointToSDL(p);
+  }
+
+  points[count-1] = PointToSDL(a4);
+
+  SDLFix::RenderDrawLines(renderer, points, count);
+}
+
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
   if(!texture->valid) return; // Silently skip null textures.

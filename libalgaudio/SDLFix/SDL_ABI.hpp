@@ -36,12 +36,6 @@ typedef struct
 {
     float x;
     float y;
-} SDL_FPoint;
-
-typedef struct
-{
-    float x;
-    float y;
     float w;
     float h;
 } SDL_FRect;

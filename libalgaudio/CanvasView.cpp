@@ -23,11 +23,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 CanvasView::CanvasView(std::shared_ptr<Window> parent) : UIWidget(parent){
-  canvas = Canvas::CreateEmpty();
 }
 
 std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> parent){
-  return std::shared_ptr<CanvasView>( new CanvasView(parent) );
+  auto ptr = std::shared_ptr<CanvasView>( new CanvasView(parent) );
+  ptr->canvas = Canvas::CreateEmpty();
+  return ptr;
 }
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
@@ -77,16 +78,16 @@ void CanvasView::CustomDraw(DrawContext& c){
     std::list<Canvas::IOID> to_list = it.second;
     for(auto to : to_list){
       Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
-      c.DrawLine(from_pos, to_pos, true);
+      c.DrawCubicBezier(from_pos, from_pos + Point2D(0,70), to_pos + Point2D(0, -70), to_pos);
     }
   }
   // Then draw the currently dragged line...
   if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
-    c.DrawLine(p, drag_position, true);
+    c.DrawCubicBezier(p, p + Point2D(0,70), drag_position + Point2D(0, -50), drag_position);
   }else  if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
     Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
-    c.DrawLine(p, drag_position, true);
+    c.DrawCubicBezier(p, p + Point2D(0,-70), drag_position + Point2D(0, 50), drag_position);
   }
 }
 

@@ -22,6 +22,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 struct SDL_Surface;
 struct SDL_Renderer;
 
+typedef struct { // This struct is not exposed by SDL API, but we need it.
+  float x;
+  float y;
+} SDL_FPoint;
+
 namespace AlgAudio{
 
 class SDLFix{
@@ -38,6 +43,8 @@ public:
   // SetBlendMode(BLENDMODE_BLEND), and make sure your textures use an invalid
   // blendmode, otherwise SDL will reset
   static void CorrectBlendMode(SDL_Renderer* renderer);
+  // Similar to SDL_RenderDrawLines, but acccepts SDL_FPoints instead of SDL_Points.
+  static void RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* points, int count);
 private:
   SDLFix() = delete;
 };

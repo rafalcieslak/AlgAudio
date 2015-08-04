@@ -132,6 +132,11 @@ void SDLFix::CorrectBlendMode(SDL_Renderer* renderer){
   throw UnimplementedException("Renderer '" + renderer_name + "' not recognized by SDLFix");
 }
 
+void SDLFix::RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* fpoints, int count){
+  // We'll ignore argument checks. See SDL_render.c if you would like to reimplement it.
+  renderer->RenderDrawLines(renderer, fpoints, count);
+}
+
 void SDLFix::PremultiplySurface32RGBA(SDL_Surface* surf){
   SDL_LockSurface(surf);
   unsigned char* pixels = (unsigned char*)surf->pixels;
