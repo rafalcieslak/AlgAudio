@@ -1,53 +1,25 @@
 <collection version="1" id="debug">
   <name>Debug utilities</name>
   <defaultlib file="debug.aa"/>
-  <module id="pipe" name="Pipe">
-    <parrams>
-      <inlet id="inbus"/>
-      <outlet id="outbus"/>
-    </parrams>
-    <sc>
-arg inbus, outbus;
-var in = In.ar(inbus);
-Out.ar(outbus,in);
-    </sc>
-  </module>
+
   <module id="helloworld" name="Hello World!">
     <class name="HelloWorld"/>
     <description>
       A simple tiny "Hello World" module. It displays a welcome message to stdout.
       It also demonstrates multiline description.
+      But it has no gui defined, so it won't do amything useful.
     </description>
   </module>
+
   <module id="window" name="Custom window">
     <class name="Window"/>
     <description> This module demonstrates how you can create a new window for a module. </description>
+    <gui type="standard auto"/>
   </module>
+
   <module id="console" name="SCLang console view">
     <class name="Console"/>
     <description> This module displays a debug console window which contains all SCLang output. </description>
-  </module>
-  <module id="debugsrc" name="Debug sound source">
-    <parrams>
-      <outlet id="out"/>
-    </parrams>
-    <description> Example SC sound source </description>
-    <sc>
-arg out;
-Out.ar(out, WhiteNoise.ar());
-    </sc>
-    <gui type="standard auto"/>
-  </module>
-  <module id="debugout" name="Debug sound output">
-    <description> Example SC sound output </description>
-    <parrams>
-       <inlet id="in"/>
-    </parrams>
-    <sc>
-arg in;
-Out.ar(1,SinOsc.ar(440,0,1));
-Out.ar(0,In.ar(in));
-    </sc>
     <gui type="standard auto"/>
   </module>
 
@@ -59,13 +31,27 @@ Out.ar(0,In.ar(in));
       <outlet id="outbus3"/>
       <outlet id="outbus4"/>
     </parrams>
-    <description> A simple fork. </description>
+    <description> A simple fork with 4 outlets. </description>
     <sc>
 arg in, outbus1, outbus2, outbus3, outbus4;
 Out.ar(outbus1, In.ar(in));
 Out.ar(outbus2, In.ar(in));
 Out.ar(outbus3, In.ar(in));
 Out.ar(outbus4, In.ar(in));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="pipe" name="Pipe">
+    <parrams>
+      <inlet id="inbus"/>
+      <outlet id="outbus"/>
+    </parrams>
+    <description> A pipe module. All signal passed throught this module is left untouched. </description>
+    <sc>
+arg inbus, outbus;
+var in = In.ar(inbus);
+Out.ar(outbus,in);
     </sc>
     <gui type="standard auto"/>
   </module>

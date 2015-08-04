@@ -1,19 +1,7 @@
 <collection version="1" id="base">
   <name>Base modules</name>
   <defaultlib file="base.aa"/>
-  <module id="pipe" name="Pipe">
-    <parrams>
-      <inlet id="inbus"/>
-      <outlet id="outbus"/>
-    </parrams>
-    <description> A pipe module. All signal passed throught this module is left untouched. </description>
-    <sc>
-arg inbus, outbus;
-var in = In.ar(inbus);
-Out.ar(outbus,in);
-    </sc>
-    <gui type="standard auto"/>
-  </module>
+
   <module id="simpleout" name="Simple output">
     <parrams>
       <inlet id="inbus"/>
@@ -23,10 +11,9 @@ arg inbus;
 var in = In.ar(inbus);
 Out.ar(0,in);
     </sc>
-    <gui type="standard">
-      <inlet id="inbus"/>
-    </gui>
+    <gui type="standard auto"/>
   </module>
+
   <module id="simplein" name="Simple input">
     <parrams>
       <inlet id="output"/>
@@ -37,7 +24,9 @@ arg outbus;
 var in = SoundIn.ar(0);
 Out.ar(outbus,in);
     </sc>
+    <gui type="standard auto"/>
   </module>
+
   <module id="stereoout" name="Stereo output">
     <parrams>
       <inlet id="inbus1"/>
@@ -51,7 +40,6 @@ Out.ar(1,In.ar(inbus2));
     </sc>
     <gui type="standard auto"/>
   </module>
-
 
   <module id="sine" name="Sine oscillator">
     <parrams>
@@ -70,7 +58,7 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
       <inlet id="in"/>
       <outlet id="out"/>
     </parrams>
-    <description> A simple ~440Hz voltage controlled oscillator. </description>
+    <description> A simple 250-350Hz voltage controlled oscillator. </description>
     <sc>
 arg in, out;
 Out.ar(out, SinOsc.ar((In.ar(in)*50.0)+300.0, 0, 1));
@@ -82,10 +70,62 @@ Out.ar(out, SinOsc.ar((In.ar(in)*50.0)+300.0, 0, 1));
     <parrams>
       <outlet id="out"/>
     </parrams>
-    <description> A simple low frequency oscillator. </description>
+    <description> A simple low frequency oscillator, it runs at a constant frequency 1Hz. </description>
     <sc>
 arg out;
 Out.ar(out, SinOsc.ar(1, 0, 1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="exlfo8" name="Example LFO 2">
+    <parrams>
+      <outlet id="out"/>
+    </parrams>
+    <description> A simple low frequency oscillator, which runs at a constant frequency of 8Hz. </description>
+    <sc>
+arg out;
+Out.ar(out, SinOsc.ar(8, 0, 1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="whitenoise" name="White noise">
+    <parrams>
+      <outlet id="out"/>
+    </parrams>
+    <description> This module emits white noise through its only outlet. </description>
+    <sc>
+arg out;
+Out.ar(out, WhiteNoise.ar());
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="pinknoise" name="Pink noise">
+    <parrams>
+      <outlet id="out"/>
+    </parrams>
+    <description> This module is a pink noise source. </description>
+    <sc>
+arg out;
+Out.ar(out, PinkNoise.ar());
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="mixer4-1" name="Simple mixer">
+    <parrams>
+      <inlet id="in1"/>
+      <inlet id="in2"/>
+      <inlet id="in3"/>
+      <inlet id="in4"/>
+      <outlet id="out"/>
+    </parrams>
+    <description> A simple 4-channel mixer with no way to regulate gain. </description>
+    <sc>
+arg in1, in2, in3, in4, out;
+Out.ar(out, In.ar(in1) + In.ar(in2) + In.ar(in3)+ In.ar(in4));
     </sc>
     <gui type="standard auto"/>
   </module>
