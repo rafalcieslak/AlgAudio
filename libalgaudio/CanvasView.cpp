@@ -177,7 +177,7 @@ void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_i
     canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
   }catch(MultipleConnectionsException){
     window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
-  }catch(LoopingConnectionException){
+  }catch(ConnectionLoopException){
     window.lock()->ShowErrorAlert("Cannot add the selected connection, it would create a loop.", "Cancel connection");
   }
   SetNeedsRedrawing();

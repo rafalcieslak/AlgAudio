@@ -86,7 +86,7 @@ void Canvas::Connect(IOID from, IOID to){
   }
 
   if(TestNewConnectionForLoop(from, to))
-    throw LoopingConnectionException("");
+    throw ConnectionLoopException("");
 
   std::cout << "Connecting" << std::endl;
   outlet->ConnectToInlet(inlet);
@@ -102,6 +102,74 @@ void Canvas::Connect(IOID from, IOID to){
     throw MultipleConnectionsException("");
     it->second.push_back(to);
   }
+
+  // Correct SC synth order.
+  RecalculateOrder();
+}
+
+void Canvas::RecalculateOrder(){
+  // To calculate a correct ordering determining how the modules SC synths
+  // should be executed, we do a simple topological sort on the graph of
+  // connections. It will be calculated whenever a new connection is added.
+  // Note that neither of:
+  //    1) creating a new module
+  //    2) removing any module
+  //    3) removing any connection
+  // may change the topological order, so there is no need to recalculate it
+  // in such cases.
+
+  // We will need to remember the current (in the sense of the steps of the
+  // toposort algorithm) indegree of each verticle (module). We will use a map
+  // for this. It may look as a waste of efficiency, because this information
+  // might be stored withing a module, but please note this costs us only
+  // O(V+E), since map operations are O(1).
+
+  std::map<std::shared_ptr<Module>, int> indegrees;
+
+  // Once we fill the map with initial data for all modules, we will always
+  // assume that all .find()s return a valid iterator, i.e. each module always
+  // has an entry in the map.
+
+  for(const std::shared_ptr<Module>& m : modules) indegrees[m] = 0;
+
+  // Calculate initial indegrees.
+  for(auto &it : connections) // For each connection
+    for(const IOID& i : it.second) // For each ending
+      indegrees[i.module]++; // Increase the indeg for that module
+
+  std::queue<std::shared_ptr<Module>> frontier;
+
+  // Initialize the frontier
+  for(auto &it : indegrees) // Look at all modules...
+    if(it.second == 0)        // ... that have 0 indeg, ...
+      frontier.push(it.first);  // ... add them.
+
+  std::list<std::shared_ptr<Module>> ordering;
+
+  while(!frontier.empty()){
+    // Get a new module from frontier.
+    std::shared_ptr<Module> current = frontier.front(); frontier.pop();
+    // Add the current module to the resulting ordering.
+    ordering.push_back(current);
+    std::list<std::shared_ptr<Module>> next_list = GetConnectedModules(current);
+    // For each module that is directly connected after the current one:
+    for(const std::shared_ptr<Module>& m : next_list)
+      if( --indegrees[m]  == 0) // Decrease the indeg, also it it's zero, then add the module to frontier.
+        frontier.push(m);
+
+  }
+
+  if(ordering.size() != modules.size()){
+    // Failure. We did not traverse all modules. This can only happen
+    // if the connection graph has a cycle.
+    // The ordering is inconclusive.
+    throw ConnectionLoopException("");
+  }
+
+  // For debugging purposes, demonstrate when the computed odrer is.
+  std::cout << "New synth ordering:" << std::endl;
+  for(const std::shared_ptr<Module> &m : ordering)
+    std::cout << "   \"" << m->templ->name << "\"" << std::endl;
 
 }
 
@@ -123,6 +191,7 @@ bool Canvas::TestNewConnectionForLoop(IOID from, IOID to){
   std::unordered_set<std::shared_ptr<Module>> visited;
   std::queue<std::shared_ptr<Module>> frontier;
 
+  // Initialize the frontier with the starting vertex.
   frontier.push(to.module);
 
   while(!frontier.empty()){

@@ -29,8 +29,8 @@ namespace AlgAudio{
 struct MultipleConnectionsException : public Exception{
   MultipleConnectionsException(std::string t) : Exception(t) {}
 };
-struct LoopingConnectionException : public Exception{
-  LoopingConnectionException(std::string t) : Exception(t) {}
+struct ConnectionLoopException : public Exception{
+  ConnectionLoopException(std::string t) : Exception(t) {}
 };
 
 class Canvas : public std::enable_shared_from_this<Canvas>{
@@ -61,6 +61,9 @@ public:
   // Returns a list of module that have an inlet directly connected to any of
   // the outlets of the module given as argument.
   std::list<std::shared_ptr<Module>> GetConnectedModules(std::shared_ptr<Module> m);
+
+  // Updates SC synth ordering.
+  void RecalculateOrder();
 
   std::map<IOID, std::list<IOID>> connections;
   std::set<std::shared_ptr<Module>> modules;
