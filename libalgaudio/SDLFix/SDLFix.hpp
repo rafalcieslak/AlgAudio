@@ -45,6 +45,13 @@ public:
   static void CorrectBlendMode(SDL_Renderer* renderer);
   // Similar to SDL_RenderDrawLines, but acccepts SDL_FPoints instead of SDL_Points.
   static void RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* points, int count);
+  // Calls glEnable( GL_LINE_SMOOTH ).
+  static void RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled);
+  // Some SDL calls forget to make renderer's contex current, for example
+  // SDL_RenderSetCLipRect suffers from this problem. This function is a helpful
+  // workaround, it forces SDL to call GL_ActivateRenderer(renderer) and nothing
+  // else.
+  static void RendererMakeCurrent(SDL_Renderer* renderer);
 private:
   SDLFix() = delete;
 };

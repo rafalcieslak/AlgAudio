@@ -19,8 +19,6 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "DrawContext.hpp"
 #include <SDL2/SDL.h>
 #include <iostream>
-#include <GL/gl.h>
-#include <GL/glext.h>
 #include "SDLTexture.hpp"
 #include "Color.hpp"
 #include "SDLFix/SDLFix.hpp"
@@ -37,13 +35,10 @@ DrawContext::DrawContext(SDL_Window* win, SDL_Renderer* r, SDL_GLContext c, int 
 }
 void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
   //std::cout << "Making current " << context << std::endl;
-  //SDL_GL_MakeCurrent(window, context);
   if(smooth){
-    glEnable( GL_LINE_SMOOTH );
-    glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+    SDLFix::RenderSetLineSmoothing(renderer, true);
   }else{
-    glDisable( GL_LINE_SMOOTH );
-    glHint( GL_LINE_SMOOTH_HINT, GL_FASTEST );
+    SDLFix::RenderSetLineSmoothing(renderer, false);
   }
   SDL_RenderDrawLine(renderer, x+from.x, y+from.y, x+to.x, y+to.y);
 }
@@ -55,8 +50,7 @@ SDL_FPoint PointToSDL(Point2D_<float> p){
 void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines){
   // TODO :: De casteljeu
 
-  glEnable( GL_LINE_SMOOTH );
-  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+  SDLFix::RenderSetLineSmoothing(renderer, true);
 
   unsigned int count = lines + 1;
   Point2D_<float> a1 = p1, a2 = p2, a3 = p3, a4 = p4;
@@ -119,8 +113,8 @@ void DrawContext::Clear(){
 void DrawContext::Clear(Color c){
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
   SetColor(c);
-  //Fill();
   SDL_RenderClear(renderer);
+  //SDL_RenderFillRect(renderer,NULL);
   SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
   SDLFix::CorrectBlendMode(renderer);
 }

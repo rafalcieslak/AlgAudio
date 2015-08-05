@@ -32,6 +32,8 @@ freely, subject to the following restrictions:
 /// ========== SDL structures =============
 /// =======================================
 
+struct SDL_SW_YUVTexture;
+
 typedef struct
 {
     float x;
@@ -39,6 +41,33 @@ typedef struct
     float w;
     float h;
 } SDL_FRect;
+
+/* Define the SDL texture structure */
+struct SDL_Texture
+{
+    const void *magic;
+    Uint32 format;              /**< The pixel format of the texture */
+    int access;                 /**< SDL_TextureAccess */
+    int w;                      /**< The width of the texture */
+    int h;                      /**< The height of the texture */
+    int modMode;                /**< The texture modulation mode */
+    SDL_BlendMode blendMode;    /**< The texture blend mode */
+    Uint8 r, g, b, a;           /**< Texture modulation values */
+
+    SDL_Renderer *renderer;
+
+    /* Support for formats not supported directly by the renderer */
+    SDL_Texture *native;
+    SDL_SW_YUVTexture *yuv;
+    void *pixels;
+    int pitch;
+    SDL_Rect locked_rect;
+
+    void *driverdata;           /**< Driver specific texture representation */
+
+    SDL_Texture *prev;
+    SDL_Texture *next;
+};
 
 struct SDL_Renderer
 {

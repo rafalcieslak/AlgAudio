@@ -46,6 +46,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 static int
 GL_Fixed_UpdateClipRect(SDL_Renderer * renderer)
 {
+    // SDL_RenderSetClipRect in SDL 2.0.3 is bugged. It forgets to make a gl
+    // context current, and therefore it sets the clip rect on a context that
+    // is not necessarily the one assiciated with this particular renderer.
+    // A workadound is used to force SDL to make the right context current.
+    AlgAudio::SDLFix::RendererMakeCurrent(renderer);
+
     const SDL_Rect *rect = &renderer->clip_rect;
     GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
     if (!SDL_RectEmpty(rect)) {
@@ -135,6 +141,48 @@ void SDLFix::CorrectBlendMode(SDL_Renderer* renderer){
 void SDLFix::RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* fpoints, int count){
   // We'll ignore argument checks. See SDL_render.c if you would like to reimplement it.
   renderer->RenderDrawLines(renderer, fpoints, count);
+}
+
+void SDLFix::RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled){
+  // Get SDL renderer info
+  SDL_RendererInfo info;
+  SDL_GetRendererInfo(renderer, &info);
+  std::string renderer_name(info.name);
+
+  #ifdef ENABLE_OPENGL
+    if(renderer_name == "opengl"){
+      GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
+      if(enabled){
+        data->glEnable(GL_LINE_SMOOTH);
+      }else{
+        data->glDisable(GL_LINE_SMOOTH);
+      }
+      return;
+    }
+  #endif
+  std::cout << "WARNING: Line smoothing for renderer " << renderer_name << " is not yet implemented" << std::endl;
+}
+
+void SDLFix::RendererMakeCurrent(SDL_Renderer* renderer){
+  // Get SDL renderer info
+  SDL_RendererInfo info;
+  SDL_GetRendererInfo(renderer, &info);
+  std::string renderer_name(info.name);
+
+  #ifdef ENABLE_OPENGL
+    if(renderer_name == "opengl"){
+      SDL_Texture tex;
+      tex.driverdata = nullptr;
+
+      // renderer->DestroyTexture points to GL_DestroyTexture (see
+      // SDL_render_gl.c), which first calls GL_ActivateRenderer and then checks
+      // if texture->driverdata is null, if it is, it returns immediatelly.
+
+      renderer->DestroyTexture(renderer,&tex);
+
+      return;
+    }
+  #endif
 }
 
 void SDLFix::PremultiplySurface32RGBA(SDL_Surface* surf){
