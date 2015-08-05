@@ -17,125 +17,57 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "SDLFix.hpp"
+#include "SDL_ABI.hpp"
 
-#include <SDL2/SDL.h>
 #include <iostream>
 #include <string>
 #include "Utilities.hpp"
 
-// TODO: CMake should control these flag
-#ifdef __unix__
-  #define ENABLE_OPENGL
-#else
-  #define ENABLE_DX3D
-  #define ENABLE_OPENGL
-#endif
-
-#ifdef ENABLE_DX3D
-  #include <windows.h>
-  #include <d3dx9.h>
-#endif
-#ifdef ENABLE_OPENGL
-  #include <GL/gl.h>
-  #include <GL/glext.h>
-#endif
-
-// SDL_ABI must be included after D3D/GL headers.
-#include "SDL_ABI.hpp"
 
 static int
 GL_Fixed_UpdateClipRect(SDL_Renderer * renderer)
 {
-    // SDL_RenderSetClipRect in SDL 2.0.3 is bugged. It forgets to make a gl
-    // context current, and therefore it sets the clip rect on a context that
-    // is not necessarily the one assiciated with this particular renderer.
-    // A workadound is used to force SDL to make the right context current.
-    AlgAudio::SDLFix::RendererMakeCurrent(renderer);
+  // SDL_RenderSetClipRect in SDL 2.0.3 is bugged. It forgets to make a gl
+  // context current, and therefore it sets the clip rect on a context that
+  // is not necessarily the one assiciated with this particular renderer.
+  // A workadound is used to force SDL to make the right context current.
+  AlgAudio::SDLFix::RendererMakeCurrent(renderer);
 
-    const SDL_Rect *rect = &renderer->clip_rect;
-    GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
-    if (!SDL_RectEmpty(rect)) {
-        data->glEnable(GL_SCISSOR_TEST);
-        // ORIG:
-        // data->glScissor(rect->x, renderer->viewport.h - rect->y - rect->h, rect->w, rect->h);
-        // FIXED:
-        data->glScissor(rect->x, rect->y, rect->w, rect->h);
-    } else {
-        data->glDisable(GL_SCISSOR_TEST);
-    }
-    return 0;
+  const SDL_Rect *rect = &renderer->clip_rect;
+  GL_RenderData *data = (GL_RenderData *) renderer->driverdata;
+  if (!SDL_RectEmpty(rect)) {
+    data->glEnable(GL_SCISSOR_TEST);
+    // ORIG:
+    // data->glScissor(rect->x, renderer->viewport.h - rect->y - rect->h, rect->w, rect->h);
+    // FIXED:
+    data->glScissor(rect->x, rect->y, rect->w, rect->h);
+  } else {
+    data->glDisable(GL_SCISSOR_TEST);
+  }
+  return 0;
 }
 
 namespace AlgAudio{
 
 void SDLFix::FixRenderer(SDL_Renderer* renderer){
-
   // Get SDL renderer info
   SDL_RendererInfo info;
   SDL_GetRendererInfo(renderer, &info);
   std::string renderer_name(info.name);
 
-#ifdef ENABLE_DX3D
-  if(renderer_name == "direct3d"){
-    // Currently nothing to fix
-    return;
-  }
-  if(renderer_name == "direct3d11"){
-    // Currently nothing to fix
-    return;
-  }
-#endif
-#ifdef ENABLE_OPENGL
-  if(renderer_name == "opengl"){
-    // Fixes clip rect position by setting function pointer to a custom modified
-    // function
-    renderer->UpdateClipRect = GL_Fixed_UpdateClipRect;
-    return;
-  }
-#endif
-  if(renderer_name == "software"){
-    // This should never happen, we explicitly ask SDL to create a hadrware accelerated renderer.
-    throw UnimplementedException("Sorry, the software renderer is not capable of required blendmodes");
-  }
-  throw UnimplementedException("Renderer '" + renderer_name + "' not recognized by SDLFix");
+  if(renderer_name != "opengl")
+    throw UnimplementedException("Renderer '" + renderer_name + "' IS NOT supported! AlgAudio will can work with opengl only.");
+
+  // Fixes clip rect position by setting function pointer to a custom modified
+  // function
+  renderer->UpdateClipRect = GL_Fixed_UpdateClipRect;
 }
 
 void SDLFix::CorrectBlendMode(SDL_Renderer* renderer){
-
-  // Get SDL renderer info
-  SDL_RendererInfo info;
-  SDL_GetRendererInfo(renderer, &info);
-  std::string renderer_name(info.name);
-
-#ifdef ENABLE_DX3D
-  if(renderer_name == "direct3d"){
-    D3D_RenderData *data = (D3D_RenderData*) renderer->driverdata;
-
-    IDirect3DDevice9_SetRenderState(data->device, D3DRS_ALPHABLENDENABLE, true);
-    IDirect3DDevice9_SetRenderState(data->device, D3DRS_SRCBLEND,       D3DBLEND_ONE);
-    IDirect3DDevice9_SetRenderState(data->device, D3DRS_DESTBLEND,      D3DBLEND_INVSRCALPHA);
-    IDirect3DDevice9_SetRenderState(data->device, D3DRS_SRCBLENDALPHA,  D3DBLEND_ONE);
-    IDirect3DDevice9_SetRenderState(data->device, D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA);
-    return;
-  }
-  if(renderer_name == "direct3d11"){
-    throw UnimplementedException("Direct3D 11 is currently not supported by AlgAudio's SDLFix, please contact the developer it you ever see this message.");
-  }
-#endif
-#ifdef ENABLE_OPENGL
-  if(renderer_name == "opengl"){
-    GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
-    data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    data->glEnable(GL_BLEND);
-    data->glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    return;
-  }
-#endif
-  if(renderer_name == "software"){
-    // This should never happen, we explicitly ask SDL to create a hadrware accelerated renderer.
-    throw UnimplementedException("Sorry, the software renderer is not capable of required blendmodes");
-  }
-  throw UnimplementedException("Renderer '" + renderer_name + "' not recognized by SDLFix");
+  GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
+  data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  data->glEnable(GL_BLEND);
+  data->glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void SDLFix::RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* fpoints, int count){
@@ -144,45 +76,21 @@ void SDLFix::RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* fpoints, 
 }
 
 void SDLFix::RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled){
-  // Get SDL renderer info
-  SDL_RendererInfo info;
-  SDL_GetRendererInfo(renderer, &info);
-  std::string renderer_name(info.name);
-
-  #ifdef ENABLE_OPENGL
-    if(renderer_name == "opengl"){
-      GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
-      if(enabled){
-        data->glEnable(GL_LINE_SMOOTH);
-      }else{
-        data->glDisable(GL_LINE_SMOOTH);
-      }
-      return;
-    }
-  #endif
-  std::cout << "WARNING: Line smoothing for renderer " << renderer_name << " is not yet implemented" << std::endl;
+  GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
+  if(enabled){
+    data->glEnable(GL_LINE_SMOOTH);
+  }else{
+    data->glDisable(GL_LINE_SMOOTH);
+  }
 }
 
 void SDLFix::RendererMakeCurrent(SDL_Renderer* renderer){
-  // Get SDL renderer info
-  SDL_RendererInfo info;
-  SDL_GetRendererInfo(renderer, &info);
-  std::string renderer_name(info.name);
-
-  #ifdef ENABLE_OPENGL
-    if(renderer_name == "opengl"){
-      SDL_Texture tex;
-      tex.driverdata = nullptr;
-
-      // renderer->DestroyTexture points to GL_DestroyTexture (see
-      // SDL_render_gl.c), which first calls GL_ActivateRenderer and then checks
-      // if texture->driverdata is null, if it is, it returns immediatelly.
-
-      renderer->DestroyTexture(renderer,&tex);
-
-      return;
-    }
-  #endif
+  SDL_Texture tex;
+  tex.driverdata = nullptr;
+  // renderer->DestroyTexture points to GL_DestroyTexture (see
+  // SDL_render_gl.c), which first calls GL_ActivateRenderer and then checks
+  // if texture->driverdata is null, if it is, it returns immediatelly.
+  renderer->DestroyTexture(renderer,&tex);
 }
 
 void SDLFix::PremultiplySurface32RGBA(SDL_Surface* surf){

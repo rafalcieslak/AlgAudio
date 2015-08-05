@@ -60,7 +60,6 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
-  std::cout << "CV draw" << std::endl;
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
     c.Push(modulegui->position, modulegui->GetRequestedSize());

@@ -27,6 +27,9 @@ freely, subject to the following restrictions:
 
 */
 
+#include <SDL2/SDL.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
 
 /// =======================================
 /// ========== SDL structures =============
@@ -153,28 +156,9 @@ struct SDL_Renderer
     void *driverdata;
 };
 
-
-/// =======================================
-/// ======== DIRECT3D structures ==========
-/// =======================================
-
-#ifdef ENABLE_DX3D
-
-typedef struct
-{
-  void* d3dDLL;
-  IDirect3D9 *d3d;
-  IDirect3DDevice9 *device;
-  // There are more fields, but we'll just ignore them.
-} D3D_RenderData;
-
-#endif //ENABLE_DX3D
-
 /// =======================================
 /// ======== OPENGL structures ==========
 /// =======================================
-
-#ifdef ENABLE_OPENGL
 
 typedef enum {
     SHADER_NONE,
@@ -281,6 +265,5 @@ SDL_PROC(void, glLoadIdentity, (void))
 
 } GL_RenderData;
 
-#endif // ENABLE_OPENGL
 
 #endif //SDL_ABI

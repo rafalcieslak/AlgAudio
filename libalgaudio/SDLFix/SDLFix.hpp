@@ -36,6 +36,8 @@ public:
   // This function substitutes several method pointers inside the renderer,
   // so that fixed (or modified) versions of several rendering functions are
   // used whenever SDL calls any of these methods on the renderer.
+  // It also checks whether the renderer is opengl.
+  // Generally, call this function on any fresh created renderer.
   static void FixRenderer(SDL_Renderer* renderer);
   // This function corrects the renderers internal blendmode state. The internal
   // formulas SDL uses are wrong, incorrect, ugly, and do not support
@@ -47,7 +49,7 @@ public:
   static void RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* points, int count);
   // Calls glEnable( GL_LINE_SMOOTH ).
   static void RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled);
-  // Some SDL calls forget to make renderer's contex current, for example
+  // Some SDL calls forget to make renderer's contex current, for example internal
   // SDL_RenderSetCLipRect suffers from this problem. This function is a helpful
   // workaround, it forces SDL to call GL_ActivateRenderer(renderer) and nothing
   // else.
