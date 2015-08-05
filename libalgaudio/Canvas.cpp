@@ -95,9 +95,6 @@ void Canvas::Connect(IOID from, IOID to){
   if(TestNewConnectionForLoop(from, to))
     throw ConnectionLoopException("Adding this connection would close a loop.");
 
-  std::cout << "Connecting" << std::endl;
-  outlet->ConnectToInlet(inlet);
-
   auto it = connections.find(from);
   if(it == connections.end()){
     // First connection from this inlet
@@ -112,6 +109,9 @@ void Canvas::Connect(IOID from, IOID to){
     else
       throw MultipleConnectionsException("Multiple connections from a single outlet are not yet supported.");
   }
+
+  std::cout << "Connecting" << std::endl;
+  outlet->ConnectToInlet(inlet);
 
   // Correct SC synth order.
   RecalculateOrder();
