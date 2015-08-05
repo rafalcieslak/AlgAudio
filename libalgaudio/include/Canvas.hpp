@@ -32,6 +32,9 @@ struct MultipleConnectionsException : public Exception{
 struct ConnectionLoopException : public Exception{
   ConnectionLoopException(std::string t) : Exception(t) {}
 };
+struct DoubleConnectionException : public Exception{
+  DoubleConnectionException(std::string t) : Exception(t) {}
+};
 
 class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
@@ -61,6 +64,8 @@ public:
   // Returns a list of module that have an inlet directly connected to any of
   // the outlets of the module given as argument.
   std::list<std::shared_ptr<Module>> GetConnectedModules(std::shared_ptr<Module> m);
+  // Returns true iff the specified connection already exists.
+  bool GetDirectConnectionExists(IOID from, IOID to);
 
   // Updates SC synth ordering.
   void RecalculateOrder();

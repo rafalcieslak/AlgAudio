@@ -175,18 +175,28 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
 
 void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id){
   std::cout << "Finalizing drag from " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
-  std::shared_ptr<Module> from = module_guis[outlet_module_id]->module.lock();
-  std::shared_ptr<Module> to   =  module_guis[inlet_module_id]->module.lock();
-  if(!from || !to){
+  std::shared_ptr<Module> from_module = module_guis[outlet_module_id]->module.lock();
+  std::shared_ptr<Module> to_module   =  module_guis[inlet_module_id]->module.lock();
+  if(!from_module || !to_module){
     window.lock()->ShowErrorAlert("Failed to create connection, one of the corresponding modules does not exist." , "Cancel");
     return;
   }
-  try{
-    canvas->Connect(Canvas::IOID{from,outlet_id},Canvas::IOID{to,inlet_id});
-  }catch(MultipleConnectionsException){
-    window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
-  }catch(ConnectionLoopException){
-    window.lock()->ShowErrorAlert("Cannot add the selected connection, it would create a loop.", "Cancel connection");
+  Canvas::IOID from = {from_module,outlet_id};
+  Canvas::IOID   to = {  to_module,inlet_id };
+  if(!canvas->GetDirectConnectionExists(from, to)){
+    // There is no such connection, connect!
+    try{
+      canvas->Connect(from,to);
+    }catch(MultipleConnectionsException){
+      window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
+    }catch(ConnectionLoopException){
+      window.lock()->ShowErrorAlert("Cannot add the selected connection, it would create a loop.", "Cancel connection");
+    }catch(DoubleConnectionException){
+      window.lock()->ShowErrorAlert("The selected connection already exists!", "Cancel connection");
+    }
+  }else{
+    // This connection already exists, remove it.
+    canvas->Disconnect(from,to);
   }
   SetNeedsRedrawing();
 }

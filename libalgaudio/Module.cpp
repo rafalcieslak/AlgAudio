@@ -55,7 +55,7 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
   }
 
   Bus::CreateNew().Then([=](std::shared_ptr<Bus> b)mutable{
-    mod->SetParram(id, b->GetID());
+    SCLang::SendOSC("/algaudioSC/connectinlet", "isi", mod->sc_id, id.c_str(), b->GetID());
     r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, b)));
   });
   return r;
@@ -79,10 +79,12 @@ void Module::Outlet::DetachFromAll(){
   SendConnections();
 }
 void Module::Outlet::SendConnections(){
-  std::list<int> ids;
-  for(auto& b : buses) ids.push_back(b.lock()->GetID());
-  if(ids.size() == 0) ids.push_back(99999999);
-  mod.SetParram(id, ids);
+  lo::Message m;
+  m.add_int32(mod.sc_id);
+  m.add_string(id);
+  for(auto& b : buses) m.add_int32(b.lock()->GetID());
+  if(buses.size() == 0) m.add_int32(99999999);
+  SCLang::SendOSCCustom("/algaudioSC/connectoutlet", m);
 }
 
 

@@ -93,7 +93,7 @@ void Canvas::Connect(IOID from, IOID to){
   }
 
   if(TestNewConnectionForLoop(from, to))
-    throw ConnectionLoopException("");
+    throw ConnectionLoopException("Adding this connection would close a loop.");
 
   std::cout << "Connecting" << std::endl;
   outlet->ConnectToInlet(inlet);
@@ -106,12 +106,43 @@ void Canvas::Connect(IOID from, IOID to){
     connections[from] = tmp;
   }else{
     // Not the first connectin from this inlet.
-    throw MultipleConnectionsException("");
-    it->second.push_back(to);
+    auto it2 = std::find(it->second.begin(), it->second.end(), to);
+    if(it2 != it->second.end()) // if found
+      throw DoubleConnectionException("This connection already exists!");
+    else
+      throw MultipleConnectionsException("Multiple connections from a single outlet are not yet supported.");
   }
 
   // Correct SC synth order.
   RecalculateOrder();
+}
+
+void Canvas::Disconnect(IOID from, IOID to){
+  std::shared_ptr<Module::Outlet> outlet = GetOutletByIOID(from);
+  std::shared_ptr<Module::Inlet >  inlet = GetInletByIOID (to);
+  if(!(inlet) || !(outlet)){
+    std::cout << "WARNING: cannot remove between unexisting inlet/outlet." << std::endl;
+    return;
+  }
+
+  std::cout << "Disonnecting" << std::endl;
+  outlet->DetachFromInlet(inlet);
+
+  auto it = connections.find(from);
+  if(it == connections.end()) return; // no such connection
+  it->second.remove(to);
+  if(it->second.size() == 0)
+    connections.erase(it);
+
+}
+
+bool Canvas::GetDirectConnectionExists(IOID from, IOID to){
+  auto it = connections.find(from);
+  if(it != connections.end())
+    if(std::find(it->second.begin(), it->second.end(), to) != it->second.end())
+      return true;
+
+  return false;
 }
 
 void Canvas::RecalculateOrder(){

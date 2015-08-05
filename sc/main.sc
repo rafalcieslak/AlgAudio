@@ -128,6 +128,28 @@ OSCdef.new( 'setparramlist', {
 	}, '/algaudioSC/setparramlist'
 ).postln;
 
+// Args: instance id, outlet id, bus id
+OSCdef.new( 'connectoutlet', {
+		arg msg;
+		("Connecting outlet " ++ msg[1].asString ++ "/" ++ msg[2].asString ++ " to bus " ++ msg[3]).postln;
+		~minstances[msg[1]].set(
+			msg[2].asString,
+			msg[3]
+		);
+	}, '/algaudioSC/connectoutlet'
+).postln;
+
+// Args: instance id, inlet id, bus id
+OSCdef.new( 'connectinlet', {
+		arg msg;
+		("Connecting inlet " ++ msg[1].asString ++ "/" ++ msg[2].asString ++ " to bus " ++ msg[3]).postln;
+		~minstances[msg[1]].set(
+			msg[2].asString,
+			msg[3]
+		);
+	}, '/algaudioSC/connectinlet'
+).postln;
+
 // This is the helper method that realizes a synth ordering.
 OSCdef.new( 'ordering', {
 		arg msg;
