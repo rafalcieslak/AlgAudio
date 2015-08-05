@@ -31,6 +31,15 @@ Bus::~Bus(){
   std::cout << "Bus freed" << std::endl;
 }
 
+std::shared_ptr<ParramController> ParramController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParramTemplate> templ){
+  return std::shared_ptr<ParramController>(new ParramController(m,templ));
+}
+
+void ParramController::Set(float value){
+  current_val = value;
+  on_set.Happen(value);
+}
+
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   auto r = Relay<std::shared_ptr<Bus>>::Create();
   SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
@@ -123,6 +132,20 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
   return r;
 }
 
+
+void Module::PrepareParramControllers(){
+  for(const std::shared_ptr<ParramTemplate> ptr : templ->parrams){
+    auto controller = ParramController::Create(shared_from_this(), ptr);
+    controller->Set(ptr->default_val);
+    parram_controllers.push_back(controller);
+    // TODO: custom defined actions on controller set
+    subscriptions += controller->on_set.Subscribe([this, parramid = ptr->id](float val){
+      SCLang::SendOSC("/algaudioSC/setparram", "isf", sc_id, parramid.c_str(), val);
+    });
+  }
+}
+
+/*
 void Module::SetParram(std::string name, int value){
   SCLang::SendOSC("/algaudioSC/setparram", "isi", sc_id, name.c_str(), value);
 }
@@ -136,6 +159,7 @@ void Module::SetParram(std::string name, std::list<int> values){
 void Module::SetParram(std::string name, double value){
   SCLang::SendOSC("/algaudioSC/setparram", "isd", sc_id, name.c_str(), value);
 }
+*/
 
 std::shared_ptr<ModuleGUI> Module::GetGUI(){
   return modulegui.lock();
@@ -144,15 +168,14 @@ std::shared_ptr<ModuleGUI> Module::GetGUI(){
 std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_window){
   std::shared_ptr<ModuleGUI> gui;
   if(templ->guitype == "standard"){
-    gui = StandardModuleGUI::CreateFromXML(parent_window, templ->guitree, templ);
+    gui = StandardModuleGUI::CreateFromXML(parent_window, templ->guitree, shared_from_this());
   }else if(templ->guitype == "standard auto"){
-    gui = StandardModuleGUI::CreateFromTemplate(parent_window, templ);
+    gui = StandardModuleGUI::CreateFromTemplate(parent_window, shared_from_this());
   }else if(templ->guitype == ""){
     throw GUIBuildException("This module has no gui defined");
   }else{
     throw GUIBuildException("Module gui type '" + templ->guitype + "' was not recognized");
   }
-  gui->Associate(shared_from_this());
   modulegui = gui;
   return gui;
 }

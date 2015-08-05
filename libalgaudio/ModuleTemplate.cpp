@@ -63,6 +63,26 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       if(!outlet_id) throw ModuleParseException(id, "An outlet is missing its id");
       outlets.push_back(outlet_id->value());
     }
+    for(xml_node<>* parram_node = parrams_node->first_node("parram"); parram_node; parram_node = parram_node->next_sibling("parram")){
+      auto p = std::make_shared<ParramTemplate>();
+      xml_attribute<>* parram_id = parram_node->first_attribute("id");
+      if(!parram_id) throw ModuleParseException(id, "An parram is missing its id");
+      p->id = parram_id->value();
+      xml_attribute<>* parram_name = parram_node->first_attribute("name");
+      if(!parram_name) p->name = "";
+      else p->name = parram_name->value();
+      xml_attribute<>* parram_defaultmax = parram_node->first_attribute("defaultmax");
+      if(!parram_defaultmax) p->default_max = 1.0;
+      else p->default_max = std::stof(parram_defaultmax->value());
+      xml_attribute<>* parram_defaultmin = parram_node->first_attribute("defaultmin");
+      if(!parram_defaultmin) p->default_min = 0.0;
+      else p->default_min = std::stof(parram_defaultmin->value());
+      xml_attribute<>* parram_defaultval = parram_node->first_attribute("defaultval");
+      if(!parram_defaultval) p->default_val = 1.0;
+      else p->default_val = std::stof(parram_defaultval->value());
+
+      parrams.push_back(p);
+    }
   }
 
   xml_node<>* desc_node = node->first_node("description");

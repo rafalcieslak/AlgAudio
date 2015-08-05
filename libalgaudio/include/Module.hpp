@@ -27,9 +27,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 class ModuleTemplate;
+class ParramTemplate;
 class Canvas;
 class ModuleGUI;
 class Window;
+class Module;
 
 // A wrapper for SC buses.
 class Bus{
@@ -41,6 +43,20 @@ public:
 private:
   Bus(int id);
   int id;
+};
+
+class ParramController{
+public:
+  static std::shared_ptr<ParramController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> templ);
+  void Set(float value);
+  Signal<float> on_set;
+  // Passing values to other controllers should be done once this controller has it value set.
+  Signal<float> after_set;
+  const std::shared_ptr<ParramTemplate> templ;
+private:
+  ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t) : templ(t), module(m) {}
+  float current_val = 0.0;
+  std::weak_ptr<Module> module;
 };
 
 class Module : public DynamicallyLoadableClass, public SubscriptionsManager, public std::enable_shared_from_this<Module>{
@@ -104,9 +120,11 @@ public:
   private:
     Inlet(std::string i, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), mod(*m.get()), bus(b) {}
   };
+  /*
   void SetParram(std::string name, int value);
   void SetParram(std::string name, double value);
   void SetParram(std::string name, std::list<int> values);
+  */
 
   // TODO: Move these functions to Canvas
   static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);
@@ -134,6 +152,9 @@ public:
   LateReturn<> CreateIOFromTemplate(bool fake = false);
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
+
+  void PrepareParramControllers();
+  std::vector<std::shared_ptr<ParramController>> parram_controllers;
 
   std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
   std::shared_ptr<Outlet> GetOutletByID(std::string id) const;

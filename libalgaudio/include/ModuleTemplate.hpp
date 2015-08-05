@@ -45,6 +45,14 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
+class ParramTemplate{
+public:
+  std::string id;
+  std::string name;
+  float default_min, default_max;
+  float default_val;
+};
+
 class ModuleTemplate{
 public:
   ModuleTemplate(ModuleCollection& collection);
@@ -62,6 +70,7 @@ public:
   ModuleCollection& collection;
   std::list<std::string> inlets;
   std::list<std::string> outlets;
+  std::list<std::shared_ptr<ParramTemplate>> parrams;
 };
 
 } // namespace AlgAudio

@@ -41,7 +41,7 @@ Out.ar(1,In.ar(inbus2));
     <gui type="standard auto"/>
   </module>
 
-  <module id="sine" name="Sine oscillator">
+  <module id="simplesine" name="Simple sine">
     <parrams>
       <outlet id="outbus"/>
     </parrams>
@@ -105,11 +105,26 @@ Out.ar(out, WhiteNoise.ar());
   <module id="pinknoise" name="Pink noise">
     <parrams>
       <outlet id="out"/>
+      <parram id="gain" name="Gain" defaultmin="0.0" defaultmax="1.0" defaultval="0.2"/>
     </parrams>
     <description> This module is a pink noise source. </description>
     <sc>
-arg out;
-Out.ar(out, PinkNoise.ar());
+arg out, gain = 0.2;
+Out.ar(out, gain * PinkNoise.ar());
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="sine" name="Sine oscillator">
+    <parrams>
+      <outlet id="outbus"/>
+      <parram id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <parram id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
+    </parrams>
+    <description> A customizable sine oscillator. </description>
+    <sc>
+arg freq=440, amp=1, outbus;
+Out.ar(outbus, SinOsc.ar(freq,0,amp));
     </sc>
     <gui type="standard auto"/>
   </module>

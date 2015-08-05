@@ -24,14 +24,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIMarginBox.hpp"
 #include "UIBox.hpp"
 #include "UI/UILabel.hpp"
+#include "UI/UISlider.hpp"
 
 namespace AlgAudio{
 
 class StandardModuleGUI : public ModuleGUI{
 public:
-  static std::shared_ptr<StandardModuleGUI> CreateEmpty(std::shared_ptr<Window> w);
-  static std::shared_ptr<StandardModuleGUI> CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<ModuleTemplate> templ);
-  static std::shared_ptr<StandardModuleGUI> CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<ModuleTemplate> templ);
+  static std::shared_ptr<StandardModuleGUI> CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<Module> mod);
+  static std::shared_ptr<StandardModuleGUI> CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<Module> mod);
   void CustomDraw(DrawContext& c) override;
   void CustomResize(Size2D s) override;
   void SetHighlight(bool) override;
@@ -44,7 +44,7 @@ public:
   virtual Point2D WhereIsInlet(std::string inlet);
   virtual Point2D WhereIsOutlet(std::string outlet);
 protected:
-  StandardModuleGUI(std::shared_ptr<Window> w) : ModuleGUI(w){}
+  StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:
   void LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ);
   void LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ);
@@ -57,6 +57,9 @@ private:
   std::shared_ptr<UIVBox> main_box;
   std::shared_ptr<UIHBox> inlets_box;
   std::shared_ptr<UIHBox> outlets_box;
+  std::shared_ptr<UIVBox> parrams_box;
+
+  std::shared_ptr<SDLTextTexture> id_texture = nullptr;
 
   class IOConn : public UIWidget{
   public:
@@ -81,6 +84,7 @@ private:
 
   std::map<std::string, std::shared_ptr<IOConn>> inlets;
   std::map<std::string, std::shared_ptr<IOConn>> outlets;
+  std::map<std::string, std::shared_ptr<UISlider>> parram_sliders;
 };
 
 } // namespace AlgAudio

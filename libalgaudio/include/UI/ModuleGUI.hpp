@@ -47,14 +47,9 @@ public:
   virtual Point2D WhereIsInlet(std::string inlet) = 0;
   virtual Point2D WhereIsOutlet(std::string outlet) = 0;
   // Sets the link to module instance
-  void Associate(std::shared_ptr<Module> m){
-    module = m;
-    SetNeedsRedrawing();
-  }
   std::shared_ptr<Module> GetModule(){ return module.lock(); }
 protected:
-  ModuleGUI(std::shared_ptr<Window> w) : UIWidget(w){}
-  std::shared_ptr<SDLTextTexture> id_texture;
+  ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
   // A link to the module instance this GUI represents.
   std::weak_ptr<Module> module;
 };

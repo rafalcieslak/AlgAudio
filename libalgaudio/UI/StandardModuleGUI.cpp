@@ -24,17 +24,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateEmpty(std::shared_ptr<Window> w){
-  return std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w) );
-}
-std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<ModuleTemplate> templ){
-  auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w) );
-  ptr->LoadFromXML(xml_data, templ);
+std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<Module> mod){
+  auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w, mod) );
+  ptr->LoadFromXML(xml_data, mod->templ);
   return ptr;
 }
-std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<ModuleTemplate> templ){
-  auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w) );
-  ptr->LoadFromTemplate( templ);
+std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<Module> mod){
+  auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w, mod) );
+  ptr->LoadFromTemplate(mod->templ);
   return ptr;
 }
 
@@ -43,11 +40,14 @@ void StandardModuleGUI::CommonInit(){
   main_box = UIVBox::Create(window);
   inlets_box = UIHBox::Create(window);
   outlets_box = UIHBox::Create(window);
+  parrams_box = UIVBox::Create(window);
+  parrams_box->SetPadding(1);
   caption = UILabel::Create(window, "", 16);
   caption->SetTextColor("standardbox-caption");
 
   main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);
   main_box->Insert(caption, UIBox::PackMode::TIGHT);
+  main_box->Insert(parrams_box, UIBox::PackMode::TIGHT);
   main_box->Insert(outlets_box, UIBox::PackMode::TIGHT);
   main_margin->Insert(main_box);
   main_margin->parent = shared_from_this();
@@ -85,6 +85,11 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
     });
     outlets[o] = outlet;
   }
+  // Parram sliders.
+  for(std::shared_ptr<ParramController>& p : GetModule()->parram_controllers){
+    auto slider = UISlider::Create(window, p);
+    parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
+  }
   UpdateMinimalSize();
 }
 
@@ -121,8 +126,11 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   c.Pop();
 
   auto m = module.lock();
+
   if(m){
-    if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), std::to_string(m->sc_id).c_str());
+    std::string idn = std::to_string(m->sc_id);
+    //std::cout << "Drawin' " << idn << std::endl;
+    if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), idn.c_str());
     c.DrawText(id_texture, Color(0,0,0), 3,3);
   }
 }
