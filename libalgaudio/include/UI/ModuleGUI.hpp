@@ -37,8 +37,6 @@ public:
   // (true = mouse button down, false = mouse button up).
   Signal<std::string, bool> on_inlet_pressed;
   Signal<std::string, bool> on_outlet_pressed;
-  // A link to the module instance this GUI represents.
-  std::weak_ptr<Module> module;
   // The position of this module on the parent CanvasView.
   Point2D position;
   // When set to true, the module shall draw itself in it's "highlighted"
@@ -48,8 +46,17 @@ public:
   // connection wire endings.
   virtual Point2D WhereIsInlet(std::string inlet) = 0;
   virtual Point2D WhereIsOutlet(std::string outlet) = 0;
+  // Sets the link to module instance
+  void Associate(std::shared_ptr<Module> m){
+    module = m;
+    SetNeedsRedrawing();
+  }
+  std::shared_ptr<Module> GetModule(){ return module.lock(); }
 protected:
   ModuleGUI(std::shared_ptr<Window> w) : UIWidget(w){}
+  std::shared_ptr<SDLTextTexture> id_texture;
+  // A link to the module instance this GUI represents.
+  std::weak_ptr<Module> module;
 };
 
 } // namespace AlgAudio

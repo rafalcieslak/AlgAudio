@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleTemplate.hpp"
 #include <SDL2/SDL.h>
 #include "Theme.hpp"
+#include "TextRenderer.hpp"
 
 namespace AlgAudio{
 
@@ -118,6 +119,12 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   c.Push(Point2D(0,0),c.Size());
   main_margin->Draw(c);
   c.Pop();
+
+  auto m = module.lock();
+  if(m){
+    if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), std::to_string(m->sc_id).c_str());
+    c.DrawText(id_texture, Color(0,0,0), 3,3);
+  }
 }
 
 void StandardModuleGUI::CustomResize(Size2D s){

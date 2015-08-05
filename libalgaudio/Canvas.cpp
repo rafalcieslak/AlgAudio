@@ -60,7 +60,7 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
       auto from_outlet = GetOutletByIOID(from);
       std::list<IOID>& tolist = it->second;
       for(IOID &to : tolist)
-        if(to.iolet == inid)
+        if(to.module == m && to.iolet == inid)
           from_outlet->DetachFromInlet(GetInletByIOID(to));
       tolist.remove(IOID{m,inid});
       if(tolist.empty()){

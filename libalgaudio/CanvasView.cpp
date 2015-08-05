@@ -175,8 +175,8 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
 
 void CanvasView::FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id){
   std::cout << "Finalizing drag from " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
-  std::shared_ptr<Module> from_module = module_guis[outlet_module_id]->module.lock();
-  std::shared_ptr<Module> to_module   =  module_guis[inlet_module_id]->module.lock();
+  std::shared_ptr<Module> from_module = module_guis[outlet_module_id]->GetModule();
+  std::shared_ptr<Module> to_module   =  module_guis[inlet_module_id]->GetModule();
   if(!from_module || !to_module){
     window.lock()->ShowErrorAlert("Failed to create connection, one of the corresponding modules does not exist." , "Cancel");
     return;
@@ -270,8 +270,8 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
 
 void CanvasView::RemoveSelected(){
   if(selected_id < 0) return;
-  auto m = module_guis[selected_id]->module.lock();
-  canvas->RemoveModule(m);
+  auto m = module_guis[selected_id]->GetModule();
+  if(m) canvas->RemoveModule(m);
   module_guis.erase(module_guis.begin() + selected_id);
   selected_id = -1; // Warning: Do not use Select() here, because the selected module just stopped existing!
   drag_in_progress = false;
