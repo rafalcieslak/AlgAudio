@@ -18,11 +18,11 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UIWidget.hpp"
+#include "UIContainer.hpp"
 
 namespace AlgAudio{
 
-class UICentered : public UIWidget{
+class UICentered : public UIContainerSingle{
 public:
   static std::shared_ptr<UICentered> Create(std::weak_ptr<Window> parent_window);
   virtual void CustomDraw(DrawContext& c) override;
@@ -34,7 +34,8 @@ public:
   virtual void CustomMouseMotion(Point2D,Point2D) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
-  void RemoveChild();
+  virtual void RemoveChild() override;
+  virtual Point2D GetChildPos() const override {return current_child_pos;}
 private:
   UICentered(std::weak_ptr<Window> parent_window);
   inline bool IsInside(Point2D) const;

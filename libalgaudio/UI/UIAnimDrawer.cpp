@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 UIAnimDrawer::UIAnimDrawer(std::weak_ptr<Window> parent_window, Direction dir) :
-    UIWidget(parent_window), direction(dir)
+    UIContainerSingle(parent_window), direction(dir)
 {
 
 }
@@ -92,6 +92,10 @@ void UIAnimDrawer::StartHide(float t){
   anim = SDLMain::on_before_frame.Subscribe(this, &UIAnimDrawer::Step);
 }
 void UIAnimDrawer::Step(float delta){
+  if(!child){ // If child was removed...
+    anim.Release();
+    return;
+  }
   //std::cout << "Step! " << delta << std::endl;
   if(state == 0) std::cout << "Warning! Step should be never called with state = 0." << std::endl;
   float phasedelta = delta/time_to_finish;
@@ -143,6 +147,10 @@ void UIAnimDrawer::CustomMouseEnter(Point2D p2){
 void UIAnimDrawer::CustomMouseLeave(Point2D p1){
   if(!child || phase < 0.999) return;
   child->OnMouseLeave(p1);
+}
+void UIAnimDrawer::RemoveChild(){
+  child = nullptr;
+  SetNeedsRedrawing();
 }
 
 } // namespace AlgAudio

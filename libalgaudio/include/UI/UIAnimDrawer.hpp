@@ -18,14 +18,14 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UIWidget.hpp"
+#include "UIContainer.hpp"
 
 namespace AlgAudio{
 
-class UIAnimDrawer: public UIWidget{
+class UIAnimDrawer: public UIContainerSingle{
 public:
   static std::shared_ptr<UIAnimDrawer> Create(std::weak_ptr<Window> parent_window, Direction dir);
-  void Insert(std::shared_ptr<UIWidget> child);
+  virtual void Insert(std::shared_ptr<UIWidget> child) override;
   void StartShow(float time_to_show);
   void StartHide(float time_to_hide);
   virtual void CustomDraw(DrawContext& c) override;
@@ -36,6 +36,8 @@ public:
   virtual void CustomMouseMotion(Point2D,Point2D) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
+  virtual Point2D GetChildPos() const override {return GetCurrentOffset(); }
+  virtual void RemoveChild() override;
 
   Signal<> on_show_complete;
   Signal<> on_hide_complete;
@@ -53,8 +55,6 @@ private:
   int state = 0;
   float time_to_finish;
   Subscription anim;
-
-  std::shared_ptr<UIWidget> child;
 };
 
 } // namespace AlgAudio

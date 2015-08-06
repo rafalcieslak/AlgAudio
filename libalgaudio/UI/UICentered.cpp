@@ -21,7 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 UICentered::UICentered(std::weak_ptr<Window> w) :
-  UIWidget(w)
+  UIContainerSingle(w)
 { }
 
 std::shared_ptr<UICentered> UICentered::Create(std::weak_ptr<Window> w){

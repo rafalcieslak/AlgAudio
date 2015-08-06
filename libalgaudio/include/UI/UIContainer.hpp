@@ -1,3 +1,5 @@
+#ifndef UICONTAINER_HPP
+#define UICONTAINER_HPP
 /*
 This file is part of AlgAudio.
 
@@ -16,29 +18,24 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/UISlider.hpp"
-#include "Module.hpp"
-#include "ModuleTemplate.hpp"
+#include "UIWidget.hpp"
 
 namespace AlgAudio{
 
-UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> c) : UIWidget(parent_window), controller(c) {
-  SetMinimalSize(Size2D(100,20));
-}
+// This file contains interfaces for
 
-std::shared_ptr<UISlider> UISlider::Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller){
-  auto res = std::shared_ptr<UISlider>(new UISlider(parent_window, controller));
-  // Temporary. Tests link to controller.
-  if(controller->templ->name == "Frequency"){
-    controller->Set(60.0);
-  }
-  return res;
-}
-
-
-void UISlider::CustomDraw(DrawContext& c){
-  c.SetColor(Color(0,0,0));
-  c.DrawRect(0,0,c.Size().width,c.Size().height);
-}
+// This is an interface for widgets which act as a container for a single child,
+// like UICentered or UIMarginBox
+class UIContainerSingle : public UIWidget{
+public:
+  virtual void Insert(std::shared_ptr<UIWidget>) = 0;
+  virtual Point2D GetChildPos() const = 0;
+  virtual void RemoveChild() = 0;
+protected:
+  UIContainerSingle(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
+  std::shared_ptr<UIWidget> child;
+};
 
 } // namespace AlgAudio
+
+#endif // UICONTAINER_HPP

@@ -21,7 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 UIMarginBox::UIMarginBox(std::weak_ptr<Window> w, int t, int r, int b, int l) :
-  UIWidget(w), top(t), right(r), bottom(b), left(l)
+  UIContainerSingle(w), top(t), right(r), bottom(b), left(l)
 { }
 
 std::shared_ptr<UIMarginBox> UIMarginBox::Create(std::weak_ptr<Window> w, int t, int r, int b, int l){
@@ -100,5 +100,10 @@ void UIMarginBox::CustomMouseLeave(Point2D p){
   if(IsInside(p)) child->OnMouseLeave(p - Point2D(left,top));
 }
 
+void UIMarginBox::RemoveChild(){
+  child = nullptr;
+  SetMinimalSize(Size2D(0,0));
+  SetNeedsRedrawing();
+}
 
 } // namespace AlgAudio
