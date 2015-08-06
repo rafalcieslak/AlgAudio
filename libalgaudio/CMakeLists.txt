@@ -45,7 +45,6 @@ target_link_libraries(
 	${SDL2_TTF_LIBRARY}
 	${LIBLO_LIBRARY}
 	freetype
-	opengl32
 	${EXTRA_SYS_LIBS}
 )
 # The following command will clear transitive dependencies of libalgaudio.

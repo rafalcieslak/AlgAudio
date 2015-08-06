@@ -33,7 +33,11 @@ Window::Window(std::string t, int w, int h, bool centered) :
   window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if(!window) throw SDLException("Unable to create a window");
   context = SDL_GL_CreateContext(window);
+#ifdef __unix__
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+#else
   renderer = SDL_CreateRenderer(window, SDL_VIDEO_RENDER_OGL, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+#endif
   if(!renderer) throw SDLException("Unable to create a renderer");
   SDL_RendererInfo r;
   SDL_GetRendererInfo(renderer,&r);
