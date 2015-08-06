@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UILayered::UILayered(std::weak_ptr<Window> w) : UIWidget(w){
+UILayered::UILayered(std::weak_ptr<Window> w) : UIContainerMultiple(w){
 
 }
 
@@ -31,6 +31,11 @@ std::shared_ptr<UILayered> UILayered::Create(std::weak_ptr<Window> w){
 void UILayered::Insert(const std::shared_ptr<UIWidget>& child){
   children.push_back(child); // copies the pointer
   child->parent = shared_from_this();
+  RecalculateSize();
+  SetNeedsRedrawing();
+}
+void UILayered::Clear(){
+  children.clear();
   RecalculateSize();
   SetNeedsRedrawing();
 }

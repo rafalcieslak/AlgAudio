@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UIPosition::UIPosition(std::weak_ptr<Window> w) : UIWidget(w)
+UIPosition::UIPosition(std::weak_ptr<Window> w) : UIContainerSingle(w)
 { }
 
 std::shared_ptr<UIPosition> UIPosition::Create(std::weak_ptr<Window> w){
@@ -92,5 +92,10 @@ void UIPosition::CustomMouseLeave(Point2D p){
   if(IsInside(p)) child->OnMouseLeave(p - position);
 }
 
+void UIPosition::RemoveChild(){
+  child = nullptr;
+  SetMinimalSize(Size2D(0,0));
+  SetNeedsRedrawing();
+}
 
 } // namespace AlgAudio

@@ -36,6 +36,22 @@ protected:
   std::shared_ptr<UIWidget> child;
 };
 
+// This is an interface for widgets which act as a container for multiple
+// children, like UIBox or UILayered
+class UIContainerMultiple : public UIWidget{
+public:
+  // Not forcing on an Insert method, as some widgets may require extra arguments
+  // for insert
+  // virtual void Insert(std::shared_ptr<UIWidget>) = 0;
+  virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const = 0;
+  virtual void Clear() = 0;
+protected:
+  UIContainerMultiple(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
+  // Not forcing how the child list looks like, some widgets may wish to store
+  // some extra data wich each child.
+  //std::list<std::shared_ptr<UIWidget>> child;
+};
+
 } // namespace AlgAudio
 
 #endif // UICONTAINER_HPP

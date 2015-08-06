@@ -21,7 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UIBox::UIBox(std::weak_ptr<Window> w) : UIWidget(w){
+UIBox::UIBox(std::weak_ptr<Window> w) : UIContainerMultiple(w){
 }
 UIVBox::UIVBox(std::weak_ptr<Window> w) : UIBox(w){
 }

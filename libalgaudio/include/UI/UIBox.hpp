@@ -21,11 +21,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <vector>
 #include <functional>
-#include "UI/UIWidget.hpp"
+#include "UI/UIContainer.hpp"
 
 namespace AlgAudio{
 
-class UIBox : public UIWidget{
+class UIBox : public UIContainerMultiple{
 public:
   enum PackMode{
     TIGHT,
@@ -36,13 +36,13 @@ public:
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
   void Insert(std::shared_ptr<UIWidget> w, PackMode m);
-  void Clear();
+  virtual void Clear() override;
   void SetPadding(unsigned int padding);
   virtual bool CustomMousePress(bool down, short b,Point2D) override;
   virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
-  Point2D GetChildPos(std::shared_ptr<UIWidget>) const;
+  virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const override;
 private:
   struct PackData{
     std::shared_ptr<UIWidget> child;

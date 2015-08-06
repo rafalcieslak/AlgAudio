@@ -18,14 +18,15 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UIWidget.hpp"
+#include "UIContainer.hpp"
 
 namespace AlgAudio{
 
-class UILayered: public UIWidget{
+class UILayered: public UIContainerMultiple{
 public:
   static std::shared_ptr<UILayered> Create(std::weak_ptr<Window> parent_window);
   void Insert(const std::shared_ptr<UIWidget>& child);
+  virtual void Clear() override;
   virtual void CustomDraw(DrawContext& c) override;
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
@@ -34,6 +35,7 @@ public:
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
   virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;
+  virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const override {return Point2D(0,0);}
 private:
   UILayered(std::weak_ptr<Window> parent_window);
   std::list<std::shared_ptr<UIWidget>> children;
