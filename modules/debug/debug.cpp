@@ -27,6 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
+#include "UI/ModuleGUI.hpp"
 
 // The custom class NEVER takes ownership of the instances
 class HelloWorld : public AlgAudio::Module{
@@ -50,6 +51,10 @@ public:
     AlgAudio::SDLMain::UnregisterWindow(my_window);
     my_window = nullptr;
   }
+  // This demonstrates how you can modify the automatically built module GUI
+  virtual void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) {
+    gui->SetCustomSize(AlgAudio::Size2D(100,100));
+  };
   std::shared_ptr<AlgAudio::Window> my_window;
 };
 

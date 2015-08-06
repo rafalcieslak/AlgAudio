@@ -74,6 +74,10 @@ public:
   // instance is removed, while the buses still exist etc.
   virtual void on_init() {};
   virtual void on_destroy() {};
+  // This method will be called when the module GUI is ready to be displayed.
+  // If you wish to modify the GUI but do not want to override BuildGUI with
+  // custom builder, you override on_gui_build and modify the UI from there.
+  virtual void on_gui_build(std::shared_ptr<ModuleGUI>) {};
 
   // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;
