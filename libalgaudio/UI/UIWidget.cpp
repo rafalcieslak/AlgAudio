@@ -18,7 +18,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/UIWidget.hpp"
 #include <iostream>
+#include <typeinfo>
 #include "Window.hpp"
+#include "UI/UIContainer.hpp"
 
 namespace AlgAudio{
 
@@ -107,6 +109,29 @@ Size2D UIWidget::GetRequestedSize() const{
       std::max(minimal_size.width,  custom_size.width ),
       std::max(minimal_size.height, custom_size.height)
     );
+}
+
+Point2D UIWidget::GetPosInParent(std::shared_ptr<UIWidget> ancestor){
+  auto p = parent.lock();
+  if(!p){
+    std::cout << "WARNING: GetPosInParent: The widget has no parent, but ancestor was not yet found." << std::endl;
+    return Point2D(0,0);
+  }
+  Point2D res(0,0);
+  auto contsingle = std::dynamic_pointer_cast<UIContainerSingle>(p);
+  auto contmulti  = std::dynamic_pointer_cast<UIContainerMultiple>(p);
+  if(contsingle){
+    res = contsingle->GetChildPos();
+  }else if(contmulti){
+    res = contmulti->GetChildPos(shared_from_this());
+  }else{
+    std::cout << "WARNING: GetPosInParent: The parent is not a container. This widget is a " << typeid(*this).name() << " and the parent is " << typeid(*p).name() << std::endl;
+    return Point2D(0,0);
+  }
+  if(p != ancestor){
+    res = res + p->GetPosInParent(ancestor);
+  }
+  return res;
 }
 
 } // namespace AlgAudio

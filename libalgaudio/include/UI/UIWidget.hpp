@@ -109,6 +109,10 @@ public:
     return (bool)(parent.lock());
   }
 
+  // This function returns an offset at which this widget is drawn inside
+  // ancestor. The argument can be either a diretct parent, or a transitive one.
+  Point2D GetPosInParent(std::shared_ptr<UIWidget> ancestor);
+
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();

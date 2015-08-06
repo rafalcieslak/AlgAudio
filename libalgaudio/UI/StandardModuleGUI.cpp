@@ -24,6 +24,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+const int StandardModuleGUI::IOConn::width = 16;
+const int StandardModuleGUI::IOConn::height = 12;
+
 std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<Module> mod){
   auto ptr = std::shared_ptr<StandardModuleGUI>( new StandardModuleGUI(w, mod) );
   ptr->LoadFromXML(xml_data, mod->templ);
@@ -36,7 +39,7 @@ std::shared_ptr<StandardModuleGUI> StandardModuleGUI::CreateFromTemplate(std::sh
 }
 
 void StandardModuleGUI::CommonInit(){
-  main_margin = UIMarginBox::Create(window,0,6,0,6);
+  main_margin = UIMarginBox::Create(window,0,3,0,3);
   main_box = UIVBox::Create(window);
   inlets_box = UIHBox::Create(window);
   outlets_box = UIHBox::Create(window);
@@ -131,12 +134,13 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
     std::string idn = std::to_string(m->sc_id);
     //std::cout << "Drawin' " << idn << std::endl;
     if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), idn.c_str());
-    c.DrawText(id_texture, Color(0,0,0), 3,3);
+    c.DrawText(id_texture, Color(0,0,0), 3,2);
   }
 }
 
 void StandardModuleGUI::CustomResize(Size2D s){
   main_margin->Resize(s);
+  UpdateWhatIsHereCache();
 }
 
 void StandardModuleGUI::SetHighlight(bool h){
@@ -159,12 +163,12 @@ std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std
 
 StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
   : UIWidget(w), id(id_), align(align_), main_color(c), border_color(c){
-  SetMinimalSize(Size2D(22,12));
+  SetMinimalSize(GetRectSize() + Size2D(2,0));
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
   on_motion.SubscribeForever([this](Point2D pos){
-    bool new_inside = pos.IsInside(GetRectPos(),Size2D(20,12));
+    bool new_inside = pos.IsInside(GetRectPos(),GetRectSize());
     if(inside != new_inside){
       inside = new_inside;
       SetNeedsRedrawing();
@@ -173,16 +177,16 @@ StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, Vert
 };
 
 Point2D StandardModuleGUI::IOConn::GetRectPos() const{
-  int x = current_size.width/2 - 10;
+  int x = current_size.width/2 - width/2;
   int y = 0;
   if(align == VertAlignment_TOP) y = 0;
-  if(align == VertAlignment_CENTERED) y = current_size.height/2 - 6;
-  if(align == VertAlignment_BOTTOM) y = current_size.height - 12;
+  if(align == VertAlignment_CENTERED) y = current_size.height/2 - height/2;
+  if(align == VertAlignment_BOTTOM) y = current_size.height - height;
   return Point2D(x,y);
 }
 
 bool StandardModuleGUI::IOConn::CustomMousePress(bool down, short b,Point2D pos){
-  if(b == SDL_BUTTON_LEFT && pos.IsInside(GetRectPos(),Size2D(20,12))){
+  if(b == SDL_BUTTON_LEFT && pos.IsInside(GetRectPos(),GetRectSize())){
     on_press.Happen(down);
     return true;
   }
@@ -194,19 +198,19 @@ void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){
   const int x = p.x, y = p.y;
   if(pointed && inside) c.SetColor(main_color.Lighter(0.2));
   else c.SetColor(main_color);
-  c.DrawRect(x,y,20,12);
+  c.DrawRect(x,y,width,height);
   c.SetColor(border_color);
-  if(align != VertAlignment_TOP) c.DrawLine(x,y,x+20,y);
-  c.DrawLine(x,y,x,y+12);
-  c.DrawLine(x+20,y,x+20,y+12);
-  if(align != VertAlignment_BOTTOM) c.DrawLine(x,y+11,x+20,y+11);
+  if(align != VertAlignment_TOP) c.DrawLine(x,y,x+width,y);
+  c.DrawLine(x,y,x,y+height);
+  c.DrawLine(x+width,y,x+width,y+height);
+  if(align != VertAlignment_BOTTOM) c.DrawLine(x,y+height-1,x+width,y+height-1);
 }
 void StandardModuleGUI::IOConn::SetBorderColor(Color c){
   border_color = c;
   SetNeedsRedrawing();
 }
 Point2D StandardModuleGUI::IOConn::GetCenterPos() const{
-  return GetRectPos() + Point2D(20,12)/2;
+  return GetRectPos() + GetRectSize()/2;
 }
 
 Point2D StandardModuleGUI::WhereIsInlet(std::string id){
@@ -232,4 +236,30 @@ Point2D StandardModuleGUI::WhereIsOutlet(std::string id){
        + it->second->GetCenterPos();
 }
 
+
+std::pair<ModuleGUI::WhatIsHereType, std::string> StandardModuleGUI::WhatIsHere(Point2D p) const{
+  for(const auto &it : rect_cache)
+    if(p.IsInside(it.first))
+      return it.second;
+  // Rect not found.
+  return std::make_pair(WhatIsHereType::Nothing,"");
 }
+
+void StandardModuleGUI::UpdateWhatIsHereCache(){
+  std::cout << "Updating rect cache!" << std::endl;
+  rect_cache.clear();
+  for(const auto &it : inlets){
+    Point2D pos = it.second->GetPosInParent(main_margin);
+    pos = pos + it.second->GetRectPos();
+    Rect r(pos, it.second->GetRectSize());
+    rect_cache.push_back({r,{WhatIsHereType::Inlet, it.second->id}});
+  }
+  for(const auto &it : outlets){
+    Point2D pos = it.second->GetPosInParent(main_margin);
+    pos = pos + it.second->GetRectPos();
+    Rect r(pos, it.second->GetRectSize());
+    rect_cache.push_back({r,{WhatIsHereType::Outlet, it.second->id}});
+  }
+}
+
+} // namespace AlgAudio

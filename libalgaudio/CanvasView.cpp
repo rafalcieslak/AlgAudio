@@ -126,41 +126,46 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     }else{
       // Mouse button down on some module
       mouse_down_offset = offset;
-      mouse_down_inletid = mouse_down_outletid = "";
-      // This subscription will be deleted just when this scope ends.
-      Subscription temp_sub1 = module_guis[id]-> on_inlet_pressed.Subscribe([this](std::string i, bool ){  mouse_down_inletid = i; });
-      Subscription temp_sub2 = module_guis[id]->on_outlet_pressed.Subscribe([this](std::string o, bool ){ mouse_down_outletid = o; });
-      bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
-      if(!captured) mouse_down_mode = ModeModuleBody;
-      else if( mouse_down_inletid != "") mouse_down_mode =  ModeInlet;
-      else if(mouse_down_outletid != "") mouse_down_mode = ModeOutlet;
-      else mouse_down_mode = ModeCaptured;
+
+      auto whatishere = module_guis[id]->WhatIsHere(offset);
+      if(whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
+        std::cout << "Mouse down on inlet" << std::endl;
+        mouse_down_mode =  ModeInlet;
+        mouse_down_inletid = whatishere.second;
+      }else if(whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
+        std::cout << "Mouse down on outlet" << std::endl;
+        mouse_down_mode =  ModeOutlet;
+        mouse_down_outletid = whatishere.second;
+      }else{ // Nothing
+        bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
+        if(!captured) mouse_down_mode = ModeModuleBody;
+        else mouse_down_mode = ModeCaptured;
+      }
 
       if(mouse_down_mode == ModeModuleBody) Select(id);
     }
   }
   if(down == false && b == SDL_BUTTON_LEFT){
-    // Mouse button down
+    // Mouse button up
     mouse_down = false;
 
     if(id >=0 ){
       // Mouse button released on some module
-
-      // This subscription will be deleted just when this scope ends.
-      std::string outlet, inlet;
-      Subscription temp_sub1 = module_guis[id]-> on_inlet_pressed.Subscribe( [&inlet](std::string i, bool ){  inlet = i; });
-      Subscription temp_sub2 = module_guis[id]->on_outlet_pressed.Subscribe([&outlet](std::string o, bool ){ outlet = o; });
-      bool captured = module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
-
+      auto whatishere = module_guis[id]->WhatIsHere(offset);
       if(drag_in_progress){
         drag_in_progress = false;
-        if(drag_mode == DragModeConnectFromInlet && captured && outlet != ""){
-            FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, outlet);
-        }else if(drag_mode == DragModeConnectFromOutlet && captured && inlet != ""){
-            FinalizeConnectingDrag(id, inlet, mouse_down_id, mouse_down_outletid);
+        if(drag_mode == DragModeConnectFromInlet && whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
+            FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, whatishere.second);
+        }else if(drag_mode == DragModeConnectFromOutlet && whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
+            FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_outletid);
+        }else{
+          // Drag ended on module body.
+          SetNeedsRedrawing(); // Redraw to remove the dragged wire.
         }
+      }else{
+        // No drag in progress.
+         module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
       }
-
     }else{
       // Mouse button released on an empty space
       if(drag_in_progress){

@@ -43,6 +43,7 @@ public:
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
   virtual Point2D WhereIsInlet(std::string inlet);
   virtual Point2D WhereIsOutlet(std::string outlet);
+  virtual std::pair<WhatIsHereType, std::string> WhatIsHere(Point2D) const override;
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:
@@ -75,16 +76,25 @@ private:
     void CustomDraw(DrawContext& c) override;
     void SetBorderColor(Color c);
     virtual bool CustomMousePress(bool down, short b,Point2D pos) override;
-    Point2D GetCenterPos() const;
+    friend class StandardModuleGUI;
+    static const int width, height;
   private:
     void Init();
     IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c);
     Point2D GetRectPos() const;
+    inline Size2D  GetRectSize() const {return Size2D(width,height);}
+    Point2D GetCenterPos() const;
   };
 
+  // Here all crucial elements are stored.
   std::map<std::string, std::shared_ptr<IOConn>> inlets;
   std::map<std::string, std::shared_ptr<IOConn>> outlets;
   std::map<std::string, std::shared_ptr<UISlider>> parram_sliders;
+
+  // Rectangle cache for WhatIsHere method
+  void UpdateWhatIsHereCache();
+  std::list<std::pair<Rect, std::pair<WhatIsHereType, std::string>>> rect_cache;
+
 };
 
 } // namespace AlgAudio

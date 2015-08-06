@@ -157,7 +157,7 @@ void UIBox::CustomResize(Size2D newsize){
 unsigned int UIBox::GetTotalSize() const{
   unsigned int total = 0;
   for(unsigned int n = 0; n < children.size(); n++){
-    total += children[n].size;
+    total += std::max(children[n].size, DirectionalDimension(children[n].child->GetRequestedSize()));
     total += padding;
   }
   return total - padding;

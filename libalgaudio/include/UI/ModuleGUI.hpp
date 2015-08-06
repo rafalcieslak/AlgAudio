@@ -49,19 +49,17 @@ public:
   // Sets the link to module instance
   std::shared_ptr<Module> GetModule(){ return module.lock(); }
 
-  // This set of helper structures and the WhatIsHere function are used
-  // by the CanvasView to determine if the clicked point is an inlet, a slider,
-  // module body, etc.
-  enum class WhatIsHere_Types{
+  enum class WhatIsHereType{
     Nothing,
     Inlet,
     Outlet,
   };
-  struct WhatIsHere_data{
-    WhatIsHere_Types type;
-    std::string id;
-  };
-  WhatIsHere_data WhatIsHere(Point2D);
+  // This function is used by the CanvasView to ask the module GUI what kind of
+  // element is located at a given point. This function shall return a enum
+  // value of WhatIsHereType and a string id (if applicable), for example for
+  // inlets/outlets. This way the CanvasView can handle connections etc. and
+  // ModuleGUI does not have to bother about them.
+  virtual std::pair<WhatIsHereType, std::string> WhatIsHere(Point2D) const = 0;
 protected:
   ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
   // A link to the module instance this GUI represents.
