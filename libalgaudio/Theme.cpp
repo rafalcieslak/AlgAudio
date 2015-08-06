@@ -53,6 +53,8 @@ void Theme::Init(){
   thememap["alert-border-error"] = Color(0x943a3aff);
 
   thememap["canvas-connection"] = Color(0x1b2737ff);
+  thememap["canvas-connection-new"] = Color(0x37a025ff);
+  thememap["canvas-connection-remove"] = Color(0xb92b2bff);
 }
 
 const Color& Theme::Get(const std::string& id){

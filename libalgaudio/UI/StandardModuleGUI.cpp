@@ -129,12 +129,10 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   c.Pop();
 
   auto m = module.lock();
-
   if(m){
     std::string idn = std::to_string(m->sc_id);
-    //std::cout << "Drawin' " << idn << std::endl;
     if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), idn.c_str());
-    c.DrawText(id_texture, Color(0,0,0), 3,2);
+    c.DrawText(id_texture, Theme::Get("standardbox-border"), 3,1);
   }
 }
 

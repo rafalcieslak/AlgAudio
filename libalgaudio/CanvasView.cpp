@@ -82,15 +82,33 @@ void CanvasView::CustomDraw(DrawContext& c){
       c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos);
     }
   }
-  // Then draw the currently dragged line...
-  if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
-    Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
-    int strength = CurveStrengthFunc(p, drag_position);
-    c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
-  }else  if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
-    Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
-    int strength = CurveStrengthFunc(p, drag_position);
-    c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);
+  // Then draw the potential new wire.
+  if(drag_in_progress && potential_wire != PotentialWireMode::None){
+    int from_id = potential_wire_connection.first.first, to_id = potential_wire_connection.second.first;
+    std::string from_outletid = potential_wire_connection.first.second, to_inletid = potential_wire_connection.second.second;
+
+    if(canvas->GetDirectConnectionExists(Canvas::IOID{module_guis[from_id]->GetModule(), from_outletid},
+                                         Canvas::IOID{module_guis[  to_id]->GetModule(),    to_inletid}  ))
+      c.SetColor(Theme::Get("canvas-connection-remove"));
+    else
+      c.SetColor(Theme::Get("canvas-connection-new"));
+
+    Point2D p1 = module_guis[from_id]->position + module_guis[from_id]->WhereIsOutlet(from_outletid);
+    Point2D p2 = module_guis[  to_id]->position + module_guis[  to_id]->WhereIsInlet (   to_inletid);
+    int strength = CurveStrengthFunc(p1, p2);
+    c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2);
+  }else if(drag_in_progress){
+    // This is a normal drag in progress.
+    // Simply draw the currently dragged line...
+    if(drag_mode == DragModeConnectFromOutlet){
+      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
+      int strength = CurveStrengthFunc(p, drag_position);
+      c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
+    }else if(drag_mode == DragModeConnectFromInlet){
+      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
+      int strength = CurveStrengthFunc(p, drag_position);
+      c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);
+    }
   }
 }
 
@@ -153,15 +171,15 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       // Mouse button released on some module
       auto whatishere = module_guis[id]->WhatIsHere(offset);
       if(drag_in_progress){
-        drag_in_progress = false;
         if(drag_mode == DragModeConnectFromInlet && whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
-            FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, whatishere.second);
+          FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, whatishere.second);
         }else if(drag_mode == DragModeConnectFromOutlet && whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
-            FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_outletid);
+          FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_outletid);
         }else{
           // Drag ended on module body.
-          SetNeedsRedrawing(); // Redraw to remove the dragged wire.
         }
+        StopDrag();
+        SetNeedsRedrawing(); // Redraw to remove the dragged wire.
       }else{
         // No drag in progress.
          module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
@@ -169,7 +187,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     }else{
       // Mouse button released on an empty space
       if(drag_in_progress){
-        drag_in_progress = false;
+        StopDrag();
         // Redrawing to clear the drag-wire.
         SetNeedsRedrawing();
       }
@@ -224,7 +242,7 @@ void CanvasView::CustomMouseEnter(Point2D pos){
 }
 void CanvasView::CustomMouseLeave(Point2D pos){
   if(mouse_down) mouse_down = false;
-  if(drag_in_progress) drag_in_progress = false;
+  if(drag_in_progress) StopDrag();
   int id = InWhich(pos);
   if(id != -1){
     module_guis[id]->OnMouseLeave(pos);
@@ -236,9 +254,33 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
     SetNeedsRedrawing();
   }else if(drag_in_progress && drag_mode == DragModeConnectFromInlet){
     drag_position = to;
+    int id = InWhich(to);
+    if(id >= 0){
+      auto whatishere = module_guis[id]->WhatIsHere(to - module_guis[id]->position);
+      if(whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
+        potential_wire = PotentialWireMode::New;
+        potential_wire_connection = {{id, whatishere.second}, {mouse_down_id, mouse_down_inletid}};
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+    }else{
+      potential_wire = PotentialWireMode::None;
+    }
     SetNeedsRedrawing();
   }else if(drag_in_progress && drag_mode == DragModeConnectFromOutlet){
     drag_position = to;
+    int id = InWhich(to);
+    if(id >= 0){
+      auto whatishere = module_guis[id]->WhatIsHere(to - module_guis[id]->position);
+      if(whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
+        potential_wire = PotentialWireMode::New;
+        potential_wire_connection = {{mouse_down_id, mouse_down_outletid}, {id, whatishere.second}};
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+    }else{
+      potential_wire = PotentialWireMode::None;
+    }
     SetNeedsRedrawing();
   }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5){
     drag_in_progress = true;
@@ -250,11 +292,9 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
     }else if(mouse_down_mode == ModeInlet){
       drag_mode = DragModeConnectFromInlet;
       drag_connection_io_start = mouse_down_inletid;
-      std::cout << "Starting connect-drag from inlet " << drag_connection_io_start << std::endl;
     }else if(mouse_down_mode == ModeOutlet){
       drag_mode = DragModeConnectFromOutlet;
       drag_connection_io_start = mouse_down_outletid;
-      std::cout << "Starting connect-drag from outlet " << drag_connection_io_start << std::endl;
     }
   }
 
@@ -269,8 +309,12 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
   }else if(id1 == id2 && id1 != -1){
     module_guis[id1]->OnMouseMotion(offset1,offset2);
   }
+}
 
-
+void CanvasView::StopDrag(){
+  drag_in_progress = false;
+  dragged_id = -1;
+  potential_wire = PotentialWireMode::None;
 }
 
 void CanvasView::RemoveSelected(){
@@ -279,7 +323,7 @@ void CanvasView::RemoveSelected(){
   if(m) canvas->RemoveModule(m);
   module_guis.erase(module_guis.begin() + selected_id);
   selected_id = -1; // Warning: Do not use Select() here, because the selected module just stopped existing!
-  drag_in_progress = false;
+  StopDrag();
   SetNeedsRedrawing();
 }
 

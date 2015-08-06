@@ -68,6 +68,20 @@ private:
   void FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id);
   // Use -1 to unselect
   void Select(int id);
+
+  // Sets drag_in_progress to false, but also does extra cleanup.
+  void StopDrag();
+
+  // This is the green or red wire that is drawn when a new connection is almost
+  // created or removed.
+  enum class PotentialWireMode{
+    None,
+    New,
+    Remove,
+  };
+  PotentialWireMode potential_wire = PotentialWireMode::None;
+  std::pair<std::pair<int,std::string>, std::pair<int,std::string>> potential_wire_connection;
+
 };
 
 } // namespace AlgAudio
