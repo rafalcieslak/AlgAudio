@@ -108,6 +108,21 @@ Out.ar(out, SinOsc.ar(freq, 0, amp));
     <gui type="standard auto"/>
   </module>
 
+  <module id="lfsquare1" name="Low frequency square">
+    <parrams>
+      <outlet id="out"/>
+      <parram id="freq" name="Frequency" defaultmin="0.0" defaultmax="8.0" defaultval="3"/>
+      <parram id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
+      <parram id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
+    </parrams>
+    <description> A simple low frequency oscillator with customizable frequency. </description>
+    <sc>
+arg out, freq=3, amp=1, dc=0.5;
+Out.ar(out, Pulse.ar(freq, dc, amp));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
   <module id="whitenoise" name="White noise">
     <parrams>
       <outlet id="out"/>
@@ -143,6 +158,36 @@ Out.ar(out, gain * PinkNoise.ar());
     <sc>
 arg freq=440, amp=1, outbus;
 Out.ar(outbus, SinOsc.ar(freq,0,amp));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+
+  <module id="square" name="Square oscillator">
+    <parrams>
+      <outlet id="outbus"/>
+      <parram id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <parram id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
+      <parram id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
+    </parrams>
+    <description> A customizable square oscillator. </description>
+    <sc>
+arg freq=440, amp=1, dc=0.5, outbus;
+Out.ar(outbus, Pulse.ar(freq,dc,amp));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="saw" name="Sawtooth oscillator">
+    <parrams>
+      <outlet id="outbus"/>
+      <parram id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <parram id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
+    </parrams>
+    <description> A customizable sawtooth oscillator. </description>
+    <sc>
+arg freq=440, amp=1, outbus;
+Out.ar(outbus, Saw.ar(freq,amp));
     </sc>
     <gui type="standard auto"/>
   </module>
@@ -206,6 +251,31 @@ Out.ar(outbus2, sin(q)*In.ar(inbus));
 arg inbus1, inbus2, outbus, src=0;
 var q = 0.5pi*((src+1)/2);
 Out.ar(outbus, (cos(q)*In.ar(inbus1)) + (sin(q)*In.ar(inbus2)));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+
+  <module id="exrev1" name="Example reverb">
+    <parrams>
+      <inlet id="inbus1"/>
+      <inlet id="inbus2"/>
+      <outlet id="outbus1"/>
+      <outlet id="outbus2"/>
+    </parrams>
+    <description> A simple basic example reverb. </description>
+    <sc>
+arg inbus1, inbus2, outbus1, outbus2;
+var sig = LocalIn.ar(4);
+var input = In.ar([inbus1,inbus2]);
+var delays = [0.070,0.042,0.051,0.087] - ControlDur.ir;
+sig = sig * [0.73,0.7,0.72,0.78];
+sig = ([[1,1,1,1],[1,-1,1,-1],[1,1,-1,-1],[1,-1,-1,1]] * sig).sum;
+sig = sig/3;
+sig = sig + (input ++ [0,0]);
+LocalOut.ar(DelayC.ar(sig,delays,delays));
+Out.ar(outbus1,sig[0]);
+Out.ar(outbus2,sig[1]);
     </sc>
     <gui type="standard auto"/>
   </module>
