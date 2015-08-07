@@ -185,32 +185,31 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     // Mouse button up
     mouse_down = false;
 
-    if(id >=0 ){
-      // Mouse button released on some module
-      auto whatishere = module_guis[id]->WhatIsHere(offset);
-      if(drag_in_progress){
-        if(drag_mode == DragModeConnectFromInlet && whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
-          FinalizeConnectingDrag(mouse_down_id, mouse_down_elemid, id, whatishere.second);
-        }else if(drag_mode == DragModeConnectFromOutlet && whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
-          FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_elemid);
-        }else if(drag_mode == DragModeSlider){
-          module_guis[dragged_id]->SliderDragEnd(mouse_down_elemid, pos - module_guis[dragged_id]->position);
+    if(drag_in_progress){
+      if(drag_mode == DragModeSlider){
+        // Slider drag end
+        module_guis[dragged_id]->SliderDragEnd(mouse_down_elemid, pos - module_guis[dragged_id]->position);
+      }else if(drag_mode == DragModeConnectFromInlet || drag_mode == DragModeConnectFromOutlet){
+        // Connection drag end
+        if(id >= 0){
+          auto whatishere = module_guis[id]->WhatIsHere(offset);
+          if(drag_mode == DragModeConnectFromInlet && whatishere.first == ModuleGUI::WhatIsHereType::Outlet)
+            FinalizeConnectingDrag(mouse_down_id, mouse_down_elemid, id, whatishere.second);
+          else if(drag_mode == DragModeConnectFromOutlet && whatishere.first == ModuleGUI::WhatIsHereType::Inlet)
+            FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_elemid);
+          else{
+            // Connecting drag ended on module, but not on an inlet/outlet.
+          }
         }else{
-          // Drag ended on module body.
+          // Connecting drag ended on empty space.
         }
-        StopDrag();
-        SetNeedsRedrawing(); // Redraw to remove the dragged wire.
-      }else{
-        // No drag in progress.
-         module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
       }
+      StopDrag();
+      // Redrawing to clear the drag-wire.
+      SetNeedsRedrawing();
     }else{
-      // Mouse button released on an empty space
-      if(drag_in_progress){
-        StopDrag();
-        // Redrawing to clear the drag-wire.
-        SetNeedsRedrawing();
-      }
+      // No drag in progress.
+      if(id >= 0) module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
     }
   }
   return true;
@@ -330,7 +329,6 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
     // Slider dragging does not require such a huge distance to start.
   }else if(mouse_down && mouse_down_id >=0 &&
     ( mouse_down_mode == ModeSlider ) ) {
-    std::cout << "Slider drag start." << std::endl;
     drag_in_progress = true;
     drag_offset = mouse_down_offset;
     dragged_id = mouse_down_id;

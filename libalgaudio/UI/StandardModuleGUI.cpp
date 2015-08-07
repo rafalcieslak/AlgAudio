@@ -280,7 +280,7 @@ void StandardModuleGUI::SliderDragStep(std::string id, Point2D current_pos){
   parram_sliders[id]->DragStep(current_pos);
 }
 void StandardModuleGUI::SliderDragEnd(std::string id, Point2D final_pos){
-  parram_sliders[id]->DragStep(final_pos);
+  parram_sliders[id]->DragEnd(final_pos);
 }
 
 } // namespace AlgAudio

@@ -38,11 +38,6 @@ std::shared_ptr<UISlider> UISlider::Create(std::weak_ptr<Window> parent_window, 
 }
 
 void UISlider::Init(std::shared_ptr<ParramController> controller){
-  // Temporary. Tests link to controller.
-  if(controller->templ->name == "Frequency"){
-    controller->Set(60.0);
-  }
-
   id = controller->templ->id;
   name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), controller->templ->name);
 
@@ -193,6 +188,7 @@ void UISlider::DragStart(Point2D pos){
   dragged = true;
   drag_start = pos;
   drag_start_q = (current_value - range_min)/(range_max - range_min);
+  SetNeedsRedrawing();
 }
 void UISlider::DragStep(Point2D pos){
   float dq = ((float)pos.x - drag_start.x)/((float)current_size.width - 24.0f);
@@ -203,6 +199,7 @@ void UISlider::DragStep(Point2D pos){
 void UISlider::DragEnd(Point2D pos){
   DragStep(pos);
   dragged = false;
+  SetNeedsRedrawing();
 }
 
 } // namespace AlgAudio

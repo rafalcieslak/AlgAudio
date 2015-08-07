@@ -31,12 +31,14 @@ Out.ar(outbus,in);
     <parrams>
       <inlet id="inbus1"/>
       <inlet id="inbus2"/>
+      <parram id="db" name="Volume (dB)" defaultmin="0.0" defaultmax="100.0" defaultval="85"/>
     </parrams>
     <description> This module has two inlets, the audio signal connected to them will be played on the system audio output device. </description>
     <sc>
-arg inbus1, inbus2;
-Out.ar(0,In.ar(inbus1));
-Out.ar(1,In.ar(inbus2));
+arg inbus1, inbus2, db=85;
+var amp = (db-100).dbamp;
+Out.ar(0,In.ar(inbus1)*amp);
+Out.ar(1,In.ar(inbus2)*amp);
     </sc>
     <gui type="standard auto"/>
   </module>
@@ -53,15 +55,17 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
     <gui type="standard auto"/>
   </module>
 
-  <module id="exvco" name="Example VCO">
+  <module id="exvco" name="Simple VCO">
     <parrams>
       <inlet id="in"/>
       <outlet id="out"/>
+      <parram id="base" name="Base freq" defaultmin="0.0" defaultmax="10000.0" defaultval="300"/>
+      <parram id="amt" name="Mod. amount" defaultmin="0.0" defaultmax="200.0" defaultval="50"/>
     </parrams>
-    <description> A simple 250-350Hz voltage controlled oscillator. </description>
+    <description> A simple voltage controlled oscillator. </description>
     <sc>
-arg in, out;
-Out.ar(out, SinOsc.ar((In.ar(in)*50.0)+300.0, 0, 1));
+arg in, out, base=300, amt=50;
+Out.ar(out, SinOsc.ar((In.ar(in)*amt)+base, 0, 1));
     </sc>
     <gui type="standard auto"/>
   </module>
@@ -86,6 +90,20 @@ Out.ar(out, SinOsc.ar(1, 0, 1));
     <sc>
 arg out;
 Out.ar(out, SinOsc.ar(8, 0, 1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="lfsine1" name="Low frequency sine">
+    <parrams>
+      <outlet id="out"/>
+      <parram id="freq" name="Frequency" defaultmin="0.0" defaultmax="8.0" defaultval="3"/>
+      <parram id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
+    </parrams>
+    <description> A simple low frequency oscillator with customizable frequency. </description>
+    <sc>
+arg out, freq=3, amp=1;
+Out.ar(out, SinOsc.ar(freq, 0, amp));
     </sc>
     <gui type="standard auto"/>
   </module>
@@ -140,7 +158,54 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
     <description> A simple 4-channel mixer with no way to regulate gain. </description>
     <sc>
 arg in1, in2, in3, in4, out;
-Out.ar(out, In.ar(in1) + In.ar(in2) + In.ar(in3)+ In.ar(in4));
+Out.ar(out, In.ar(in1) + In.ar(in2) + In.ar(in3) + In.ar(in4));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="gain1" name="Gain">
+    <parrams>
+      <inlet id="inbus"/>
+      <outlet id="outbus"/>
+      <parram id="gain" name="Level" defaultmin="0.0" defaultmax="2.0" defaultval="1.0"/>
+    </parrams>
+    <description> Multiplies signal by a constant value. </description>
+    <sc>
+arg inbus, outbus, gain=1;
+Out.ar(outbus, gain*In.ar(inbus));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="pan2" name="Panorama">
+    <parrams>
+      <inlet id="inbus"/>
+      <outlet id="outbus1"/>
+      <outlet id="outbus2"/>
+      <parram id="dir" name="Direction" defaultmin="-1.0" defaultmax="1.0" defaultval="0.0"/>
+    </parrams>
+    <description> Distributes a single signal to two outlets. </description>
+    <sc>
+arg inbus, outbus1, outbus2, dir=0;
+var q = 0.5pi*((dir+1)/2);
+Out.ar(outbus1, cos(q)*In.ar(inbus));
+Out.ar(outbus2, sin(q)*In.ar(inbus));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+  <module id="cross2" name="Crossfade">
+    <parrams>
+      <inlet id="inbus1"/>
+      <inlet id="inbus2"/>
+      <outlet id="outbus"/>
+      <parram id="src" name="Source" defaultmin="-1.0" defaultmax="1.0" defaultval="0.0"/>
+    </parrams>
+    <description> Outputs a balanced mixture of two input signals. </description>
+    <sc>
+arg inbus1, inbus2, outbus, src=0;
+var q = 0.5pi*((src+1)/2);
+Out.ar(outbus, (cos(q)*In.ar(inbus1)) + (sin(q)*In.ar(inbus2)));
     </sc>
     <gui type="standard auto"/>
   </module>
