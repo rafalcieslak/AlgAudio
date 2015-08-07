@@ -31,6 +31,11 @@ public:
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override;
   virtual void CustomMouseEnter(Point2D pos) override;
   virtual void CustomMouseLeave(Point2D pos) override;
+  Rect GetInputRect() const;
+  Rect GetOutputRect() const;
+  Rect GetBodyRect() const;
+  
+  std::string id;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
 private:

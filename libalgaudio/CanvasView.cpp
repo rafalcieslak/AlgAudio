@@ -154,10 +154,15 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
         std::cout << "Mouse down on outlet" << std::endl;
         mouse_down_mode =  ModeOutlet;
         mouse_down_outletid = whatishere.second;
-      }else{ // Nothing
+      }else if(whatishere.first == ModuleGUI::WhatIsHereType::SliderBody){
+        mouse_down_mode = ModeNone;
+        std::cout << "Slider body!" << std::endl;
+      }else if(whatishere.first == ModuleGUI::WhatIsHereType::Nothing){
         bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
         if(!captured) mouse_down_mode = ModeModuleBody;
         else mouse_down_mode = ModeCaptured;
+      }else{
+        mouse_down_mode = ModeNone;
       }
 
       if(mouse_down_mode == ModeModuleBody) Select(id);
@@ -282,7 +287,11 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       potential_wire = PotentialWireMode::None;
     }
     SetNeedsRedrawing();
-  }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5){
+  }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5 &&
+    ( mouse_down_mode == ModeModuleBody ||
+      mouse_down_mode == ModeInlet      ||
+      mouse_down_mode == ModeOutlet       ) ) {
+    //std::cout << "DRAG start" << std::endl;
     drag_in_progress = true;
     drag_offset = mouse_down_offset;
     dragged_id = mouse_down_id;
@@ -312,6 +321,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
 }
 
 void CanvasView::StopDrag(){
+  //std::cout << "Stopping drag" << std::endl;
   drag_in_progress = false;
   dragged_id = -1;
   potential_wire = PotentialWireMode::None;

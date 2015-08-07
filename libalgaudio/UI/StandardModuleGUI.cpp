@@ -92,6 +92,7 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   for(std::shared_ptr<ParramController>& p : GetModule()->parram_controllers){
     auto slider = UISlider::Create(window, p);
     parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
+    parram_sliders[slider->id] = slider;
   }
   UpdateMinimalSize();
 }
@@ -257,6 +258,17 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
     pos = pos + it.second->GetRectPos();
     Rect r(pos, it.second->GetRectSize());
     rect_cache.push_back({r,{WhatIsHereType::Outlet, it.second->id}});
+  }
+  for(const auto &it : parram_sliders){
+    Point2D pos = it.second->GetPosInParent(main_margin);
+    Rect r;
+    std::cout << "Cache for slider" << std::endl;
+    r = it.second->GetInputRect().MoveOffset(pos);
+    rect_cache.push_back({r,{WhatIsHereType::SliderInput, it.second->id}});
+    r = it.second->GetOutputRect().MoveOffset(pos);
+    rect_cache.push_back({r,{WhatIsHereType::SliderOutput, it.second->id}});
+    r = it.second->GetBodyRect().MoveOffset(pos);
+    rect_cache.push_back({r,{WhatIsHereType::SliderBody, it.second->id}});
   }
 }
 

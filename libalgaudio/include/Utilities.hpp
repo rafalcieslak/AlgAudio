@@ -79,12 +79,14 @@ Point2D_<T> operator*(const T& t, const Point2D_<T>& a) {
 struct Rect{
   Point2D a;
   Point2D b;
+  Rect() {}
   Rect(Point2D a_, Point2D b_) : a(a_), b(b_) {}
   Rect(Point2D a_, Size2D s) : a(a_), b(a_+s) {}
   Size2D Size() const {
     auto q = b-a;
     return {q.x,q.y};
   }
+  Rect MoveOffset(Point2D p) {return Rect(a+p, b+p);}
 };
 
 template <typename T>

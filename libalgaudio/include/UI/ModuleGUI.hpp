@@ -53,6 +53,9 @@ public:
     Nothing,
     Inlet,
     Outlet,
+    SliderInput,
+    SliderOutput,
+    SliderBody,
   };
   // This function is used by the CanvasView to ask the module GUI what kind of
   // element is located at a given point. This function shall return a enum

@@ -39,6 +39,8 @@ void UISlider::Init(std::shared_ptr<ParramController> controller){
   if(controller->templ->name == "Frequency"){
     controller->Set(60.0);
   }
+
+  id = controller->templ->id;
   name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), controller->templ->name);
 
   range_min = controller->templ->default_min;
@@ -57,6 +59,16 @@ void UISlider::Init(std::shared_ptr<ParramController> controller){
     value_texture_big = TextRenderer::Render(window,FontParrams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
     SetNeedsRedrawing();
   });
+}
+
+Rect UISlider::GetInputRect() const{
+  return Rect(Point2D(0,0), Size2D(12, current_size.height));
+}
+Rect UISlider::GetOutputRect() const{
+  return Rect(Point2D(current_size.width - 12, 0), Size2D(12, current_size.height));
+}
+Rect UISlider::GetBodyRect() const{
+  return Rect(Point2D(12, 0), Size2D(current_size.width - 24, current_size.height));
 }
 
 void UISlider::CustomDraw(DrawContext& c){
