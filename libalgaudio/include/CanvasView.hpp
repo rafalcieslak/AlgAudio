@@ -49,9 +49,10 @@ private:
     ModeCaptured,
     ModeInlet,
     ModeOutlet,
+    ModeSlider,
   };
   MouseDownMode mouse_down_mode;
-  std::string mouse_down_inletid, mouse_down_outletid;
+  std::string mouse_down_inletid, mouse_down_outletid, mouse_down_sliderid;
   Point2D mouse_down_position, drag_position;
   int mouse_down_id = -1;
   Point2D mouse_down_offset, drag_offset;

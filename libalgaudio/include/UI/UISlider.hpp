@@ -28,13 +28,14 @@ class UISlider : public UIWidget{
 public:
   static std::shared_ptr<UISlider> Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
   void CustomDraw(DrawContext& c) override;
+  virtual bool CustomMousePress(bool down, short b,Point2D pos) override;
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override;
   virtual void CustomMouseEnter(Point2D pos) override;
   virtual void CustomMouseLeave(Point2D pos) override;
   Rect GetInputRect() const;
   Rect GetOutputRect() const;
   Rect GetBodyRect() const;
-  
+
   std::string id;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);

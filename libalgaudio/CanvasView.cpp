@@ -127,10 +127,17 @@ int CanvasView::InWhich(Point2D p){
 bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
   int id = InWhich(pos);
   Point2D offset;
+
   if(id >=0 ){
     offset = pos - module_guis[id]->position;
   }
   if(down == true && b == SDL_BUTTON_LEFT){
+
+    // When a module was just added, it is dragged with LMB up. The drag is
+    // stopped by clicking. We want to ignore that click, so generally let's skip
+    // all mouse down events that happen during a drag.
+    if(drag_in_progress) return true;
+
     // Mouse button down
     mouse_down = true;
     mouse_down_position = pos;
@@ -143,6 +150,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       }
     }else{
       // Mouse button down on some module
+
       mouse_down_offset = offset;
 
       auto whatishere = module_guis[id]->WhatIsHere(offset);
@@ -155,8 +163,13 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
         mouse_down_mode =  ModeOutlet;
         mouse_down_outletid = whatishere.second;
       }else if(whatishere.first == ModuleGUI::WhatIsHereType::SliderBody){
-        mouse_down_mode = ModeNone;
-        std::cout << "Slider body!" << std::endl;
+          module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
+          //if(captured) mouse_down_mode = ModeCaptured;
+          //else{
+            mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
+            mouse_down_sliderid = whatishere.second;
+          //}
+
       }else if(whatishere.first == ModuleGUI::WhatIsHereType::Nothing){
         bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
         if(!captured) mouse_down_mode = ModeModuleBody;

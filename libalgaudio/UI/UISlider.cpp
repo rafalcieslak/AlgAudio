@@ -22,6 +22,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "TextRenderer.hpp"
 
+// Just because we need SDL_BUTTON_LEFT. TODO: Create a custom button number enum.
+#include <SDL2/SDL.h>
+
 namespace AlgAudio{
 
 UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> c) : UIWidget(parent_window), controller(c) {
@@ -75,7 +78,9 @@ void UISlider::CustomDraw(DrawContext& c){
   int w = c.Size().width;
   int h = c.Size().height;
 
-  c.SetColor(Theme::Get("slider-bg"));
+  Color bg_color = Theme::Get("slider-bg");
+  if(point_mode == PointMode::Center) bg_color = bg_color.Lighter(0.07);
+  c.SetColor(bg_color);
   c.DrawRect(0,0,w,h);
 
   // Left connector body
@@ -142,8 +147,18 @@ void UISlider::CustomDraw(DrawContext& c){
 
 }
 
+bool UISlider::CustomMousePress(bool down, short b,Point2D pos){
+  if(pos.IsInside(GetBodyRect()) && down && b == SDL_BUTTON_LEFT){
+    float x = pos.x - 12;
+    float q = x / (current_size.width - 24);
+    float val = range_min + (range_max - range_min) * q;
+    controller.lock()->Set(val);
+    return true;
+  }
+  return false;
+}
 
-void UISlider::CustomMouseMotion(Point2D pos1,Point2D pos2){
+void UISlider::CustomMouseMotion(Point2D, Point2D pos2){
   if(pos2.IsInside(Point2D(0,0), Size2D(12,current_size.height))){
     if(point_mode != PointMode::Left){
       point_mode = PointMode::Left;
@@ -168,7 +183,6 @@ void UISlider::CustomMouseEnter(Point2D pos){
     point_mode = PointMode::Right;
   else
     point_mode = PointMode::Center;
-  // TODO: Redraw only if point mode has atually changed
   SetNeedsRedrawing();
 }
 void UISlider::CustomMouseLeave(Point2D pos){
