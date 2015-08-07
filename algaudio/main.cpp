@@ -44,7 +44,21 @@ void TestSignals(){
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
-
+/*
+  std::cout << Utilities::PrettyFloat(0.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(0.00012345) << std::endl;
+  std::cout << Utilities::PrettyFloat(2.12345678) << std::endl;
+  std::cout << Utilities::PrettyFloat(2.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(9.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(11.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(99.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(100.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(150.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(1000.0) << std::endl;
+  std::cout << Utilities::PrettyFloat(1111.1111) << std::endl;
+  std::cout << Utilities::PrettyFloat(1500.0) << std::endl;
+  return 0;
+*/
   //TestSignals(); return 0;
 
   try{

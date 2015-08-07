@@ -189,6 +189,16 @@ Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C*
   return p;
 }
 
+
+// This class provides a single helper member field: subscriptions.
+// You can use it to store all subscriptions that shall be released when your
+// object is destroyed.
+// Use the += operator to add stored subcriptions. They will be released
+// automatically when this object is destroyed.
+// To use this class, inherit from it, it is recommended to use public *virtual*
+// inheritance, since a lot of classes uses a SubscriptionsManager as one of its
+// bases. Also note that may classes (widgets, modules) already inherit from
+// SubscriptionsManager, so you are welcome to use that subscriptions field.
 class SubscriptionsManager{
 public:
   class SubscriptionList{

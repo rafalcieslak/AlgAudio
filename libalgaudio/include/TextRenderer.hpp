@@ -46,9 +46,9 @@ class TextRenderer{
   TextRenderer() = delete; // static class
 public:
   static std::shared_ptr<SDLTextTexture> Render(std::weak_ptr<Window>, FontParrams, std::string);
+private:
   static TTF_Font* GetFont(FontParrams);
   static TTF_Font* Preload(FontParrams);
-private:
   // Temporarily it is assumed that any rendering will be performed only if
   // at least one window exists, thus it should be safe to assume that SDL
   // is always initialised.

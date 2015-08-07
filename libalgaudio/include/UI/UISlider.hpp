@@ -28,9 +28,24 @@ class UISlider : public UIWidget{
 public:
   static std::shared_ptr<UISlider> Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
   void CustomDraw(DrawContext& c) override;
+  virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override;
+  virtual void CustomMouseEnter(Point2D pos) override;
+  virtual void CustomMouseLeave(Point2D pos) override;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
+private:
+  void Init(std::shared_ptr<ParramController> controller);
   std::weak_ptr<ParramController> controller;
+  std::shared_ptr<SDLTextTexture> name_texture;
+
+  float current_value;
+  std::shared_ptr<SDLTextTexture> value_texture, value_texture_big;
+
+  float range_min, range_max;
+  std::shared_ptr<SDLTextTexture> range_min_texture, range_max_texture;
+
+  enum class PointMode{ None, Left, Center, Right };
+  PointMode point_mode = PointMode::None;
 };
 
 

@@ -31,7 +31,7 @@ namespace AlgAudio{
 class Window;
 
 // shared_from_this is required for proper parent tracking
-class UIWidget : public UIMouseEventsBase, public std::enable_shared_from_this<UIWidget>{
+class UIWidget : public UIMouseEventsBase, public virtual SubscriptionsManager, public std::enable_shared_from_this<UIWidget>{
 protected:
   UIWidget(std::weak_ptr<Window> parent_window)
     : window(parent_window) {

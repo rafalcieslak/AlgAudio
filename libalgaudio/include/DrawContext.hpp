@@ -44,13 +44,12 @@ public:
   DrawContext(SDL_Window* w, SDL_Renderer* renderer, SDL_GLContext cont, int x, int y, int width, int height);
   void SetColor(short r, short g, short b, short a = 255);
   void SetColor(const Color&);
-  void DrawLine(int x1, int y1, int x2, int y2) {DrawLine(Point2D(x1,y1),Point2D(x2,y2));}
+  inline void DrawLine(int x1, int y1, int x2, int y2) {DrawLine(Point2D(x1,y1),Point2D(x2,y2));}
   void DrawLine(Point2D from, Point2D to, bool smooth=false);
+  void DrawLineEx(float x1, float y1, float x2, float y2, float width = 1.0);
   void DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines = 15);
   void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
   void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
-  // Draws the text texture onto a clear cache. Does not blend anything, this is useful
-  void DrawTextClear(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   void DrawRect(int x, int y, int w, int h);
   void Fill();
   void Clear();
@@ -61,6 +60,13 @@ bool HasZeroArea();
   void Push(Point2D p, Size2D s);
   void Push(std::shared_ptr<SDLTexture>, int width, int height);
   void Pop();
+  // Reapplies the current context parrams. It is useful if your context was
+  // messed up by a different context using the same window.
+  // For example, if you use TextRenderer::Render inside a CustomDraw, then
+  // the remporary drawcontext used by TextRenderer will reset the settings
+  // carried by your Draw context. Use Restore to fix the context after text
+  // rendering is completed.
+  void Restore();
 private:
   int width, height;
   int x,y;

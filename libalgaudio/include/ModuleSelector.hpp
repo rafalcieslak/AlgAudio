@@ -29,7 +29,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-class ModuleSelector : public UIHBox, public SubscriptionsManager{
+class ModuleSelector : public UIHBox{
 public:
   static std::shared_ptr<ModuleSelector> Create(std::weak_ptr<Window> parent_window);
   // Argument: selected template full ID, or empty string if none.

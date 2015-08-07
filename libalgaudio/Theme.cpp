@@ -55,6 +55,11 @@ void Theme::Init(){
   thememap["canvas-connection"] = Color(0x1b2737ff);
   thememap["canvas-connection-new"] = Color(0x37a025ff);
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
+
+  thememap["slider-bg"] = Color(0x5a6e8dff);
+  thememap["slider-border"] = Color(0x293b53ff);
+  thememap["slider-marker"] = Color(0x063373ff);
+  thememap["slider-connector"] = Color(0x666d96ff);
 }
 
 const Color& Theme::Get(const std::string& id){

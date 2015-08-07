@@ -49,6 +49,7 @@ class ParramController{
 public:
   static std::shared_ptr<ParramController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> templ);
   void Set(float value);
+  inline float Get() const {return current_val;}
   Signal<float> on_set;
   // Passing values to other controllers should be done once this controller has it value set.
   Signal<float> after_set;
@@ -59,7 +60,7 @@ private:
   std::weak_ptr<Module> module;
 };
 
-class Module : public DynamicallyLoadableClass, public SubscriptionsManager, public std::enable_shared_from_this<Module>{
+class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
   Module() {};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};

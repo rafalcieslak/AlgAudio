@@ -75,6 +75,11 @@ void SDLFix::RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* fpoints, 
   renderer->RenderDrawLines(renderer, fpoints, count);
 }
 
+void SDLFix::RenderSetLineWidth(SDL_Renderer* renderer, float w){
+  GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
+  data->glLineWidth(w);
+}
+
 void SDLFix::RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled){
   GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
   if(enabled){

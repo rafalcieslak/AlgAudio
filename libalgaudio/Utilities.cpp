@@ -22,6 +22,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <fstream>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 #ifdef __unix__
   #include <unistd.h>
 #else
@@ -171,6 +173,22 @@ Point2D Utilities::Align(HorizAlignment h, VertAlignment v, Size2D inner, Size2D
   else y = 0;
 
   return Point2D(x,y);
+
+}
+
+std::string Utilities::PrettyFloat(float val){
+  std::stringstream ss;
+  //std::cout << "Float to prettify: " << val << std::endl;
+  int s = (val == 0.0) ? 1 : floor(log10(fabs(val))) + 1;
+  //std::cout << "s = " << s << std::endl;
+  if(s < 0){
+    float factor = pow(10.0f, s - 3);
+    //std::cout << "factor = " << factor << std::endl;
+    val = round(val/factor)*factor;
+  }
+  int precision = std::max(0, 3 - s);
+  ss << std::setprecision(precision) << std::fixed << val;
+  return ss.str();
 }
 
 } // namespace AlgAudio

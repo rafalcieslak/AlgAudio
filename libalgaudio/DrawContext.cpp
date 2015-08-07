@@ -72,6 +72,16 @@ void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4
   SDLFix::RenderDrawLines(renderer, points, count);
 }
 
+
+void DrawContext::DrawLineEx(float x1, float y1, float x2, float y2, float width){
+  SDL_FPoint points[2];
+  points[0].x = x1; points[0].y = y1;
+  points[1].x = x2; points[1].y = y2;
+  SDLFix::RenderSetLineWidth(renderer, width);
+  SDLFix::RenderDrawLines(renderer, points, 2);
+  SDLFix::RenderSetLineWidth(renderer, 1.0);
+}
+
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
   if(!texture->valid) return; // Silently skip null textures.
@@ -124,6 +134,10 @@ void DrawContext::Push(Point2D p, Size2D s){
   // Set new state
   x = p.x; y = p.y;
   width = s.width; height = s.height;
+  UpdateClipRect();
+}
+void DrawContext::Restore(){
+  SwitchToTarget(current_target);
   UpdateClipRect();
 }
 void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){

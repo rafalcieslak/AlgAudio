@@ -54,6 +54,8 @@ public:
   // workaround, it forces SDL to call GL_ActivateRenderer(renderer) and nothing
   // else.
   static void RendererMakeCurrent(SDL_Renderer* renderer);
+  // Sets GL line width.
+  static void RenderSetLineWidth(SDL_Renderer* renderer, float w);
 private:
   SDLFix() = delete;
 };
