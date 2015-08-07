@@ -79,7 +79,7 @@ void UISlider::CustomDraw(DrawContext& c){
   int h = c.Size().height;
 
   Color bg_color = Theme::Get("slider-bg");
-  if(point_mode == PointMode::Center) bg_color = bg_color.Lighter(0.07);
+  if(point_mode == PointMode::Center || dragged) bg_color = bg_color.Lighter(0.07);
   c.SetColor(bg_color);
   c.DrawRect(0,0,w,h);
 
@@ -93,7 +93,7 @@ void UISlider::CustomDraw(DrawContext& c){
   else c.SetColor(Theme::Get("slider-connector"));
   c.DrawRect(w-12,0,12,h);
 
-  if(point_mode != PointMode::Center){
+  if(point_mode != PointMode::Center && !dragged){
     // NOT pointed on center
 
     // Slider name
@@ -118,9 +118,8 @@ void UISlider::CustomDraw(DrawContext& c){
 
     auto contr = controller.lock();
     if(contr){
-      float v = contr->Get();
-      float p = (v - range_min)/(range_max - range_min);
-      float pos = std::max(0.0f, std::min(p, 1.0f));
+      float q = (current_value - range_min)/(range_max - range_min);
+      float pos = std::max(0.0f, std::min(q, 1.0f));
       float x = 12.0 + pos*((float)w - 25.0f);
 
       c.SetColor(Theme::Get("slider-marker"));
@@ -185,9 +184,25 @@ void UISlider::CustomMouseEnter(Point2D pos){
     point_mode = PointMode::Center;
   SetNeedsRedrawing();
 }
-void UISlider::CustomMouseLeave(Point2D pos){
+void UISlider::CustomMouseLeave(Point2D){
   point_mode = PointMode::None;
   SetNeedsRedrawing();
+}
+
+void UISlider::DragStart(Point2D pos){
+  dragged = true;
+  drag_start = pos;
+  drag_start_q = (current_value - range_min)/(range_max - range_min);
+}
+void UISlider::DragStep(Point2D pos){
+  float dq = ((float)pos.x - drag_start.x)/((float)current_size.width - 24.0f);
+  float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
+  float val = range_min + q*(range_max - range_min);
+  controller.lock()->Set(val);
+}
+void UISlider::DragEnd(Point2D pos){
+  DragStep(pos);
+  dragged = false;
 }
 
 } // namespace AlgAudio

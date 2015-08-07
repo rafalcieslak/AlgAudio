@@ -101,11 +101,11 @@ void CanvasView::CustomDraw(DrawContext& c){
     // This is a normal drag in progress.
     // Simply draw the currently dragged line...
     if(drag_mode == DragModeConnectFromOutlet){
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_outletid);
+      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_elemid);
       int strength = CurveStrengthFunc(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
     }else if(drag_mode == DragModeConnectFromInlet){
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_inletid);
+      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_elemid);
       int strength = CurveStrengthFunc(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);
     }
@@ -155,19 +155,19 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
 
       auto whatishere = module_guis[id]->WhatIsHere(offset);
       if(whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
-        std::cout << "Mouse down on inlet" << std::endl;
+        //std::cout << "Mouse down on inlet" << std::endl;
         mouse_down_mode =  ModeInlet;
-        mouse_down_inletid = whatishere.second;
+        mouse_down_elemid = whatishere.second;
       }else if(whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
-        std::cout << "Mouse down on outlet" << std::endl;
+        //std::cout << "Mouse down on outlet" << std::endl;
         mouse_down_mode =  ModeOutlet;
-        mouse_down_outletid = whatishere.second;
+        mouse_down_elemid = whatishere.second;
       }else if(whatishere.first == ModuleGUI::WhatIsHereType::SliderBody){
           module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
           //if(captured) mouse_down_mode = ModeCaptured;
           //else{
             mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
-            mouse_down_sliderid = whatishere.second;
+            mouse_down_elemid = whatishere.second;
           //}
 
       }else if(whatishere.first == ModuleGUI::WhatIsHereType::Nothing){
@@ -190,9 +190,11 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       auto whatishere = module_guis[id]->WhatIsHere(offset);
       if(drag_in_progress){
         if(drag_mode == DragModeConnectFromInlet && whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
-          FinalizeConnectingDrag(mouse_down_id, mouse_down_inletid, id, whatishere.second);
+          FinalizeConnectingDrag(mouse_down_id, mouse_down_elemid, id, whatishere.second);
         }else if(drag_mode == DragModeConnectFromOutlet && whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
-          FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_outletid);
+          FinalizeConnectingDrag(id, whatishere.second, mouse_down_id, mouse_down_elemid);
+        }else if(drag_mode == DragModeSlider){
+          module_guis[dragged_id]->SliderDragEnd(mouse_down_elemid, pos - module_guis[dragged_id]->position);
         }else{
           // Drag ended on module body.
         }
@@ -277,7 +279,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       auto whatishere = module_guis[id]->WhatIsHere(to - module_guis[id]->position);
       if(whatishere.first == ModuleGUI::WhatIsHereType::Outlet){
         potential_wire = PotentialWireMode::New;
-        potential_wire_connection = {{id, whatishere.second}, {mouse_down_id, mouse_down_inletid}};
+        potential_wire_connection = {{id, whatishere.second}, {mouse_down_id, mouse_down_elemid}};
       }else{
         potential_wire = PotentialWireMode::None;
       }
@@ -292,7 +294,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       auto whatishere = module_guis[id]->WhatIsHere(to - module_guis[id]->position);
       if(whatishere.first == ModuleGUI::WhatIsHereType::Inlet){
         potential_wire = PotentialWireMode::New;
-        potential_wire_connection = {{mouse_down_id, mouse_down_outletid}, {id, whatishere.second}};
+        potential_wire_connection = {{mouse_down_id, mouse_down_elemid}, {id, whatishere.second}};
       }else{
         potential_wire = PotentialWireMode::None;
       }
@@ -300,6 +302,12 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       potential_wire = PotentialWireMode::None;
     }
     SetNeedsRedrawing();
+
+  }else if(drag_in_progress && drag_mode == DragModeSlider){
+
+    drag_position = to;
+    module_guis[dragged_id]->SliderDragStep(mouse_down_elemid, to - module_guis[dragged_id]->position);
+
   }else if(mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5 &&
     ( mouse_down_mode == ModeModuleBody ||
       mouse_down_mode == ModeInlet      ||
@@ -313,11 +321,22 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       drag_mode = DragModeMove;
     }else if(mouse_down_mode == ModeInlet){
       drag_mode = DragModeConnectFromInlet;
-      drag_connection_io_start = mouse_down_inletid;
+      drag_connection_io_start = mouse_down_elemid;
     }else if(mouse_down_mode == ModeOutlet){
       drag_mode = DragModeConnectFromOutlet;
-      drag_connection_io_start = mouse_down_outletid;
+      drag_connection_io_start = mouse_down_elemid;
     }
+
+    // Slider dragging does not require such a huge distance to start.
+  }else if(mouse_down && mouse_down_id >=0 &&
+    ( mouse_down_mode == ModeSlider ) ) {
+    std::cout << "Slider drag start." << std::endl;
+    drag_in_progress = true;
+    drag_offset = mouse_down_offset;
+    dragged_id = mouse_down_id;
+    drag_position = to;
+    drag_mode = DragModeSlider;
+    module_guis[dragged_id]->SliderDragStart(mouse_down_elemid, to - module_guis[dragged_id]->position);
   }
 
   // standard motion?

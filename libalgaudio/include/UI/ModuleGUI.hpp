@@ -49,6 +49,16 @@ public:
   // Sets the link to module instance
   std::shared_ptr<Module> GetModule(){ return module.lock(); }
 
+  // CanvasView uses this function to notify the ModuleGUI that a slider is
+  // being dragged. This way the drag can continue outside the ModuleGUI.
+  // Arguments: The slider id (as returned by WhatIsHere), starting position
+  // (relative to moduleGUI position).
+  virtual void SliderDragStart(std::string, Point2D){}
+  // This method is called by CanvasView for each step of a slider drag.
+  // Note that current_pos values may be outside moduleGUI, or even negative.
+  virtual void SliderDragStep(std::string, Point2D){}
+  virtual void SliderDragEnd(std::string, Point2D){}
+
   enum class WhatIsHereType{
     Nothing,
     Inlet,

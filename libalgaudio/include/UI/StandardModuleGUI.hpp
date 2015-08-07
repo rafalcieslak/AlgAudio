@@ -44,6 +44,9 @@ public:
   virtual Point2D WhereIsInlet(std::string inlet);
   virtual Point2D WhereIsOutlet(std::string outlet);
   virtual std::pair<WhatIsHereType, std::string> WhatIsHere(Point2D) const override;
+  virtual void SliderDragStart(std::string id, Point2D start_pos) override;
+  virtual void SliderDragStep(std::string id, Point2D current_pos) override;
+  virtual void SliderDragEnd(std::string id, Point2D final_pos) override;
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:

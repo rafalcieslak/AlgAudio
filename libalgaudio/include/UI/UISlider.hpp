@@ -36,6 +36,10 @@ public:
   Rect GetOutputRect() const;
   Rect GetBodyRect() const;
 
+  void DragStart(Point2D pos);
+  void DragStep(Point2D pos);
+  void DragEnd(Point2D pos);
+
   std::string id;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
@@ -49,6 +53,10 @@ private:
 
   float range_min, range_max;
   std::shared_ptr<SDLTextTexture> range_min_texture, range_max_texture;
+
+  bool dragged = false;
+  Point2D drag_start;
+  float drag_start_q;
 
   enum class PointMode{ None, Left, Center, Right };
   PointMode point_mode = PointMode::None;
