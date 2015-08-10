@@ -88,7 +88,7 @@ var in = In.ar(inbus);
 Out.ar(outbus, gain*in);
     </sc>
     <gui type="standard">
-      <inlet id="inbus"/>
+      <inlet id="inbusGUI" inlet="inbus"/>
       <slider id="gainslider" parram="gain" name="Gain 1" defaultmin="0.0" defaultmax="1.0"/>
       <slider id="gainslider2" parram="gain" name="Gain 2" defaultmin="1.0" defaultmax="5.0"/>
       <slider id="stdoutslider" parram="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>

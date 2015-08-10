@@ -41,12 +41,15 @@ public:
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override {main_margin->OnMouseMotion(pos1,pos2);}
   virtual void CustomMouseEnter(Point2D pos) override {main_margin->OnMouseEnter(pos);}
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
-  virtual Point2D WhereIsInlet(std::string inlet);
-  virtual Point2D WhereIsOutlet(std::string outlet);
-  virtual std::pair<WhatIsHereType, std::string> WhatIsHere(Point2D) const override;
-  virtual void SliderDragStart(std::string id, Point2D start_pos) override;
-  virtual void SliderDragStep(std::string id, Point2D current_pos) override;
-  virtual void SliderDragEnd(std::string id, Point2D final_pos) override;
+  virtual Point2D WhereIsInletByWidgetID(UIWidget::ID inlet) override;
+  virtual Point2D WhereIsOutletByWidgetID(UIWidget::ID outlet) override;
+  virtual Point2D WhereIsInletByParramID(std::string inlet) override;
+  virtual Point2D WhereIsOutletByParramID(std::string outlet) override;
+  virtual WhatIsHere GetWhatIsHere(Point2D) const override;
+  virtual void SliderDragStart(UIWidget::ID id, Point2D start_pos) override;
+  virtual void SliderDragStep(UIWidget::ID id, Point2D current_pos) override;
+  virtual void SliderDragEnd(UIWidget::ID id, Point2D final_pos) override;
+  virtual std::string GetIoletParramID(UIWidget::ID) const override;
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:
@@ -67,7 +70,7 @@ private:
 
   class IOConn : public UIWidget{
   public:
-    std::string id;
+    std::string iolet_id;
     VertAlignment align;
     Color main_color;
     Color border_color;
@@ -90,13 +93,13 @@ private:
   };
 
   // Here all crucial elements are stored.
-  std::map<std::string, std::shared_ptr<IOConn>> inlets;
-  std::map<std::string, std::shared_ptr<IOConn>> outlets;
-  std::map<std::string, std::shared_ptr<UISlider>> parram_sliders;
+  std::map<UIWidget::ID, std::shared_ptr<IOConn>> inlets;
+  std::map<UIWidget::ID, std::shared_ptr<IOConn>> outlets;
+  std::map<UIWidget::ID, std::shared_ptr<UISlider>> parram_sliders;
 
   // Rectangle cache for WhatIsHere method
   void UpdateWhatIsHereCache();
-  std::list<std::pair<Rect, std::pair<WhatIsHereType, std::string>>> rect_cache;
+  std::list<std::pair<Rect, WhatIsHere>> rect_cache;
 
 };
 

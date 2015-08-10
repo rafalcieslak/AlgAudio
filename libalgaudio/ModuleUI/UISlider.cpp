@@ -38,7 +38,7 @@ std::shared_ptr<UISlider> UISlider::Create(std::weak_ptr<Window> parent_window, 
 }
 
 void UISlider::Init(std::shared_ptr<ParramController> controller){
-  id = controller->templ->id;
+  parram_id = controller->templ->id;
   name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), controller->templ->name);
 
   range_min = controller->templ->default_min;

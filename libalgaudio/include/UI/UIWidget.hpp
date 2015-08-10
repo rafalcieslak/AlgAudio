@@ -113,6 +113,22 @@ public:
   // ancestor. The argument can be either a diretct parent, or a transitive one.
   Point2D GetPosInParent(std::shared_ptr<UIWidget> ancestor);
 
+  // The idea of this class is to make it impossible to accidentally
+  // convert between a string and a widget ID.
+  class ID{
+  public:
+    ID() : id("none") {}
+    ID(const ID& other) : id(other.id) {}
+    explicit ID(const std::string& s) : id(s) {}
+    std::string ToString() const {return id;}
+    bool operator==(const ID& other) const {return id == other.id;}
+    bool operator!=(const ID& other) const {return id != other.id;}
+    bool operator<(const ID& other) const {return id < other.id;}
+    ID& operator=(const ID& other) {id = other.id; return *this;}
+  private:
+    std::string id;
+  };
+  ID widget_id;
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();

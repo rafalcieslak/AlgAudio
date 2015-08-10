@@ -78,29 +78,33 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
   for( ; node; node = node->next_sibling()){
     std::string name = node->name();
     if(name == "inlet"){
-      std::string id;
+      std::string id, inlet_id;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
       else throw GUIBuildException("An inlet is missing its corresponding parram id");
 
-      auto inlet = IOConn::Create(window, id, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+      rapidxml::xml_attribute<>* attr_inlet = node->first_attribute("inlet");
+      if(attr_inlet) inlet_id = attr_inlet->value();
+      else inlet_id = id;
+
+      auto inlet = IOConn::Create(window, inlet_id, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+      inlet->widget_id = UIWidget::ID(id);
       inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
-      inlet->on_press.SubscribeForever([this, id](bool b){
-        on_inlet_pressed.Happen(id, b);
-      });
-      inlets[id] = inlet;
+      inlets[inlet->widget_id] = inlet;
     }else if(name == "outlet"){
-      std::string id;
+      std::string id, outlet_id;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
       else throw GUIBuildException("An outlet is missing its corresponding parram id");
 
+      rapidxml::xml_attribute<>* attr_outlet = node->first_attribute("outlet");
+      if(attr_outlet) outlet_id = attr_outlet->value();
+      else outlet_id = id;
+
       auto outlet = IOConn::Create(window, id, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+      outlet->widget_id = UIWidget::ID(id);
       outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
-      outlet->on_press.SubscribeForever([this, id](bool b){
-        on_outlet_pressed.Happen(id, b);
-      });
-      outlets[id] = outlet;
+      outlets[outlet->widget_id] = outlet;
     }else if(name == "slider"){
       std::string id, parram;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
@@ -113,8 +117,10 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       auto p = GetModule()->GetParramControllerByID(parram);
       if(!p) throw GUIBuildException("A slider has an unexisting parram id " + parram);
       auto slider = UISlider::Create(window, p);
+      slider->widget_id = UIWidget::ID(id);
+      slider->parram_id = parram;
       parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
-      parram_sliders[slider->id] = slider;
+      parram_sliders[slider->widget_id] = slider;
 
       rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
       if(attr_name) slider->SetName(attr_name->value());
@@ -140,25 +146,23 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
 
   for(auto& i : templ->inlets){
     auto inlet = IOConn::Create(window, i, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+    inlet->widget_id = UIWidget::ID("autoinlet_" + i);
     inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
-    inlet->on_press.SubscribeForever([this, i](bool b){
-      on_inlet_pressed.Happen(i, b);
-    });
-    inlets[i] = inlet;
+    inlets[inlet->widget_id] = inlet;
   }
   for(auto& o : templ->outlets){
     auto outlet = IOConn::Create(window, o, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+    outlet->widget_id = UIWidget::ID("autooutlet_" + o);
     outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
-    outlet->on_press.SubscribeForever([this, o](bool b){
-      on_outlet_pressed.Happen(o, b);
-    });
-    outlets[o] = outlet;
+    outlets[outlet->widget_id] = outlet;
   }
   // Parram sliders.
   for(std::shared_ptr<ParramController>& p : GetModule()->parram_controllers){
     auto slider = UISlider::Create(window, p);
+    slider->widget_id = UIWidget::ID("autoslider_" + p->id);
+    slider->parram_id = p->id;
     parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
-    parram_sliders[slider->id] = slider;
+    parram_sliders[slider->widget_id] = slider;
   }
   UpdateMinimalSize();
 }
@@ -227,7 +231,7 @@ std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std
 }
 
 StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
-  : UIWidget(w), id(id_), align(align_), main_color(c), border_color(c){
+  : UIWidget(w), iolet_id(id_), align(align_), main_color(c), border_color(c){
   SetMinimalSize(GetRectSize() + Size2D(2,0));
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
@@ -278,7 +282,7 @@ Point2D StandardModuleGUI::IOConn::GetCenterPos() const{
   return GetRectPos() + GetRectSize()/2;
 }
 
-Point2D StandardModuleGUI::WhereIsInlet(std::string id){
+Point2D StandardModuleGUI::WhereIsInletByWidgetID(UIWidget::ID id){
   auto it = inlets.find(id);
   if(it == inlets.end()){
     std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
@@ -289,7 +293,7 @@ Point2D StandardModuleGUI::WhereIsInlet(std::string id){
        + inlets_box->GetChildPos(it->second)
        + it->second->GetCenterPos();
 }
-Point2D StandardModuleGUI::WhereIsOutlet(std::string id){
+Point2D StandardModuleGUI::WhereIsOutletByWidgetID(UIWidget::ID id){
   auto it = outlets.find(id);
   if(it == outlets.end()){
     std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
@@ -300,14 +304,43 @@ Point2D StandardModuleGUI::WhereIsOutlet(std::string id){
        + outlets_box->GetChildPos(it->second)
        + it->second->GetCenterPos();
 }
+Point2D StandardModuleGUI::WhereIsInletByParramID(std::string id){
+  for(auto &it: inlets){
+    if(it.second->iolet_id == id)
+      return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
+  }
+  std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
+  return Point2D(0,0);
+}
+Point2D StandardModuleGUI::WhereIsOutletByParramID(std::string id){
+  for(auto &it: outlets){
+    if(it.second->iolet_id == id)
+      return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
+  }
+  std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
+  return Point2D(0,0);
+}
+
+std::string StandardModuleGUI::GetIoletParramID(UIWidget::ID id) const{
+  auto it = outlets.find(id);
+  if(it == outlets.end()){
+    it = inlets.find(id);
+    if(it == inlets.end()){
+      std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
+      return "";
+    }
+    return it->second->iolet_id;
+  }
+  return it->second->iolet_id;
+}
 
 
-std::pair<ModuleGUI::WhatIsHereType, std::string> StandardModuleGUI::WhatIsHere(Point2D p) const{
+auto StandardModuleGUI::GetWhatIsHere(Point2D p) const -> WhatIsHere{
   for(const auto &it : rect_cache)
     if(p.IsInside(it.first))
       return it.second;
   // Rect not found.
-  return std::make_pair(WhatIsHereType::Nothing,"");
+  return WhatIsHere{WhatIsHereType::Nothing,UIWidget::ID(),""};
 }
 
 void StandardModuleGUI::UpdateWhatIsHereCache(){
@@ -317,35 +350,35 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
     Point2D pos = it.second->GetPosInParent(main_margin);
     pos = pos + it.second->GetRectPos();
     Rect r(pos, it.second->GetRectSize());
-    rect_cache.push_back({r,{WhatIsHereType::Inlet, it.second->id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::Inlet, it.second->widget_id, it.second->iolet_id}});
   }
   for(const auto &it : outlets){
     Point2D pos = it.second->GetPosInParent(main_margin);
     pos = pos + it.second->GetRectPos();
     Rect r(pos, it.second->GetRectSize());
-    rect_cache.push_back({r,{WhatIsHereType::Outlet, it.second->id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::Outlet, it.second->widget_id, it.second->iolet_id}});
   }
   for(const auto &it : parram_sliders){
     Point2D pos = it.second->GetPosInParent(main_margin);
     Rect r;
     std::cout << "Cache for slider" << std::endl;
     r = it.second->GetInputRect().MoveOffset(pos);
-    rect_cache.push_back({r,{WhatIsHereType::SliderInput, it.second->id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderInput, it.second->widget_id, it.second->parram_id}});
     r = it.second->GetOutputRect().MoveOffset(pos);
-    rect_cache.push_back({r,{WhatIsHereType::SliderOutput, it.second->id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutput, it.second->widget_id, it.second->parram_id}});
     r = it.second->GetBodyRect().MoveOffset(pos);
-    rect_cache.push_back({r,{WhatIsHereType::SliderBody, it.second->id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderBody, it.second->widget_id, it.second->parram_id}});
   }
 }
 
 
-void StandardModuleGUI::SliderDragStart(std::string id, Point2D start_pos){
+void StandardModuleGUI::SliderDragStart(UIWidget::ID id, Point2D start_pos){
   parram_sliders[id]->DragStart(start_pos);
 }
-void StandardModuleGUI::SliderDragStep(std::string id, Point2D current_pos){
+void StandardModuleGUI::SliderDragStep(UIWidget::ID id, Point2D current_pos){
   parram_sliders[id]->DragStep(current_pos);
 }
-void StandardModuleGUI::SliderDragEnd(std::string id, Point2D final_pos){
+void StandardModuleGUI::SliderDragEnd(UIWidget::ID id, Point2D final_pos){
   parram_sliders[id]->DragEnd(final_pos);
 }
 

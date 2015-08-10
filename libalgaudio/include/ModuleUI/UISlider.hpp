@@ -44,7 +44,7 @@ public:
   void SetRangeMin(float x){ range_min = x; }
   void SetRangeMax(float x){ range_max = x; }
 
-  std::string id;
+  std::string parram_id;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
 private:

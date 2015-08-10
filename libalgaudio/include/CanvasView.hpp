@@ -52,7 +52,7 @@ private:
     ModeSlider,
   };
   MouseDownMode mouse_down_mode;
-  std::string mouse_down_elemid;
+  UIWidget::ID mouse_down_elemid;
   Point2D mouse_down_position, drag_position;
   int mouse_down_id = -1;
   Point2D mouse_down_offset, drag_offset;
@@ -66,8 +66,7 @@ private:
   };
   DragMode drag_mode;
   int dragged_id = -1;
-  std::string drag_connection_io_start;
-  void FinalizeConnectingDrag(int inlet_module_id, std::string inlet_id, int outlet_module_id, std::string outlet_id);
+  void FinalizeConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
   // Use -1 to unselect
   void Select(int id);
 
@@ -82,7 +81,7 @@ private:
     Remove,
   };
   PotentialWireMode potential_wire = PotentialWireMode::None;
-  std::pair<std::pair<int,std::string>, std::pair<int,std::string>> potential_wire_connection;
+  std::pair<std::pair<int,UIWidget::ID>, std::pair<int,UIWidget::ID>> potential_wire_connection;
 
 };
 
