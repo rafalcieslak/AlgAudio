@@ -27,7 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
-#include "UI/ModuleGUI.hpp"
+#include "ModuleUI/ModuleGUI.hpp"
 
 // The custom class NEVER takes ownership of the instances
 class HelloWorld : public AlgAudio::Module{

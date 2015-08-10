@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include "ModuleTemplate.hpp"
 #include "SCLang.hpp"
-#include "UI/StandardModuleGUI.hpp"
+#include "ModuleUI/StandardModuleGUI.hpp"
 
 namespace AlgAudio{
 

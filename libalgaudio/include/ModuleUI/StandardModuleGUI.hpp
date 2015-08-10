@@ -22,9 +22,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Module.hpp"
 #include "ModuleGUI.hpp"
 #include "UI/UIMarginBox.hpp"
-#include "UIBox.hpp"
+#include "UI/UIBox.hpp"
 #include "UI/UILabel.hpp"
-#include "UI/UISlider.hpp"
+#include "ModuleUI/UISlider.hpp"
 
 namespace AlgAudio{
 

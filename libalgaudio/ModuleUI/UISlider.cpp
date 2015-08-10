@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/UISlider.hpp"
+#include "ModuleUI/UISlider.hpp"
 #include "Module.hpp"
 #include "ModuleTemplate.hpp"
 #include "Theme.hpp"

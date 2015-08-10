@@ -16,7 +16,7 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/StandardModuleGUI.hpp"
+#include "ModuleUI/StandardModuleGUI.hpp"
 #include "ModuleTemplate.hpp"
 #include <SDL2/SDL.h>
 #include "Theme.hpp"
