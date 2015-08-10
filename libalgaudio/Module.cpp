@@ -31,6 +31,11 @@ Bus::~Bus(){
   std::cout << "Bus freed" << std::endl;
 }
 
+
+ParramController::ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t)
+  : id(t->id), templ(t), module(m) {
+
+}
 std::shared_ptr<ParramController> ParramController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParramTemplate> templ){
   return std::shared_ptr<ParramController>(new ParramController(m,templ));
 }
@@ -38,6 +43,15 @@ std::shared_ptr<ParramController> ParramController::Create(std::shared_ptr<Modul
 void ParramController::Set(float value){
   current_val = value;
   on_set.Happen(value);
+  auto m = module.lock();
+  if(m){
+    if(templ->parram_mode == ParramTemplate::ParramMode::SC){
+      SCLang::SendOSC("/algaudioSC/setparram", "isf", m->sc_id, templ->id.c_str(), value);
+    }else if(templ->parram_mode == ParramTemplate::ParramMode::Custom){
+      m->on_parram_set(templ->id, value);
+    }
+  }
+  after_set.Happen(value);
 }
 
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
@@ -135,13 +149,10 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
 
 void Module::PrepareParramControllers(){
   for(const std::shared_ptr<ParramTemplate> ptr : templ->parrams){
+    std::cout << "About to create " << ptr->name << std::endl;
     auto controller = ParramController::Create(shared_from_this(), ptr);
     controller->Set(ptr->default_val);
     parram_controllers.push_back(controller);
-    // TODO: custom defined actions on controller set
-    subscriptions += controller->on_set.Subscribe([this, parramid = ptr->id](float val){
-      SCLang::SendOSC("/algaudioSC/setparram", "isf", sc_id, parramid.c_str(), val);
-    });
   }
 }
 
@@ -189,6 +200,12 @@ std::shared_ptr<Module::Inlet> Module::GetInletByID(std::string id) const{
 std::shared_ptr<Module::Outlet> Module::GetOutletByID(std::string id) const{
   for(auto& o : outlets)
     if(o->id == id) return o;
+  return nullptr;
+}
+
+std::shared_ptr<ParramController> Module::GetParramControllerByID(std::string id) const{
+  for(auto& p : parram_controllers)
+    if(p->id == id) return p;
   return nullptr;
 }
 

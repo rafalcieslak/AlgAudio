@@ -72,4 +72,29 @@ SendReply.kr(Impulse.kr(10), '/algaudioSC/sendreply', amp, result);
     <gui type="standard auto"/>
   </module>
 
+
+  <module id="guidemo" name="GUI demo">
+    <class name="GUIDemo"/>
+    <parrams>
+      <inlet id="inbus"/>
+      <parram id="gain" defaultval="1.0" action="sc"/>
+      <parram id="stdout" defaultval="0.0" action="custom"/>
+      <outlet id="outbus"/>
+    </parrams>
+    <description> Custom GUI demo. </description>
+    <sc>
+arg inbus, outbus, gain;
+var in = In.ar(inbus);
+Out.ar(outbus, gain*in);
+    </sc>
+    <gui type="standard">
+      <inlet id="inbus"/>
+      <slider id="gainslider" parram="gain" name="Gain 1" defaultmin="0.0" defaultmax="1.0"/>
+      <slider id="gainslider2" parram="gain" name="Gain 2" defaultmin="1.0" defaultmax="5.0"/>
+      <slider id="stdoutslider" parram="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>
+      <display id="displaydemo" name="Result display" defaultmin="-100.0" defaultmax="100.0"/>
+      <outlet id="outbus"/>
+    </gui>
+  </module>
+
 </collection>

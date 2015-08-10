@@ -59,6 +59,11 @@ void UISlider::Init(std::shared_ptr<ParramController> controller){
   });
 }
 
+void UISlider::SetName(std::string name){
+  name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), name);
+  SetNeedsRedrawing();
+}
+
 Rect UISlider::GetInputRect() const{
   return Rect(Point2D(0,0), Size2D(12, current_size.height));
 }

@@ -40,6 +40,10 @@ public:
   void DragStep(Point2D pos);
   void DragEnd(Point2D pos);
 
+  void SetName(std::string name);
+  void SetRangeMin(float x){ range_min = x; }
+  void SetRangeMax(float x){ range_max = x; }
+
   std::string id;
 protected:
   UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);

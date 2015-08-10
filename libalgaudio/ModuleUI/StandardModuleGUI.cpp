@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include "Theme.hpp"
 #include "TextRenderer.hpp"
+#include "rapidxml/rapidxml.hpp"
 
 namespace AlgAudio{
 
@@ -65,6 +66,71 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
   CommonInit();
   std::cout << "Building GUI from XML " << std::endl;
   caption->SetText(templ->name);
+
+  unsigned int length = xml_data.length();
+
+  char* buffer = new char[length+2];
+  strcpy(buffer, xml_data.c_str());
+  rapidxml::xml_document<> doc;
+  doc.parse<0>(buffer);
+  rapidxml::xml_node<>* gui_node = doc.first_node("gui");
+  rapidxml::xml_node<>* node = gui_node->first_node();
+  for( ; node; node = node->next_sibling()){
+    std::string name = node->name();
+    if(name == "inlet"){
+      std::string id;
+      rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
+      if(attr_id) id = attr_id->value();
+      else throw GUIBuildException("An inlet is missing its corresponding parram id");
+
+      auto inlet = IOConn::Create(window, id, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+      inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
+      inlet->on_press.SubscribeForever([this, id](bool b){
+        on_inlet_pressed.Happen(id, b);
+      });
+      inlets[id] = inlet;
+    }else if(name == "outlet"){
+      std::string id;
+      rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
+      if(attr_id) id = attr_id->value();
+      else throw GUIBuildException("An outlet is missing its corresponding parram id");
+
+      auto outlet = IOConn::Create(window, id, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+      outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
+      outlet->on_press.SubscribeForever([this, id](bool b){
+        on_outlet_pressed.Happen(id, b);
+      });
+      outlets[id] = outlet;
+    }else if(name == "slider"){
+      std::string id, parram;
+      rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
+      if(attr_id) id = attr_id->value();
+      else throw GUIBuildException("A slider is missing its id");
+      rapidxml::xml_attribute<>* attr_parram = node->first_attribute("parram");
+      if(attr_parram) parram = attr_parram->value();
+      else throw GUIBuildException("A slider is missing its corresponding parram id");
+
+      auto p = GetModule()->GetParramControllerByID(parram);
+      if(!p) throw GUIBuildException("A slider has an unexisting parram id " + parram);
+      auto slider = UISlider::Create(window, p);
+      parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
+      parram_sliders[slider->id] = slider;
+
+      rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
+      if(attr_name) slider->SetName(attr_name->value());
+      rapidxml::xml_attribute<>* attr_min = node->first_attribute("defaultmin");
+      if(attr_min) slider->SetRangeMin(std::stof(attr_min->value()));
+      rapidxml::xml_attribute<>* attr_max = node->first_attribute("defaultmax");
+      if(attr_max) slider->SetRangeMax(std::stof(attr_max->value()));
+
+    }else if(name == "display"){
+
+    }else {
+      throw GUIBuildException("Unrecognized gui element: " + name);
+    }
+  }
+
+  delete[] buffer;
   UpdateMinimalSize();
 }
 void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){

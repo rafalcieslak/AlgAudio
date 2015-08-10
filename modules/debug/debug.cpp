@@ -108,7 +108,12 @@ public:
 };
 
 // --------------------------------
-
+class GUIDemo : public AlgAudio::Module{
+public:
+  void on_parram_set(std::string id, float val) override{
+    std::cout << "GUIDemo executes some custom code on parram set! " << id << " " << val << std::endl;
+  }
+};
 
 extern "C"{
 void delete_instance(void* obj){
@@ -119,6 +124,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"Window")==0) return new Window();
   if(strcmp(name,"Console")==0) return new Console();
   if(strcmp(name,"Measure")==0) return new Measure();
+  if(strcmp(name,"GUIDemo")==0) return new GUIDemo();
   else return nullptr;
 }
 } // extern C

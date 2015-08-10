@@ -49,6 +49,11 @@ class ParramTemplate{
 public:
   std::string id;
   std::string name;
+  enum class ParramMode{
+    SC,
+    Custom,
+  };
+  ParramMode parram_mode;
   float default_min, default_max;
   float default_val;
 };

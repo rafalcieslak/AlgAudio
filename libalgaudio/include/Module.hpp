@@ -47,6 +47,7 @@ private:
 
 class ParramController{
 public:
+  std::string id;
   static std::shared_ptr<ParramController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> templ);
   void Set(float value);
   inline float Get() const {return current_val;}
@@ -55,7 +56,7 @@ public:
   Signal<float> after_set;
   const std::shared_ptr<ParramTemplate> templ;
 private:
-  ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t) : templ(t), module(m) {}
+  ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t);
   float current_val = 0.0;
   std::weak_ptr<Module> module;
 };
@@ -79,6 +80,8 @@ public:
   // If you wish to modify the GUI but do not want to override BuildGUI with
   // custom builder, you override on_gui_build and modify the UI from there.
   virtual void on_gui_build(std::shared_ptr<ModuleGUI>) {};
+  // This method is used if a parram is defined with action="custom" attribute.
+  virtual void on_parram_set(std::string, float) {}
   // This method gets called if you used action="custom" for a reply parram.
   virtual void on_reply(std::string, float) {};
 
@@ -161,7 +164,10 @@ public:
   std::vector<std::shared_ptr<Outlet>> outlets;
 
   void PrepareParramControllers();
+  // TODO: Make this a map?
   std::vector<std::shared_ptr<ParramController>> parram_controllers;
+
+  std::shared_ptr<ParramController> GetParramControllerByID(std::string) const;
 
   std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
   std::shared_ptr<Outlet> GetOutletByID(std::string id) const;

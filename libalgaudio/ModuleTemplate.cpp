@@ -17,7 +17,9 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ModuleTemplate.hpp"
+#include <sstream>
 #include "rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml_print.hpp"
 using namespace rapidxml;
 #include "Module.hpp"
 #include "ModuleCollection.hpp"
@@ -45,6 +47,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
   }
 
   xml_node<>* class_node = node->first_node("class");
+
   if(class_node){
     has_class = true;
     xml_attribute<>* class_name_attr = class_node->first_attribute("name");
@@ -81,6 +84,16 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       if(!parram_defaultval) p->default_val = 1.0;
       else p->default_val = std::stof(parram_defaultval->value());
 
+      xml_attribute<>* parram_action = parram_node->first_attribute("action");
+      if(!parram_action) p->parram_mode = ParramTemplate::ParramMode::SC;
+      else{
+        std::string val(parram_action->value());
+        if(val == "sc")     p->parram_mode = ParramTemplate::ParramMode::SC;
+        else if(val == "custom") p->parram_mode = ParramTemplate::ParramMode::Custom;
+        else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
+      }
+
+
       parrams.push_back(p);
     }
   }
@@ -90,7 +103,9 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
 
   xml_node<>* gui_node = node->first_node("gui");
   if(gui_node){
-    guitree = gui_node->value();
+    std::stringstream ss;
+    ss << *gui_node;
+    guitree = std::string(ss.str());
     xml_attribute<>* gui_type_attr = gui_node->first_attribute("type");
     if(gui_type_attr) guitype = gui_type_attr->value();
   }
