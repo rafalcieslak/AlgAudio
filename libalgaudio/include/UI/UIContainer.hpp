@@ -31,6 +31,7 @@ public:
   virtual void Insert(std::shared_ptr<UIWidget>) = 0;
   virtual Point2D GetChildPos() const = 0;
   virtual void RemoveChild() = 0;
+  virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override {return child?child->FindChild(id):nullptr;}
 protected:
   UIContainerSingle(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
   std::shared_ptr<UIWidget> child;

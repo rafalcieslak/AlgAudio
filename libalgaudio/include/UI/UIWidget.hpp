@@ -129,6 +129,12 @@ public:
     std::string id;
   };
   ID widget_id;
+
+  std::shared_ptr<UIWidget> FindChild(ID search_id){
+    if(search_id == widget_id) return shared_from_this();
+    else return CustomFindChild(search_id);
+  }
+  virtual std::shared_ptr<UIWidget> CustomFindChild(ID) const {return nullptr;}
 protected:
   Size2D current_size;
   void SetNeedsRedrawing();

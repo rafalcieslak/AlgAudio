@@ -76,6 +76,14 @@ Point2D UIBox::GetChildPos(std::shared_ptr<UIWidget> w) const{
   return Point2D(0,0);
 }
 
+std::shared_ptr<UIWidget> UIBox::CustomFindChild(ID id) const{
+  for(unsigned int n = 0; n < children.size(); n++){
+    auto res = children[n].child->FindChild(id);
+    if(res) return res;
+  }
+  return nullptr;
+}
+
 void UIBox::RecalculateChildSizes(unsigned int available){
   // Begin by removing the space taken up by padding.
   available -= padding*(children.size() - 1);

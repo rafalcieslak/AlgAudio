@@ -50,6 +50,7 @@ public:
   virtual void SliderDragStep(UIWidget::ID id, Point2D current_pos) override;
   virtual void SliderDragEnd(UIWidget::ID id, Point2D final_pos) override;
   virtual std::string GetIoletParramID(UIWidget::ID) const override;
+  virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override{ return main_margin->FindChild(id);}
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:

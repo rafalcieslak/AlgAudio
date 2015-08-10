@@ -28,7 +28,7 @@ Bus::Bus(int i) : id(i) {}
 
 Bus::~Bus(){
   /// TODO: Ask SC to remove the bus
-  std::cout << "Bus freed" << std::endl;
+  // std::cout << "Bus freed" << std::endl;
 }
 
 
@@ -149,7 +149,6 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
 
 void Module::PrepareParramControllers(){
   for(const std::shared_ptr<ParramTemplate> ptr : templ->parrams){
-    std::cout << "About to create " << ptr->name << std::endl;
     auto controller = ParramController::Create(shared_from_this(), ptr);
     controller->Set(ptr->default_val);
     parram_controllers.push_back(controller);

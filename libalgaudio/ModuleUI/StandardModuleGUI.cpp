@@ -361,7 +361,6 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
   for(const auto &it : parram_sliders){
     Point2D pos = it.second->GetPosInParent(main_margin);
     Rect r;
-    std::cout << "Cache for slider" << std::endl;
     r = it.second->GetInputRect().MoveOffset(pos);
     rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderInput, it.second->widget_id, it.second->parram_id}});
     r = it.second->GetOutputRect().MoveOffset(pos);

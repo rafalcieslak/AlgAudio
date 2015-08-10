@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UITextArea.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UIBox.hpp"
+#include "ModuleUI/UISlider.hpp"
 #include "Theme.hpp"
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
@@ -112,6 +113,11 @@ class GUIDemo : public AlgAudio::Module{
 public:
   void on_parram_set(std::string id, float val) override{
     std::cout << "GUIDemo executes some custom code on parram set! " << id << " " << val << std::endl;
+  }
+  void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) override{
+    auto slider = std::dynamic_pointer_cast<AlgAudio::UISlider>( gui->FindChild(AlgAudio::UIWidget::ID("gainslider")) );
+    if(!slider) std::cout << "Oops, our child widget was not found?" << std::endl;
+    else slider->SetName("Custom name");
   }
 };
 

@@ -43,6 +43,7 @@ public:
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
   virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const override;
+  virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override;
 private:
   struct PackData{
     std::shared_ptr<UIWidget> child;
