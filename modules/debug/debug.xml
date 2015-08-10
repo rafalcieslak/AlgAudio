@@ -55,4 +55,21 @@ Out.ar(outbus,in);
     </sc>
     <gui type="standard auto"/>
   </module>
+
+  <module id="measure" name="Amp measure">
+    <class name="Measure"/>
+    <parrams>
+      <inlet id="inbus"/>
+      <reply id="result" name="Amplitude" min="0.0" max="100.0" action="custom"/>
+    </parrams>
+    <description> This class demonstrates reacting on signal analysis results. </description>
+    <sc>
+arg inbus, result=42;
+var in = In.ar(inbus);
+var amp = Amplitude.kr(in);
+SendReply.kr(Impulse.kr(10), '/algaudioSC/sendreply', amp, result);
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>

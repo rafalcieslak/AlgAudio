@@ -163,6 +163,13 @@ OSCdef.new( 'ordering', {
 	}, '/algaudioSC/ordering'
 ).postln;
 
+// Helper catcher for SendReply-ies
+OSCdef.new( 'sendreply', {
+		arg msg;
+		("Got SendReply: " ++ msg.asString).postln;
+	}, '/algaudioSC/sendreply'
+).postln;
+
 // A dummy helper for listing all installed synthdefs
 OSCdef.new( 'listall', {
 		SynthDescLib.global.synthDescs.do { |desc|

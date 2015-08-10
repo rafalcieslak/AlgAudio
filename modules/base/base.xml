@@ -32,13 +32,18 @@ Out.ar(outbus,in);
       <inlet id="inbus1"/>
       <inlet id="inbus2"/>
       <parram id="db" name="Volume (dB)" defaultmin="0.0" defaultmax="100.0" defaultval="85"/>
+      <reply id="amp_reply" name="Amplitude (dB)" min="0.0" max="100.0" action="custom"/>
     </parrams>
     <description> This module has two inlets, the audio signal connected to them will be played on the system audio output device. </description>
     <sc>
-arg inbus1, inbus2, db=85;
+arg inbus1, inbus2, db=85, amp_reply;
 var amp = (db-100).dbamp;
-Out.ar(0,In.ar(inbus1)*amp);
-Out.ar(1,In.ar(inbus2)*amp);
+var in1 = In.ar(inbus1)*amp;
+var in2 = In.ar(inbus2)*amp;
+var signal_amp = (in1+in2)/2;
+Out.ar(0,in1);
+Out.ar(1,in2);
+SendReply.kr(Impulse.kr(30), '/algaudioSC/answer', signal_amp);
     </sc>
     <gui type="standard auto"/>
   </module>

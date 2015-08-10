@@ -100,6 +100,16 @@ public:
 };
 // ------------------------------
 
+class Measure : public AlgAudio::Module{
+public:
+  void on_reply(std::string id, float val){
+    std::cout << "Measure got a reply: " << id << " " << val << std::endl;
+  }
+};
+
+// --------------------------------
+
+
 extern "C"{
 void delete_instance(void* obj){
   delete reinterpret_cast<AlgAudio::DynamicallyLoadableClass*>(obj);
@@ -108,6 +118,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"HelloWorld")==0) return new HelloWorld();
   if(strcmp(name,"Window")==0) return new Window();
   if(strcmp(name,"Console")==0) return new Console();
+  if(strcmp(name,"Measure")==0) return new Measure();
   else return nullptr;
 }
 } // extern C
