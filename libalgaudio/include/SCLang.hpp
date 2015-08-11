@@ -30,6 +30,7 @@ namespace AlgAudio{
 
 class SCLangSubprocess;
 class ModuleTemplate;
+class SendReplyController;
 
 struct SCLangException : public Exception{
   SCLangException(std::string t) : Exception(t) {}
@@ -74,6 +75,13 @@ public:
   // when Q = {}.
   template <typename... Rest>
   inline static LateReturn<> SendOSCWithEmptyReply(const std::string& path, Rest... args);
+
+  // Returns the new reply id the catcher will use. Afterwards it is logical
+  // to set the SC Synth arg to that returned value, so that it will start
+  // sending replies with the right id.
+  static int RegisterSendReply(int synth_id, std::weak_ptr<SendReplyController>);
+  static void UnregisterSendReply(int synth_id, int reply_id);
+
   static void BootServer(bool supernova = false);
   static void StopServer();
   static bool ready;
@@ -83,6 +91,10 @@ private:
   static std::set<std::string> installed_templates;
   static bool osc_debug;
   static std::unique_ptr<OSC> osc;
+  static void SendReplyCatcher(int synth_id, int reply_id, float value);
+
+  static std::map<std::pair<int,int>, std::weak_ptr<SendReplyController>> sendreply_map;
+  static int sendreply_id;
 };
 
 template <typename... T>

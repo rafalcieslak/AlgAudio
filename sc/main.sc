@@ -165,7 +165,7 @@ OSCdef.new( 'ordering', {
 // Helper catcher for SendReply-ies
 OSCdef.new( 'sendreply', {
 		arg msg;
-		("Got SendReply: " ++ msg.asString).postln;
+		~addr.sendMsg("/algaudio/sendreply",msg[1],msg[2],msg[3]);
 	}, '/algaudioSC/sendreply'
 ).postln;
 

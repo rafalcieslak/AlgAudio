@@ -94,8 +94,18 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
         else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
       }
 
-      
+
       params.push_back(p);
+    }
+    for(xml_node<>* reply_node = params_node->first_node("reply"); reply_node; reply_node = reply_node->next_sibling("reply")){
+      xml_attribute<>* reply_id = reply_node->first_attribute("id");
+      if(!reply_id) throw ModuleParseException(id, "A reply is missing its id attribute");
+      xml_attribute<>* reply_param = reply_node->first_attribute("param");
+      if(!reply_param) throw ModuleParseException(id, "A reply is missing its param attribute");
+      std::string id = reply_id->value();
+      std::string param = reply_param->value();
+
+      replies.push_back({id,param});
     }
   }
 

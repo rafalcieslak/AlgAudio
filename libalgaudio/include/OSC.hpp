@@ -57,10 +57,17 @@ public:
   void Send(std::string path, lo::Message);
   void Send(std::string path, std::function<void(lo::Message)> reply_action, lo::Message);
   //void Send(lo::Message msg, );
+  void SetSendreplyCacher(std::function<void(int, int, float)> f){
+    sendreply_catcher = f;
+  }
+
   void TriggerReplies();
+
 private:
   std::unique_ptr<lo::ServerThread> server;
   lo::Address addr;
+
+  std::function<void(int, int, float)> sendreply_catcher;
 
   static int msg_id;
 

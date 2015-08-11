@@ -50,6 +50,15 @@ OSC::OSC(std::string address, std::string port) : addr(""){
     waiting_for_reply.erase(it);
   });
 
+  server->add_method("/algaudio/sendreply", NULL, [&](lo_message m){
+    std::lock_guard<std::recursive_mutex> lock(osc_mutex);
+    lo::Message msg(m);
+    replies_to_call.push_back( [this,msg](){
+      if(sendreply_catcher) sendreply_catcher(msg.argv()[0]->i32, msg.argv()[1]->i32, msg.argv()[2]->f);
+    } );
+    SDLMain::PushNotifyOSCEvent();
+  });
+
   server->start();
 
   // The constructor for lo::Address is messed up. Creating an lo_address

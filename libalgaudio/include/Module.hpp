@@ -62,6 +62,19 @@ private:
   std::weak_ptr<Module> module;
 };
 
+class SendReplyController{
+public:
+  std::string id;
+  void Got(float v){ controller->Set(v); }
+  static std::shared_ptr<SendReplyController> Create(std::shared_ptr<Module> m, std::string id, std::shared_ptr<ParamController> ctrl);
+  ~SendReplyController();
+private:
+  SendReplyController(std::shared_ptr<Module> m, std::string id, std::shared_ptr<ParamController> ctrl);
+  int sendreply_id, module_id;
+  std::shared_ptr<ParamController> controller;
+  std::weak_ptr<Module> module;
+};
+
 class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
   Module() {};
@@ -169,6 +182,8 @@ public:
 
   // TODO: Make this a map?
   std::vector<std::shared_ptr<ParamController>> param_controllers;
+
+  std::vector<std::shared_ptr<SendReplyController>> reply_controllers;
 
   std::shared_ptr<ParamController> GetParamControllerByID(std::string) const;
 

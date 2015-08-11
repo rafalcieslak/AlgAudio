@@ -71,6 +71,20 @@ std::shared_ptr<Bus> Bus::CreateFake(){
   return std::shared_ptr<Bus>(new Bus(-42));
 }
 
+SendReplyController::SendReplyController(std::shared_ptr<Module> m, std::string i, std::shared_ptr<ParamController> ctrl) : id(i), controller(ctrl), module(m){
+}
+std::shared_ptr<SendReplyController> SendReplyController::Create(std::shared_ptr<Module> m, std::string id, std::shared_ptr<ParamController> ctrl){
+  auto res = std::shared_ptr<SendReplyController>( new SendReplyController(m, id, ctrl) );
+  res->module_id = m->sc_id;
+  res->sendreply_id = SCLang::RegisterSendReply(m->sc_id, res);
+  // TODO: Specialize /setparam into /bindsendreply
+  SCLang::SendOSC("/algaudioSC/setparam", "isi", m->sc_id, id.c_str(), res->sendreply_id);
+  return res;
+}
+SendReplyController::~SendReplyController(){
+  SCLang::UnregisterSendReply(module_id, sendreply_id);
+}
+
 std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::shared_ptr<Module> mod){
   return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, mod));
 }
@@ -157,6 +171,15 @@ void Module::PrepareParamControllers(){
   for(const std::shared_ptr<ParamTemplate> ptr : templ->params){
     auto controller = ParamController::Create(shared_from_this(), ptr);
     param_controllers.push_back(controller);
+  }
+  for(auto reply_pair : templ->replies){
+    auto c = GetParamControllerByID(reply_pair.second);
+    if(!c){
+      std::cout << "WARNING: Reply '" << reply_pair.first << "' has unexisting param '" << reply_pair.second << "'" << std::endl;
+      continue;
+    }
+    auto replycontroller = SendReplyController::Create(shared_from_this(), reply_pair.first, c);
+    reply_controllers.push_back(replycontroller);
   }
 }
 void Module::ResetControllers(){

@@ -99,14 +99,6 @@ public:
     console_window = nullptr;
   }
 };
-// ------------------------------
-
-class Measure : public AlgAudio::Module{
-public:
-  void on_param_set(std::string id, float val){
-    std::cout << "Measure got a reply: " << id << " " << val << std::endl;
-  }
-};
 
 // --------------------------------
 class GUIDemo : public AlgAudio::Module{
@@ -131,7 +123,6 @@ void* create_instance(const char* name){
   if(strcmp(name,"HelloWorld")==0) return new HelloWorld();
   if(strcmp(name,"Window")==0) return new Window();
   if(strcmp(name,"Console")==0) return new Console();
-  if(strcmp(name,"Measure")==0) return new Measure();
   if(strcmp(name,"GUIDemo")==0) return new GUIDemo();
   else return nullptr;
 }

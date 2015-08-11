@@ -26,6 +26,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SCLangSubprocess.hpp"
 #include "ModuleTemplate.hpp"
 #include "ModuleCollection.hpp"
+#include "Module.hpp"
 #include "OSC.hpp"
 
 namespace AlgAudio{
@@ -39,6 +40,9 @@ Signal<int,std::string> SCLang::on_start_progress;
 bool SCLang::osc_debug = false;
 bool SCLang::ready = false;
 std::unique_ptr<OSC> SCLang::osc;
+
+std::map<std::pair<int,int>, std::weak_ptr<SendReplyController>> SCLang::sendreply_map;
+int SCLang::sendreply_id = 0;
 
 void SCLang::Start(std::string command, bool supernova){
   if(subprocess) return;
@@ -66,6 +70,7 @@ void SCLang::Start(std::string command, bool supernova){
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
       osc = std::make_unique<OSC>("localhost", port);
+      osc->SetSendreplyCacher([](int x, int y, float z){SCLang::SendReplyCatcher(x,y,z);});
       SendOSCWithEmptyReply("/algaudioSC/hello").Then([supernova](){
         on_start_progress.Happen(5,"Booting server...");
         BootServer(supernova);
@@ -197,6 +202,35 @@ void SCLang::StopServer(){
 
 void SCLang::DebugQueryInstalled(){
   SendOSC("/algaudioSC/listall");
+}
+
+void SCLang::SendReplyCatcher(int synth_id, int reply_id, float value){
+  auto it = sendreply_map.find({reply_id, synth_id});
+  if(it == sendreply_map.end()){
+    std::cout << "WARNING: recieved an unregistered sendreply " << synth_id << " " << reply_id << std::endl;
+    return;
+  }
+  auto ctrl = it->second.lock();
+  if(!ctrl){
+    std::cout << "WARNING: recieved a registered sendreply, but the controller does not exist anymore" << std::endl;
+    return;
+  }
+  ctrl->Got(value);
+}
+
+int SCLang::RegisterSendReply(int synth_id, std::weak_ptr<SendReplyController> ctrl){
+  sendreply_id++;
+  sendreply_map[{sendreply_id, synth_id}] = ctrl;
+  return sendreply_id;
+}
+
+void SCLang::UnregisterSendReply(int synth_id, int reply_id){
+  auto it = sendreply_map.find({reply_id, synth_id});
+  if(it == sendreply_map.end()){
+    std::cout << "WARNING: failed to unregister a sendreply, it was not registered" << std::endl;
+    return;
+  }
+  sendreply_map.erase(it);
 }
 
 } // namespace AlgAudio

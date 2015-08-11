@@ -77,6 +77,7 @@ public:
   std::list<std::string> inlets;
   std::list<std::string> outlets;
   std::list<std::shared_ptr<ParamTemplate>> params;
+  std::list<std::pair<std::string, std::string>> replies;
 };
 
 } // namespace AlgAudio
