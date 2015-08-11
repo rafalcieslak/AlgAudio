@@ -6,7 +6,6 @@ OSCdef.new( 'hello', {
 		// This is when the ~addr is stored.
 		~addr = addr;
 		~minstances = Dictionary.new(0);
-		~instanceid = 0;
 		~buses = Dictionary.new(0);
 		"Hello World!".postln;
 		~addr.sendMsg("/algaudio/reply",msg[msg.size-1]);
@@ -54,10 +53,10 @@ OSCdef.new( 'boothelper', {
 OSCdef.new( 'newinstance', {
 		arg msg;
 		var name = "aa/" ++ msg[1];
-		var id = ~instanceid;
-		~instanceid = ~instanceid + 1;
-		("Creating new \"" ++ name ++ "\" instance " ++ id.asString).postln;
-		~minstances.add( id -> Synth.new(name));
+		var synth = Synth.new(name);
+		var id = synth.nodeID;
+		("Created new \"" ++ name ++ "\" instance " ++ id.asString ).postln;
+		~minstances.add( id -> synth);
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newinstance'
 ).postln;
@@ -67,11 +66,11 @@ OSCdef.new( 'newinstance', {
 OSCdef.new( 'newinstanceparams', {
 		arg msg;
 		var name = "aa/" ++ msg[1];
-		var id = ~instanceid;
 		var params = msg[2..(msg.size-2)];
-		~instanceid = ~instanceid + 1;
-		("Creating new \"" ++ name ++ "\" instance " ++ id.asString ++ " with " ++ params.asString ).postln;
-		~minstances.add( id -> Synth.new(name, params));
+		var synth = Synth.new(name, params);
+		var id = synth.nodeID;
+		("Created new \"" ++ name ++ "\" instance " ++ id.asString ++ " with " ++ params.asString ).postln;
+		~minstances.add( id -> synth);
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newinstanceparams'
 ).postln;
