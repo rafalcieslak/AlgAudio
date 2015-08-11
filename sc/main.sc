@@ -62,18 +62,18 @@ OSCdef.new( 'newinstance', {
 	}, '/algaudioSC/newinstance'
 ).postln;
 
-// args: the template name + a list of parrams and values
+// args: the template name + a list of params and values
 // reply value: instance id
-OSCdef.new( 'newinstanceparrams', {
+OSCdef.new( 'newinstanceparams', {
 		arg msg;
 		var name = "aa/" ++ msg[1];
 		var id = ~instanceid;
-		var parrams = msg[2..(msg.size-2)];
+		var params = msg[2..(msg.size-2)];
 		~instanceid = ~instanceid + 1;
-		("Creating new \"" ++ name ++ "\" instance " ++ id.asString ++ " with " ++ parrams.asString ).postln;
-		~minstances.add( id -> Synth.new(name, parrams));
+		("Creating new \"" ++ name ++ "\" instance " ++ id.asString ++ " with " ++ params.asString ).postln;
+		~minstances.add( id -> Synth.new(name, params));
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
-	}, '/algaudioSC/newinstanceparrams'
+	}, '/algaudioSC/newinstanceparams'
 ).postln;
 
 // 1 argument: the template id
@@ -99,33 +99,33 @@ OSCdef.new( 'newbus', {
 	}, '/algaudioSC/newbus'
 ).postln;
 
-// Args: instance id, parram name, value
-OSCdef.new( 'setparram', {
+// Args: instance id, param name, value
+OSCdef.new( 'setparam', {
 		arg msg;
 		if((msg[1] == -1),{
-			("Not setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3] ++ ", because it's not a valid instance!").postln;
+			("Not setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3] ++ ", because it's not a valid instance!").postln;
 		});
-		("Setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3]).postln;
+		("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3]).postln;
 		~minstances[msg[1]].set(
 			msg[2].asString,
 			msg[3]
 		);
-	}, '/algaudioSC/setparram'
+	}, '/algaudioSC/setparam'
 ).postln;
 
-// Args: instance id, parram name, values
-OSCdef.new( 'setparramlist', {
+// Args: instance id, param name, values
+OSCdef.new( 'setparamlist', {
 		arg msg;
 		var list = msg[3..(msg.size-2)];
 		if((msg[1] == -1),{
-			("Not setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to a list, because it's not a valid instance!").postln;
+			("Not setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to a list, because it's not a valid instance!").postln;
 		});
-		("Setting parram " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ list).postln;
+		("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ list).postln;
 		~minstances[msg[1]].set(
 			msg[2].asString,
 			list
 		);
-	}, '/algaudioSC/setparramlist'
+	}, '/algaudioSC/setparamlist'
 ).postln;
 
 // Args: instance id, outlet id, bus id

@@ -67,24 +67,24 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       // Happen a global error signal instead.
       res->on_init(); // temporary!
       res->CreateIOFromTemplate(true); // Create fake io
-      res->PrepareParramControllers();
+      res->PrepareParamControllers();
       res->enabled_by_factory = true;
       r.Return(res);
     }else{
       lo::Message m;
       // Use the full ID to identify SynthDef.
       m.add_string(templ->GetFullID());
-      // Prepare a list of parrams. Set all output buses to 999999.
+      // Prepare a list of params. Set all output buses to 999999.
       for(const std::string& o : templ->outlets){
         m.add_string(o);
         m.add_int32(999999999);
       }
-      SCLang::SendOSCCustomWithReply<int>("/algaudioSC/newinstanceparrams", m)
+      SCLang::SendOSCCustomWithReply<int>("/algaudioSC/newinstanceparams", m)
         .Then([=](int id){
           std::cout << "On id " << id << std::endl;
           res->sc_id = id;
           res->CreateIOFromTemplate().Then([=](){
-            res->PrepareParramControllers();
+            res->PrepareParamControllers();
             res->enabled_by_factory = true;
             res->on_init();
             r.Return(res);

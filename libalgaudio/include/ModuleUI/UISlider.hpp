@@ -22,11 +22,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-struct ParramController;
+struct ParamController;
 
 class UISlider : public UIWidget{
 public:
-  static std::shared_ptr<UISlider> Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
+  static std::shared_ptr<UISlider> Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> controller);
   void CustomDraw(DrawContext& c) override;
   virtual bool CustomMousePress(bool down, short b,Point2D pos) override;
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override;
@@ -44,12 +44,12 @@ public:
   void SetRangeMin(float x){ range_min = x; }
   void SetRangeMax(float x){ range_max = x; }
 
-  std::string parram_id;
+  std::string param_id;
 protected:
-  UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller);
+  UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> controller);
 private:
-  void Init(std::shared_ptr<ParramController> controller);
-  std::weak_ptr<ParramController> controller;
+  void Init(std::shared_ptr<ParamController> controller);
+  std::weak_ptr<ParamController> controller;
   std::shared_ptr<SDLTextTexture> name_texture;
 
   float current_value;

@@ -73,11 +73,11 @@ void CanvasView::CustomDraw(DrawContext& c){
   c.SetColor(Theme::Get("canvas-connection"));
   for(auto it : canvas->connections){
     Canvas::IOID from = it.first;
-    Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutletByParramID(from.iolet);
+    Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutletByParamID(from.iolet);
     // For each target of this outlet
     std::list<Canvas::IOID> to_list = it.second;
     for(auto to : to_list){
-      Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInletByParramID(to.iolet);
+      Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInletByParamID(to.iolet);
       int strength = CurveStrengthFunc(from_pos, to_pos);
       c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos);
     }
@@ -223,8 +223,8 @@ void CanvasView::FinalizeConnectingDrag(int inlet_module_id, UIWidget::ID inlet_
     window.lock()->ShowErrorAlert("Failed to create connection, one of the corresponding modules does not exist." , "Cancel");
     return;
   }
-  std::string outlet_id = module_guis[outlet_module_id]->GetIoletParramID(outlet_widget_id);
-  std::string inlet_id = module_guis[inlet_module_id]->GetIoletParramID(inlet_widget_id);
+  std::string outlet_id = module_guis[outlet_module_id]->GetIoletParamID(outlet_widget_id);
+  std::string inlet_id = module_guis[inlet_module_id]->GetIoletParamID(inlet_widget_id);
   std::cout << "Which corresponds to " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
   Canvas::IOID from = {from_module,outlet_id};
   Canvas::IOID   to = {  to_module,inlet_id };

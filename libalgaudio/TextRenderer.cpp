@@ -28,22 +28,22 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-std::map<FontParrams, TTF_Font*> TextRenderer::fontbank;
+std::map<FontParams, TTF_Font*> TextRenderer::fontbank;
 
-TTF_Font* TextRenderer::GetFont(FontParrams fp){
+TTF_Font* TextRenderer::GetFont(FontParams fp){
   auto it = fontbank.find(fp);
   if(it != fontbank.end()) return it->second;
   return Preload(fp);
 }
 
-TTF_Font* TextRenderer::Preload(FontParrams fp){
+TTF_Font* TextRenderer::Preload(FontParams fp){
   std::string path = "fonts/" + fp.name + ".ttf";
   TTF_Font* f = TTF_OpenFont(path.c_str(), fp.size);
   if(!f) throw SDLException("TTF_OpenFont failed");
   fontbank[fp] = f;
   return f;
 }
-std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParrams fp, std::string text){
+std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,FontParams fp, std::string text){
   auto parent_window = w.lock();
   // Split the text into lines.
   std::vector<std::string> lines = Utilities::SplitString(text,"\n");

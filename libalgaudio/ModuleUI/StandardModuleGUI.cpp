@@ -44,14 +44,14 @@ void StandardModuleGUI::CommonInit(){
   main_box = UIVBox::Create(window);
   inlets_box = UIHBox::Create(window);
   outlets_box = UIHBox::Create(window);
-  parrams_box = UIVBox::Create(window);
-  parrams_box->SetPadding(1);
+  params_box = UIVBox::Create(window);
+  params_box->SetPadding(1);
   caption = UILabel::Create(window, "", 16);
   caption->SetTextColor("standardbox-caption");
 
   main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);
   main_box->Insert(caption, UIBox::PackMode::TIGHT);
-  main_box->Insert(parrams_box, UIBox::PackMode::TIGHT);
+  main_box->Insert(params_box, UIBox::PackMode::TIGHT);
   main_box->Insert(outlets_box, UIBox::PackMode::TIGHT);
   main_margin->Insert(main_box);
   main_margin->parent = shared_from_this();
@@ -81,7 +81,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       std::string id, inlet_id;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
-      else throw GUIBuildException("An inlet is missing its corresponding parram id");
+      else throw GUIBuildException("An inlet is missing its corresponding param id");
 
       rapidxml::xml_attribute<>* attr_inlet = node->first_attribute("inlet");
       if(attr_inlet) inlet_id = attr_inlet->value();
@@ -95,7 +95,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       std::string id, outlet_id;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
-      else throw GUIBuildException("An outlet is missing its corresponding parram id");
+      else throw GUIBuildException("An outlet is missing its corresponding param id");
 
       rapidxml::xml_attribute<>* attr_outlet = node->first_attribute("outlet");
       if(attr_outlet) outlet_id = attr_outlet->value();
@@ -106,21 +106,21 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
       outlets[outlet->widget_id] = outlet;
     }else if(name == "slider"){
-      std::string id, parram;
+      std::string id, param;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
       else throw GUIBuildException("A slider is missing its id");
-      rapidxml::xml_attribute<>* attr_parram = node->first_attribute("parram");
-      if(attr_parram) parram = attr_parram->value();
-      else throw GUIBuildException("A slider is missing its corresponding parram id");
+      rapidxml::xml_attribute<>* attr_param = node->first_attribute("param");
+      if(attr_param) param = attr_param->value();
+      else throw GUIBuildException("A slider is missing its corresponding param id");
 
-      auto p = GetModule()->GetParramControllerByID(parram);
-      if(!p) throw GUIBuildException("A slider has an unexisting parram id " + parram);
+      auto p = GetModule()->GetParamControllerByID(param);
+      if(!p) throw GUIBuildException("A slider has an unexisting param id " + param);
       auto slider = UISlider::Create(window, p);
       slider->widget_id = UIWidget::ID(id);
-      slider->parram_id = parram;
-      parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
-      parram_sliders[slider->widget_id] = slider;
+      slider->param_id = param;
+      params_box->Insert(slider, UIBox::PackMode::TIGHT);
+      param_sliders[slider->widget_id] = slider;
 
       rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
       if(attr_name) slider->SetName(attr_name->value());
@@ -156,13 +156,13 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
     outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
     outlets[outlet->widget_id] = outlet;
   }
-  // Parram sliders.
-  for(std::shared_ptr<ParramController>& p : GetModule()->parram_controllers){
+  // Param sliders.
+  for(std::shared_ptr<ParamController>& p : GetModule()->param_controllers){
     auto slider = UISlider::Create(window, p);
     slider->widget_id = UIWidget::ID("autoslider_" + p->id);
-    slider->parram_id = p->id;
-    parrams_box->Insert(slider, UIBox::PackMode::TIGHT);
-    parram_sliders[slider->widget_id] = slider;
+    slider->param_id = p->id;
+    params_box->Insert(slider, UIBox::PackMode::TIGHT);
+    param_sliders[slider->widget_id] = slider;
   }
   UpdateMinimalSize();
 }
@@ -202,7 +202,7 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   auto m = module.lock();
   if(m){
     std::string idn = std::to_string(m->sc_id);
-    if(!id_texture) id_texture = TextRenderer::Render(window, FontParrams("Dosis-Bold",8), idn.c_str());
+    if(!id_texture) id_texture = TextRenderer::Render(window, FontParams("Dosis-Bold",8), idn.c_str());
     c.DrawText(id_texture, Theme::Get("standardbox-border"), 3,1);
   }
 }
@@ -304,7 +304,7 @@ Point2D StandardModuleGUI::WhereIsOutletByWidgetID(UIWidget::ID id){
        + outlets_box->GetChildPos(it->second)
        + it->second->GetCenterPos();
 }
-Point2D StandardModuleGUI::WhereIsInletByParramID(std::string id){
+Point2D StandardModuleGUI::WhereIsInletByParamID(std::string id){
   for(auto &it: inlets){
     if(it.second->iolet_id == id)
       return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
@@ -312,7 +312,7 @@ Point2D StandardModuleGUI::WhereIsInletByParramID(std::string id){
   std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
   return Point2D(0,0);
 }
-Point2D StandardModuleGUI::WhereIsOutletByParramID(std::string id){
+Point2D StandardModuleGUI::WhereIsOutletByParamID(std::string id){
   for(auto &it: outlets){
     if(it.second->iolet_id == id)
       return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
@@ -321,7 +321,7 @@ Point2D StandardModuleGUI::WhereIsOutletByParramID(std::string id){
   return Point2D(0,0);
 }
 
-std::string StandardModuleGUI::GetIoletParramID(UIWidget::ID id) const{
+std::string StandardModuleGUI::GetIoletParamID(UIWidget::ID id) const{
   auto it = outlets.find(id);
   if(it == outlets.end()){
     it = inlets.find(id);
@@ -358,27 +358,27 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
     Rect r(pos, it.second->GetRectSize());
     rect_cache.push_back({r,WhatIsHere{WhatIsHereType::Outlet, it.second->widget_id, it.second->iolet_id}});
   }
-  for(const auto &it : parram_sliders){
+  for(const auto &it : param_sliders){
     Point2D pos = it.second->GetPosInParent(main_margin);
     Rect r;
     r = it.second->GetInputRect().MoveOffset(pos);
-    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderInput, it.second->widget_id, it.second->parram_id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderInput, it.second->widget_id, it.second->param_id}});
     r = it.second->GetOutputRect().MoveOffset(pos);
-    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutput, it.second->widget_id, it.second->parram_id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutput, it.second->widget_id, it.second->param_id}});
     r = it.second->GetBodyRect().MoveOffset(pos);
-    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderBody, it.second->widget_id, it.second->parram_id}});
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderBody, it.second->widget_id, it.second->param_id}});
   }
 }
 
 
 void StandardModuleGUI::SliderDragStart(UIWidget::ID id, Point2D start_pos){
-  parram_sliders[id]->DragStart(start_pos);
+  param_sliders[id]->DragStart(start_pos);
 }
 void StandardModuleGUI::SliderDragStep(UIWidget::ID id, Point2D current_pos){
-  parram_sliders[id]->DragStep(current_pos);
+  param_sliders[id]->DragStep(current_pos);
 }
 void StandardModuleGUI::SliderDragEnd(UIWidget::ID id, Point2D final_pos){
-  parram_sliders[id]->DragEnd(final_pos);
+  param_sliders[id]->DragEnd(final_pos);
 }
 
 } // namespace AlgAudio

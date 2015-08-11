@@ -43,13 +43,13 @@ public:
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
   virtual Point2D WhereIsInletByWidgetID(UIWidget::ID inlet) override;
   virtual Point2D WhereIsOutletByWidgetID(UIWidget::ID outlet) override;
-  virtual Point2D WhereIsInletByParramID(std::string inlet) override;
-  virtual Point2D WhereIsOutletByParramID(std::string outlet) override;
+  virtual Point2D WhereIsInletByParamID(std::string inlet) override;
+  virtual Point2D WhereIsOutletByParamID(std::string outlet) override;
   virtual WhatIsHere GetWhatIsHere(Point2D) const override;
   virtual void SliderDragStart(UIWidget::ID id, Point2D start_pos) override;
   virtual void SliderDragStep(UIWidget::ID id, Point2D current_pos) override;
   virtual void SliderDragEnd(UIWidget::ID id, Point2D final_pos) override;
-  virtual std::string GetIoletParramID(UIWidget::ID) const override;
+  virtual std::string GetIoletParamID(UIWidget::ID) const override;
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override{ return main_margin->FindChild(id);}
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
@@ -65,7 +65,7 @@ private:
   std::shared_ptr<UIVBox> main_box;
   std::shared_ptr<UIHBox> inlets_box;
   std::shared_ptr<UIHBox> outlets_box;
-  std::shared_ptr<UIVBox> parrams_box;
+  std::shared_ptr<UIVBox> params_box;
 
   std::shared_ptr<SDLTextTexture> id_texture = nullptr;
 
@@ -96,7 +96,7 @@ private:
   // Here all crucial elements are stored.
   std::map<UIWidget::ID, std::shared_ptr<IOConn>> inlets;
   std::map<UIWidget::ID, std::shared_ptr<IOConn>> outlets;
-  std::map<UIWidget::ID, std::shared_ptr<UISlider>> parram_sliders;
+  std::map<UIWidget::ID, std::shared_ptr<UISlider>> param_sliders;
 
   // Rectangle cache for WhatIsHere method
   void UpdateWhatIsHereCache();

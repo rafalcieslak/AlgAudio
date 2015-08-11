@@ -39,14 +39,14 @@ public:
   // variant.
   virtual void SetHighlight(bool) = 0;
   // These methods are used by the CanvasView to query where it should draw
-  // connection wire endings. Arguments: iolet parram id (not widget id!)
+  // connection wire endings. Arguments: iolet param id (not widget id!)
   virtual Point2D WhereIsInletByWidgetID(UIWidget::ID inlet) = 0;
   virtual Point2D WhereIsOutletByWidgetID(UIWidget::ID outlet) = 0;
-  virtual Point2D WhereIsInletByParramID(std::string inlet) = 0;
-  virtual Point2D WhereIsOutletByParramID(std::string outlet) = 0;
+  virtual Point2D WhereIsInletByParamID(std::string inlet) = 0;
+  virtual Point2D WhereIsOutletByParamID(std::string outlet) = 0;
   // This method shall translate an inlet/outlet widget id to the corresponding
-  // parram id.
-  virtual std::string GetIoletParramID(UIWidget::ID) const = 0;
+  // param id.
+  virtual std::string GetIoletParamID(UIWidget::ID) const = 0;
   // Sets the link to module instance
   std::shared_ptr<Module> GetModule(){ return module.lock(); }
 
@@ -72,8 +72,8 @@ public:
     WhatIsHereType type;
     // The id of the widget
     UIWidget::ID widget_id;
-    // The id of the parram/inlet/outlet corresponding to this widget
-    std::string parram_id;
+    // The id of the param/inlet/outlet corresponding to this widget
+    std::string param_id;
   };
   // This function is used by the CanvasView to ask the module GUI what kind of
   // element is located at a given point. This way the CanvasView can handle
@@ -82,7 +82,7 @@ public:
 
   // Helper function which creates an IOID used by Canvas from inlet/outlet
   // widget id.
-  Canvas::IOID MakeIOID(UIWidget::ID w) {return {GetModule(), GetIoletParramID(w)};}
+  Canvas::IOID MakeIOID(UIWidget::ID w) {return {GetModule(), GetIoletParamID(w)};}
 protected:
   ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
   // A link to the module instance this GUI represents.

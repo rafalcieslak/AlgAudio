@@ -27,7 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 class ModuleTemplate;
-class ParramTemplate;
+class ParamTemplate;
 class Canvas;
 class ModuleGUI;
 class Window;
@@ -45,18 +45,18 @@ private:
   int id;
 };
 
-class ParramController{
+class ParamController{
 public:
   std::string id;
-  static std::shared_ptr<ParramController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> templ);
+  static std::shared_ptr<ParamController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> templ);
   void Set(float value);
   inline float Get() const {return current_val;}
   Signal<float> on_set;
   // Passing values to other controllers should be done once this controller has it value set.
   Signal<float> after_set;
-  const std::shared_ptr<ParramTemplate> templ;
+  const std::shared_ptr<ParamTemplate> templ;
 private:
-  ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t);
+  ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t);
   float current_val = 0.0;
   std::weak_ptr<Module> module;
 };
@@ -80,8 +80,8 @@ public:
   // If you wish to modify the GUI but do not want to override BuildGUI with
   // custom builder, you override on_gui_build and modify the UI from there.
   virtual void on_gui_build(std::shared_ptr<ModuleGUI>) {};
-  // This method is used if a parram is defined with action="custom" attribute.
-  virtual void on_parram_set(std::string, float) {}
+  // This method is used if a param is defined with action="custom" attribute.
+  virtual void on_param_set(std::string, float) {}
 
   // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;
@@ -129,9 +129,9 @@ public:
     Inlet(std::string i, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), mod(*m.get()), bus(b) {}
   };
   /*
-  void SetParram(std::string name, int value);
-  void SetParram(std::string name, double value);
-  void SetParram(std::string name, std::list<int> values);
+  void SetParam(std::string name, int value);
+  void SetParam(std::string name, double value);
+  void SetParam(std::string name, std::list<int> values);
   */
 
   // TODO: Move these functions to Canvas
@@ -161,11 +161,11 @@ public:
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
 
-  void PrepareParramControllers();
+  void PrepareParamControllers();
   // TODO: Make this a map?
-  std::vector<std::shared_ptr<ParramController>> parram_controllers;
+  std::vector<std::shared_ptr<ParamController>> param_controllers;
 
-  std::shared_ptr<ParramController> GetParramControllerByID(std::string) const;
+  std::shared_ptr<ParamController> GetParamControllerByID(std::string) const;
 
   std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
   std::shared_ptr<Outlet> GetOutletByID(std::string id) const;

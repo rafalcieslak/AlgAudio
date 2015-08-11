@@ -99,7 +99,7 @@ void UIButton::SetFontSize(int fs){
 }
 
 void UIButton::UpdateTexture(){
-  texture = TextRenderer::Render(window, FontParrams("Dosis-Regular",fontsize), text);
+  texture = TextRenderer::Render(window, FontParams("Dosis-Regular",fontsize), text);
   SetMinimalSize(texture->GetSize() + Size2D(2*inner_margin,2*inner_margin));
   SetNeedsRedrawing();
 }

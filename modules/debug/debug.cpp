@@ -103,7 +103,7 @@ public:
 
 class Measure : public AlgAudio::Module{
 public:
-  void on_parram_set(std::string id, float val){
+  void on_param_set(std::string id, float val){
     std::cout << "Measure got a reply: " << id << " " << val << std::endl;
   }
 };
@@ -111,8 +111,8 @@ public:
 // --------------------------------
 class GUIDemo : public AlgAudio::Module{
 public:
-  void on_parram_set(std::string id, float val) override{
-    std::cout << "GUIDemo executes some custom code on parram set! " << id << " " << val << std::endl;
+  void on_param_set(std::string id, float val) override{
+    std::cout << "GUIDemo executes some custom code on param set! " << id << " " << val << std::endl;
   }
   void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) override{
     auto slider = std::dynamic_pointer_cast<AlgAudio::UISlider>( gui->FindChild(AlgAudio::UIWidget::ID("gainslider")) );

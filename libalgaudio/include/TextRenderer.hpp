@@ -34,26 +34,26 @@ class SDLTexture;
 class SDLTextTexture;
 class Window;
 
-struct FontParrams{
-  FontParrams(std::string n, int s) : name(n), size(s) {}
+struct FontParams{
+  FontParams(std::string n, int s) : name(n), size(s) {}
   std::string name;
   int size;
-  bool operator<(const FontParrams& other) const{ return name<other.name || (name==other.name && size < other.size);}
+  bool operator<(const FontParams& other) const{ return name<other.name || (name==other.name && size < other.size);}
 };
 
 // TODO: Instantiable class, SDLHandle tracking, font unloading on destruction
 class TextRenderer{
   TextRenderer() = delete; // static class
 public:
-  static std::shared_ptr<SDLTextTexture> Render(std::weak_ptr<Window>, FontParrams, std::string);
+  static std::shared_ptr<SDLTextTexture> Render(std::weak_ptr<Window>, FontParams, std::string);
 private:
-  static TTF_Font* GetFont(FontParrams);
-  static TTF_Font* Preload(FontParrams);
+  static TTF_Font* GetFont(FontParams);
+  static TTF_Font* Preload(FontParams);
   // Temporarily it is assumed that any rendering will be performed only if
   // at least one window exists, thus it should be safe to assume that SDL
   // is always initialised.
   // SDLHandle handle;
-  static std::map<FontParrams, TTF_Font*> fontbank;
+  static std::map<FontParams, TTF_Font*> fontbank;
 };
 
 

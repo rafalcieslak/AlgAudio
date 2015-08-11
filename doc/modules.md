@@ -48,11 +48,11 @@ This node represents a single module. It must be a child of a `collection` node,
 Attributes:
 
   - `id` - **required**. The identifier of this module. It is up to you to make sure the identifiers within a collection are unique. It is not an issue if a module id is the same as the id of a module from a different collection. The id may not contain a `/` char.
-  - `name` - **required**. The value of this attribute will be presented to the user as the name of this module, e.g. when browsing available modules, or in the module GUI box - so choose something short but desctiptive.
+  - `name` - **required**. The value of this attribute will be presented to the user as the name of this module, e.g. when browsing available modules, or in the module GUI box - so choose something short but descriptive.
 
 Child nodes:
   - `class` - *optional*. This node can be used to link the module with a custom implementation inside your shared library plugin. See `class` node description for details.
-  - `parrams` - *optional*. This node groups the specification of this module's input and output, both audio and control streams. See `parrams` node description for details.
+  - `params` - *optional*. This node groups the specification of this module's input and output, both audio and control streams. See `params` node description for details.
   - `description` - *optional*. The value of this node will be used as the description of this module's features. You are welcome to provide here a longer text. Multiple text lines are supported. Tailing and heading whitespace characters will be trimmed.
   - `sc` - *optional*. This node can be used to embed SuperCollider SynthDef source code that shall be associated with your module. See `sc` node description for details.
   - `gui` - *optional. While a module definition is correct without this node, it makes little sense to describe a module without defining its GUI layout.* This node defines the look and layout of this module's user interface which gets displayed on the canvas alongside other modules. See `gui` node for details.
@@ -65,7 +65,7 @@ Attributes:
 
   - `name` - **required**. Specifies the class name. Note that this is not necessarily a class name as seen by the language you use to write the AA file, this is just a string that will be passes to the loader inside your AA file. See AA file information for details.
 
-## `parrams` node
+## `params` node
 
 This node has no attributes and it's purpose is to group the parameter specification for a module. It must be a child of a module node.
 
@@ -75,7 +75,7 @@ Child nodes: **(all are optional and may appear more than once!)**
 
     - `id` - **required**. The inlet identifier. The value of this attribute specifies the SynthDef argument associated with the input bus. For example, if your Synth reads input using `In.ar(inbus)`, then the value of this attribute should be `inbus`.
 
-    AlgAudio will take care to set the SynthDef's argument value when the module is connected to another etc. so you just need to expose these values as SynthDef arguments, specify the `inlet` parram, and AlgAudio will manage synth connections automatically.
+    AlgAudio will take care to set the SynthDef's argument value when the module is connected to another etc. so you just need to expose these values as SynthDef arguments, specify the `inlet` param, and AlgAudio will manage synth connections automatically.
 
 
   - `outlet` - Specifies an audio output of this module. This node is analogous to `inlet` node. Attributes:
@@ -83,22 +83,22 @@ Child nodes: **(all are optional and may appear more than once!)**
     - `id` - **required**. The outlet identifier. Similar to inlet identifier, see above.
 
 
-  - `parram` - Specifies a parameter of the module. All parameters have values represented as IEEE floats. Quite frequently, classic parrams are associated with UI sliders, but they have a more universal semantics. Attributes:
+  - `param` - Specifies a parameter of the module. All parameters have values represented as IEEE floats. Quite frequently, classic params are associated with UI sliders, but they have a more universal semantics. Attributes:
 
-    - `id` - **required**. The parram id. It is significant in two ways:
+    - `id` - **required**. The param id. It is significant in two ways:
 
-      1. If the parram is linked to a SynthDef argument, then the id must be strictly the same as the argument name.
-      2. If your custom implementation wishes to control a parameter on their own, it can access it by asking for a parram with a given id.
+      1. If the param is linked to a SynthDef argument, then the id must be strictly the same as the argument name.
+      2. If your custom implementation wishes to control a parameter on their own, it can access it by asking for a param with a given id.
 
-    - `action` - *optional, default value:`sc`*. This attribute is used to specify what action should be taken when this parram's value changes. It should have one of following values:
+    - `action` - *optional, default value:`sc`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
 
-      - `sc` - Set SuperCollider Synth's (the one's that corresponds to this module) argument, which has the name equal to this parram's id, to this parram's value. This is the default behavior. This way you can use `parram`s to expose SynthDef's arguments to the user.
+      - `sc` - Set SuperCollider Synth's (the one's that corresponds to this module) argument, which has the name equal to this param's id, to this param's value. This is the default behavior. This way you can use `param`s to expose SynthDef's arguments to the user.
 
-      - `custom` - Pass the value to module's custom implementation. Setting this parram will call `on_parram_set` of this module (with the first argument set to the `id` of this parram, and the second to the new value). Your custom `Module` implementation can override that method and react on it in a custom way.
+      - `custom` - Pass the value to module's custom implementation. Setting this param will call `on_param_set` of this module (with the first argument set to the `id` of this param, and the second to the new value). Your custom `Module` implementation can override that method and react on it in a custom way.
 
-      - `none` - Setting this parram has no effect (though the value is stored).
+      - `none` - Setting this param has no effect (though the value is stored).
 
-    - `defaultval` - *optional*. The float value this parram is set when creating a new module.
+    - `defaultval` - *optional*. The float value this param is set when creating a new module.
 
     - `name`, `defaultmin`, `defaultmax` - *optional*. These attributes are only significant when automatically building module GUI. These values will be passed to slider configuration. See `gui` node, especially `slider`, for defails.
 
@@ -118,7 +118,7 @@ Child nodes: **(all are optional and may appear more than once!)**
 
     - `id` - The reply id. Must be equal to the SynthDef's argument which is used as the "replyid" parameter of SendReply.
 
-    - `parram` - The parram id which this reply is linked to. When a reply is received from synth, that parram will be set to the received value (and that parram's action will be executed).
+    - `param` - The param id which this reply is linked to. When a reply is received from synth, that param will be set to the received value (and that param's action will be executed).
 
 ## `sc` node
 
@@ -126,7 +126,7 @@ This node contains the SynthDef source code. It must be a child of a module node
 
 The source inside sc node will be passed to SuperCollider as a SynthDef template. Each instance of the module will be linked with an instance of such Synth.
 
-If your Synth processes audio data, use SynthDef arguments for input/output bus numbers, and mark them using `inlet` and/or `outlet` parrams. AlgAudio will bind them to correct buses, so that modules connected together in AlgAudio can pass audio data according to connections.
+If your Synth processes audio data, use SynthDef arguments for input/output bus numbers, and mark them using `inlet` and/or `outlet` params. AlgAudio will bind them to correct buses, so that modules connected together in AlgAudio can pass audio data according to connections.
 
 Example:
 ```supercollider
@@ -135,7 +135,7 @@ arg inbus, outbus;
 var in = In.ar(inbus);
 var out = in * SinOsc.ar(440,0,1);
 Out.ar(ourbus, out);
-// Remember to add <inlet id="inbus"/> and <outlet id="outbus"/> to <parrams> node.
+// Remember to add <inlet id="inbus"/> and <outlet id="outbus"/> to <params> node.
 </sc>
 ```
 
@@ -149,7 +149,7 @@ This node has only one attribute:
 
 - `type` - **required**. This attribute specifies the type of the module GUI. It is used to select the general graphical style of the module. Currently, only the two following values are supported:
 
-  - `standard auto` - Classic style. This GUI will be build automatically according using module's parram list. In this case the `gui` node shall have no children.
+  - `standard auto` - Classic style. This GUI will be build automatically according using module's param list. In this case the `gui` node shall have no children.
 
   - `standard` - Classic style. The children of the `gui` node determine the visible UI elements contained in the module gui box. The following children nodes are supported (their relative order of appearance determines the layout order):
 
@@ -167,7 +167,7 @@ The following ANSI-C symbols must be available in the library:
 
     This function is used by AlgAudio to ask your library for a new instance of your custom module. When the user adds a new module, and the module has a `class` node in the XML file, then instead of simply creating an instance of `AlgAudio::Module`, AlgAudio will call `create_instance` instead, with `name` argument set to the value of the `name` attribute of the `class` node. Your implementation should then return a raw pointer to a new instance `AlgAudio::Module`.
 
-    Because `AlgAudio::Module` is polymorhpic, it is reccommended to define a subclass of `AlgAudio::Module`, override some of it's methods (see below), and have create_instance create a new instance of that custom subclass, and return it as a pointer to the base `AlgAudio::Module`.
+    Because `AlgAudio::Module` is polymorhphic, it is reccommended to define a subclass of `AlgAudio::Module`, override some of it's methods (see below), and have create_instance create a new instance of that custom subclass, and return it as a pointer to the base `AlgAudio::Module`.
 
     In case of problems, `create_instance` should return a null pointer.
 
@@ -205,7 +205,7 @@ The following ANSI-C symbols must be available in the library:
 
 ### Creating custom classes
 
-When creating a custom class that publicly inhertis from `Module::AlgAudio`, you have a great degree of freedom, as `libalgaudio` exposes 99.9% of AlgAudio's functionality. Thus you can potentially hook up anywhere you want, up to the point where we believe it might be even possible (though insanely difficult) to have a module substitute SuperCollider with a different engine.
+When creating a custom class that publicly inherits from `Module::AlgAudio`, you have a great degree of freedom, as `libalgaudio` exposes 99.9% of AlgAudio's functionality. Thus you can potentially hook up anywhere you want, up to the point where we believe it might be even possible (though insanely difficult) to have a module substitute SuperCollider with a different engine.
 
 The development headers for `libalgaudio` are either available packet together within AlgAudio SDK, or you can browse them at `libalgaudio/include/.`.
 
@@ -220,8 +220,8 @@ However, most modules will simply want to override these several useful methods 
 
     This method is called a bit later than `on_init`, immediately after GUI building for this module instance has been completed. You get a pointer that module GUI as a method argument. This is the right moment to perform GUI post-initialization.
 
-  - `void AlgAudio::Module::on_parram_set(std::string, float)`
+  - `void AlgAudio::Module::on_param_set(std::string, float)`
 
-    This method is called when a parram is set, and its `mode` is set to `custom`. Place here the code that reacts on parram change. The arguments passed to this method are: parram's `id` and the new value.
+    This method is called when a param is set, and its `mode` is set to `custom`. Place here the code that reacts on param change. The arguments passed to this method are: param's `id` and the new value.
 
-Browse the header files, especially `Module.hpp` for useful method you can call from your custom module subclass. For example, you may be interested in `AlgAudio::Module::GetParramControllerByID(std::string)`, which returns a pointer to a ParramController, allowing you to set a param value as you wish.
+Browse the header files, especially `Module.hpp` for useful method you can call from your custom module subclass. For example, you may be interested in `AlgAudio::Module::GetParamControllerByID(std::string)`, which returns a pointer to a ParamController, allowing you to set a param value as you wish.

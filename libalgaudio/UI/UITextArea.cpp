@@ -57,7 +57,7 @@ void UITextArea::Push(std::string s){
 }
 void UITextArea::PushLine(std::string s){
   text.push_back(s);
-  textures.push_back( TextRenderer::Render(window, FontParrams("FiraMono-Regular",10), s) );
+  textures.push_back( TextRenderer::Render(window, FontParams("FiraMono-Regular",10), s) );
   SetNeedsRedrawing();
 }
 

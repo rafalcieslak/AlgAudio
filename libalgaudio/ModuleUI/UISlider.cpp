@@ -27,40 +27,40 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> c) : UIWidget(parent_window), controller(c) {
+UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> c) : UIWidget(parent_window), controller(c) {
   SetMinimalSize(Size2D(130,20));
 }
 
-std::shared_ptr<UISlider> UISlider::Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParramController> controller){
+std::shared_ptr<UISlider> UISlider::Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> controller){
   auto res = std::shared_ptr<UISlider>(new UISlider(parent_window, controller));
   res->Init(controller);
   return res;
 }
 
-void UISlider::Init(std::shared_ptr<ParramController> controller){
-  parram_id = controller->templ->id;
-  name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), controller->templ->name);
+void UISlider::Init(std::shared_ptr<ParamController> controller){
+  param_id = controller->templ->id;
+  name_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), controller->templ->name);
 
   range_min = controller->templ->default_min;
   range_max = controller->templ->default_max;
 
-  range_max_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
-  range_min_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
+  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
+  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
 
   current_value = controller->Get();
-  value_texture     = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
-  value_texture_big = TextRenderer::Render(window,FontParrams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
+  value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
+  value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
 
   subscriptions += controller->on_set.Subscribe([this](float v){
     current_value = v;
-    value_texture     = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
-    value_texture_big = TextRenderer::Render(window,FontParrams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
+    value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
+    value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
     SetNeedsRedrawing();
   });
 }
 
 void UISlider::SetName(std::string name){
-  name_texture = TextRenderer::Render(window,FontParrams("FiraMono-Regular",10), name);
+  name_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), name);
   SetNeedsRedrawing();
 }
 

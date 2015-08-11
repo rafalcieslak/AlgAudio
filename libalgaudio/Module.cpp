@@ -32,24 +32,24 @@ Bus::~Bus(){
 }
 
 
-ParramController::ParramController(std::shared_ptr<Module> m, const std::shared_ptr<ParramTemplate> t)
+ParamController::ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t)
   : id(t->id), templ(t), module(m) {
 
 }
-std::shared_ptr<ParramController> ParramController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParramTemplate> templ){
-  return std::shared_ptr<ParramController>(new ParramController(m,templ));
+std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParamTemplate> templ){
+  return std::shared_ptr<ParamController>(new ParamController(m,templ));
 }
 
-void ParramController::Set(float value){
+void ParamController::Set(float value){
   current_val = value;
   on_set.Happen(value);
   auto m = module.lock();
   if(m){
-    if(templ->parram_mode == ParramTemplate::ParramMode::SC){
-      SCLang::SendOSC("/algaudioSC/setparram", "isf", m->sc_id, templ->id.c_str(), value);
-    }else if(templ->parram_mode == ParramTemplate::ParramMode::Custom){
-      m->on_parram_set(templ->id, value);
-    }else if(templ->parram_mode == ParramTemplate::ParramMode::None){
+    if(templ->param_mode == ParamTemplate::ParamMode::SC){
+      SCLang::SendOSC("/algaudioSC/setparam", "isf", m->sc_id, templ->id.c_str(), value);
+    }else if(templ->param_mode == ParamTemplate::ParamMode::Custom){
+      m->on_param_set(templ->id, value);
+    }else if(templ->param_mode == ParamTemplate::ParamMode::None){
       // NOP
     }
   }
@@ -149,27 +149,27 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
 }
 
 
-void Module::PrepareParramControllers(){
-  for(const std::shared_ptr<ParramTemplate> ptr : templ->parrams){
-    auto controller = ParramController::Create(shared_from_this(), ptr);
+void Module::PrepareParamControllers(){
+  for(const std::shared_ptr<ParamTemplate> ptr : templ->params){
+    auto controller = ParamController::Create(shared_from_this(), ptr);
     controller->Set(ptr->default_val);
-    parram_controllers.push_back(controller);
+    param_controllers.push_back(controller);
   }
 }
 
 /*
-void Module::SetParram(std::string name, int value){
-  SCLang::SendOSC("/algaudioSC/setparram", "isi", sc_id, name.c_str(), value);
+void Module::SetParam(std::string name, int value){
+  SCLang::SendOSC("/algaudioSC/setparam", "isi", sc_id, name.c_str(), value);
 }
-void Module::SetParram(std::string name, std::list<int> values){
+void Module::SetParam(std::string name, std::list<int> values){
   lo::Message m;
   m.add_int32(sc_id);
   m.add_string(name);
   for(int i : values) m.add_int32(i);
-  SCLang::SendOSCCustom("/algaudioSC/setparramlist", m);
+  SCLang::SendOSCCustom("/algaudioSC/setparamlist", m);
 }
-void Module::SetParram(std::string name, double value){
-  SCLang::SendOSC("/algaudioSC/setparram", "isd", sc_id, name.c_str(), value);
+void Module::SetParam(std::string name, double value){
+  SCLang::SendOSC("/algaudioSC/setparam", "isd", sc_id, name.c_str(), value);
 }
 */
 
@@ -204,8 +204,8 @@ std::shared_ptr<Module::Outlet> Module::GetOutletByID(std::string id) const{
   return nullptr;
 }
 
-std::shared_ptr<ParramController> Module::GetParramControllerByID(std::string id) const{
-  for(auto& p : parram_controllers)
+std::shared_ptr<ParamController> Module::GetParamControllerByID(std::string id) const{
+  for(auto& p : param_controllers)
     if(p->id == id) return p;
   return nullptr;
 }

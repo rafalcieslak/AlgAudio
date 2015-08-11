@@ -45,16 +45,16 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
-class ParramTemplate{
+class ParamTemplate{
 public:
   std::string id;
   std::string name;
-  enum class ParramMode{
+  enum class ParamMode{
     SC,
     Custom,
     None,
   };
-  ParramMode parram_mode;
+  ParamMode param_mode;
   float default_min, default_max;
   float default_val;
 };
@@ -76,7 +76,7 @@ public:
   ModuleCollection& collection;
   std::list<std::string> inlets;
   std::list<std::string> outlets;
-  std::list<std::shared_ptr<ParramTemplate>> parrams;
+  std::list<std::shared_ptr<ParamTemplate>> params;
 };
 
 } // namespace AlgAudio

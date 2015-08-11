@@ -60,7 +60,7 @@ bool HasZeroArea();
   void Push(Point2D p, Size2D s);
   void Push(std::shared_ptr<SDLTexture>, int width, int height);
   void Pop();
-  // Reapplies the current context parrams. It is useful if your context was
+  // Reapplies the current context params. It is useful if your context was
   // messed up by a different context using the same window.
   // For example, if you use TextRenderer::Render inside a CustomDraw, then
   // the remporary drawcontext used by TextRenderer will reset the settings

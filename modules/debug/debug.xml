@@ -24,13 +24,13 @@
   </module>
 
   <module id="fork4" name="Fork   ">
-    <parrams>
+    <params>
       <inlet id="in"/>
       <outlet id="outbus1"/>
       <outlet id="outbus2"/>
       <outlet id="outbus3"/>
       <outlet id="outbus4"/>
-    </parrams>
+    </params>
     <description> A simple fork with 4 outlets. </description>
     <sc>
 arg in, outbus1, outbus2, outbus3, outbus4;
@@ -43,10 +43,10 @@ Out.ar(outbus4, In.ar(in));
   </module>
 
   <module id="pipe" name="Pipe">
-    <parrams>
+    <params>
       <inlet id="inbus"/>
       <outlet id="outbus"/>
-    </parrams>
+    </params>
     <description> A pipe module. All signal passed throught this module is left untouched. </description>
     <sc>
 arg inbus, outbus;
@@ -58,11 +58,11 @@ Out.ar(outbus,in);
 
   <module id="measure" name="Amp measure">
     <class name="Measure"/>
-    <parrams>
+    <params>
       <inlet id="inbus"/>
-      <parram id="resultparram" name="Amplitude" min="0.0" max="100.0" action="custom"/>
-      <reply id="result" parram="result"/>
-    </parrams>
+      <param id="resultparam" name="Amplitude" min="0.0" max="100.0" action="custom"/>
+      <reply id="result" param="result"/>
+    </params>
     <description> This class demonstrates reacting on signal analysis results. </description>
     <sc>
 arg inbus, result=42;
@@ -76,12 +76,12 @@ SendReply.kr(Impulse.kr(10), '/algaudioSC/sendreply', amp, result);
 
   <module id="guidemo" name="GUI demo">
     <class name="GUIDemo"/>
-    <parrams>
+    <params>
       <inlet id="inbus"/>
-      <parram id="gain" defaultval="1.0" action="sc"/>
-      <parram id="stdout" defaultval="0.0" action="custom"/>
+      <param id="gain" defaultval="1.0" action="sc"/>
+      <param id="stdout" defaultval="0.0" action="custom"/>
       <outlet id="outbus"/>
-    </parrams>
+    </params>
     <description> Custom GUI demo. </description>
     <sc>
 arg inbus, outbus, gain;
@@ -90,9 +90,9 @@ Out.ar(outbus, gain*in);
     </sc>
     <gui type="standard">
       <inlet id="inbusGUI" inlet="inbus"/>
-      <slider id="gainslider" parram="gain" name="Gain 1" defaultmin="0.0" defaultmax="1.0"/>
-      <slider id="gainslider2" parram="gain" name="Gain 2" defaultmin="1.0" defaultmax="5.0"/>
-      <slider id="stdoutslider" parram="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>
+      <slider id="gainslider" param="gain" name="Gain 1" defaultmin="0.0" defaultmax="1.0"/>
+      <slider id="gainslider2" param="gain" name="Gain 2" defaultmin="1.0" defaultmax="5.0"/>
+      <slider id="stdoutslider" param="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>
       <display id="displaydemo" name="Result display" defaultmin="-100.0" defaultmax="100.0"/>
       <outlet id="outbus"/>
     </gui>

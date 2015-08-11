@@ -54,48 +54,48 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
     if(!class_name_attr) throw ModuleParseException(id, "Module has class node, but the class name is missing");
     class_name = class_name_attr->value();
   }
-  xml_node<>* parrams_node = node->first_node("parrams");
-  if(parrams_node){
-    for(xml_node<>* inlet_node = parrams_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
+  xml_node<>* params_node = node->first_node("params");
+  if(params_node){
+    for(xml_node<>* inlet_node = params_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
       xml_attribute<>* inlet_id = inlet_node->first_attribute("id");
       if(!inlet_id) throw ModuleParseException(id, "An inlet is missing its id");
       inlets.push_back(inlet_id->value());
     }
-    for(xml_node<>* outlet_node = parrams_node->first_node("outlet"); outlet_node; outlet_node = outlet_node->next_sibling("outlet")){
+    for(xml_node<>* outlet_node = params_node->first_node("outlet"); outlet_node; outlet_node = outlet_node->next_sibling("outlet")){
       xml_attribute<>* outlet_id = outlet_node->first_attribute("id");
       if(!outlet_id) throw ModuleParseException(id, "An outlet is missing its id");
       outlets.push_back(outlet_id->value());
     }
-    for(xml_node<>* parram_node = parrams_node->first_node("parram"); parram_node; parram_node = parram_node->next_sibling("parram")){
-      auto p = std::make_shared<ParramTemplate>();
-      xml_attribute<>* parram_id = parram_node->first_attribute("id");
-      if(!parram_id) throw ModuleParseException(id, "An parram is missing its id");
-      p->id = parram_id->value();
-      xml_attribute<>* parram_name = parram_node->first_attribute("name");
-      if(!parram_name) p->name = "";
-      else p->name = parram_name->value();
-      xml_attribute<>* parram_defaultmax = parram_node->first_attribute("defaultmax");
-      if(!parram_defaultmax) p->default_max = 1.0;
-      else p->default_max = std::stof(parram_defaultmax->value());
-      xml_attribute<>* parram_defaultmin = parram_node->first_attribute("defaultmin");
-      if(!parram_defaultmin) p->default_min = 0.0;
-      else p->default_min = std::stof(parram_defaultmin->value());
-      xml_attribute<>* parram_defaultval = parram_node->first_attribute("defaultval");
-      if(!parram_defaultval) p->default_val = 1.0;
-      else p->default_val = std::stof(parram_defaultval->value());
+    for(xml_node<>* param_node = params_node->first_node("param"); param_node; param_node = param_node->next_sibling("param")){
+      auto p = std::make_shared<ParamTemplate>();
+      xml_attribute<>* param_id = param_node->first_attribute("id");
+      if(!param_id) throw ModuleParseException(id, "An param is missing its id");
+      p->id = param_id->value();
+      xml_attribute<>* param_name = param_node->first_attribute("name");
+      if(!param_name) p->name = "";
+      else p->name = param_name->value();
+      xml_attribute<>* param_defaultmax = param_node->first_attribute("defaultmax");
+      if(!param_defaultmax) p->default_max = 1.0;
+      else p->default_max = std::stof(param_defaultmax->value());
+      xml_attribute<>* param_defaultmin = param_node->first_attribute("defaultmin");
+      if(!param_defaultmin) p->default_min = 0.0;
+      else p->default_min = std::stof(param_defaultmin->value());
+      xml_attribute<>* param_defaultval = param_node->first_attribute("defaultval");
+      if(!param_defaultval) p->default_val = 1.0;
+      else p->default_val = std::stof(param_defaultval->value());
 
-      xml_attribute<>* parram_action = parram_node->first_attribute("action");
-      if(!parram_action) p->parram_mode = ParramTemplate::ParramMode::SC;
+      xml_attribute<>* param_action = param_node->first_attribute("action");
+      if(!param_action) p->param_mode = ParamTemplate::ParamMode::SC;
       else{
-        std::string val(parram_action->value());
-        if(val == "sc")     p->parram_mode = ParramTemplate::ParramMode::SC;
-        else if(val == "custom") p->parram_mode = ParramTemplate::ParramMode::Custom;
-        else if(val == "none") p->parram_mode = ParramTemplate::ParramMode::None;
+        std::string val(param_action->value());
+        if(val == "sc")     p->param_mode = ParamTemplate::ParamMode::SC;
+        else if(val == "custom") p->param_mode = ParamTemplate::ParamMode::Custom;
+        else if(val == "none") p->param_mode = ParamTemplate::ParamMode::None;
         else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
       }
 
 
-      parrams.push_back(p);
+      params.push_back(p);
     }
   }
 
