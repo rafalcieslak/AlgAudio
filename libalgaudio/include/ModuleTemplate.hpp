@@ -49,12 +49,18 @@ class ParamTemplate{
 public:
   std::string id;
   std::string name;
-  enum class ParamMode{
+  enum class ParamAction{
     SC,
     Custom,
     None,
   };
-  ParamMode param_mode;
+  enum class ParamMode{
+    Input,
+    Output,
+    None,
+  };
+  ParamAction action;
+  ParamMode mode = ParamMode::Input;
   float default_min, default_max;
   float default_val;
 };

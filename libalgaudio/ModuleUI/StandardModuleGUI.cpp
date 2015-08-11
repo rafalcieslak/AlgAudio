@@ -159,9 +159,11 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   }
   // Param sliders.
   for(std::shared_ptr<ParamController>& p : GetModule()->param_controllers){
+    if(p->templ->mode == ParamTemplate::ParamMode::None) continue;
     auto slider = UISlider::Create(window, p);
     slider->widget_id = UIWidget::ID("autoslider_" + p->id);
     slider->param_id = p->id;
+    if(p->templ->mode == ParamTemplate::ParamMode::Output) slider->SetMode(UISlider::Mode::Display);
     params_box->Insert(slider, UIBox::PackMode::TIGHT);
     param_sliders[slider->widget_id] = slider;
   }

@@ -45,11 +45,11 @@ void ParamController::Set(float value){
   on_set.Happen(value);
   auto m = module.lock();
   if(m){
-    if(templ->param_mode == ParamTemplate::ParamMode::SC){
+    if(templ->action == ParamTemplate::ParamAction::SC){
       SCLang::SendOSC("/algaudioSC/setparam", "isf", m->sc_id, templ->id.c_str(), value);
-    }else if(templ->param_mode == ParamTemplate::ParamMode::Custom){
+    }else if(templ->action == ParamTemplate::ParamAction::Custom){
       m->on_param_set(templ->id, value);
-    }else if(templ->param_mode == ParamTemplate::ParamMode::None){
+    }else if(templ->action == ParamTemplate::ParamAction::None){
       // NOP
     }
   }

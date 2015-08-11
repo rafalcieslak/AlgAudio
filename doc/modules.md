@@ -90,6 +90,14 @@ Child nodes: **(all are optional and may appear more than once!)**
       1. If the param is linked to a SynthDef argument, then the id must be strictly the same as the argument name.
       2. If your custom implementation wishes to control a parameter on their own, it can access it by asking for a param with a given id.
 
+    - `mode` - *optional, default value: input*. Provides a hint on what is the purpose of this param. This attribute is crucial for automatically building module GUI. Possible values are:
+
+      - `input` - this param is an input value. It will be represented by a slider, and the user will be able to modify this value.
+
+      - `output` - this param is an output value, or a result of some computations. This value will be show to the user, but they will not be able to modify it.
+
+      - `none` - this parram shall be not used externally. It will not be presented to the user.
+
     - `action` - *optional, default value:`sc`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
 
       - `sc` - Set SuperCollider Synth's (the one's that corresponds to this module) argument, which has the name equal to this param's id, to this param's value. This is the default behavior. This way you can use `param`s to expose SynthDef's arguments to the user.

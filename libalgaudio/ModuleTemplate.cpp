@@ -74,6 +74,17 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       xml_attribute<>* param_name = param_node->first_attribute("name");
       if(!param_name) p->name = "";
       else p->name = param_name->value();
+
+      xml_attribute<>* param_mode = param_node->first_attribute("mode");
+      if(!param_mode) p->mode = ParamTemplate::ParamMode::Input;
+      else{
+        std::string mode = param_mode->value();
+        if(mode == "input") p->mode = ParamTemplate::ParamMode::Input;
+        else if(mode == "output") p->mode = ParamTemplate::ParamMode::Output;
+        else if(mode == "none") p->mode = ParamTemplate::ParamMode::None;
+        else throw ModuleParseException(id, "A param has invalid mode value: " + mode);
+      }
+
       xml_attribute<>* param_defaultmax = param_node->first_attribute("defaultmax");
       if(!param_defaultmax) p->default_max = 1.0;
       else p->default_max = std::stof(param_defaultmax->value());
@@ -84,13 +95,13 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       if(!param_defaultval) p->default_val = 1.0;
       else p->default_val = std::stof(param_defaultval->value());
 
-      xml_attribute<>* param_action = param_node->first_attribute("action");
-      if(!param_action) p->param_mode = ParamTemplate::ParamMode::SC;
+      xml_attribute<>* action = param_node->first_attribute("action");
+      if(!action) p->action = ParamTemplate::ParamAction::SC;
       else{
-        std::string val(param_action->value());
-        if(val == "sc")     p->param_mode = ParamTemplate::ParamMode::SC;
-        else if(val == "custom") p->param_mode = ParamTemplate::ParamMode::Custom;
-        else if(val == "none") p->param_mode = ParamTemplate::ParamMode::None;
+        std::string val(action->value());
+        if(val == "sc")     p->action = ParamTemplate::ParamAction::SC;
+        else if(val == "custom") p->action = ParamTemplate::ParamAction::Custom;
+        else if(val == "none") p->action = ParamTemplate::ParamAction::None;
         else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
       }
 

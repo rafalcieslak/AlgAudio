@@ -32,7 +32,7 @@ Out.ar(outbus,in);
       <inlet id="inbus1"/>
       <inlet id="inbus2"/>
       <param id="db" name="Volume (dB)" defaultmin="0.0" defaultmax="100.0" defaultval="85"/>
-      <param id="measure" name="Amplitude (dB)" defaultmin="0.0" defaultmax="100.0" action="custom"/>
+      <param id="measure" mode="output" name="Amplitude (dB)" defaultmin="0.0" defaultmax="100.0" action="custom"/>
       <reply id="amp_reply" param="measure"/>
     </params>
     <description> This module has two inlets, the audio signal connected to them will be played on the system audio output device. </description>
