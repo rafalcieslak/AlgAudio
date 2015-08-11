@@ -82,8 +82,6 @@ public:
   virtual void on_gui_build(std::shared_ptr<ModuleGUI>) {};
   // This method is used if a parram is defined with action="custom" attribute.
   virtual void on_parram_set(std::string, float) {}
-  // This method gets called if you used action="custom" for a reply parram.
-  virtual void on_reply(std::string, float) {};
 
   // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;

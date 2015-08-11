@@ -24,7 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 extern "C"{
 void delete_instance(void* obj){
-  delete reinterpret_cast<AlgAudio::DynamicallyLoadableClass*>(obj);
+  delete reinterpret_cast<AlgAudio::Module*>(obj);
 }
 void* create_instance(const char* name){
    return nullptr;

@@ -90,6 +90,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
         std::string val(parram_action->value());
         if(val == "sc")     p->parram_mode = ParramTemplate::ParramMode::SC;
         else if(val == "custom") p->parram_mode = ParramTemplate::ParramMode::Custom;
+        else if(val == "none") p->parram_mode = ParramTemplate::ParramMode::None;
         else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
       }
 

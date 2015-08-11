@@ -52,6 +52,7 @@ public:
   enum class ParramMode{
     SC,
     Custom,
+    None,
   };
   ParramMode parram_mode;
   float default_min, default_max;

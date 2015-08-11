@@ -49,6 +49,8 @@ void ParramController::Set(float value){
       SCLang::SendOSC("/algaudioSC/setparram", "isf", m->sc_id, templ->id.c_str(), value);
     }else if(templ->parram_mode == ParramTemplate::ParramMode::Custom){
       m->on_parram_set(templ->id, value);
+    }else if(templ->parram_mode == ParramTemplate::ParramMode::None){
+      // NOP
     }
   }
   after_set.Happen(value);

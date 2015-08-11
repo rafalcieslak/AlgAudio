@@ -60,7 +60,8 @@ Out.ar(outbus,in);
     <class name="Measure"/>
     <parrams>
       <inlet id="inbus"/>
-      <reply id="result" name="Amplitude" min="0.0" max="100.0" action="custom"/>
+      <parram id="resultparram" name="Amplitude" min="0.0" max="100.0" action="custom"/>
+      <reply id="result" parram="result"/>
     </parrams>
     <description> This class demonstrates reacting on signal analysis results. </description>
     <sc>
