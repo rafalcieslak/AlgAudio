@@ -56,6 +56,10 @@ void ParamController::Set(float value){
   after_set.Happen(value);
 }
 
+void ParamController::Reset(){
+  Set(templ->default_val);
+}
+
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
   auto r = Relay<std::shared_ptr<Bus>>::Create();
   SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
@@ -152,9 +156,12 @@ LateReturn<> Module::CreateIOFromTemplate(bool fake){
 void Module::PrepareParamControllers(){
   for(const std::shared_ptr<ParamTemplate> ptr : templ->params){
     auto controller = ParamController::Create(shared_from_this(), ptr);
-    controller->Set(ptr->default_val);
     param_controllers.push_back(controller);
   }
+}
+void Module::ResetControllers(){
+  for(auto controller : param_controllers)
+    controller->Reset();
 }
 
 /*
@@ -205,8 +212,9 @@ std::shared_ptr<Module::Outlet> Module::GetOutletByID(std::string id) const{
 }
 
 std::shared_ptr<ParamController> Module::GetParamControllerByID(std::string id) const{
-  for(auto& p : param_controllers)
+  for(const auto& p : param_controllers){
     if(p->id == id) return p;
+  }
   return nullptr;
 }
 

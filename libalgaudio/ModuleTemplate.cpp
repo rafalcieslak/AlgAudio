@@ -94,7 +94,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
         else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
       }
 
-
+      
       params.push_back(p);
     }
   }

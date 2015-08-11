@@ -50,6 +50,7 @@ public:
   std::string id;
   static std::shared_ptr<ParamController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> templ);
   void Set(float value);
+  void Reset();
   inline float Get() const {return current_val;}
   Signal<float> on_set;
   // Passing values to other controllers should be done once this controller has it value set.
@@ -162,6 +163,10 @@ public:
   std::vector<std::shared_ptr<Outlet>> outlets;
 
   void PrepareParamControllers();
+
+  // Sets all controllers to default values
+  void ResetControllers();
+
   // TODO: Make this a map?
   std::vector<std::shared_ptr<ParamController>> param_controllers;
 

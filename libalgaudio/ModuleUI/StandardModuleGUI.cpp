@@ -105,7 +105,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       outlet->widget_id = UIWidget::ID(id);
       outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
       outlets[outlet->widget_id] = outlet;
-    }else if(name == "slider"){
+    }else if(name == "slider" || name == "display"){
       std::string id, param;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
@@ -119,6 +119,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       auto slider = UISlider::Create(window, p);
       slider->widget_id = UIWidget::ID(id);
       slider->param_id = param;
+      if(name == "display") slider->SetMode(UISlider::Mode::Display);
       params_box->Insert(slider, UIBox::PackMode::TIGHT);
       param_sliders[slider->widget_id] = slider;
 

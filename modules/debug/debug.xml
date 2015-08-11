@@ -80,6 +80,7 @@ SendReply.kr(Impulse.kr(10), '/algaudioSC/sendreply', amp, result);
       <inlet id="inbus"/>
       <param id="gain" defaultval="1.0" action="sc"/>
       <param id="stdout" defaultval="0.0" action="custom"/>
+      <param id="stdout2" defaultval="0.0" action="none"/>
       <outlet id="outbus"/>
     </params>
     <description> Custom GUI demo. </description>
@@ -90,10 +91,9 @@ Out.ar(outbus, gain*in);
     </sc>
     <gui type="standard">
       <inlet id="inbusGUI" inlet="inbus"/>
-      <slider id="gainslider" param="gain" name="Gain 1" defaultmin="0.0" defaultmax="1.0"/>
-      <slider id="gainslider2" param="gain" name="Gain 2" defaultmin="1.0" defaultmax="5.0"/>
+      <slider id="gainslider" param="gain" name="Gain 1" defaultmin="0.0" defaultmax="3.0"/>
       <slider id="stdoutslider" param="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>
-      <display id="displaydemo" name="Result display" defaultmin="-100.0" defaultmax="100.0"/>
+      <display id="displaydemo" param="stdout2" name="Result display" defaultmin="-100.0" defaultmax="100.0"/>
       <outlet id="outbus"/>
     </gui>
   </module>

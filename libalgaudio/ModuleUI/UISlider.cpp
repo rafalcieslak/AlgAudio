@@ -44,8 +44,8 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
   range_min = controller->templ->default_min;
   range_max = controller->templ->default_max;
 
-  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
   range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
+  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
 
   current_value = controller->Get();
   value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
@@ -64,29 +64,47 @@ void UISlider::SetName(std::string name){
   SetNeedsRedrawing();
 }
 
+void UISlider::SetRangeMin(float x){
+  range_min = x;
+  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
+}
+void UISlider::SetRangeMax(float x){
+  range_max = x;
+  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
+}
+
 Rect UISlider::GetInputRect() const{
-  return Rect(Point2D(0,0), Size2D(12, current_size.height));
+  return (mode == Mode::Display) ?
+    Rect(Point2D(0,0), Size2D(0,0)) :
+    Rect(Point2D(0,0), Size2D(12, current_size.height));
 }
 Rect UISlider::GetOutputRect() const{
   return Rect(Point2D(current_size.width - 12, 0), Size2D(12, current_size.height));
 }
 Rect UISlider::GetBodyRect() const{
-  return Rect(Point2D(12, 0), Size2D(current_size.width - 24, current_size.height));
+  return (mode == Mode::Display) ?
+    Rect(Point2D(0 , 0), Size2D(current_size.width - 12, current_size.height)) :
+    Rect(Point2D(12, 0), Size2D(current_size.width - 24, current_size.height));
 }
 
 void UISlider::CustomDraw(DrawContext& c){
   int w = c.Size().width;
   int h = c.Size().height;
 
-  Color bg_color = Theme::Get("slider-bg");
-  if(point_mode == PointMode::Center || dragged) bg_color = bg_color.Lighter(0.07);
+  Color bg_color;
+  if(mode == Mode::Slider) bg_color = Theme::Get("slider-bg");
+  else if(mode == Mode::Display) bg_color = Theme::Get("slider-bg-display");
+
+  if( mode == Mode::Slider && (point_mode == PointMode::Center || dragged)) bg_color = bg_color.Lighter(0.07);
   c.SetColor(bg_color);
   c.DrawRect(0,0,w,h);
 
-  // Left connector body
-  if(point_mode == PointMode::Left) c.SetColor(Theme::Get("slider-connector").Lighter(0.1));
-  else c.SetColor(Theme::Get("slider-connector"));
-  c.DrawRect(0,0,12,h);
+  if(mode == Mode::Slider){
+    // Left connector body
+    if(point_mode == PointMode::Left) c.SetColor(Theme::Get("slider-connector").Lighter(0.1));
+    else c.SetColor(Theme::Get("slider-connector"));
+    c.DrawRect(0,0,12,h);
+  }
 
   // Right connector body
   if(point_mode == PointMode::Right) c.SetColor(Theme::Get("slider-connector").Lighter(0.1));
@@ -97,20 +115,20 @@ void UISlider::CustomDraw(DrawContext& c){
     // NOT pointed on center
 
     // Slider name
-    c.DrawText(name_texture, Color(0,0,0), 13,3);
+    c.DrawText(name_texture, Color(0,0,0), (mode == Mode::Display)?1:13,3);
 
     auto contr = controller.lock();
     if(contr){
       float v = contr->Get();
       float p = (v - range_min)/(range_max - range_min);
       float pos = std::max(0.0f, std::min(p, 1.0f));
-      float x = 12.0 + pos*((float)w - 25.0f);
+      float x = GetBodyStart() + pos*(GetBodyWidth());
 
       c.SetColor(Theme::Get("slider-marker"));
       c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(value_texture, Color(0,0,0), w - 14 - value_texture->GetSize().width ,3);
+      c.DrawText(value_texture, Color(0,0,0), GetBodyEnd() - 1 - value_texture->GetSize().width ,3);
     }
 
   }else{
@@ -120,7 +138,7 @@ void UISlider::CustomDraw(DrawContext& c){
     if(contr){
       float q = (current_value - range_min)/(range_max - range_min);
       float pos = std::max(0.0f, std::min(q, 1.0f));
-      float x = 12.0 + pos*((float)w - 25.0f);
+      float x = GetBodyStart() + pos*(GetBodyWidth());
 
       c.SetColor(Theme::Get("slider-marker"));
       c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
@@ -129,10 +147,10 @@ void UISlider::CustomDraw(DrawContext& c){
       c.DrawText(value_texture_big, Color(0,0,0), w/2 - value_texture_big->GetSize().width/2, 0);
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(range_max_texture, Color(0,0,0), w - 14 - range_max_texture->GetSize().width ,3);
+      c.DrawText(range_max_texture, Color(0,0,0), GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3);
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(range_min_texture, Color(0,0,0), 13 ,3);
+      c.DrawText(range_min_texture, Color(0,0,0), GetBodyStart() + 1 ,3);
     }
 
   }
@@ -141,15 +159,15 @@ void UISlider::CustomDraw(DrawContext& c){
   c.DrawLine(0,0,0,h);
   c.DrawLine(0,h-1,w,h-1);
   c.DrawLine(w-1,0,w-1,h);
-  c.DrawLine(12,0,12,h);
+  if(mode == Mode::Slider) c.DrawLine(12,0,12,h);
   c.DrawLine(w-13,0,w-13,h);
 
 }
 
 bool UISlider::CustomMousePress(bool down, short b,Point2D pos){
-  if(pos.IsInside(GetBodyRect()) && down && b == SDL_BUTTON_LEFT){
-    float x = pos.x - 12;
-    float q = x / (current_size.width - 24);
+  if(pos.IsInside(GetBodyRect()) && down && b == SDL_BUTTON_LEFT && mode == Mode::Slider){
+    float x = pos.x - GetBodyStart();
+    float q = x / GetBodyWidth();
     float val = range_min + (range_max - range_min) * q;
     controller.lock()->Set(val);
     return true;
@@ -158,12 +176,12 @@ bool UISlider::CustomMousePress(bool down, short b,Point2D pos){
 }
 
 void UISlider::CustomMouseMotion(Point2D, Point2D pos2){
-  if(pos2.IsInside(Point2D(0,0), Size2D(12,current_size.height))){
+  if(pos2.IsInside(GetInputRect())){
     if(point_mode != PointMode::Left){
       point_mode = PointMode::Left;
       SetNeedsRedrawing();
     }
-  }else if(pos2.IsInside(Point2D(current_size.width - 12, 0), Size2D(12, current_size.height))) {
+  }else if(pos2.IsInside(GetOutputRect())) {
     if(point_mode != PointMode::Right){
       point_mode = PointMode::Right;
       SetNeedsRedrawing();
@@ -176,9 +194,9 @@ void UISlider::CustomMouseMotion(Point2D, Point2D pos2){
   }
 }
 void UISlider::CustomMouseEnter(Point2D pos){
-  if(pos.IsInside(Point2D(0,0), Size2D(12,current_size.height)))
+  if(pos.IsInside(GetInputRect()))
     point_mode = PointMode::Left;
-  else if(pos.IsInside(Point2D(current_size.width - 12, 0), Size2D(12, current_size.height)))
+  else if(pos.IsInside(GetOutputRect()))
     point_mode = PointMode::Right;
   else
     point_mode = PointMode::Center;
@@ -196,7 +214,9 @@ void UISlider::DragStart(Point2D pos){
   SetNeedsRedrawing();
 }
 void UISlider::DragStep(Point2D pos){
-  float dq = ((float)pos.x - drag_start.x)/((float)current_size.width - 24.0f);
+  if(mode == Mode::Display) return;
+
+  float dq = ((float)pos.x - drag_start.x)/((float)GetBodyWidth());
   float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
   float val = range_min + q*(range_max - range_min);
   controller.lock()->Set(val);

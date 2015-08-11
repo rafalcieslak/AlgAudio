@@ -57,6 +57,7 @@ void Theme::Init(){
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
 
   thememap["slider-bg"] = Color(0x5a6e8dff);
+  thememap["slider-bg-display"] = Color(0x475872ff);
   thememap["slider-border"] = Color(0x293b53ff);
   thememap["slider-marker"] = Color(0x063373ff);
   thememap["slider-connector"] = Color(0x666d96ff);

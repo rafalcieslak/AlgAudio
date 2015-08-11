@@ -41,8 +41,17 @@ public:
   void DragEnd(Point2D pos);
 
   void SetName(std::string name);
-  void SetRangeMin(float x){ range_min = x; }
-  void SetRangeMax(float x){ range_max = x; }
+  void SetRangeMin(float x);
+  void SetRangeMax(float x);
+
+  enum class Mode{
+    Slider,
+    Display,
+  };
+  void SetMode(Mode m){
+    mode = m;
+    SetNeedsRedrawing();
+  }
 
   std::string param_id;
 protected:
@@ -62,8 +71,14 @@ private:
   Point2D drag_start;
   float drag_start_q;
 
+  Mode mode = Mode::Slider;
+
   enum class PointMode{ None, Left, Center, Right };
   PointMode point_mode = PointMode::None;
+
+  inline int GetBodyStart() const{ return (mode == Mode::Slider)?   12 : 0  ;}
+  inline int GetBodyEnd()   const{ return current_size.width - 12 ;}
+  inline int GetBodyWidth() const{ return (mode == Mode::Slider)? (current_size.width - 25) : (current_size.width - 13) ;}
 };
 
 

@@ -65,10 +65,11 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       // TODO: Do not return an unlinked module reference! This is a temporary
       // trick which allows to quickly test GUI without starting the SC server.
       // Happen a global error signal instead.
-      res->on_init(); // temporary!
       res->CreateIOFromTemplate(true); // Create fake io
       res->PrepareParamControllers();
       res->enabled_by_factory = true;
+      res->on_init(); // temporary!
+      res->ResetControllers();
       r.Return(res);
     }else{
       lo::Message m;
@@ -87,6 +88,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
             res->PrepareParamControllers();
             res->enabled_by_factory = true;
             res->on_init();
+            res->ResetControllers();
             r.Return(res);
           });
           }

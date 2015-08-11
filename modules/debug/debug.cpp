@@ -112,7 +112,9 @@ public:
 class GUIDemo : public AlgAudio::Module{
 public:
   void on_param_set(std::string id, float val) override{
-    std::cout << "GUIDemo executes some custom code on param set! " << id << " " << val << std::endl;
+    //std::cout << "GUIDemo executes some custom code on param set! " << id << " " << val << std::endl;
+    auto controller = GetParamControllerByID("stdout2");
+    controller->Set(val*5);
   }
   void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) override{
     auto slider = std::dynamic_pointer_cast<AlgAudio::UISlider>( gui->FindChild(AlgAudio::UIWidget::ID("gainslider")) );
