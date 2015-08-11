@@ -67,6 +67,18 @@ class LateReturn;
 template <typename... Types>
 class Relay;
 
+/* A Sync is a helper class for waiting for several LateReplies to arrive.
+ * Example usage:
+
+Sync s(3);
+PerformLongActionA(args1).ThenSync(s);
+PerformLongActionB(args2).ThenSync(s);
+PerformLongActionC(args3).ThenSync(s);
+s.WhenAll([](){
+  std::cout << "Done!" << std::endl;
+});
+
+ */
 class Sync{
 public:
   Sync(int count);

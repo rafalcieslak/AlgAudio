@@ -45,6 +45,10 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
+/* A template for creating params. Contains all data about a param that is
+ * loaded from module description file. All ParamControlers have a link to their
+ * corresponding template.
+ */
 class ParamTemplate{
 public:
   std::string id;
@@ -65,9 +69,16 @@ public:
   float default_val;
 };
 
+/* All modules are build according to a template. If multiple instances
+ * of the same module type are present, they will share a single instance
+ * of ModuleTemplate.
+ * ModuleTemplate contains all data about a module that are loaded from the
+ * module description file. The fields are self-explainatory.
+ */
 class ModuleTemplate{
 public:
   ModuleTemplate(ModuleCollection& collection);
+  // Create a module template by parsing data from an XML module node.
   ModuleTemplate(ModuleCollection& collection, rapidxml::xml_node<char>* node);
   std::string GetFullID() const;
   std::string id;

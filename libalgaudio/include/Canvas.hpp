@@ -36,12 +36,25 @@ struct DoubleConnectionException : public Exception{
   DoubleConnectionException(std::string t) : Exception(t) {}
 };
 
+/* A Canvas represents a set of interconnected modules. The Canvas manages
+ * connections between them, calculates topological ordering and detects loops.
+ * It also sends control data between modules.
+ * The Canvas is strictly an abstract representation.
+ * In fututre, it is likely that modules such as subpatch or poly will simply
+ * maintain their own instance of a Canvas.
+ */
 class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
-  virtual ~Canvas();
-  LateReturn<std::shared_ptr<Module>> CreateModule(std::string id);
-  void RemoveModule(std::shared_ptr<Module>);
+  // Creates a new instance of a Canvas with no modules inside.
   static std::shared_ptr<Canvas> CreateEmpty();
+
+  virtual ~Canvas();
+  // Creates a new module according to the given template id, and places the
+  // new module instance on this Canvas.
+  LateReturn<std::shared_ptr<Module>> CreateModule(std::string id);
+  // Removes a particular module instance from the Canvas.
+  void RemoveModule(std::shared_ptr<Module>);
+
 
   // This structure is simply a pair of module pointer and inlet/outlet id.
   // It's simpler to use them then just a reference to the inlet/outlet,
@@ -54,10 +67,14 @@ public:
   };
   std::shared_ptr<Module::Inlet >  GetInletByIOID(IOID) const;
   std::shared_ptr<Module::Outlet> GetOutletByIOID(IOID) const;
-  void RemoveAllConnectionsFrom(std::shared_ptr<Module>);
-  void RemoveAllConnectionsTo(std::shared_ptr<Module>);
+  // These methods are used for creating and removing audio connections between
+  // modules.
   void Connect(IOID from, IOID to);
   void Disconnect(IOID from, IOID to);
+  // These methods are useful for the Canvas itself, to clean up connections
+  // to/from a module which is about to be removed.
+  void RemoveAllConnectionsFrom(std::shared_ptr<Module>);
+  void RemoveAllConnectionsTo(std::shared_ptr<Module>);
   // Returns true iff the new connection suggested by method arguments would
   // create a cycle in connections graph.
   bool TestNewConnectionForLoop(IOID from, IOID to);
@@ -67,12 +84,17 @@ public:
   // Returns true iff the specified connection already exists.
   bool GetDirectConnectionExists(IOID from, IOID to);
 
-  // Updates SC synth ordering.
+  // Updates SC synth ordering. Calculates a topological ordering for the graph
+  // of interconnections, and sends the result to SC so that it can reorder
+  // synths.
   void RecalculateOrder();
 
+  // The list of all connections "from-to", in the format of one-to-many.
   std::map<IOID, std::list<IOID>> connections;
+  // The set of all modules that are placed onto (and maintained by) this Canvas.
   std::set<std::shared_ptr<Module>> modules;
 private:
+  // Private constructor. Use CreateEmpty() instead.
   Canvas();
 };
 

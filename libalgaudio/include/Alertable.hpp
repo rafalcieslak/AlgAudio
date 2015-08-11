@@ -50,8 +50,9 @@ struct AlertableException : public Exception{
   AlertableException(std::string t) : Exception(t) {}
 };
 
-// Class implemented by objects which are capable of displaying an alert.
-// For example, the MainWindow is such class.
+/* This is an interface implemented by all classes which are capable of
+ * displaying an alert. For example, the MainWindow is such class.
+ */
 class IAlertable {
 public:
   // Returns 0 if the first button was clicked, 1, if the second.

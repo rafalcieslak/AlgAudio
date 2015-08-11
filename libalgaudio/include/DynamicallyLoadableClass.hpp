@@ -22,6 +22,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/* This class is a base for any class that may be loaded from a shared library
+ * loaded at runtime. Such clases may require a custom deleter, if they were
+ * allocated dynamically in an external binary module.
+ */
 class DynamicallyLoadableClass{
   void (*deleter)(void*) = nullptr;
 public:

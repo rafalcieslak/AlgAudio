@@ -36,10 +36,14 @@ struct SCLangException : public Exception{
   SCLangException(std::string t) : Exception(t) {}
 };
 
-// The static interface to a single global sclang process
+/* The static interface to a single global sclang process.
+ * Manages all interaction with the SuperCollider instance, including intepteter
+ * starting and halting, server configuration and booting, OSC messaging.
+ */
 class SCLang{
   SCLang() = delete; // static class
 public:
+  // Interpreter state controls.
   static void Start(std::string command, bool supernova = false);
   static void Restart(std::string command);
   static void Stop();
@@ -60,6 +64,8 @@ public:
   static LateReturn<> InstallTemplate(const std::shared_ptr<ModuleTemplate> templ);
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
+
+  // Various functions and type templates for OSC communication.
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
   static void SendOSC(const std::string& path, std::string tag, ...);
@@ -82,11 +88,11 @@ public:
   static int RegisterSendReply(int synth_id, std::weak_ptr<SendReplyController>);
   static void UnregisterSendReply(int synth_id, int reply_id);
 
+  // Controls SuperCollider server.
   static void BootServer(bool supernova = false);
   static void StopServer();
   static bool ready;
 private:
-  static void Start2();
   static std::unique_ptr<SCLangSubprocess> subprocess;
   static std::set<std::string> installed_templates;
   static bool osc_debug;

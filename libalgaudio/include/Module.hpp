@@ -33,11 +33,14 @@ class ModuleGUI;
 class Window;
 class Module;
 
-// A wrapper for SC buses.
+/* This is a wrapper class for SC buses */
 class Bus{
 public:
   int GetID() const {return id;}
+  // Asks SC for a new bus id, and returns a new Bus instance wrapping that bus.
   static LateReturn<std::shared_ptr<Bus>> CreateNew();
+  // Creates a fake Bus instance, which does not wrap anything. Useful only for
+  // testing module instances without OSC connection.
   static std::shared_ptr<Bus> CreateFake();
   ~Bus();
 private:
@@ -45,6 +48,12 @@ private:
   int id;
 };
 
+/* A ParamController is the representation of a Param state.
+ * All ParamControllers belong to some Module, and are always build according to
+ * a ParramTemplate. The internal state of a ParamController represents it's
+ * current value. A ParamController's value may be Set(...), which sends
+ * the value to SC, or to user-defined custom reaction routine.
+ */
 class ParamController{
 public:
   std::string id;
@@ -62,6 +71,12 @@ private:
   std::weak_ptr<Module> module;
 };
 
+/* This class represents a single subscription to received SendReply messages
+ * from SC server. A SendReplyController always belongs to a Module, and is
+ * linked to one of it's Params. When the server sends a SendReply, the OSC
+ * listener will call the Got() message of a corresponding SendReplyController,
+ * which, in turn, sets the linked Param.
+ */
 class SendReplyController{
 public:
   std::string id;
@@ -74,9 +89,17 @@ private:
   std::shared_ptr<ParamController> controller;
   std::weak_ptr<Module> module;
 };
+// =================
 
+/* This is the module, the main class that represents any module instance.
+ * It is intended to:
+ * 1. serve as a client-side representation of a SC Synth instance
+ * 2. provide an interface to be overriden by third-party module extensions.
+ */
 class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
+  // You don't usually use these constructors. Create a module instance
+  // using ModuleFactory instead, this will ensure proper initialisation.
   Module() {};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
   Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
@@ -185,11 +208,14 @@ public:
 
   std::vector<std::shared_ptr<SendReplyController>> reply_controllers;
 
+  // Returns a ParamControler by given ID.
   std::shared_ptr<ParamController> GetParamControllerByID(std::string) const;
 
+  // Returns inlets and outlets by their ID.
   std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
   std::shared_ptr<Outlet> GetOutletByID(std::string id) const;
 
+  // The canvas this module belongs to.
   std::weak_ptr<Canvas> canvas;
 private:
   std::weak_ptr<ModuleGUI> modulegui;

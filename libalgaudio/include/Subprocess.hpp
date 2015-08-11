@@ -32,6 +32,9 @@ struct SubprocessException : public Exception{
   SubprocessException(std::string t) : Exception(t) {}
 };
 
+/* A universal class for launching and terminating subprocesses, as well as
+ * communicating with them via stdio.
+ */
 class Subprocess{
 public:
   Subprocess(std::string command);

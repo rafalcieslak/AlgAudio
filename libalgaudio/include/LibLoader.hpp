@@ -41,18 +41,29 @@ struct LibLoadingException : public Exception{
   std::string path;
 };
 
+/* This class is a wrapper for dynamically loadable libraries.
+ * The static part of this class opens up and loads dynamic libraries, while
+ * the instantiable part requests the Module instances from an AA file.
+ */
 class LibLoader{
 public:
+  // Calls create_instance asking for a new module instance of a given class name.
   Module* AskForInstance(std::string);
+  // Returns the deleter function from the shared library.
   deleter_t* GetDeleter() {return deleter_func;}
+  // Loads (or returns an existing instance, if cached) of a library from the
+  // provided path.
   static std::shared_ptr<LibLoader> GetByPath(std::string path);
-  static std::shared_ptr<LibLoader> Preload(std::string path);
-  // Do not use the constructor; it is public only because shared_ptr need it to be.
-  // Use GetByPath instead.
-  LibLoader(std::string);
+
   ~LibLoader();
 private:
+  LibLoader(std::string);
+  // This method loads a new library into cache.
+  static std::shared_ptr<LibLoader> Preload(std::string path);
+  // The path to maintained library.
   const std::string path;
+
+  // Pointers to the create and delete functions as loaded from the dynamic library.
   create_instance_func_t* create_instance_func = nullptr;
   deleter_t* deleter_func = nullptr;
 
@@ -62,6 +73,7 @@ private:
   HINSTANCE hLib;
 #endif
 
+  // Library cache.
   static std::map<std::string, std::shared_ptr<LibLoader>> libs_by_path;
 };
 

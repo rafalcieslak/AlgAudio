@@ -34,7 +34,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-// TODO: Singleton?
+/* MainWindow is an implementation of a Window specialised to display
+ * the main window interface, embeding, among others, a CanvasView, a
+ * ModuleSelector etc.
+ * This class implements the Alertable interface.
+ */
 class MainWindow : public Window{
 public:
   static std::shared_ptr<MainWindow> Create();

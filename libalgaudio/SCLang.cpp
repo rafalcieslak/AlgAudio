@@ -91,10 +91,6 @@ void SCLang::Start(std::string command, bool supernova){
     }); // sendinstruction port
   }); // subprocess started
 }
-void SCLang::Start2(){
-
-}
-
 void SCLang::Restart(std::string command){
   Stop();
   Start(command);

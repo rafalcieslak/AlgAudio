@@ -23,6 +23,8 @@ struct SDL_Color;
 
 namespace AlgAudio{
 
+/* A handy class for representin colors and operations on them.
+ */
 class Color{
 public:
   constexpr Color(unsigned char R, unsigned char G, unsigned char B, unsigned char A=255) : r(R), g(G), b(B), alpha(A) {}
@@ -32,18 +34,24 @@ public:
        b((hex&0x0000ff00)>>8),
    alpha((hex&0x000000ff)>>0) {}
   Color() {}
+
   unsigned char r,g,b,alpha;
+
+  // Conversion to SDL_Color struct.
   SDL_Color SDL() const;
   operator SDL_Color() const;
-    // Color operations
-    Color ZeroAlpha() const { return Color(r,g,b,0); }
-    Color Lighter(double amount) const;
-    Color Darker(double amount) const;
+
+  // Color operations
+  Color ZeroAlpha() const { return Color(r,g,b,0); }
+  Color Lighter(double amount) const;
+  Color Darker(double amount) const;
+
+  // Prettyprinter
   std::string ToString(){
     return "{r: " + std::to_string(r) + ", g:" + std::to_string(g) + ", b:" + std::to_string(b) + "}";
   }
 private:
-// HSL representation wrapper
+  // HSL representation wrapper
   class HSL{
   public:
     constexpr HSL(double hue, double saturation, double lightness, unsigned char a = 255) : h(hue), s(saturation), l(lightness), alpha(a) {}
@@ -60,6 +68,12 @@ private:
   explicit operator HSL() const;
 };
 
+/* A ColorString is a textual representation for a color. When created, the string
+ * is looked up in the Theme map, and is processed according to the tags in the
+ * string. Afterwards it is cached so that further lookups are instantenous.
+ * This class provides a simple to use wrapper for seamlessly operatning on both
+ * RGB colors, as well as color strings.
+ */
 class ColorString{
 public:
   ColorString(const ColorString& other) : formula(other.formula), color(other.color) {}

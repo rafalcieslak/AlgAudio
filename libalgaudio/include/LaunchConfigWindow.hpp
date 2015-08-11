@@ -30,6 +30,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/* This class is an implementation of a Window which displays the welcome
+ * dialog and AlgAudio launcher config.
+ */
 class LaunchConfigWindow : public Window{
 public:
   static std::shared_ptr<LaunchConfigWindow> Create();

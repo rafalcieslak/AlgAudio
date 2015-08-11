@@ -68,7 +68,7 @@ std::shared_ptr<LibLoader> LibLoader::GetByPath(std::string path){
 }
 
 std::shared_ptr<LibLoader> LibLoader::Preload(std::string path){
-  auto lib_ptr = std::make_shared<LibLoader>(path);
+  auto lib_ptr = std::shared_ptr<LibLoader>( new LibLoader(path) );
   libs_by_path[path] = lib_ptr;
   return lib_ptr;
 }

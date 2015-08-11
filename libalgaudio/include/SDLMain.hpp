@@ -28,6 +28,9 @@ union SDL_Event;
 
 namespace AlgAudio{
 
+/* The static interface implementing the main loop, event processing and window
+ * rendering.
+ */
 class SDLMain{
 private:
   SDLMain() = delete; // static class

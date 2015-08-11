@@ -42,6 +42,8 @@ struct FontParams{
 };
 
 // TODO: Instantiable class, SDLHandle tracking, font unloading on destruction
+/* This class provides a static interface to font-rendering routines
+ */
 class TextRenderer{
   TextRenderer() = delete; // static class
 public:

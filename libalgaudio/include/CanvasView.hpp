@@ -26,48 +26,79 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/* This class is a graphical representation of a Canvas.
+ * A CanvasView is always linked with a single Canvas instance.
+ * It will draw the ModuleGUIs and connections between them. It will also
+ * process mouse events, clicks and drags. By reacting on user input it asks
+ * the underlying Canvas instance to connect/disconnect modules, etc.
+ */
 class CanvasView : public UIWidget{
 public:
+  // Creates a new empty instance of this widget.
   static std::shared_ptr<CanvasView> CreateEmpty(std::shared_ptr<Window> parent);
   virtual void CustomDraw(DrawContext& c);
-  LateReturn<> AddModule(std::string id, Point2D position);
   virtual bool CustomMousePress(bool,short,Point2D);
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
   virtual void CustomMouseMotion(Point2D,Point2D);
+
+  // This method (usually called by the parent) creates a new Module instance
+  // on the underlying canvas according to the template with the given ID,
+  // prepares its ModuleGUI and places it on the given position.
+  LateReturn<> AddModule(std::string id, Point2D position);
+
+  // This method removes the currencly selected module from both the CanvasView
+  // and the underlying Canvas.
   void RemoveSelected();
 private:
   CanvasView(std::shared_ptr<Window> parent);
+  // The link to the canvas containing Modules.
   std::shared_ptr<Canvas> canvas;
+  // The collection of all maintained ModuleGUIs.
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
+  // Used to determine which module was clicked knowing the click position.
   int InWhich(Point2D);
   int CurveStrengthFunc(Point2D a, Point2D b);
+  // This flag is set according to the LMB state.
   bool mouse_down = false;
+  // What happened the last time the mouse button was pressed down?
+  // This information is important to determine what to do when a drag starts.
   enum MouseDownMode{
-    ModeNone,
-    ModeModuleBody,
-    ModeCaptured,
-    ModeInlet,
-    ModeOutlet,
-    ModeSlider,
+    ModeNone, // Nothing, mouse was outside any module
+    ModeModuleBody, // Mouse was inside a module, but not on any widget.
+    ModeCaptured, // Mouse was inside a module, but the ModuleGUI captured the click event.
+    ModeInlet, // Mouse was over an inlet.
+    ModeOutlet, // Mouse was over an outlet.
+    ModeSlider, // Mouse was over a slider.
   };
   MouseDownMode mouse_down_mode;
+  // The Widget id of the element corresponding to current mouse_down_mode.
   UIWidget::ID mouse_down_elemid;
+  // The position where mouse was last pressed down.
   Point2D mouse_down_position, drag_position;
+  // The number of the ModuleGUI mouse press happened over. Note that this
+  // value only represents the position in ModuleGUIs vector.
   int mouse_down_id = -1;
+
   Point2D mouse_down_offset, drag_offset;
+  // The currently selected and higlighted ModuleGUI.
   int selected_id = -1;
+  // Is there any dragging action in progress?
   bool drag_in_progress = false;
+  // This enum determines what is the currrent drag action.
   enum DragMode{
-    DragModeMove,
-    DragModeConnectFromInlet,
-    DragModeConnectFromOutlet,
+    DragModeMove, // Changing a ModuleGUI position
+    DragModeConnectFromInlet, // Creating a connection from an inlet to an outlet
+    DragModeConnectFromOutlet, // Creating a connection from an outlet to an inlet
     DragModeSlider,
   };
   DragMode drag_mode;
+  // The ID of currently dragged/moved ModuleGUI.
   int dragged_id = -1;
+  // Helper function which is called right after a connection drag is completed.
+  // It checks the connection for validity and asks the Canvas to make it.
   void FinalizeConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
-  // Use -1 to unselect
+  // Mark a module as selected. Use -1 to unselect all.
   void Select(int id);
 
   // Sets drag_in_progress to false, but also does extra cleanup.
@@ -80,6 +111,8 @@ private:
     New,
     Remove,
   };
+  // A potential wire connection is the name for a graphical wire that is alraedy
+  // drawn on the canvas (bright green), but was not yet created.
   PotentialWireMode potential_wire = PotentialWireMode::None;
   std::pair<std::pair<int,UIWidget::ID>, std::pair<int,UIWidget::ID>> potential_wire_connection;
 
