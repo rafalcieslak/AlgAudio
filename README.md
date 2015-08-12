@@ -27,7 +27,7 @@ To launch, you will also need sclang (SuperCollider). Execute [from `build` dire
 
 ### Using MSYS2
 
-From MSYS2 shell, use `pacman` to install following packages (for mingw subsystem, also choose an architecture you are compiling for):
+From MSYS2 shell, use `pacman` to install following packages (choose an architecture you are compiling for):
 
 	mingw/gcc
 	mingw/make
@@ -57,6 +57,8 @@ When ready, run `./algaudio.exe` to launch the application.
 The easiest way to build the project using any other build environment and/or compiler is to use the CMake-gui application, which generates build files for common IDEs from source.
 
 Then use your environment of choice to compile the application.
+
+However, please note that the official distribution of AlgAudio uses GCC C++ ABI, so you will not be able to use third-party module plugins with AlgAudio compiled using a different ABI.
 
 ## On other systems
 
