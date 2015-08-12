@@ -329,7 +329,7 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
   Canvas::IOID   to = {  to_module,param2_id };
   if(!canvas->GetDirectDataConnectionExists(from, to)){
     try{
-      canvas->ConnectData(from,to,Canvas::DataConnectionMode::Absolute);
+      canvas->ConnectData(from,to,Canvas::DataConnectionMode::Relative);
     }catch(MultipleConnectionsException){
       window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
     }catch(ConnectionLoopException){

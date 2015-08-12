@@ -105,7 +105,7 @@ public:
   std::map<IOID, std::list<IOIDWithMode>> data_connections;
   std::map<IOID, Subscription> data_connections_subscriptions;
 
-  void PassData(IOID source, float value);
+  void PassData(IOID source, float value, float relative);
   // The set of all modules that are placed onto (and maintained by) this Canvas.
   std::set<std::shared_ptr<Module>> modules;
 private:

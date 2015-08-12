@@ -125,10 +125,8 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
 
       rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
       if(attr_name) slider->SetName(attr_name->value());
-      rapidxml::xml_attribute<>* attr_min = node->first_attribute("defaultmin");
-      if(attr_min) slider->SetRangeMin(std::stof(attr_min->value()));
-      rapidxml::xml_attribute<>* attr_max = node->first_attribute("defaultmax");
-      if(attr_max) slider->SetRangeMax(std::stof(attr_max->value()));
+      slider->SetRangeMin(p->GetRangeMin());
+      slider->SetRangeMax(p->GetRangeMax());
 
     }else if(name == "display"){
 

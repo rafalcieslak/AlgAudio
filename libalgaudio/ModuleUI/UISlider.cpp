@@ -41,17 +41,17 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
   param_id = controller->templ->id;
   name_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), controller->templ->name);
 
-  range_min = controller->templ->default_min;
-  range_max = controller->templ->default_max;
+  current_range_min = controller->GetRangeMin();
+  current_range_max = controller->GetRangeMax();
 
-  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
-  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
+  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_min));
+  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_max));
 
   current_value = controller->Get();
   value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
   value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
 
-  subscriptions += controller->on_set.Subscribe([this](float v){
+  subscriptions += controller->on_set.Subscribe([this](float v, float){
     current_value = v;
     value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
     value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
@@ -65,12 +65,12 @@ void UISlider::SetName(std::string name){
 }
 
 void UISlider::SetRangeMin(float x){
-  range_min = x;
-  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_min));
+  current_range_min = x;
+  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_min));
 }
 void UISlider::SetRangeMax(float x){
-  range_max = x;
-  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(range_max));
+  current_range_max = x;
+  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_max));
 }
 
 Rect UISlider::GetInputRect() const{
@@ -120,7 +120,7 @@ void UISlider::CustomDraw(DrawContext& c){
     auto contr = controller.lock();
     if(contr){
       float v = contr->Get();
-      float p = (v - range_min)/(range_max - range_min);
+      float p = (v - current_range_min)/(current_range_max - current_range_min);
       float pos = std::max(0.0f, std::min(p, 1.0f));
       float x = GetBodyStart() + pos*(GetBodyWidth());
 
@@ -136,7 +136,7 @@ void UISlider::CustomDraw(DrawContext& c){
 
     auto contr = controller.lock();
     if(contr){
-      float q = (current_value - range_min)/(range_max - range_min);
+      float q = (current_value - current_range_min)/(current_range_max - current_range_min);
       float pos = std::max(0.0f, std::min(q, 1.0f));
       float x = GetBodyStart() + pos*(GetBodyWidth());
 
@@ -168,7 +168,7 @@ bool UISlider::CustomMousePress(bool down, short b,Point2D pos){
   if(pos.IsInside(GetBodyRect()) && down && b == SDL_BUTTON_LEFT && mode == Mode::Slider){
     float x = pos.x - GetBodyStart();
     float q = x / GetBodyWidth();
-    float val = range_min + (range_max - range_min) * q;
+    float val = current_range_min + (current_range_max - current_range_min) * q;
     controller.lock()->Set(val);
     return true;
   }
@@ -210,7 +210,7 @@ void UISlider::CustomMouseLeave(Point2D){
 void UISlider::DragStart(Point2D pos){
   dragged = true;
   drag_start = pos;
-  drag_start_q = (current_value - range_min)/(range_max - range_min);
+  drag_start_q = (current_value - current_range_min)/(current_range_max - current_range_min);
   SetNeedsRedrawing();
 }
 void UISlider::DragStep(Point2D pos){
@@ -218,7 +218,7 @@ void UISlider::DragStep(Point2D pos){
 
   float dq = ((float)pos.x - drag_start.x)/((float)GetBodyWidth());
   float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
-  float val = range_min + q*(range_max - range_min);
+  float val = current_range_min + q*(current_range_max - current_range_min);
   controller.lock()->Set(val);
 }
 void UISlider::DragEnd(Point2D pos){

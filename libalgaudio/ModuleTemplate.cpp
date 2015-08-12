@@ -96,8 +96,12 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       else p->default_val = std::stof(param_defaultval->value());
 
       xml_attribute<>* action = param_node->first_attribute("action");
-      if(!action) p->action = ParamTemplate::ParamAction::SC;
-      else{
+      if(!action){
+        if(p->mode == ParamTemplate::ParamMode::Input)
+          p->action = ParamTemplate::ParamAction::SC;
+        else
+          p->action = ParamTemplate::ParamAction::None;
+      }else{
         std::string val(action->value());
         if(val == "sc")     p->action = ParamTemplate::ParamAction::SC;
         else if(val == "custom") p->action = ParamTemplate::ParamAction::Custom;

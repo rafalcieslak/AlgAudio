@@ -98,7 +98,7 @@ Child nodes: **(all are optional and may appear more than once!)**
 
       - `none` - this parram shall be not used externally. It will not be presented to the user.
 
-    - `action` - *optional, default value:`sc`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
+    - `action` - *optional, default value: `sc` when `mode` is `input`, `none` when `mode` is `custom` or `none`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
 
       - `sc` - Set SuperCollider Synth's (the one's that corresponds to this module) argument, which has the name equal to this param's id, to this param's value. This is the default behavior. This way you can use `param`s to expose SynthDef's arguments to the user.
 
@@ -108,7 +108,9 @@ Child nodes: **(all are optional and may appear more than once!)**
 
     - `defaultval` - *optional*. The float value this param is set when creating a new module.
 
-    - `name`, `defaultmin`, `defaultmax` - *optional*. These attributes are only significant when automatically building module GUI. These values will be passed to slider configuration. See `gui` node, especially `slider`, for defails.
+    - `defaultmin`, `defaultmax` - *optional, default values: `0.0` and `1.0`* - The default range for this parameter.
+
+    - `name` - *optional*. This attributes are only significant when automatically building module GUI. It will be passed to slider configuration. See `gui` node, especially `slider`, for details.
 
   - `reply` - Specifies a value reply from the synth to AlgAudio. This is useful if your synth performs some kind of signal analysis (e.g. amplitude measuring or pitch detection) and you want to send a result from the synth back to your module in AlgAudio.
 

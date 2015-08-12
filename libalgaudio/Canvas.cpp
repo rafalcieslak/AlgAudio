@@ -173,8 +173,8 @@ void Canvas::ConnectData(IOID from, IOID to, DataConnectionMode m){
     tmp.push_back({to,m});
     data_connections[from] = tmp;
     auto paramctrl = from.module->GetParamControllerByID(from.iolet);
-    data_connections_subscriptions[from] = paramctrl->after_set.Subscribe([this, source=from](float val){
-      PassData(source, val);
+    data_connections_subscriptions[from] = paramctrl->after_set.Subscribe([this, source=from](float val, float val2){
+      PassData(source, val, val2);
     });
   }else{
     // Not the first connection from this inlet.
@@ -203,7 +203,7 @@ void Canvas::DisconnectData(IOID from, IOID to){
   }
 }
 
-void Canvas::PassData(IOID source, float value){
+void Canvas::PassData(IOID source, float value, float relative){
   auto it = data_connections.find(source);
   if(it == data_connections.end()){
     std::cout << "WARNING: Pasing data from source, which has no connections anymore..." << std::endl;
@@ -211,11 +211,11 @@ void Canvas::PassData(IOID source, float value){
   }
   auto list = it->second;
   for(const IOIDWithMode& iwm : list){
+    auto ctrl = iwm.ioid.module->GetParamControllerByID(iwm.ioid.iolet);
     if(iwm.mode == DataConnectionMode::Absolute){
-      auto ctrl = iwm.ioid.module->GetParamControllerByID(iwm.ioid.iolet);
       ctrl->Set(value);
     }else{
-      std::cout << "WARNING: Relative connections not yet supported!" << std::endl;
+      ctrl->SetRelative(relative);
     }
   }
 }

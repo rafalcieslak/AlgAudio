@@ -59,7 +59,7 @@ Out.ar(outbus,in);
   <module id="measure" name="Amp measure">
     <params>
       <inlet id="inbus"/>
-      <param id="resultparam" mode="output" name="Amplitude" min="0.0" max="100.0" action="custom"/>
+      <param id="resultparam" mode="output" name="Amplitude" defaultmin="0.0" defaultmax="1.0" action="custom"/>
       <reply id="result" param="resultparam"/>
     </params>
     <description> This class demonstrates reacting on signal analysis results. </description>
@@ -72,14 +72,28 @@ SendReply.kr(Impulse.kr(20), '/algaudioSC/sendreply', amp, result);
     <gui type="standard auto"/>
   </module>
 
+  <module id="value" name="Signal value">
+    <params>
+      <inlet id="inbus"/>
+      <param id="value" mode="output" name="Value" defaultmin="-1.0" defaultmax="1.0"/>
+      <reply id="valreply" param="value"/>
+    </params>
+    <description> This module converts audio signal to control stream. </description>
+    <sc>
+arg inbus, valreply;
+var in = In.ar(inbus);
+SendReply.kr(Impulse.kr(20), '/algaudioSC/sendreply', in, valreply);
+    </sc>
+    <gui type="standard auto"/>
+  </module>
 
   <module id="guidemo" name="GUI demo">
     <class name="GUIDemo"/>
     <params>
       <inlet id="inbus"/>
-      <param id="gain" defaultval="1.0" action="sc"/>
-      <param id="stdout" defaultval="0.0" action="custom"/>
-      <param id="stdout2" defaultval="0.0" action="none"/>
+      <param id="gain" defaultval="1.0" defaultmin="0.0" defaultmax="3.0" action="sc"/>
+      <param id="stdout" defaultval="0.0" defaultmin="-10.0" defaultmax="10.0" action="custom"/>
+      <param id="stdout2" defaultval="0.0" action="none" defaultmin="-100.0" defaultmax="100.0"/>
       <outlet id="outbus"/>
     </params>
     <description> Custom GUI demo. </description>
@@ -90,9 +104,9 @@ Out.ar(outbus, gain*in);
     </sc>
     <gui type="standard">
       <inlet id="inbusGUI" inlet="inbus"/>
-      <slider id="gainslider" param="gain" name="Gain 1" defaultmin="0.0" defaultmax="3.0"/>
-      <slider id="stdoutslider" param="stdout" name="C stdout" defaultmin="-10.0" defaultmax="10.0"/>
-      <display id="displaydemo" param="stdout2" name="Result display" defaultmin="-100.0" defaultmax="100.0"/>
+      <slider id="gainslider" param="gain" name="Gain 1"/>
+      <slider id="stdoutslider" param="stdout" name="C stdout"/>
+      <display id="displaydemo" param="stdout2" name="Result display"/>
       <outlet id="outbus"/>
     </gui>
   </module>

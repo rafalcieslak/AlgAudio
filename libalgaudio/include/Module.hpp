@@ -59,15 +59,25 @@ public:
   std::string id;
   static std::shared_ptr<ParamController> Create(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> templ);
   void Set(float value);
+  void SetRelative(float value);
   void Reset();
   inline float Get() const {return current_val;}
-  Signal<float> on_set;
+  inline float GetRelative() const {return (current_val - range_min)/(range_max - range_min);}
+  inline void SetRangeMin(float v) {range_min = v; }
+  inline void SetRangeMax(float v) {range_max = v; }
+  inline float GetRangeMin() const {return range_min;}
+  inline float GetRangeMax() const {return range_max;}
+
+  // This signal passes two values: the absolute value of this param, and the relative fraction
+  // of the range it operates in.
+  Signal<float, float> on_set;
   // Passing values to other controllers should be done once this controller has it value set.
-  Signal<float> after_set;
+  Signal<float, float> after_set;
   const std::shared_ptr<ParamTemplate> templ;
 private:
   ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t);
   float current_val = 0.0;
+  float range_min = 0.0, range_max = 1.0;
   std::weak_ptr<Module> module;
 };
 

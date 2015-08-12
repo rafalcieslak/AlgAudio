@@ -64,7 +64,7 @@ private:
   float current_value;
   std::shared_ptr<SDLTextTexture> value_texture, value_texture_big;
 
-  float range_min, range_max;
+  float current_range_min, current_range_max;
   std::shared_ptr<SDLTextTexture> range_min_texture, range_max_texture;
 
   bool dragged = false;

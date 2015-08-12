@@ -33,7 +33,7 @@ Bus::~Bus(){
 
 
 ParamController::ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t)
-  : id(t->id), templ(t), module(m) {
+  : id(t->id), templ(t), range_min(t->default_min), range_max(t->default_max), module(m){
 
 }
 std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParamTemplate> templ){
@@ -42,7 +42,8 @@ std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module>
 
 void ParamController::Set(float value){
   current_val = value;
-  on_set.Happen(value);
+  float relative = GetRelative();
+  on_set.Happen(value, relative);
   auto m = module.lock();
   if(m){
     if(templ->action == ParamTemplate::ParamAction::SC){
@@ -53,7 +54,11 @@ void ParamController::Set(float value){
       // NOP
     }
   }
-  after_set.Happen(value);
+  after_set.Happen(value, relative);
+}
+
+void ParamController::SetRelative(float value){
+  Set(range_min + value*(range_max - range_min));
 }
 
 void ParamController::Reset(){
