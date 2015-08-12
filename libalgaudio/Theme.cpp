@@ -33,7 +33,8 @@ void Theme::Init(){
   thememap["bg-button-neutral"] = Color(0x415a8aff);
   //thememap["bg-button-neutral"] = Color(0x3d4f67ff);
   thememap["mg_main"] = Color(0x5c6878ff);
-  thememap["text-generic"] = Color(0xaaaeb8ff);
+  thememap["text-generic"] = Color(0xaaaeb8ff); // White
+  //thememap["text-generic"] = Color(0x1b2737ff); // Dark blue
   thememap["text-button"] = Color(0x212227ff);
   thememap["text-error"] = Color(0xdc8c96ff);
   thememap["progress-bar"] = Color(0x346d97ff);
@@ -42,7 +43,8 @@ void Theme::Init(){
 
   thememap["standardbox-bg"] = Color(0x3e4f6cff);
   thememap["standardbox-border"] = Color(0x293b53ff);
-  thememap["standardbox-caption"] = Color(0x94acccff);
+  // thememap["standardbox-caption"] = Color(0x94acccff); // Whiteish blue
+  thememap["standardbox-caption"] = Color(0x070a0eff); // Blueish black
   thememap["standardbox-inlet"] = Color(0x52607cff);
   thememap["standardbox-outlet"] = Color(0x52607cff);
 

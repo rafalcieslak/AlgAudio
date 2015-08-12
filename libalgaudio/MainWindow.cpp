@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-MainWindow::MainWindow() : Window("AlgAudio",900,600){
+MainWindow::MainWindow() : Window("AlgAudio",1200,800){
 }
 
 void MainWindow::init(){
