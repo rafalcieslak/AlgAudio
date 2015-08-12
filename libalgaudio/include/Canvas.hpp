@@ -89,8 +89,8 @@ public:
   // synths.
   void RecalculateOrder();
 
-  // The list of all connections "from-to", in the format of one-to-many.
-  std::map<IOID, std::list<IOID>> connections;
+  // The list of all audio connections "from-to", in the format of one-to-many.
+  std::map<IOID, std::list<IOID>> audio_connections;
   // The set of all modules that are placed onto (and maintained by) this Canvas.
   std::set<std::shared_ptr<Module>> modules;
 private:

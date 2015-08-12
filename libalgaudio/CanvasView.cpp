@@ -71,7 +71,7 @@ void CanvasView::CustomDraw(DrawContext& c){
   // about the io position every time when redrawing is not going to be
   // efficient when there are 100+ modules present.
   c.SetColor(Theme::Get("canvas-connection"));
-  for(auto it : canvas->connections){
+  for(auto it : canvas->audio_connections){
     Canvas::IOID from = it.first;
     Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutletByParamID(from.iolet);
     // For each target of this outlet

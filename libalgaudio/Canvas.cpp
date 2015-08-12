@@ -47,15 +47,15 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
   if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
   // First, remove all connections that start at this module.
   for(std::string &outid : m->templ->outlets){
-    auto it = connections.find(IOID{m, outid});
-    if(it != connections.end()){
+    auto it = audio_connections.find(IOID{m, outid});
+    if(it != audio_connections.end()){
       GetOutletByIOID(IOID{m, outid})->DetachFromAll();
-      connections.erase(it);
+      audio_connections.erase(it);
     }
   }
   // Next, erase all connections that end at this module.
   for(const std::string &inid : m->templ->inlets){
-    for(auto it = connections.begin(); it != connections.end(); /*--*/){
+    for(auto it = audio_connections.begin(); it != audio_connections.end(); /*--*/){
       IOID from = it->first;
       auto from_outlet = GetOutletByIOID(from);
       std::list<IOID>& tolist = it->second;
@@ -65,7 +65,7 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
       tolist.remove(IOID{m,inid});
       if(tolist.empty()){
         // That was the last connection from that outlet.
-        connections.erase(it++);
+        audio_connections.erase(it++);
       }else{
         it++;
       }
@@ -95,12 +95,12 @@ void Canvas::Connect(IOID from, IOID to){
   if(TestNewConnectionForLoop(from, to))
     throw ConnectionLoopException("Adding this connection would close a loop.");
 
-  auto it = connections.find(from);
-  if(it == connections.end()){
+  auto it = audio_connections.find(from);
+  if(it == audio_connections.end()){
     // First connection from this inlet
     std::list<IOID> tmp;
     tmp.push_back(to);
-    connections[from] = tmp;
+    audio_connections[from] = tmp;
   }else{
     // Not the first connectin from this inlet.
     auto it2 = std::find(it->second.begin(), it->second.end(), to);
@@ -128,17 +128,17 @@ void Canvas::Disconnect(IOID from, IOID to){
   std::cout << "Disonnecting" << std::endl;
   outlet->DetachFromInlet(inlet);
 
-  auto it = connections.find(from);
-  if(it == connections.end()) return; // no such connection
+  auto it = audio_connections.find(from);
+  if(it == audio_connections.end()) return; // no such connection
   it->second.remove(to);
   if(it->second.size() == 0)
-    connections.erase(it);
+    audio_connections.erase(it);
 
 }
 
 bool Canvas::GetDirectConnectionExists(IOID from, IOID to){
-  auto it = connections.find(from);
-  if(it != connections.end())
+  auto it = audio_connections.find(from);
+  if(it != audio_connections.end())
     if(std::find(it->second.begin(), it->second.end(), to) != it->second.end())
       return true;
 
@@ -171,7 +171,7 @@ void Canvas::RecalculateOrder(){
   for(const std::shared_ptr<Module>& m : modules) indegrees[m] = 0;
 
   // Calculate initial indegrees.
-  for(auto &it : connections) // For each connection
+  for(auto &it : audio_connections) // For each connection
     for(const IOID& i : it.second) // For each ending
       indegrees[i.module]++; // Increase the indeg for that module
 
@@ -261,8 +261,8 @@ std::list<std::shared_ptr<Module>> Canvas::GetConnectedModules(std::shared_ptr<M
   std::list<std::shared_ptr<Module>> result;
   for(const std::string& outletid : m->templ->outlets){
     // For each outlet, get the list of connections from it
-    auto it = connections.find(IOID{m,outletid});
-    if(it == connections.end()) continue; // No connections from this outlet.
+    auto it = audio_connections.find(IOID{m,outletid});
+    if(it == audio_connections.end()) continue; // No connections from this outlet.
     for(const IOID& inlet : it->second){
       result.push_back(inlet.module);
     }
