@@ -131,12 +131,12 @@ void CanvasView::CustomDraw(DrawContext& c){
     // This is a normal drag in progress.
     // Simply draw the currently dragged line...
     if(drag_mode == DragModeConnectAudioFromOutlet){
-      c.SetColor(Theme::Get("canvas-connection"));
+      c.SetColor(Theme::Get("canvas-connection-audio"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
     }else if(drag_mode == DragModeConnectAudioFromInlet){
-      c.SetColor(Theme::Get("canvas-connection"));
+      c.SetColor(Theme::Get("canvas-connection-audio"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);

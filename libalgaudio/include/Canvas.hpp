@@ -78,10 +78,6 @@ public:
   };
   void ConnectData(IOID from, IOID to, DataConnectionMode m);
   void DisconnectData(IOID from, IOID to);
-  // These methods are useful for the Canvas itself, to clean up connections
-  // to/from a module which is about to be removed.
-  void RemoveAllConnectionsFrom(std::shared_ptr<Module>);
-  void RemoveAllConnectionsTo(std::shared_ptr<Module>);
   // Returns true iff the new connection suggested by method arguments would
   // create a cycle in connections graph.
   bool TestNewConnectionForLoop(IOID from, IOID to);

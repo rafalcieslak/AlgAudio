@@ -45,7 +45,7 @@ LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
 
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
   if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
-  // First, remove all connections that start at this module.
+  // First, remove all audio connections that start at this module.
   for(std::string &outid : m->templ->outlets){
     auto it = audio_connections.find(IOID{m, outid});
     if(it != audio_connections.end()){
@@ -53,7 +53,7 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
       audio_connections.erase(it);
     }
   }
-  // Next, erase all connections that end at this module.
+  // Next, erase all audio connections that end at this module.
   for(const std::string &inid : m->templ->inlets){
     for(auto it = audio_connections.begin(); it != audio_connections.end(); /*--*/){
       IOID from = it->first;
@@ -71,6 +71,35 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
       }
     }
   }
+
+  // Then, remove all data connections that start at this module.
+  for(auto param : m->templ->params){
+    std::string paramid = param->id;
+    auto it = data_connections.find(IOID{m, paramid});
+    if(it != data_connections.end())
+      data_connections.erase(it);
+  }
+  // Fianlly, remove all data connections that end at this module.
+  for(auto param : m->templ->params){
+    std::string paramid = param->id;
+    for(auto it = data_connections.begin(); it != data_connections.end(); /*--*/){
+      std::list<IOIDWithMode>& tolist = it->second;
+      tolist.remove(IOIDWithMode{{m,paramid}, DataConnectionMode::Absolute}); // connection mode is ignored in comparison
+      if(tolist.empty()){
+        // That was the last connection from that outlet.
+        // Remove the subscription
+        auto it2 = data_connections_subscriptions.find(it->first);
+        if(it2 == data_connections_subscriptions.end()){
+          std::cout << "WARNING: Unable to remove data_connections subscriptions, as none was found!" << std::endl;
+        }else data_connections_subscriptions.erase(it2);
+        // Erase the connection
+        data_connections.erase(it++);
+      }else{
+        it++;
+      }
+    }
+  }
+
 
   // Then, erase the module and destroy it via ModuleFactory.
   modules.erase(m);

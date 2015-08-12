@@ -104,7 +104,7 @@ OSCdef.new( 'setparam', {
 		if((msg[1] == -1),{
 			("Not setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3] ++ ", because it's not a valid instance!").postln;
 		});
-		("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3]).postln;
+		//("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ msg[3]).postln;
 		~minstances[msg[1]].set(
 			msg[2].asString,
 			msg[3]
@@ -119,7 +119,7 @@ OSCdef.new( 'setparamlist', {
 		if((msg[1] == -1),{
 			("Not setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to a list, because it's not a valid instance!").postln;
 		});
-		("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ list).postln;
+		//("Setting param " ++ msg[2].asString ++ " of " ++ msg[1].asString ++ " to " ++ list).postln;
 		~minstances[msg[1]].set(
 			msg[2].asString,
 			list
