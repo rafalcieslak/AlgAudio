@@ -133,15 +133,78 @@ void Canvas::Disconnect(IOID from, IOID to){
   it->second.remove(to);
   if(it->second.size() == 0)
     audio_connections.erase(it);
-
 }
 
-bool Canvas::GetDirectConnectionExists(IOID from, IOID to){
+
+void Canvas::ConnectData(IOID from, IOID to, DataConnectionMode m){
+  auto it = data_connections.find(from);
+  if(it == data_connections.end()){
+    // First connection from this inlet
+    std::list<IOIDWithMode> tmp;
+    tmp.push_back({to,m});
+    data_connections[from] = tmp;
+    auto paramctrl = from.module->GetParamControllerByID(from.iolet);
+    data_connections_subscriptions[from] = paramctrl->after_set.Subscribe([this, source=from](float val){
+      PassData(source, val);
+    });
+  }else{
+    // Not the first connection from this inlet.
+    auto it2 = std::find(it->second.begin(), it->second.end(), IOIDWithMode{to, DataConnectionMode::Relative}); // Note that connection mode is ignored in comparison.
+    if(it2 != it->second.end()) // if found
+      throw DoubleConnectionException("This connection already exists!");
+
+    it->second.push_back({to,m});
+  }
+}
+void Canvas::DisconnectData(IOID from, IOID to){
+  auto it = data_connections.find(from);
+  if(it == data_connections.end()) return; // no such connection
+  it->second.remove({to, DataConnectionMode::Relative});
+  it->second.remove({to, DataConnectionMode::Absolute});
+  if(it->second.size() == 0){
+    // The last connection from that source was removed. Erase the entry,
+    // and cleanup the subscription
+    data_connections.erase(it);
+    auto it2 = data_connections_subscriptions.find(from);
+    if(it2 == data_connections_subscriptions.end()){
+      std::cout << "WARNING: Unable to remove data_connections subscriptions, as none was found!" << std::endl;
+    }else{
+      data_connections_subscriptions.erase(it2);
+    }
+  }
+}
+
+void Canvas::PassData(IOID source, float value){
+  auto it = data_connections.find(source);
+  if(it == data_connections.end()){
+    std::cout << "WARNING: Pasing data from source, which has no connections anymore..." << std::endl;
+    return;
+  }
+  auto list = it->second;
+  for(const IOIDWithMode& iwm : list){
+    if(iwm.mode == DataConnectionMode::Absolute){
+      auto ctrl = iwm.ioid.module->GetParamControllerByID(iwm.ioid.iolet);
+      ctrl->Set(value);
+    }else{
+      std::cout << "WARNING: Relative connections not yet supported!" << std::endl;
+    }
+  }
+}
+
+bool Canvas::GetDirectAudioConnectionExists(IOID from, IOID to){
   auto it = audio_connections.find(from);
   if(it != audio_connections.end())
     if(std::find(it->second.begin(), it->second.end(), to) != it->second.end())
       return true;
+  return false;
+}
 
+bool Canvas::GetDirectDataConnectionExists(IOID from, IOID to){
+  auto it = data_connections.find(from);
+  if(it != data_connections.end())
+    if(std::find(it->second.begin(), it->second.end(), IOIDWithMode{to, DataConnectionMode::Relative} /* Note that connection mode is ignored in comparison. */ )
+         != it->second.end())
+      return true;
   return false;
 }
 

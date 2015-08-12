@@ -52,7 +52,8 @@ void Theme::Init(){
   thememap["alert-border-warning"] = Color(0x94913aff);
   thememap["alert-border-error"] = Color(0x943a3aff);
 
-  thememap["canvas-connection"] = Color(0x1b2737ff);
+  thememap["canvas-connection-audio"] = Color(0x1b2737ff);
+  thememap["canvas-connection-data"] = Color(0x2c104eff);
   thememap["canvas-connection-new"] = Color(0x37a025ff);
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
 

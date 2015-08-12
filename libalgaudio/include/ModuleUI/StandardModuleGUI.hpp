@@ -41,10 +41,10 @@ public:
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override {main_margin->OnMouseMotion(pos1,pos2);}
   virtual void CustomMouseEnter(Point2D pos) override {main_margin->OnMouseEnter(pos);}
   virtual void CustomMouseLeave(Point2D pos) override {main_margin->OnMouseLeave(pos);}
-  virtual Point2D WhereIsInletByWidgetID(UIWidget::ID inlet) override;
-  virtual Point2D WhereIsOutletByWidgetID(UIWidget::ID outlet) override;
-  virtual Point2D WhereIsInletByParamID(std::string inlet) override;
-  virtual Point2D WhereIsOutletByParamID(std::string outlet) override;
+  virtual Point2D WhereIsInlet(std::string inlet) override;
+  virtual Point2D WhereIsOutlet(std::string outlet) override;
+  virtual Point2D WhereIsParamInlet(std::string inlet) override;
+  virtual Point2D WhereIsParamOutlet(std::string outlet) override;
   virtual WhatIsHere GetWhatIsHere(Point2D) const override;
   virtual void SliderDragStart(UIWidget::ID id, Point2D start_pos) override;
   virtual void SliderDragStep(UIWidget::ID id, Point2D current_pos) override;

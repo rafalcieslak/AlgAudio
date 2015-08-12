@@ -71,6 +71,13 @@ public:
   // modules.
   void Connect(IOID from, IOID to);
   void Disconnect(IOID from, IOID to);
+
+  enum class DataConnectionMode{
+    Relative,
+    Absolute
+  };
+  void ConnectData(IOID from, IOID to, DataConnectionMode m);
+  void DisconnectData(IOID from, IOID to);
   // These methods are useful for the Canvas itself, to clean up connections
   // to/from a module which is about to be removed.
   void RemoveAllConnectionsFrom(std::shared_ptr<Module>);
@@ -82,7 +89,8 @@ public:
   // the outlets of the module given as argument.
   std::list<std::shared_ptr<Module>> GetConnectedModules(std::shared_ptr<Module> m);
   // Returns true iff the specified connection already exists.
-  bool GetDirectConnectionExists(IOID from, IOID to);
+  bool GetDirectAudioConnectionExists(IOID from, IOID to);
+  bool  GetDirectDataConnectionExists(IOID from, IOID to);
 
   // Updates SC synth ordering. Calculates a topological ordering for the graph
   // of interconnections, and sends the result to SC so that it can reorder
@@ -91,6 +99,17 @@ public:
 
   // The list of all audio connections "from-to", in the format of one-to-many.
   std::map<IOID, std::list<IOID>> audio_connections;
+
+  // The list of all data connections.
+  struct IOIDWithMode{
+    IOID ioid;
+    mutable DataConnectionMode mode;
+    bool operator==(const IOIDWithMode& other) const {return ioid == other.ioid; /* Ignore modes for comparison. */}
+  };
+  std::map<IOID, std::list<IOIDWithMode>> data_connections;
+  std::map<IOID, Subscription> data_connections_subscriptions;
+
+  void PassData(IOID source, float value);
   // The set of all modules that are placed onto (and maintained by) this Canvas.
   std::set<std::shared_ptr<Module>> modules;
 private:

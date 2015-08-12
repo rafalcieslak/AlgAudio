@@ -38,12 +38,18 @@ public:
   // When set to true, the module shall draw itself in it's "highlighted"
   // variant.
   virtual void SetHighlight(bool) = 0;
+
   // These methods are used by the CanvasView to query where it should draw
-  // connection wire endings. Arguments: iolet param id (not widget id!)
-  virtual Point2D WhereIsInletByWidgetID(UIWidget::ID inlet) = 0;
-  virtual Point2D WhereIsOutletByWidgetID(UIWidget::ID outlet) = 0;
-  virtual Point2D WhereIsInletByParamID(std::string inlet) = 0;
-  virtual Point2D WhereIsOutletByParamID(std::string outlet) = 0;
+  // connection wire endings.
+  // Arguments: WidgetIDs
+  // virtual Point2D WhereIsInlet(UIWidget::ID inlet) = 0;
+  // virtual Point2D WhereIsOutlet(UIWidget::ID outlet) = 0;
+  // Arguments: iolet IDs
+  virtual Point2D WhereIsInlet(std::string inlet) = 0;
+  virtual Point2D WhereIsOutlet(std::string outlet) = 0;
+  virtual Point2D WhereIsParamInlet(std::string inlet) = 0;
+  virtual Point2D WhereIsParamOutlet(std::string inlet) = 0;
+
   // This method shall translate an inlet/outlet widget id to the corresponding
   // param id.
   virtual std::string GetIoletParamID(UIWidget::ID) const = 0;
@@ -79,10 +85,7 @@ public:
   // element is located at a given point. This way the CanvasView can handle
   // connections etc. and ModuleGUI does not have to bother about them.
   virtual WhatIsHere GetWhatIsHere(Point2D) const = 0;
-
-  // Helper function which creates an IOID used by Canvas from inlet/outlet
-  // widget id.
-  Canvas::IOID MakeIOID(UIWidget::ID w) {return {GetModule(), GetIoletParamID(w)};}
+  
 protected:
   ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
   // A link to the module instance this GUI represents.

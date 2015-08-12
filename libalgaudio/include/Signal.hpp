@@ -189,7 +189,18 @@ Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C*
   return p;
 }
 
-
+// A storable container for subscriptions
+class SubscriptionList{
+public:
+  SubscriptionList(const SubscriptionList& other) = delete;
+  std::list<Subscription> list;
+  void ReleaseAll() { list.clear(); }
+  SubscriptionList& operator+=(Subscription&& s) {
+    list.push_back(std::move(s));
+    return *this;
+  }
+  SubscriptionList() : list(0){}
+};
 // This class provides a single helper member field: subscriptions.
 // You can use it to store all subscriptions that shall be released when your
 // object is destroyed.
@@ -201,17 +212,6 @@ Subscription __attribute__((warn_unused_result)) Signal<Types...>::Subscribe( C*
 // SubscriptionsManager, so you are welcome to use that subscriptions field.
 class SubscriptionsManager{
 public:
-  class SubscriptionList{
-  public:
-    SubscriptionList(const SubscriptionList& other) = delete;
-    std::list<Subscription> list;
-    void ReleaseAll() { list.clear(); }
-    SubscriptionList& operator+=(Subscription&& s) {
-      list.push_back(std::move(s));
-      return *this;
-    }
-    SubscriptionList() : list(0){}
-  };
   SubscriptionList subscriptions;
 };
 

@@ -58,7 +58,8 @@ private:
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
   // Used to determine which module was clicked knowing the click position.
   int InWhich(Point2D);
-  int CurveStrengthFunc(Point2D a, Point2D b);
+  int CurveStrengthFuncA(Point2D a, Point2D b);
+  int CurveStrengthFuncB(Point2D a, Point2D b);
   // This flag is set according to the LMB state.
   bool mouse_down = false;
   // What happened the last time the mouse button was pressed down?
@@ -70,10 +71,14 @@ private:
     ModeInlet, // Mouse was over an inlet.
     ModeOutlet, // Mouse was over an outlet.
     ModeSlider, // Mouse was over a slider.
+    ModeSliderInlet, // Mouse was over a slider.
+    ModeSliderOutlet, // Mouse was over a slider.
   };
   MouseDownMode mouse_down_mode;
   // The Widget id of the element corresponding to current mouse_down_mode.
-  UIWidget::ID mouse_down_elemid;
+  UIWidget::ID mouse_down_elem_widgetid;
+  // The iolet/param id of the element coresponding to the current mouse_down_mode;
+  std::string mouse_down_elem_paramid;
   // The position where mouse was last pressed down.
   Point2D mouse_down_position, drag_position;
   // The number of the ModuleGUI mouse press happened over. Note that this
@@ -88,16 +93,19 @@ private:
   // This enum determines what is the currrent drag action.
   enum DragMode{
     DragModeMove, // Changing a ModuleGUI position
-    DragModeConnectFromInlet, // Creating a connection from an inlet to an outlet
-    DragModeConnectFromOutlet, // Creating a connection from an outlet to an inlet
-    DragModeSlider,
+    DragModeConnectAudioFromInlet, // Creating an audio connection from an inlet to an outlet
+    DragModeConnectAudioFromOutlet, // Creating an audio connection from an outlet to an inlet
+    DragModeConnectDataFromInlet, // Creating a data connection from an inlet to an outlet
+    DragModeConnectDataFromOutlet, // Creating a data connection from an outlet to an inlet
+    DragModeSlider, // Dragging a slider value
   };
   DragMode drag_mode;
   // The ID of currently dragged/moved ModuleGUI.
   int dragged_id = -1;
   // Helper function which is called right after a connection drag is completed.
   // It checks the connection for validity and asks the Canvas to make it.
-  void FinalizeConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
+  void FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
+  void FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID inlet_slider_id, int outlet_module_id, UIWidget::ID outlet_slider_id);
   // Mark a module as selected. Use -1 to unselect all.
   void Select(int id);
 
@@ -111,10 +119,15 @@ private:
     New,
     Remove,
   };
+  enum class PotentialWireType{
+    Audio,
+    Data,
+  };
   // A potential wire connection is the name for a graphical wire that is alraedy
   // drawn on the canvas (bright green), but was not yet created.
   PotentialWireMode potential_wire = PotentialWireMode::None;
-  std::pair<std::pair<int,UIWidget::ID>, std::pair<int,UIWidget::ID>> potential_wire_connection;
+  PotentialWireType potential_wire_type;
+  std::pair<std::pair<int,std::string>, std::pair<int,std::string>> potential_wire_connection;
 
 };
 

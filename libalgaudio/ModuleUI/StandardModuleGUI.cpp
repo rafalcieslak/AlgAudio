@@ -284,43 +284,36 @@ void StandardModuleGUI::IOConn::SetBorderColor(Color c){
 Point2D StandardModuleGUI::IOConn::GetCenterPos() const{
   return GetRectPos() + GetRectSize()/2;
 }
-
-Point2D StandardModuleGUI::WhereIsInletByWidgetID(UIWidget::ID id){
-  auto it = inlets.find(id);
-  if(it == inlets.end()){
-    std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
-    return Point2D(0,0);
-  }
-  return main_margin->GetChildPos()
-       + main_box->GetChildPos(inlets_box)
-       + inlets_box->GetChildPos(it->second)
-       + it->second->GetCenterPos();
-}
-Point2D StandardModuleGUI::WhereIsOutletByWidgetID(UIWidget::ID id){
-  auto it = outlets.find(id);
-  if(it == outlets.end()){
-    std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
-    return Point2D(0,0);
-  }
-  return main_margin->GetChildPos()
-       + main_box->GetChildPos(outlets_box)
-       + outlets_box->GetChildPos(it->second)
-       + it->second->GetCenterPos();
-}
-Point2D StandardModuleGUI::WhereIsInletByParamID(std::string id){
+Point2D StandardModuleGUI::WhereIsInlet(std::string id){
   for(auto &it: inlets){
     if(it.second->iolet_id == id)
       return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
   }
-  std::cout << "WARNING: Queried position of an unexisting inlet gui" << std::endl;
+  std::cout << "WARNING: Queried position of an unexisting inlet" << std::endl;
   return Point2D(0,0);
 }
-Point2D StandardModuleGUI::WhereIsOutletByParamID(std::string id){
+Point2D StandardModuleGUI::WhereIsOutlet(std::string id){
   for(auto &it: outlets){
     if(it.second->iolet_id == id)
       return it.second->GetPosInParent(main_margin) + it.second->GetCenterPos();
   }
-  std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
+  std::cout << "WARNING: Queried position of an unexisting outlet" << std::endl;
+  return Point2D(0,0);
+}
+Point2D StandardModuleGUI::WhereIsParamInlet(std::string id){
+  for(auto &it: param_sliders){
+    if(it.second->param_id == id)
+      return it.second->GetPosInParent(main_margin) + it.second->GetInputRect().Center();
+  }
+  std::cout << "WARNING: Queried position of an unexisting param inlet" << std::endl;
+  return Point2D(0,0);
+}
+Point2D StandardModuleGUI::WhereIsParamOutlet(std::string id){
+  for(auto &it: param_sliders){
+    if(it.second->param_id == id)
+      return it.second->GetPosInParent(main_margin) + it.second->GetOutputRect().Center();
+  }
+  std::cout << "WARNING: Queried position of an unexisting param outlet" << std::endl;
   return Point2D(0,0);
 }
 
@@ -329,8 +322,12 @@ std::string StandardModuleGUI::GetIoletParamID(UIWidget::ID id) const{
   if(it == outlets.end()){
     it = inlets.find(id);
     if(it == inlets.end()){
-      std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
-      return "";
+      auto it2 = param_sliders.find(id);
+      if(it2 == param_sliders.end()){
+        std::cout << "WARNING: Queried position of an unexisting outlet gui" << std::endl;
+        return "";
+      }
+      return it2->second->param_id;
     }
     return it->second->iolet_id;
   }

@@ -47,10 +47,11 @@ SDL_FPoint PointToSDL(Point2D_<float> p){
   return {p.x, p.y};
 }
 
-void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines){
+void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines, float width){
   // TODO :: De casteljeu
 
   SDLFix::RenderSetLineSmoothing(renderer, true);
+  SDLFix::RenderSetLineWidth(renderer, width);
 
   unsigned int count = lines + 1;
   Point2D_<float> a1 = p1, a2 = p2, a3 = p3, a4 = p4;
