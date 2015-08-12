@@ -65,11 +65,9 @@ int main(int argc, char *argv[]){
     Theme::Init();
     SDLMain::Init();
 
+    // TODO: Load modules later, with SC start.
     ModuleCollectionBase::InstallDir("modules");
     std::cout << ModuleCollectionBase::ListInstalledTemplates();
-    std::shared_ptr<Module> module1, module2, console_module;
-    std::shared_ptr<Canvas> main_canvas;
-    LateAssign(console_module, ModuleFactory::CreateNewInstance("debug/console"));
 
     std::shared_ptr<MainWindow> mainwindow = nullptr;
     auto configwindow = LaunchConfigWindow::Create();
@@ -92,8 +90,6 @@ int main(int argc, char *argv[]){
     SDLMain::RegisterWindow(configwindow);
 
     SDLMain::Loop();
-
-    ModuleFactory::DestroyInstance(console_module);
 
     SCLang::Stop();
     // SDL seems to have problems when the destroy functions are called from

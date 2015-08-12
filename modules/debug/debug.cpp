@@ -20,14 +20,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <cstring>
 
-#include "Window.hpp"
-#include "UI/UITextArea.hpp"
-#include "UI/UIButton.hpp"
-#include "UI/UIBox.hpp"
+#include "Console.hpp"
 #include "ModuleUI/UISlider.hpp"
 #include "Theme.hpp"
 #include "SDLMain.hpp"
-#include "SCLang.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
 
 // The custom class NEVER takes ownership of the instances
@@ -64,46 +60,24 @@ public:
 
 class Console : public AlgAudio::Module{
 public:
-  std::shared_ptr<AlgAudio::Window> console_window;
+  std::shared_ptr<AlgAudio::Console> console;
   void on_init(){
-    console_window = AlgAudio::Window::Create("SCLang console", 500, 400, false);
-    auto mainvbox = AlgAudio::UIVBox::Create(console_window);
-    auto textarea = AlgAudio::UITextArea::Create(console_window, AlgAudio::Color(255,255,255), AlgAudio::Color(0,0,0));
-    auto clipboard_button = AlgAudio::UIButton::Create(console_window, "Copy console output to clipboard");
-    textarea->SetBottomAligned(true);
-    clipboard_button->SetFontSize(13);
-    clipboard_button->SetColors(AlgAudio::Theme::Get("text-generic"),AlgAudio::Theme::Get("bg-button-neutral"));
-
-    mainvbox->Insert(textarea, AlgAudio::UIBox::PackMode::WIDE);
-    mainvbox->Insert(clipboard_button, AlgAudio::UIBox::PackMode::TIGHT);
-    console_window->Insert(mainvbox);
-
-    console_window->subscriptions += AlgAudio::SCLang::on_line_received.Subscribe([=](std::string line){
-      textarea->PushLine(line);
+    console = AlgAudio::Console::Create();
+    console->on_close.SubscribeForever([&](){
+      AlgAudio::SDLMain::UnregisterWindow(console);
     });
-    subscriptions += clipboard_button->on_clicked.Subscribe([=](){
-      AlgAudio::Utilities::CopyToClipboard(textarea->GetAllText());
-    });
-    // When subscribing to signals, be careful not to create shared_ptr loops.
-    // In the example below, if console_window was captured by value, it would
-    // copy the shared_ptr, increase refcount and store it INSIDE console window
-    // (lambda stored inside signal), and in such case the shared_ptr would
-    // never free.
-    console_window->on_close.SubscribeForever([&](){
-      AlgAudio::SDLMain::UnregisterWindow(console_window);
-    });
-    AlgAudio::SDLMain::RegisterWindow(console_window);
+    AlgAudio::SDLMain::RegisterWindow(console);
   }
   void on_destroy(){
-    AlgAudio::SDLMain::UnregisterWindow(console_window);
-    console_window = nullptr;
+    AlgAudio::SDLMain::UnregisterWindow(console);
+    console = nullptr;
   }
 };
 
 // --------------------------------
 class GUIDemo : public AlgAudio::Module{
 public:
-  void on_param_set(std::string id, float val) override{
+  void on_param_set(std::string, float val) override{
     //std::cout << "GUIDemo executes some custom code on param set! " << id << " " << val << std::endl;
     auto controller = GetParamControllerByID("stdout2");
     controller->Set(val*5);

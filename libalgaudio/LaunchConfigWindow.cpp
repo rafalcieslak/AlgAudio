@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "Canvas.hpp"
 #include "MainWindow.hpp"
+#include "SDLMain.hpp"
 
 namespace AlgAudio{
 
@@ -45,6 +46,7 @@ void LaunchConfigWindow::init(){
   configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
   chkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
   supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
+  consolechkbox = UICheckbox::Create(shared_from_this(),"Enable console");
   mainvbox = UIVBox::Create(shared_from_this());
   buttonhbox = UIHBox::Create(shared_from_this());
   progressbar = UIProgressBar::Create(shared_from_this());
@@ -57,6 +59,7 @@ void LaunchConfigWindow::init(){
   mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
   mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
+  mainvbox->Insert(consolechkbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
   mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
@@ -69,7 +72,7 @@ void LaunchConfigWindow::init(){
 
   subscriptions += startbutton->on_clicked.Subscribe([this](){
     if(!SCLang::IsRunning()){
-      SCLang::Start(sclang_path, supernovachkbox->active);
+      SCLang::Start(sclang_path, supernovachkbox->GetActive());
       startbutton->SetText("Stop SCLang");
     }else{
       SCLang::Stop();
@@ -89,12 +92,24 @@ void LaunchConfigWindow::init(){
     std::cout << "COMPLETE" << std::endl;
     on_complete.Happen();
   });
-  
+
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
   subscriptions += chkbox->on_toggled.Subscribe([](bool state){
     SCLang::SetOSCDebug(state);
+  });
+  subscriptions += consolechkbox->on_toggled.Subscribe([this](bool enabled){
+    if(enabled){
+      console = Console::Create();
+      subscriptions += console->on_close.Subscribe([this](){
+        consolechkbox->SetActive(false); // This will also unregister the window.
+      });
+      SDLMain::RegisterWindow(console);
+    }else{
+      SDLMain::UnregisterWindow(console);
+      console = nullptr;
+    }
   });
   subscriptions += SCLang::on_start_completed.Subscribe([this](bool success, std::string message){
     if(success){

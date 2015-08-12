@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Window.hpp"
+#include "Console.hpp"
 #include "UI/UIButton.hpp"
 #include "UI/UIMarginBox.hpp"
 #include "UI/UITextArea.hpp"
@@ -51,10 +52,13 @@ private:
   std::shared_ptr<UILabel> configlabel;
   std::shared_ptr<UICheckbox> chkbox;
   std::shared_ptr<UICheckbox> supernovachkbox;
+  std::shared_ptr<UICheckbox> consolechkbox;
   std::shared_ptr<UIVBox> mainvbox;
   std::shared_ptr<UIHBox> buttonhbox;
   std::shared_ptr<UIProgressBar> progressbar;
   std::shared_ptr<UILabel> statustext;
+
+  std::shared_ptr<Console> console;
 };
 
 } //namespace AlgAudio

@@ -41,7 +41,7 @@ void UICheckbox::CustomDraw(DrawContext& c){
 void UICheckbox::Init(){
   child_box = UIHBox::Create(window);
   child_box->parent = shared_from_this();
-  child_button = UIButton::Create(window,"   ");
+  child_button = UIButton::Create(window," ");
   child_label = UILabel::Create(window,text,12);
   child_box->Insert(child_button, UIBox::PackMode::TIGHT);
   child_box->Insert(child_label, UIBox::PackMode::TIGHT);
@@ -53,21 +53,19 @@ void UICheckbox::Init(){
 
   SetBackColor(Theme::Get("bg-main"));
   on_clicked.SubscribeForever([&](){
-    if(active){
-      active = false;
-      child_button->SetText(" ");
-      UpdateColors();
-      on_toggled.Happen(false);
-    }else{
-      active = true;
-      child_button->SetText("X");
-      UpdateColors();
-      on_toggled.Happen(true);
-    };
+    SetActive(!active);
   });
   on_pointed.SubscribeForever([&](bool){
     UpdateColors();
   });
+}
+
+void UICheckbox::SetActive(bool a){
+  active = a;
+  if(active) child_button->SetText("X");
+  else       child_button->SetText(" ");
+  UpdateColors();
+  on_toggled.Happen(a);
 }
 
 void UICheckbox::UpdateColors(){

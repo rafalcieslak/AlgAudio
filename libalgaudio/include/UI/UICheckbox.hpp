@@ -32,14 +32,16 @@ public:
   static std::shared_ptr<UICheckbox> Create(std::weak_ptr<Window> parent_window, std::string text);
   Signal<bool> on_toggled;
   void SetText(std::string);
+  void SetActive(bool a);
   virtual void CustomDraw(DrawContext& c) override;
   virtual void CustomResize(Size2D s) override;
   virtual void OnChildRequestedSizeChanged() override;
-  bool active = false;
+  inline bool GetActive() const {return active;}
 private:
   UICheckbox(std::weak_ptr<Window> parent_window, std::string text);
   void Init();
   void UpdateColors();
+  bool active = false;
   std::string text;
   std::shared_ptr<UIHBox> child_box;
   std::shared_ptr<UIButton> child_button;
