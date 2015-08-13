@@ -134,4 +134,17 @@ Point2D UIWidget::GetPosInParent(std::shared_ptr<UIWidget> ancestor){
   return res;
 }
 
+void UIWidget::RequestFocus(){
+  auto p = parent.lock();
+  if(!p) return;
+  p->OnChildFocusRequested(shared_from_this());
+  OnFocusChanged();
+}
+
+bool UIWidget::GetIsFocused() const{
+  auto p = parent.lock();
+  if(!p) return true;
+  return p->OnChildFocusTested(shared_from_this());
+}
+
 } // namespace AlgAudio

@@ -64,6 +64,9 @@ void Theme::Init(){
   thememap["slider-border"] = Color(0x293b53ff);
   thememap["slider-marker"] = Color(0x063373ff);
   thememap["slider-connector"] = Color(0x666d96ff);
+
+  thememap["textentry-bg"] = Color(0x52607cff);
+  thememap["textentry-text"] = Color(0x212227ff);
 }
 
 const Color& Theme::Get(const std::string& id){

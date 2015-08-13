@@ -131,6 +131,11 @@ void Window::ProcessMouseButtonEvent(bool d, short b, Point2D p){
     child->OnMousePress(d,b,p);
 }
 
+void Window::ProcessKeyboardEvent(KeyData k){
+  if(child)
+    child->OnKeyboard(k);
+}
+
 Size2D Window::GetSize() const{
   int w,h;
   SDL_GetWindowSize(window, &w, &h);

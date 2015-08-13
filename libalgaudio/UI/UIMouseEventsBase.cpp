@@ -27,6 +27,7 @@ bool UIMouseEventsBase::OnMousePress(bool down, short b,Point2D p){
   // In other case, execute our own code
   if(down == true && b == SDL_BUTTON_LEFT){
     pressed = true;
+    if(focusable) RequestFocus();
     return on_pressed.Happen(true);
   }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
     pressed = false;

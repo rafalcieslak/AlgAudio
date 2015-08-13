@@ -56,6 +56,7 @@ public:
   void ProcessEnterEvent();
   void ProcessLeaveEvent();
   void ProcessResizeEvent();
+  void ProcessKeyboardEvent(KeyData data);
 
   template<class W, typename... Args>
   std::shared_ptr<W> Create(Args... args){

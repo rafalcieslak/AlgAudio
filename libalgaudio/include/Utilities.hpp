@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Signal.hpp"
 
 struct SDL_Color;
+struct SDL_KeyboardEvent;
 
 namespace AlgAudio{
 
@@ -125,6 +126,32 @@ class UnimplementedException : public Exception{
 public:
   UnimplementedException(std::string t) : Exception(t){}
 };
+
+
+// A custom structure representing keypress info.
+struct KeyData{
+  // Called by SDLMain::Init(). Builds a keycode lookup map.
+  static void InitKeymap();
+  enum KeyType{
+    Unknown,
+    Text,
+    Letter,
+    Digit,
+    Symbol,
+    Backspace,
+    Delete,
+    Return,
+  };
+  KeyData(const SDL_KeyboardEvent&);
+  KeyData(std::string);
+  bool pressed = true;
+  bool repeat = false;
+  bool shift = false, ctrl = false, alt = false;
+  KeyType type;
+  std::string symbol = "";
+  bool IsPrintable() const {return type == Letter || type == Digit || type == Symbol || type == Text;}
+};
+
 
 class Utilities{
 private:

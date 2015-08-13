@@ -31,6 +31,7 @@ std::atomic<int> SDLMain::notify_event_id;
 
 void SDLMain::Init(){
   notify_event_id = SDL_RegisterEvents(1);
+  KeyData::InitKeymap();
 }
 
 void SDLMain::Loop(){
@@ -104,6 +105,10 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
     window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, Point2D(ev.button.x, ev.button.y));
   }else if(ev.type == SDL_MOUSEMOTION){
     window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
+  }else if(ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP){
+    window->ProcessKeyboardEvent( KeyData(ev.key) );
+  }else if(ev.type == SDL_TEXTINPUT){
+    window->ProcessKeyboardEvent( KeyData(ev.text.text) );
   }
 }
 
@@ -139,6 +144,16 @@ void SDLMain::UnregisterWindow(std::shared_ptr<Window> w){
 }
 void SDLMain::UnregisterAll(){
   registered_windows.clear();
+}
+
+void SDLMain::SetTextInput(bool b){
+  if(b){
+    std::cout << "Starting text input" << std::endl;
+    SDL_StartTextInput();
+  }else{
+    std::cout << "Ending text input" << std::endl;
+    SDL_StopTextInput();
+  }
 }
 
 } // namespace AlgAudio

@@ -69,6 +69,10 @@ public:
   void Resize(Size2D s);
   virtual void CustomResize(Size2D) {};
 
+  /* Mouse events are inherited from UIMouseEventsBase */
+  /* Keyboard event. */
+  virtual void OnKeyboard(KeyData) {}
+
   // Starts the downward resize-chain without actually changing size.
   // Useful for propagating size to a newly inserted child.
   void TriggerFakeResize() { CustomResize(current_size); }
@@ -130,14 +134,32 @@ public:
   };
   ID widget_id;
 
+  // This method lets you search the widget hierarchy tree for a transitive
+  // child with given id.
   std::shared_ptr<UIWidget> FindChild(ID search_id){
     if(search_id == widget_id) return shared_from_this();
     else return CustomFindChild(search_id);
   }
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID) const {return nullptr;}
+
+  // This method is called by the widget when it wishes to grab focus, for example
+  // a text entry field should call this method when it's clicked.
+  void RequestFocus() override;
+  // This method is called when the widget focus state has changed. It is not clear
+  // if the child actually has focus now, or not. When implementing a custom
+  // override, you may use GetIsFocused() to check for current focus state.
+  virtual void OnFocusChanged() {}
 protected:
   Size2D current_size;
+  /* Calling this method marks the widget's (as well as its ancestor's) render
+   * cache as invalid, causing it to be redrawn with the next frame using
+   * CustomDraw. It is NOT inefficient to call this method multiple times in a
+   * single frame. When implementng a custom widget, you should call this method
+   * whenever its internal state changes in a way that modifies widget's
+   * appearance.
+   */
   void SetNeedsRedrawing();
+
   // Only the topmost widget should be bound to a window.
   std::weak_ptr<Window> window;
 
@@ -155,6 +177,25 @@ protected:
   virtual void OnChildRequestedSizeChanged() {}
   /* This method will be called by a child when it changes its visibility. */
   virtual void OnChildVisibilityChanged() {}
+  /* This method gets called when a child widget tries to catch focus.
+   * Multiple container widgets should react on it by remembering which widget
+   * is the focused one, and passing keyboard events to it. Single container
+   * widgets can ignore this signal, as they have no choice as to whom they
+   * shall pass such events to.
+   * Argument: the child that is requesting focus. */
+  virtual void OnChildFocusRequested(std::shared_ptr<UIWidget>) {}
+  /* This method is called by a child when it has to ask the parent whether it
+   * is the focused child. This is necessary for performing GetIsFocused() test.
+   * Containers should override this method.
+   */
+  virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget>) {return false;}
+
+  /* This method checks whether this widget currently has focus. If it does,
+   * this method returns true. If it lies on the focus path (e.g. is a box whose
+   * child as grabbed focus), it also returns true. This should be always true
+   * for a top-level widget. In any other case, false is returned.
+  */
+  bool GetIsFocused() const;
 
 private:
   Color clear_color = Color(0,0,0,0);

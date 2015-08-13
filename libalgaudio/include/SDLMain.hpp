@@ -69,6 +69,8 @@ public:
   static void PushNotifySubprocessEvent();
   static void PushNotifyOSCEvent();
   static std::atomic<int> notify_event_id;
+  
+  static void SetTextInput(bool);
 
   static std::atomic_bool running;
 private:

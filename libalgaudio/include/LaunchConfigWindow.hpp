@@ -28,6 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UILabel.hpp"
 #include "UI/UICheckbox.hpp"
 #include "UI/UIProgressBar.hpp"
+#include "UI/UITextEntry.hpp"
 
 namespace AlgAudio{
 
@@ -59,6 +60,9 @@ private:
   std::shared_ptr<UILabel> statustext;
 
   std::shared_ptr<Console> console;
+
+  std::shared_ptr<UITextEntry> testentry;
+  std::shared_ptr<UITextEntry> testentry2;
 };
 
 } //namespace AlgAudio

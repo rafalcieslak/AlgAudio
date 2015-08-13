@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <sstream>
 #include <iomanip>
+#include <unordered_map>
 #ifdef __unix__
   #include <unistd.h>
 #else
@@ -33,6 +34,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 // #define SILLY_GDB
 
 namespace AlgAudio {
+
+static std::unordered_map<SDL_Keycode, std::pair<std::string, KeyData::KeyType>> keymap;
 
 #ifdef __unix__
   const char Utilities::OSDirSeparator = '/';
@@ -190,5 +193,46 @@ std::string Utilities::PrettyFloat(float val){
   ss << std::setprecision(precision) << std::fixed << val;
   return ss.str();
 }
+
+KeyData::KeyData(const SDL_KeyboardEvent& k){
+  SDL_Keycode kc = k.keysym.sym;
+  shift = (k.keysym.mod & KMOD_LSHIFT) || (k.keysym.mod & KMOD_RSHIFT);
+  ctrl = (k.keysym.mod & KMOD_LCTRL) || (k.keysym.mod & KMOD_RCTRL);
+  alt = (k.keysym.mod & KMOD_LALT) || (k.keysym.mod & KMOD_RALT);
+  auto it = keymap.find(kc);
+  if(it == keymap.end()){
+    symbol = "";
+    type = KeyType::Unknown;
+  }else{
+    symbol = it->second.first;
+    // If shift, uppercase the symbol.
+    type = it->second.second;
+  }
+  repeat = k.repeat;
+  pressed = k.state;
+}
+
+KeyData::KeyData(std::string s){
+  type = KeyType::Text;
+  symbol = s;
+}
+
+void KeyData::InitKeymap(){
+  keymap[SDLK_0] = {"0", Digit}; keymap[SDLK_KP_0] = {"0", Digit};
+  keymap[SDLK_1] = {"1", Digit}; keymap[SDLK_KP_1] = {"1", Digit};
+  keymap[SDLK_2] = {"2", Digit}; keymap[SDLK_KP_2] = {"2", Digit};
+  keymap[SDLK_3] = {"3", Digit}; keymap[SDLK_KP_3] = {"3", Digit};
+  keymap[SDLK_4] = {"4", Digit}; keymap[SDLK_KP_4] = {"4", Digit};
+  keymap[SDLK_5] = {"5", Digit}; keymap[SDLK_KP_5] = {"5", Digit};
+  keymap[SDLK_6] = {"6", Digit}; keymap[SDLK_KP_6] = {"6", Digit};
+  keymap[SDLK_7] = {"7", Digit}; keymap[SDLK_KP_7] = {"7", Digit};
+  keymap[SDLK_8] = {"8", Digit}; keymap[SDLK_KP_8] = {"8", Digit};
+  keymap[SDLK_9] = {"9", Digit}; keymap[SDLK_KP_9] = {"9", Digit};
+
+  keymap[SDLK_RETURN] = {"\n", Return}; keymap[SDLK_RETURN2] = {"\n", Return};
+  keymap[SDLK_BACKSPACE] = {"", Backspace};
+  keymap[SDLK_DELETE] = {"", Delete};
+}
+
 
 } // namespace AlgAudio

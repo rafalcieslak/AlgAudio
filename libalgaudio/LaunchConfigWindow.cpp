@@ -52,6 +52,11 @@ void LaunchConfigWindow::init(){
   progressbar = UIProgressBar::Create(shared_from_this());
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
 
+  testentry = UITextEntry::Create(shared_from_this());
+  testentry->SetText("Example text");
+  testentry2 = UITextEntry::Create(shared_from_this());
+  testentry2->SetText("Another text");
+
   //mainvbox->SetPadding(10);
   Insert(marginbox);
   marginbox->Insert(mainvbox);
@@ -59,7 +64,9 @@ void LaunchConfigWindow::init(){
   mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
   mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
+  mainvbox->Insert(testentry, UIBox::PackMode::TIGHT); // temporary
   mainvbox->Insert(consolechkbox, UIBox::PackMode::TIGHT);
+  mainvbox->Insert(testentry2, UIBox::PackMode::TIGHT); // temporary
   mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
   mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);

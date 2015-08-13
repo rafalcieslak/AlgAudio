@@ -38,11 +38,17 @@ public:
   virtual void CustomMouseEnter(Point2D) {}
   virtual void CustomMouseLeave(Point2D) {}
   virtual void CustomMouseMotion(Point2D,Point2D) {}
+
+  virtual void RequestFocus() = 0;
+
+  void SetFocusable(bool f){focusable = f;}
   Point2D last_mouse_pos;
 protected:
   UIMouseEventsBase() {} // Only construcible when inherited
   bool pressed = false;
   bool pointed = false;
+  // If a child is focusable, clicking on it will call RequestFocus().
+  bool focusable  = true;
 };
 
 } // namespace AlgAudio
