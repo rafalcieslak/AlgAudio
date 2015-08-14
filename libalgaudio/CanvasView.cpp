@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "CanvasView.hpp"
 #include <algorithm>
 #include "Window.hpp"
+#include "SDLMain.hpp"
 
 namespace AlgAudio{
 
@@ -98,20 +99,20 @@ void CanvasView::CustomDraw(DrawContext& c){
   // Then draw the potential new wire.
   if(drag_in_progress && potential_wire != PotentialWireMode::None){
 
-    int from_id = potential_wire_connection.first .first,
-          to_id = potential_wire_connection.second.first;
+    std::shared_ptr<ModuleGUI> from_mgui = module_guis[potential_wire_connection.first .first],
+                                 to_mgui = module_guis[potential_wire_connection.second.first];
     std::string from_outlet_paramid = potential_wire_connection.first .second,
                    to_inlet_paramid = potential_wire_connection.second.second;
-    Canvas::IOID from = {module_guis[from_id]->GetModule(), from_outlet_paramid},
-                   to = {module_guis[  to_id]->GetModule(),    to_inlet_paramid};
+    Canvas::IOID from = {from_mgui->GetModule(), from_outlet_paramid},
+                   to = {  to_mgui->GetModule(),    to_inlet_paramid};
 
     if(potential_wire_type == PotentialWireType::Audio){
       // Potential audio wire
       if(canvas->GetDirectAudioConnectionExists(from, to)) c.SetColor(Theme::Get("canvas-connection-remove"));
       else                                                 c.SetColor(Theme::Get("canvas-connection-new"));
 
-      Point2D p1 = module_guis[from_id]->position + module_guis[from_id]->WhereIsOutlet(from_outlet_paramid);
-      Point2D p2 = module_guis[  to_id]->position + module_guis[  to_id]->WhereIsInlet (   to_inlet_paramid);
+      Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
+      Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncA(p1, p2);
       c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2);
     }else{
@@ -119,8 +120,8 @@ void CanvasView::CustomDraw(DrawContext& c){
       if(canvas-> GetDirectDataConnectionExists(from, to)) c.SetColor(Theme::Get("canvas-connection-remove"));
       else                                                 c.SetColor(Theme::Get("canvas-connection-new"));
 
-      Point2D p1 = module_guis[from_id]->position + module_guis[from_id]->WhereIsParamOutlet(from_outlet_paramid);
-      Point2D p2 = module_guis[  to_id]->position + module_guis[  to_id]->WhereIsParamInlet (   to_inlet_paramid);
+      Point2D p1 = from_mgui->position + from_mgui->WhereIsParamOutlet(from_outlet_paramid);
+      Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncB(p1, p2);
       c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 15, 1.0f);
     }
@@ -157,6 +158,34 @@ void CanvasView::CustomDraw(DrawContext& c){
       c.DrawRectBorder(r);
     }
   }
+
+  if(fadeout_wire != PotentialWireMode::None){
+    // Draw the fadeout wire
+    std::shared_ptr<ModuleGUI> from_mgui = fadeout_wire_connection.first .first.lock(),
+                                 to_mgui = fadeout_wire_connection.second.first.lock();
+    if(from_mgui && to_mgui){
+      std::string from_outlet_paramid = fadeout_wire_connection.first .second,
+                     to_inlet_paramid = fadeout_wire_connection.second.second;
+      Canvas::IOID from = {from_mgui->GetModule(), from_outlet_paramid},
+                     to = {  to_mgui->GetModule(),    to_inlet_paramid};
+
+      if(fadeout_wire == PotentialWireMode::Remove) c.SetColor(Theme::Get("canvas-connection-remove").SetAlpha(fadeout_phase));
+      else                                          c.SetColor(Theme::Get("canvas-connection-new-TEMP").SetAlpha(fadeout_phase));
+
+      if(fadeout_wire_type == PotentialWireType::Audio){
+        Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
+        Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
+        int strength = CurveStrengthFuncA(p1, p2);
+        c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2);
+      }else{
+        Point2D p1 = from_mgui->position + from_mgui->WhereIsParamOutlet(from_outlet_paramid);
+        Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
+        int strength = CurveStrengthFuncB(p1, p2);
+        c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 15, 1.0f);
+      }
+    }
+  } // if fadeout wire is not none
+
 }
 
 int CanvasView::CurveStrengthFuncA(Point2D a, Point2D b){
@@ -324,6 +353,7 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
     // There is no such connection, connect!
     try{
       canvas->Connect(from,to);
+      FadeoutWireStart(PotentialWireMode::New);
     }catch(MultipleConnectionsException){
       window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
     }catch(ConnectionLoopException){
@@ -334,6 +364,7 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
   }else{
     // This connection already exists, remove it.
     canvas->Disconnect(from,to);
+    FadeoutWireStart(PotentialWireMode::Remove);
   }
   SetNeedsRedrawing();
 }
@@ -356,6 +387,7 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
   if(!canvas->GetDirectDataConnectionExists(from, to)){
     try{
       canvas->ConnectData(from,to,Canvas::DataConnectionMode::Relative);
+      FadeoutWireStart(PotentialWireMode::New);
     }catch(MultipleConnectionsException){
       window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
     }catch(ConnectionLoopException){
@@ -366,6 +398,7 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
   }else{
     // This connection already exists, remove it.
     canvas->DisconnectData(from,to);
+    FadeoutWireStart(PotentialWireMode::Remove);
   }
 }
 
@@ -557,6 +590,28 @@ void CanvasView::RemoveSelected(){
   }
   selection.clear();
   StopDrag();
+  SetNeedsRedrawing();
+}
+
+void CanvasView::FadeoutWireStart(PotentialWireMode m){
+  if(potential_wire == PotentialWireMode::None || m == PotentialWireMode::None) return;
+  fadeout_wire = m;
+  fadeout_anim.Release();
+  fadeout_phase = 0.8; // Start at 4/5 opacity
+  auto pw = potential_wire_connection; // temp alias
+  fadeout_wire_connection = {{module_guis[pw.first .first], pw.first .second},
+                             {module_guis[pw.second.first], pw.second.second}};
+  fadeout_wire_type = potential_wire_type;
+  fadeout_anim = SDLMain::on_before_frame.Subscribe(this, &CanvasView::FadeoutWireStep);
+}
+void CanvasView::FadeoutWireStep(float delta){
+  const float length = (fadeout_wire == PotentialWireMode::New)?0.12f:0.3f; // in seconds
+  fadeout_phase -= delta*(1.0f/length);
+  if(fadeout_phase <= 0.0){
+    fadeout_wire = PotentialWireMode::None;
+    fadeout_phase = 0.0;
+    fadeout_anim.Release();
+  }
   SetNeedsRedrawing();
 }
 

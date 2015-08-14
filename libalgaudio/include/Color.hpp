@@ -43,6 +43,7 @@ public:
 
   // Color operations
   Color ZeroAlpha() const { return Color(r,g,b,0); }
+  Color SetAlpha(float a_) const { return Color(r,g,b,a_*255); }
   Color Lighter(double amount) const;
   Color Darker(double amount) const;
 

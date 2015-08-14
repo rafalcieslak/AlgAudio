@@ -57,6 +57,7 @@ void Theme::Init(){
   thememap["canvas-connection-audio"] = Color(0x1b2737ff);
   thememap["canvas-connection-data"] = Color(0x2c104eff);
   thememap["canvas-connection-new"] = Color(0x37a025ff);
+  thememap["canvas-connection-new-TEMP"] = Color(0x37ff2577);
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
   thememap["canvas-bb-body"] = Color(0x96b2e915);
   thememap["canvas-bb-border"] = Color(0x003caa79);

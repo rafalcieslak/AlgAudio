@@ -131,6 +131,14 @@ private:
   PotentialWireMode potential_wire = PotentialWireMode::None;
   PotentialWireType potential_wire_type;
   std::pair<std::pair<int,std::string>, std::pair<int,std::string>> potential_wire_connection;
+  // Animated fadeout of potential wire.
+  Subscription fadeout_anim;
+  PotentialWireMode fadeout_wire = PotentialWireMode::None;
+  PotentialWireType fadeout_wire_type;
+  std::pair<std::pair<std::weak_ptr<ModuleGUI>,std::string>, std::pair<std::weak_ptr<ModuleGUI>,std::string>> fadeout_wire_connection;
+  void FadeoutWireStart(PotentialWireMode m);
+  void FadeoutWireStep(float delta);
+  float fadeout_phase;
 
   // Flags remebering held keys.
   bool shift_held, ctrl_held, alt_held;
