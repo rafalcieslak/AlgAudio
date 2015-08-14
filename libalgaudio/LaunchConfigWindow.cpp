@@ -40,33 +40,28 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 void LaunchConfigWindow::init(){
   marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
   startbutton = UIButton::Create(shared_from_this(),"Start AlgAudio");
-  testbutton = UIButton::Create(shared_from_this(),"Test button");
+  testbutton = UIButton::Create(shared_from_this(),"Test UI");
+  testbutton->SetVisible(false);
   quitbutton = UIButton::Create(shared_from_this(),"Quit App");
   titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
   configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
-  chkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
+  oscchkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
+  oscchkbox->SetVisible(false);
   supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
-  consolechkbox = UICheckbox::Create(shared_from_this(),"Enable console");
+  debugchkbox = UICheckbox::Create(shared_from_this(),"Enable debug tools");
   mainvbox = UIVBox::Create(shared_from_this());
   buttonhbox = UIHBox::Create(shared_from_this());
   progressbar = UIProgressBar::Create(shared_from_this());
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
-
-  testentry = UITextEntry::Create(shared_from_this());
-  testentry->SetText("Example text");
-  testentry2 = UITextEntry::Create(shared_from_this());
-  testentry2->SetText("Another text");
 
   //mainvbox->SetPadding(10);
   Insert(marginbox);
   marginbox->Insert(mainvbox);
   mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
   mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
-  mainvbox->Insert(chkbox, UIBox::PackMode::TIGHT);
+  mainvbox->Insert(oscchkbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(testentry, UIBox::PackMode::TIGHT); // temporary
-  mainvbox->Insert(consolechkbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(testentry2, UIBox::PackMode::TIGHT); // temporary
+  mainvbox->Insert(debugchkbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
   mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
@@ -85,7 +80,7 @@ void LaunchConfigWindow::init(){
       SCLang::Stop();
       progressbar->SetAmount(0.0);
       statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
-      startbutton->SetText("Start SCLang");
+      startbutton->SetText("Start AlgAudio");
     }
     statustext->SetTextColor("text-generic");
     statustext->SetBold(false);
@@ -103,18 +98,22 @@ void LaunchConfigWindow::init(){
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
-  subscriptions += chkbox->on_toggled.Subscribe([](bool state){
+  subscriptions += oscchkbox->on_toggled.Subscribe([](bool state){
     SCLang::SetOSCDebug(state);
   });
-  subscriptions += consolechkbox->on_toggled.Subscribe([this](bool enabled){
+  subscriptions += debugchkbox->on_toggled.Subscribe([this](bool enabled){
     if(enabled){
       console = Console::Create();
       subscriptions += console->on_close.Subscribe([this](){
-        consolechkbox->SetActive(false); // This will also unregister the window.
+        debugchkbox->SetActive(false); // This will also unregister the window.
       });
       SDLMain::RegisterWindow(console);
+      oscchkbox->SetVisible(true);
+      testbutton->SetVisible(true);
     }else{
       SDLMain::UnregisterWindow(console);
+      oscchkbox->SetVisible(false);
+      testbutton->SetVisible(false);
       console = nullptr;
     }
   });

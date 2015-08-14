@@ -51,18 +51,15 @@ private:
   std::shared_ptr<UIButton> quitbutton;
   std::shared_ptr<UILabel> titlelabel;
   std::shared_ptr<UILabel> configlabel;
-  std::shared_ptr<UICheckbox> chkbox;
+  std::shared_ptr<UICheckbox> oscchkbox;
   std::shared_ptr<UICheckbox> supernovachkbox;
-  std::shared_ptr<UICheckbox> consolechkbox;
+  std::shared_ptr<UICheckbox> debugchkbox;
   std::shared_ptr<UIVBox> mainvbox;
   std::shared_ptr<UIHBox> buttonhbox;
   std::shared_ptr<UIProgressBar> progressbar;
   std::shared_ptr<UILabel> statustext;
 
   std::shared_ptr<Console> console;
-
-  std::shared_ptr<UITextEntry> testentry;
-  std::shared_ptr<UITextEntry> testentry2;
 };
 
 } //namespace AlgAudio
