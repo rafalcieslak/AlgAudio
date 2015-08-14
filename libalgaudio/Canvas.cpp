@@ -136,7 +136,7 @@ void Canvas::Connect(IOID from, IOID to){
     if(it2 != it->second.end()) // if found
       throw DoubleConnectionException("Cannot add the connection, it already exists!");
     else{
-      if(audio_connections[from].size() >= 2) throw MultipleConnectionsException("Cannot add another connection to the same outlet, maximum reached.");
+      if(audio_connections[from].size() >= 20) throw MultipleConnectionsException("Cannot add another connection to the same outlet, maximum (20) reached.");
       audio_connections[from].push_back(to);
     }
   }
