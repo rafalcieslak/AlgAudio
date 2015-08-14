@@ -116,8 +116,7 @@ void UISlider::CustomDraw(DrawContext& c){
 
     auto contr = controller.lock();
     if(contr){
-      float v = contr->Get();
-      float p = (v - current_range_min)/(current_range_max - current_range_min);
+      float p = contr->GetRelative();
       float pos = std::max(0.0f, std::min(p, 1.0f));
       float x = GetBodyStart() + pos*(GetBodyWidth());
 
@@ -165,8 +164,7 @@ bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){
   if(pos.IsInside(GetBodyRect()) && down && b == MouseButton::Left && mode == Mode::Slider){
     float x = pos.x - GetBodyStart();
     float q = x / GetBodyWidth();
-    float val = current_range_min + (current_range_max - current_range_min) * q;
-    controller.lock()->Set(val);
+    controller.lock()->SetRelative(q);
     return true;
   }
   return false;
@@ -215,8 +213,7 @@ void UISlider::DragStep(Point2D pos){
 
   float dq = ((float)pos.x - drag_start.x)/((float)GetBodyWidth());
   float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
-  float val = current_range_min + q*(current_range_max - current_range_min);
-  controller.lock()->Set(val);
+  controller.lock()->SetRelative(q);
 }
 void UISlider::DragEnd(Point2D pos){
   DragStep(pos);

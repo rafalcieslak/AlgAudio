@@ -539,14 +539,14 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
         drag_mode = DragModeConnectDataFromOutlet;
       }else if(mouse_down_mode == ModeNone){
         drag_mode = DragModeBBSelect;
-        std::cout << "Starting BBSelect drag" << std::endl;
+        //std::cout << "Starting BBSelect drag" << std::endl;
       }
       // Slider dragging does not require such a huge distance to start.
     }else if(lmb_down && mouse_down_id >=0 &&
       ( mouse_down_mode == ModeSlider ) ) {
       drag_in_progress = true;
       drag_mode = DragModeSlider;
-      std::cout << "Slider drag." << std::endl;
+      //std::cout << "Slider drag." << std::endl;
       module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid, to - module_guis[mouse_down_id]->position);
     }
   }
