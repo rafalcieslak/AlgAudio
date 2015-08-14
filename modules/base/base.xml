@@ -4,7 +4,7 @@
 
   <module id="simplein" name="Simple input">
     <params>
-      <inlet id="output"/>
+      <outlet id="output"/>
     </params>
     <description> System's first audio input channel is accessible with this module. </description>
     <sc>
@@ -42,7 +42,7 @@ SendReply.kr(Impulse.kr(30), '/algaudioSC/sendreply', signal_db, amp_reply);
     <params>
       <inlet id="in"/>
       <outlet id="out"/>
-      <param id="base" name="Base freq" defaultmin="0.0" defaultmax="10000.0" defaultval="300"/>
+      <param id="base" name="Base freq" defaultmin="0.0" defaultmax="1000.0" defaultval="300"/>
       <param id="amt" name="Mod. amount" defaultmin="0.0" defaultmax="200.0" defaultval="50"/>
     </params>
     <description> A simple voltage controlled oscillator. </description>
