@@ -66,7 +66,7 @@ struct Point2D_{
   Point2D_<T> operator*(const T& t) const {return Point2D_<T>(x*t, y*t);}
   Point2D_<T> operator+(const Size2D& other) const { return Point2D_<T>(x + other.width, y + other.height);}
   Point2D_<T> operator-(const Size2D& other) const { return Point2D_<T>(x - other.width, y - other.height);}
-  bool IsInside(Point2D_<T> r, Size2D s) const { return (x >= r.x) && (x <= r.x + s.width) && (y >= r.y) && (y <= r.y + s.height);}
+  bool IsInside(Point2D_<T> r, Size2D s) const { return (x >= r.x) && (x < r.x + s.width) && (y >= r.y) && (y < r.y + s.height);}
   bool IsInside(const Rect& r) const;
   static float Distance(Point2D_<T> a, Point2D_<T> b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}
 };
@@ -81,7 +81,12 @@ struct Rect{
   Point2D a;
   Point2D b;
   Rect() {}
-  Rect(Point2D a_, Point2D b_) : a(a_), b(b_) {}
+  Rect(Point2D a_, Point2D b_){
+         if(a_.x <= b_.x && a_.y <= b_.y) {a = a_; b = b_;}
+    else if(a_.x >= b_.x && a_.y >= b_.y) {a = b_; b = a_;}
+    else if(a_.x <= b_.x && a_.y >= b_.y) {a = {a_.x,b_.y}; b = {b_.x,a_.y};}
+    else if(a_.x >= b_.x && a_.y <= b_.y) {a = {b_.x,a_.y}; b = {a_.x,b_.y};}
+  }
   Rect(Point2D a_, Size2D s) : a(a_), b(a_+s) {}
   inline Size2D Size() const {
     auto q = b-a;
@@ -89,6 +94,9 @@ struct Rect{
   }
   Rect MoveOffset(Point2D p) {return Rect(a+p, b+p);}
   inline Point2D Center() const {return a + Size()/2;}
+  bool IsFullyInside(const Rect& other){
+    return a.x >= other.a.x && a.y >= other.a.y && b.x <= other.b.x && b.y <= other.b.y;
+  }
 };
 
 template <typename T>
@@ -134,13 +142,10 @@ struct KeyData{
   static void InitKeymap();
   enum KeyType{
     Unknown,
-    Text,
-    Letter,
-    Digit,
-    Symbol,
-    Backspace,
-    Delete,
+    Text, Letter, Digit, Symbol,
+    Backspace, Delete,
     Return,
+    Shift, Ctrl, Alt
   };
   KeyData(const SDL_KeyboardEvent&);
   KeyData(std::string);

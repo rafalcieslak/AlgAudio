@@ -110,6 +110,13 @@ void DrawContext::DrawRect(int x, int y, int w, int h){
   SDL_Rect rect{x,y,w,h};
   SDL_RenderFillRect(renderer,&rect);
 }
+void DrawContext::DrawRectBorder(Rect r){
+  Point2D a(r.a.x, r.a.y), b(r.a.x, r.b.y), c(r.b.x, r.b.y), d(r.b.x, r.a.y);
+  DrawLine(a,b);
+  DrawLine(b,c);
+  DrawLine(c,d);
+  DrawLine(d,a);
+}
 
 void DrawContext::Fill(){
 	SDL_RenderFillRect(renderer,NULL);
@@ -183,7 +190,8 @@ void DrawContext::SetColor(short r, short g, short b, short a){
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
 }
 void DrawContext::SetColor(const Color& c){
-  SDL_SetRenderDrawColor(renderer, c.r*(c.alpha/255.0), c.g*(c.alpha/255.0), c.b*(c.alpha/255.0), c.alpha);
+  //SDL_SetRenderDrawColor(renderer, c.r*(c.alpha/255.0), c.g*(c.alpha/255.0), c.b*(c.alpha/255.0), c.alpha);
+  SDL_SetRenderDrawColor(renderer, c.r, c.g, c.b, c.alpha);
 }
 bool DrawContext::HasZeroArea(){
   if(width <= 0 || height <= 0) return true;

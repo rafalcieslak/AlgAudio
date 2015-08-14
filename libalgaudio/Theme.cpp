@@ -58,6 +58,8 @@ void Theme::Init(){
   thememap["canvas-connection-data"] = Color(0x2c104eff);
   thememap["canvas-connection-new"] = Color(0x37a025ff);
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
+  thememap["canvas-bb-body"] = Color(0x96b2e915);
+  thememap["canvas-bb-border"] = Color(0x003caa79);
 
   thememap["slider-bg"] = Color(0x5a6e8dff);
   thememap["slider-bg-display"] = Color(0x475872ff);

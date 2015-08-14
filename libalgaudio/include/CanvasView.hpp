@@ -41,6 +41,7 @@ public:
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
   virtual void CustomMouseMotion(Point2D,Point2D);
+  virtual void OnKeyboard(KeyData);
 
   // This method (usually called by the parent) creates a new Module instance
   // on the underlying canvas according to the template with the given ID,
@@ -85,9 +86,14 @@ private:
   // value only represents the position in ModuleGUIs vector.
   int mouse_down_id = -1;
 
-  Point2D mouse_down_offset, drag_offset;
-  // The currently selected and higlighted ModuleGUI.
-  int selected_id = -1;
+  // The list of currently selected module guis. Each is stored with a corresponding
+  // distance from drag start - necessary for calculating positions when moving
+  // multiple modules.
+  std::list<std::pair<std::shared_ptr<ModuleGUI>, Point2D>> selection;
+  void ClearSelection();
+  void SelectSingle(std::shared_ptr<ModuleGUI>);
+  void AddToSelection(std::shared_ptr<ModuleGUI>);
+
   // Is there any dragging action in progress?
   bool drag_in_progress = false;
   // This enum determines what is the currrent drag action.
@@ -98,16 +104,13 @@ private:
     DragModeConnectDataFromInlet, // Creating a data connection from an inlet to an outlet
     DragModeConnectDataFromOutlet, // Creating a data connection from an outlet to an inlet
     DragModeSlider, // Dragging a slider value
+    DragModeBBSelect, // Bounding-box selection
   };
   DragMode drag_mode;
-  // The ID of currently dragged/moved ModuleGUI.
-  int dragged_id = -1;
   // Helper function which is called right after a connection drag is completed.
   // It checks the connection for validity and asks the Canvas to make it.
   void FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
   void FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID inlet_slider_id, int outlet_module_id, UIWidget::ID outlet_slider_id);
-  // Mark a module as selected. Use -1 to unselect all.
-  void Select(int id);
 
   // Sets drag_in_progress to false, but also does extra cleanup.
   void StopDrag();
@@ -129,6 +132,8 @@ private:
   PotentialWireType potential_wire_type;
   std::pair<std::pair<int,std::string>, std::pair<int,std::string>> potential_wire_connection;
 
+  // Flags remebering held keys.
+  bool shift_held, ctrl_held, alt_held;
 };
 
 } // namespace AlgAudio

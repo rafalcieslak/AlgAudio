@@ -63,6 +63,8 @@ public:
   void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
   // Drawing rectangles.
   void DrawRect(int x, int y, int w, int h);
+  inline void DrawRect(Rect r){DrawRect(r.a.x, r.a.y, r.Size().width, r.Size().height);}
+  void DrawRectBorder(Rect r);
   // Fills the whole context with current color.
   void Fill();
   void Clear();

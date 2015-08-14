@@ -232,6 +232,9 @@ void KeyData::InitKeymap(){
   keymap[SDLK_RETURN] = {"\n", Return}; keymap[SDLK_RETURN2] = {"\n", Return};
   keymap[SDLK_BACKSPACE] = {"", Backspace};
   keymap[SDLK_DELETE] = {"", Delete};
+  keymap[SDLK_RSHIFT] = {"RShift", Shift}; keymap[SDLK_LSHIFT] = {"LShift", Shift};
+  keymap[SDLK_RCTRL] = {"RCtrl", Ctrl}; keymap[SDLK_LCTRL] = {"LCtrl", Ctrl};
+  keymap[SDLK_RALT] = {"RAlt", Alt}; keymap[SDLK_LALT] = {"LAlt", Alt};
 }
 
 

@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
 #include <SDL2/SDL.h>
+#include <algorithm>
 #include "Window.hpp"
 
 namespace AlgAudio{
@@ -41,12 +42,11 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       modulegui->parent = shared_from_this();
       modulegui->Resize(guisize);
       module_guis.push_back(modulegui);
-      int id = module_guis.size()-1;
-      Select(id); // Select the just-added module
-      dragged_id = id;
+      ClearSelection();
+      selection.push_back({modulegui, (guisize/2).ToPoint()});
+      modulegui->SetHighlight(true);
       drag_in_progress = true;
       drag_mode = DragModeMove;
-      drag_offset = (guisize/2).ToPoint();
       SetNeedsRedrawing();
       r.Return();
     }catch(GUIBuildException ex){
@@ -150,6 +150,12 @@ void CanvasView::CustomDraw(DrawContext& c){
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(-strength,0), drag_position + Point2D(strength/2, 0), drag_position, 15, 1.0f);
+    }else if(drag_mode == DragModeBBSelect){
+      c.SetColor(Theme::Get("canvas-bb-body"));
+      Rect r(drag_position, mouse_down_position);
+      c.DrawRect(r);
+      c.SetColor(Theme::Get("canvas-bb-border"));
+      c.DrawRectBorder(r);
     }
   }
 }
@@ -190,13 +196,10 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     mouse_down_mode = ModeNone;
     if(id < 0){
       // Mouse buton down on an empty space
-      if(down == true && b == SDL_BUTTON_LEFT){
-        Select(-1);
-      }
+      if(down == true && b == SDL_BUTTON_LEFT)
+        ClearSelection();
     }else{
       // Mouse button down on some module
-
-      mouse_down_offset = offset;
 
       auto whatishere = module_guis[id]->GetWhatIsHere(offset);
       if(whatishere.type == ModuleGUI::WhatIsHereType::Inlet){
@@ -230,7 +233,22 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
         mouse_down_mode = ModeNone;
       }
 
-      if(mouse_down_mode == ModeModuleBody) Select(id);
+      if(mouse_down_mode == ModeModuleBody){
+        auto mgui = module_guis[id];
+        bool already_selected = false;
+        for(auto p : selection)
+          if(p.first == mgui)
+            already_selected = true;
+
+        if(already_selected){
+          // This module is already selected!
+          // TODO: Unselect it if shift is pressed
+        }else{
+          // This module is not selected.
+          if(shift_held) AddToSelection(mgui);
+          else SelectSingle(mgui);
+        }
+      }
     }
   }
   if(down == false && b == SDL_BUTTON_LEFT){
@@ -240,7 +258,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     if(drag_in_progress){
       if(drag_mode == DragModeSlider){
         // Slider drag end
-        module_guis[dragged_id]->SliderDragEnd(mouse_down_elem_widgetid, pos - module_guis[dragged_id]->position);
+        module_guis[mouse_down_id]->SliderDragEnd(mouse_down_elem_widgetid, pos - module_guis[mouse_down_id]->position);
       }else if(drag_mode == DragModeConnectAudioFromInlet || drag_mode == DragModeConnectAudioFromOutlet){
         // Connection drag end
         if(id >= 0){
@@ -268,6 +286,15 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
           }
         }else{
           // Data connecting drag ended on empty space.
+        }
+      }else if(drag_mode == DragModeBBSelect){
+        // BB select drag end
+        ClearSelection();
+        Rect bb = {drag_position, mouse_down_position};
+        for(auto mgui : module_guis){
+          Rect r = {mgui->position,  mgui->GetCurrentSize()};
+          if(r.IsFullyInside(bb))
+            AddToSelection(mgui);
         }
       }
       StopDrag();
@@ -343,14 +370,22 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
   }
 }
 
-void CanvasView::Select(int id){
-  if(selected_id != -1){
-    module_guis[selected_id]->SetHighlight(false);
+void CanvasView::SelectSingle(std::shared_ptr<ModuleGUI> mgui){
+  ClearSelection();
+  AddToSelection(mgui);
+}
+
+void CanvasView::AddToSelection(std::shared_ptr<ModuleGUI> mgui){
+  selection.push_back({mgui, Point2D(0,0)});
+  mgui->SetHighlight(true);
+}
+
+void CanvasView::ClearSelection(){
+  for(auto p : selection){
+    std::shared_ptr<ModuleGUI> mgui = p.first;
+    mgui->SetHighlight(false);
   }
-  selected_id = id;
-  if(selected_id != -1){
-    module_guis[selected_id]->SetHighlight(true);
-  }
+  selection.clear();
 }
 
 void CanvasView::CustomMouseEnter(Point2D pos){
@@ -368,109 +403,121 @@ void CanvasView::CustomMouseLeave(Point2D pos){
   }
 }
 void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
-  if(drag_in_progress && drag_mode == DragModeMove){
-    module_guis[dragged_id]->position = to - drag_offset;
-    SetNeedsRedrawing();
-  }else if(drag_in_progress && drag_mode == DragModeConnectAudioFromInlet){
-    int id = InWhich(to);
-    if(id >= 0){
-      auto whatishere = module_guis[id]->GetWhatIsHere(to - module_guis[id]->position);
-      if(whatishere.type == ModuleGUI::WhatIsHereType::Outlet){
-        potential_wire = PotentialWireMode::New;
-        potential_wire_type = PotentialWireType::Audio;
-        potential_wire_connection = {{id, whatishere.param_id}, {mouse_down_id, mouse_down_elem_paramid}};
-      }else{
-        potential_wire = PotentialWireMode::None;
-      }
-    }else{
-      potential_wire = PotentialWireMode::None;
-    }
-    SetNeedsRedrawing();
-  }else if(drag_in_progress && drag_mode == DragModeConnectAudioFromOutlet){
-    int id = InWhich(to);
-    if(id >= 0){
-      auto whatishere = module_guis[id]->GetWhatIsHere(to - module_guis[id]->position);
-      if(whatishere.type == ModuleGUI::WhatIsHereType::Inlet){
-        potential_wire = PotentialWireMode::New;
-        potential_wire_type = PotentialWireType::Audio;
-        potential_wire_connection = {{mouse_down_id, mouse_down_elem_paramid}, {id, whatishere.param_id}};
-      }else{
-        potential_wire = PotentialWireMode::None;
-      }
-    }else{
-      potential_wire = PotentialWireMode::None;
-    }
-    SetNeedsRedrawing();
-
-  }else if(drag_in_progress && drag_mode == DragModeConnectDataFromInlet){
-    int id = InWhich(to);
-    if(id >= 0){
-      auto whatishere = module_guis[id]->GetWhatIsHere(to - module_guis[id]->position);
-      if(whatishere.type == ModuleGUI::WhatIsHereType::SliderOutput){
-        potential_wire = PotentialWireMode::New;
-        potential_wire_type = PotentialWireType::Data;
-        potential_wire_connection = {{id, whatishere.param_id}, {mouse_down_id, mouse_down_elem_paramid}};
-      }else{
-        potential_wire = PotentialWireMode::None;
-      }
-    }else{
-      potential_wire = PotentialWireMode::None;
-    }
-    SetNeedsRedrawing();
-  }else if(drag_in_progress && drag_mode == DragModeConnectDataFromOutlet){
-    int id = InWhich(to);
-    if(id >= 0){
-      auto whatishere = module_guis[id]->GetWhatIsHere(to - module_guis[id]->position);
-      if(whatishere.type == ModuleGUI::WhatIsHereType::SliderInput){
-        potential_wire = PotentialWireMode::New;
-        potential_wire_type = PotentialWireType::Data;
-        potential_wire_connection = {{mouse_down_id, mouse_down_elem_paramid}, {id, whatishere.param_id}};
-      }else{
-        potential_wire = PotentialWireMode::None;
-      }
-    }else{
-      potential_wire = PotentialWireMode::None;
-    }
-    SetNeedsRedrawing();
-  }else if(drag_in_progress && drag_mode == DragModeSlider){
-
-    module_guis[dragged_id]->SliderDragStep(mouse_down_elem_widgetid, to - module_guis[dragged_id]->position);
-
-  }else if(!drag_in_progress && mouse_down && mouse_down_id >=0 && Point2D::Distance(mouse_down_position, to) > 5 &&
-    ( mouse_down_mode == ModeModuleBody ||
-      mouse_down_mode == ModeInlet      ||
-      mouse_down_mode == ModeOutlet     ||
-      mouse_down_mode == ModeSliderInlet ||
-      mouse_down_mode == ModeSliderOutlet   ) ) {
-    //std::cout << "DRAG start" << std::endl;
-    drag_in_progress = true;
-    drag_offset = mouse_down_offset;
-    dragged_id = mouse_down_id;
-    if(mouse_down_mode == ModeModuleBody){
-      drag_mode = DragModeMove;
-    }else if(mouse_down_mode == ModeInlet){
-      drag_mode = DragModeConnectAudioFromInlet;
-    }else if(mouse_down_mode == ModeOutlet){
-      drag_mode = DragModeConnectAudioFromOutlet;
-    }else if(mouse_down_mode == ModeSliderInlet){
-      drag_mode = DragModeConnectDataFromInlet;
-      std::cout << "Starting data drag from inlet" << std::endl;
-    }else if(mouse_down_mode == ModeSliderOutlet){
-      drag_mode = DragModeConnectDataFromOutlet;
-      std::cout << "Starting data drag from outlet" << std::endl;
-    }
-    // Slider dragging does not require such a huge distance to start.
-  }else if(!drag_in_progress && mouse_down && mouse_down_id >=0 &&
-    ( mouse_down_mode == ModeSlider ) ) {
-    drag_in_progress = true;
-    drag_offset = mouse_down_offset;
-    dragged_id = mouse_down_id;
-    drag_mode = DragModeSlider;
-    module_guis[dragged_id]->SliderDragStart(mouse_down_elem_widgetid, to - module_guis[dragged_id]->position);
-  }
-
-  if(drag_in_progress)
+  if(drag_in_progress){
+    // A drag is already in progress.
     drag_position = to;
+
+    if(drag_mode == DragModeMove){
+
+      // Update selected widgets positions.
+      for(auto& p : selection)
+        p.first->position = drag_position - p.second;
+
+      SetNeedsRedrawing();
+    }else if(drag_mode == DragModeConnectAudioFromInlet){
+      int id = InWhich(drag_position);
+      if(id >= 0){
+        auto whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position);
+        if(whatishere.type == ModuleGUI::WhatIsHereType::Outlet){
+          potential_wire = PotentialWireMode::New;
+          potential_wire_type = PotentialWireType::Audio;
+          potential_wire_connection = {{id, whatishere.param_id}, {mouse_down_id, mouse_down_elem_paramid}};
+        }else{
+          potential_wire = PotentialWireMode::None;
+        }
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+      SetNeedsRedrawing();
+    }else if(drag_mode == DragModeConnectAudioFromOutlet){
+      int id = InWhich(drag_position);
+      if(id >= 0){
+        auto whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position);
+        if(whatishere.type == ModuleGUI::WhatIsHereType::Inlet){
+          potential_wire = PotentialWireMode::New;
+          potential_wire_type = PotentialWireType::Audio;
+          potential_wire_connection = {{mouse_down_id, mouse_down_elem_paramid}, {id, whatishere.param_id}};
+        }else{
+          potential_wire = PotentialWireMode::None;
+        }
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+      SetNeedsRedrawing();
+
+    }else if(drag_mode == DragModeConnectDataFromInlet){
+      int id = InWhich(drag_position);
+      if(id >= 0){
+        auto whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position);
+        if(whatishere.type == ModuleGUI::WhatIsHereType::SliderOutput){
+          potential_wire = PotentialWireMode::New;
+          potential_wire_type = PotentialWireType::Data;
+          potential_wire_connection = {{id, whatishere.param_id}, {mouse_down_id, mouse_down_elem_paramid}};
+        }else{
+          potential_wire = PotentialWireMode::None;
+        }
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+      SetNeedsRedrawing();
+    }else if(drag_mode == DragModeConnectDataFromOutlet){
+      int id = InWhich(drag_position);
+      if(id >= 0){
+        auto whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position);
+        if(whatishere.type == ModuleGUI::WhatIsHereType::SliderInput){
+          potential_wire = PotentialWireMode::New;
+          potential_wire_type = PotentialWireType::Data;
+          potential_wire_connection = {{mouse_down_id, mouse_down_elem_paramid}, {id, whatishere.param_id}};
+        }else{
+          potential_wire = PotentialWireMode::None;
+        }
+      }else{
+        potential_wire = PotentialWireMode::None;
+      }
+      SetNeedsRedrawing();
+    }else if(drag_mode == DragModeSlider){
+      module_guis[mouse_down_id]->SliderDragStep(mouse_down_elem_widgetid, drag_position - module_guis[mouse_down_id]->position);
+    }else if(drag_mode == DragModeBBSelect){
+      SetNeedsRedrawing();
+    }
+  }else{
+    // No drag in progress.
+    if(mouse_down && Point2D::Distance(mouse_down_position, to) > 5 &&
+      ( mouse_down_mode == ModeModuleBody ||
+        mouse_down_mode == ModeInlet      ||
+        mouse_down_mode == ModeOutlet     ||
+        mouse_down_mode == ModeSliderInlet ||
+        mouse_down_mode == ModeSliderOutlet ||
+        mouse_down_mode == ModeNone ) ) {
+      //std::cout << "DRAG start" << std::endl;
+      drag_in_progress = true;
+      if(mouse_down_mode == ModeModuleBody){
+        drag_mode = DragModeMove;
+        // Store move drag offsets.
+        for(auto &p : selection)
+          p.second = mouse_down_position - p.first->position;
+
+      }else if(mouse_down_mode == ModeInlet){
+        drag_mode = DragModeConnectAudioFromInlet;
+      }else if(mouse_down_mode == ModeOutlet){
+        drag_mode = DragModeConnectAudioFromOutlet;
+      }else if(mouse_down_mode == ModeSliderInlet){
+        drag_mode = DragModeConnectDataFromInlet;
+      }else if(mouse_down_mode == ModeSliderOutlet){
+        drag_mode = DragModeConnectDataFromOutlet;
+      }else if(mouse_down_mode == ModeNone){
+        drag_mode = DragModeBBSelect;
+        std::cout << "Starting BBSelect drag" << std::endl;
+      }
+      // Slider dragging does not require such a huge distance to start.
+    }else if(mouse_down && mouse_down_id >=0 &&
+      ( mouse_down_mode == ModeSlider ) ) {
+      drag_in_progress = true;
+      drag_mode = DragModeSlider;
+      std::cout << "Slider drag." << std::endl;
+      module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid, to - module_guis[mouse_down_id]->position);
+    }
+  }
 
   // standard motion?
   int id1 = InWhich(from), id2 = InWhich(to);
@@ -485,19 +532,31 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
   }
 }
 
+void CanvasView::OnKeyboard(KeyData k){
+  if(k.type == KeyData::KeyType::Delete && k.pressed){
+    RemoveSelected();
+  }
+  if(k.type == KeyData::KeyType::Shift) shift_held = k.pressed;
+  if(k.type == KeyData::KeyType::Alt) alt_held = k.pressed;
+  if(k.type == KeyData::KeyType::Ctrl) ctrl_held = k.pressed;
+
+  // TODO: pass events to children
+}
+
 void CanvasView::StopDrag(){
   //std::cout << "Stopping drag" << std::endl;
   drag_in_progress = false;
-  dragged_id = -1;
   potential_wire = PotentialWireMode::None;
 }
 
 void CanvasView::RemoveSelected(){
-  if(selected_id < 0) return;
-  auto m = module_guis[selected_id]->GetModule();
-  if(m) canvas->RemoveModule(m);
-  module_guis.erase(module_guis.begin() + selected_id);
-  selected_id = -1; // Warning: Do not use Select() here, because the selected module just stopped existing!
+  for(auto p : selection){
+    std::shared_ptr<ModuleGUI> mgui = p.first;
+    std::shared_ptr<Module> module = mgui->GetModule();
+    if(module) canvas->RemoveModule(module);
+    module_guis.erase(std::remove(module_guis.begin(), module_guis.end(), mgui), module_guis.end());
+  }
+  selection.clear();
   StopDrag();
   SetNeedsRedrawing();
 }

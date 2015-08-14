@@ -52,6 +52,7 @@ public:
     Color button2_color = Theme::Get("bg-button-neutral")
   ) override;
   LateReturn<> ShowErrorAlert(std::string message, std::string button_text) override;
+  void ProcessKeyboardEvent(KeyData data) override;
 private:
   MainWindow();
   void init();

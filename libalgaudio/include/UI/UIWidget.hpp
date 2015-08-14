@@ -93,6 +93,11 @@ public:
      Except for serval cases, a widget shall never be drawn smaller than its
      requested size. */
   Size2D GetRequestedSize() const;
+  /* The current size is the actual size this widget takes on screen. This is
+     exactly the dimensions of the DrawContext from the last time this widget
+     was drawn. Note that before a widget is drawn for the first time, this
+     value is unspecified. */
+  Size2D GetCurrentSize() const {return current_size;}
 
   /* If you want to unset a custom-size, simply set the desired dimension(s) to
     0, so that minimal-size will always take precedence. */

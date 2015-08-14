@@ -87,6 +87,12 @@ void MainWindow::init(){
     };
     */
   });
+
+}
+
+void MainWindow::ProcessKeyboardEvent(KeyData data){
+  // Pass all key events to the canvasview.
+  canvasview->OnKeyboard(data);
 }
 
 std::shared_ptr<MainWindow> MainWindow::Create(){
