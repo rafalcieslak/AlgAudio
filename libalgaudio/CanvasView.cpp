@@ -354,12 +354,12 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
     try{
       canvas->Connect(from,to);
       FadeoutWireStart(PotentialWireMode::New);
-    }catch(MultipleConnectionsException){
-      window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
-    }catch(ConnectionLoopException){
-      window.lock()->ShowErrorAlert("Cannot add the selected connection, it would create a loop.", "Cancel connection");
-    }catch(DoubleConnectionException){
-      window.lock()->ShowErrorAlert("The selected connection already exists!", "Cancel connection");
+    }catch(MultipleConnectionsException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
+    }catch(ConnectionLoopException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
+    }catch(DoubleConnectionException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
     }
   }else{
     // This connection already exists, remove it.
@@ -388,12 +388,12 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
     try{
       canvas->ConnectData(from,to,Canvas::DataConnectionMode::Relative);
       FadeoutWireStart(PotentialWireMode::New);
-    }catch(MultipleConnectionsException){
-      window.lock()->ShowErrorAlert("Multiple connections from a single outlet are not yet implemented.", "Cancel connection");
-    }catch(ConnectionLoopException){
-      window.lock()->ShowErrorAlert("Cannot add the selected connection, it would create a loop.", "Cancel connection");
-    }catch(DoubleConnectionException){
-      window.lock()->ShowErrorAlert("The selected connection already exists!", "Cancel connection");
+    }catch(MultipleConnectionsException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
+    }catch(ConnectionLoopException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
+    }catch(DoubleConnectionException ex){
+      window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
     }
   }else{
     // This connection already exists, remove it.

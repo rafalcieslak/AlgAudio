@@ -122,7 +122,7 @@ void Canvas::Connect(IOID from, IOID to){
   }
 
   if(TestNewConnectionForLoop(from, to))
-    throw ConnectionLoopException("Adding this connection would close a loop.");
+    throw ConnectionLoopException("Cannot add the selected connection, adding it would close a loop.");
 
   auto it = audio_connections.find(from);
   if(it == audio_connections.end()){
@@ -134,9 +134,11 @@ void Canvas::Connect(IOID from, IOID to){
     // Not the first connectin from this inlet.
     auto it2 = std::find(it->second.begin(), it->second.end(), to);
     if(it2 != it->second.end()) // if found
-      throw DoubleConnectionException("This connection already exists!");
-    else
-      throw MultipleConnectionsException("Multiple connections from a single outlet are not yet supported.");
+      throw DoubleConnectionException("Cannot add the connection, it already exists!");
+    else{
+      if(audio_connections[from].size() >= 2) throw MultipleConnectionsException("Cannot add another connection to the same outlet, maximum reached.");
+      audio_connections[from].push_back(to);
+    }
   }
 
   std::cout << "Connecting" << std::endl;

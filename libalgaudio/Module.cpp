@@ -131,7 +131,7 @@ void Module::Outlet::SendConnections(){
   m.add_int32(mod.sc_id);
   m.add_string(id);
   for(auto& b : buses) m.add_int32(b.lock()->GetID());
-  if(buses.size() == 0) m.add_int32(99999999);
+  if(buses.size() == 0) m.add_int32(-1);
   SCLang::SendOSCCustom("/algaudioSC/connectoutlet", m);
 }
 
