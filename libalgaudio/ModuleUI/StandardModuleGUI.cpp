@@ -17,8 +17,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "ModuleUI/StandardModuleGUI.hpp"
+#include <cstring>
 #include "ModuleTemplate.hpp"
-#include <SDL2/SDL.h>
 #include "Theme.hpp"
 #include "TextRenderer.hpp"
 #include "rapidxml/rapidxml.hpp"
@@ -255,8 +255,8 @@ Point2D StandardModuleGUI::IOConn::GetRectPos() const{
   return Point2D(x,y);
 }
 
-bool StandardModuleGUI::IOConn::CustomMousePress(bool down, short b,Point2D pos){
-  if(b == SDL_BUTTON_LEFT && pos.IsInside(GetRectPos(),GetRectSize())){
+bool StandardModuleGUI::IOConn::CustomMousePress(bool down, MouseButton b,Point2D pos){
+  if(b == MouseButton::Left && pos.IsInside(GetRectPos(),GetRectSize())){
     on_press.Happen(down);
     return true;
   }

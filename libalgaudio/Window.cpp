@@ -126,7 +126,7 @@ void Window::ProcessResizeEvent(){
   needs_redrawing = true;
 }
 
-void Window::ProcessMouseButtonEvent(bool d, short b, Point2D p){
+void Window::ProcessMouseButtonEvent(bool d, MouseButton b, Point2D p){
   if(child)
     child->OnMousePress(d,b,p);
 }

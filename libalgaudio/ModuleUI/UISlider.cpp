@@ -22,9 +22,6 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "TextRenderer.hpp"
 
-// Just because we need SDL_BUTTON_LEFT. TODO: Create a custom button number enum.
-#include <SDL2/SDL.h>
-
 namespace AlgAudio{
 
 UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> c) : UIWidget(parent_window), controller(c) {
@@ -164,8 +161,8 @@ void UISlider::CustomDraw(DrawContext& c){
 
 }
 
-bool UISlider::CustomMousePress(bool down, short b,Point2D pos){
-  if(pos.IsInside(GetBodyRect()) && down && b == SDL_BUTTON_LEFT && mode == Mode::Slider){
+bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){
+  if(pos.IsInside(GetBodyRect()) && down && b == MouseButton::Left && mode == Mode::Slider){
     float x = pos.x - GetBodyStart();
     float q = x / GetBodyWidth();
     float val = current_range_min + (current_range_max - current_range_min) * q;

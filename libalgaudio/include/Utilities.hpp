@@ -157,6 +157,13 @@ struct KeyData{
   bool IsPrintable() const {return type == Letter || type == Digit || type == Symbol || type == Text;}
 };
 
+// Custom enum for identifying mouse buttons
+enum class MouseButton{
+  Left,
+  Right,
+  Middle
+};
+
 
 class Utilities{
 private:

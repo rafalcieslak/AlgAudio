@@ -31,7 +31,7 @@ public:
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;
-  virtual bool CustomMousePress(bool,short,Point2D) override;
+  virtual bool CustomMousePress(bool,MouseButton,Point2D) override;
   virtual void CustomMouseEnter(Point2D) override;
   virtual void CustomMouseLeave(Point2D) override;
   virtual void CustomMouseMotion(Point2D p1, Point2D p2) override;

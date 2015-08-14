@@ -17,7 +17,6 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
-#include <SDL2/SDL.h>
 #include <algorithm>
 #include "Window.hpp"
 
@@ -175,14 +174,14 @@ int CanvasView::InWhich(Point2D p){
   return -1;
 }
 
-bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
+bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos){
   int id = InWhich(pos);
   Point2D offset;
 
   if(id >=0 ){
     offset = pos - module_guis[id]->position;
   }
-  if(down == true && b == SDL_BUTTON_LEFT){
+  if(down == true && b == MouseButton::Left){
 
     // When a module was just added, it is dragged with LMB up. The drag is
     // stopped by clicking. We want to ignore that click, so generally let's skip
@@ -190,13 +189,13 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
     if(drag_in_progress) return true;
 
     // Mouse button down
-    mouse_down = true;
+    lmb_down = true;
     mouse_down_position = pos;
     mouse_down_id = id;
     mouse_down_mode = ModeNone;
     if(id < 0){
       // Mouse buton down on an empty space
-      if(down == true && b == SDL_BUTTON_LEFT)
+      if(down == true && b == MouseButton::Left)
         ClearSelection();
     }else{
       // Mouse button down on some module
@@ -213,7 +212,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
       }else if(whatishere.type == ModuleGUI::WhatIsHereType::SliderBody){
-        module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
+        module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
         mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
@@ -226,7 +225,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
       }else if(whatishere.type == ModuleGUI::WhatIsHereType::Nothing){
-        bool captured = module_guis[id]->OnMousePress(true, SDL_BUTTON_LEFT, offset);
+        bool captured = module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
         if(!captured) mouse_down_mode = ModeModuleBody;
         else mouse_down_mode = ModeCaptured;
       }else{
@@ -251,9 +250,9 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       }
     }
   }
-  if(down == false && b == SDL_BUTTON_LEFT){
+  if(down == false && b == MouseButton::Left){
     // Mouse button up
-    mouse_down = false;
+    lmb_down = false;
 
     if(drag_in_progress){
       if(drag_mode == DragModeSlider){
@@ -302,7 +301,7 @@ bool CanvasView::CustomMousePress(bool down,short b,Point2D pos){
       SetNeedsRedrawing();
     }else{
       // No drag in progress.
-      if(id >= 0) module_guis[id]->OnMousePress(false, SDL_BUTTON_LEFT, offset);
+      if(id >= 0) module_guis[id]->OnMousePress(false, MouseButton::Left, offset);
     }
   }
   return true;
@@ -395,7 +394,7 @@ void CanvasView::CustomMouseEnter(Point2D pos){
   }
 }
 void CanvasView::CustomMouseLeave(Point2D pos){
-  if(mouse_down) mouse_down = false;
+  if(lmb_down) lmb_down = false;
   if(drag_in_progress) StopDrag();
   int id = InWhich(pos);
   if(id != -1){
@@ -482,7 +481,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
     }
   }else{
     // No drag in progress.
-    if(mouse_down && Point2D::Distance(mouse_down_position, to) > 5 &&
+    if(lmb_down && Point2D::Distance(mouse_down_position, to) > 5 &&
       ( mouse_down_mode == ModeModuleBody ||
         mouse_down_mode == ModeInlet      ||
         mouse_down_mode == ModeOutlet     ||
@@ -510,7 +509,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
         std::cout << "Starting BBSelect drag" << std::endl;
       }
       // Slider dragging does not require such a huge distance to start.
-    }else if(mouse_down && mouse_down_id >=0 &&
+    }else if(lmb_down && mouse_down_id >=0 &&
       ( mouse_down_mode == ModeSlider ) ) {
       drag_in_progress = true;
       drag_mode = DragModeSlider;

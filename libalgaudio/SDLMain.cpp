@@ -102,7 +102,11 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
       window->ProcessResizeEvent();
     }
   }else if(ev.type == SDL_MOUSEBUTTONDOWN || ev.type == SDL_MOUSEBUTTONUP){
-    window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), ev.button.button, Point2D(ev.button.x, ev.button.y));
+    MouseButton b;
+    if(ev.button.button == SDL_BUTTON_LEFT) b = MouseButton::Left;
+    if(ev.button.button == SDL_BUTTON_RIGHT) b = MouseButton::Right;
+    if(ev.button.button == SDL_BUTTON_MIDDLE) b = MouseButton::Middle;
+    window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), b, Point2D(ev.button.x, ev.button.y));
   }else if(ev.type == SDL_MOUSEMOTION){
     window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
   }else if(ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP){

@@ -65,7 +65,7 @@ void UIMarginBox::OnChildVisibilityChanged(){
   //  SetMinimalSize(Size2D(top+bottom, left+right));
 }
 
-bool UIMarginBox::CustomMousePress(bool down, short b,Point2D p){
+bool UIMarginBox::CustomMousePress(bool down, MouseButton b,Point2D p){
   if(!child) return false;
   if(IsInside(p))
     return child->OnMousePress(down,b,p - Point2D(left,top));

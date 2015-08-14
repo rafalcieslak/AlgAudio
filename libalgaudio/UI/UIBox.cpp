@@ -202,7 +202,7 @@ int UIBox::InWhich(Point2D p) const{
   return -1;
 }
 
-bool UIBox::CustomMousePress(bool down, short b,Point2D p){
+bool UIBox::CustomMousePress(bool down, MouseButton b,Point2D p){
   int n = InWhich(p);
   if(n<0) return false;
   return children[n].child->OnMousePress(down,b,p - GetChildLocation(n));

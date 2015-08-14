@@ -30,11 +30,11 @@ public:
   Signal<Point2D> on_motion;
   // Returns true, if the press event was captured (performed anything
   // meaningful), and false in any other case.
-  bool OnMousePress(bool,short,Point2D);
+  bool OnMousePress(bool,MouseButton,Point2D);
   void OnMouseEnter(Point2D);
   void OnMouseLeave(Point2D);
   void OnMouseMotion(Point2D,Point2D);
-  virtual bool CustomMousePress(bool,short,Point2D) {return false;}
+  virtual bool CustomMousePress(bool,MouseButton,Point2D) {return false;}
   virtual void CustomMouseEnter(Point2D) {}
   virtual void CustomMouseLeave(Point2D) {}
   virtual void CustomMouseMotion(Point2D,Point2D) {}

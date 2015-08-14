@@ -37,7 +37,7 @@ public:
   // Creates a new empty instance of this widget.
   static std::shared_ptr<CanvasView> CreateEmpty(std::shared_ptr<Window> parent);
   virtual void CustomDraw(DrawContext& c);
-  virtual bool CustomMousePress(bool,short,Point2D);
+  virtual bool CustomMousePress(bool,MouseButton,Point2D);
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
   virtual void CustomMouseMotion(Point2D,Point2D);
@@ -62,7 +62,7 @@ private:
   int CurveStrengthFuncA(Point2D a, Point2D b);
   int CurveStrengthFuncB(Point2D a, Point2D b);
   // This flag is set according to the LMB state.
-  bool mouse_down = false;
+  bool lmb_down = false;
   // What happened the last time the mouse button was pressed down?
   // This information is important to determine what to do when a drag starts.
   enum MouseDownMode{

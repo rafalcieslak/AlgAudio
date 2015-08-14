@@ -51,7 +51,7 @@ public:
   void SetNeedsRedrawing();
 
   void ProcessCloseEvent();
-  void ProcessMouseButtonEvent(bool down, short button, Point2D);
+  void ProcessMouseButtonEvent(bool down, MouseButton button, Point2D);
   void ProcessMotionEvent(Point2D);
   void ProcessEnterEvent();
   void ProcessLeaveEvent();

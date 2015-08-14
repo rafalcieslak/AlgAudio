@@ -17,19 +17,18 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/UIMouseEventsBase.hpp"
-#include <SDL2/SDL.h>
 
 namespace AlgAudio{
 
-bool UIMouseEventsBase::OnMousePress(bool down, short b,Point2D p){
+bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
   bool result = CustomMousePress(down,b,p);
   if(result) return true; // The custom handler captured the event
   // In other case, execute our own code
-  if(down == true && b == SDL_BUTTON_LEFT){
+  if(down == true && b == MouseButton::Left){
     pressed = true;
     if(focusable) RequestFocus();
     return on_pressed.Happen(true);
-  }else if(down == false && b == SDL_BUTTON_LEFT && pressed == true){
+  }else if(down == false && b == MouseButton::Left && pressed == true){
     pressed = false;
     result = on_pressed.Happen(false);
     if(result) return true;
