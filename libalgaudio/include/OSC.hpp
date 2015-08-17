@@ -63,23 +63,22 @@ public:
   void Send(std::string path, lo::Message);
   void Send(std::string path, std::function<void(lo::Message)> reply_action, lo::Message);
 
-  // Set the function to be called when a SendReply arrives.
-  void SetSendreplyCacher(std::function<void(int, int, float)> f){
-    sendreply_catcher = f;
-  }
-
   // Called by the main thread when new OSC replies are ready to process.
   // The server thread cannot interact with the application, so it stores
   // functions it would like to call into a list, and then the main thread
   // calls them using this method.
   void TriggerReplies();
 
+  // Adds a new method handler. This function will be called when an OSC message
+  // is received on the chosen path. The handler will not be called
+  // immediatelly, instead the main thread will call it soon after. This way
+  // you can assume your handler will be always called by the main thread.
+  void AddMethodHandler(std::string path, std::function<void(lo::Message)>);
+
 private:
   // The OSC listener.
   std::unique_ptr<lo::ServerThread> server;
   lo::Address addr;
-
-  std::function<void(int, int, float)> sendreply_catcher;
 
   // OSC Message identifier for numbering replies.
   static int msg_id;

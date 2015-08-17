@@ -70,7 +70,7 @@ void SCLang::Start(std::string command, bool supernova){
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
       osc = std::make_unique<OSC>("localhost", port);
-      osc->SetSendreplyCacher([](int x, int y, float z){SCLang::SendReplyCatcher(x,y,z);});
+      osc->AddMethodHandler("/algaudio/sendreply", [](lo::Message msg){SendReplyCatcher(msg.argv()[0]->i32, msg.argv()[1]->i32, msg.argv()[2]->f); });
       SendOSCWithEmptyReply("/algaudioSC/hello").Then([supernova](){
         on_start_progress.Happen(5,"Booting server...");
         BootServer(supernova);
@@ -86,7 +86,7 @@ void SCLang::Start(std::string command, bool supernova){
             // Server failed to boot
             on_start_completed.Happen(false,"SC Server failed to start");
           }
-        });
+        }); // on_server_started
       }); // /algaudioSC/hello
     }); // sendinstruction port
   }); // subprocess started
