@@ -42,7 +42,7 @@ SendReply.kr(Impulse.kr(30), '/algaudioSC/sendreply', signal_db, amp_reply);
     <params>
       <inlet id="in"/>
       <outlet id="out"/>
-      <param id="base" name="Base freq" defaultmin="0.0" defaultmax="1000.0" defaultval="300"/>
+      <param id="base" name="Base freq" defaultmin="40.0" defaultmax="5000.0" defaultval="300" scale="log"/>
       <param id="amt" name="Mod. amount" defaultmin="0.0" defaultmax="200.0" defaultval="50"/>
     </params>
     <description> A simple voltage controlled oscillator. </description>
@@ -56,7 +56,7 @@ Out.ar(out, SinOsc.ar((In.ar(in)*amt)+base, 0, 1));
   <module id="lfsine1" name="Low frequency sine">
     <params>
       <outlet id="out"/>
-      <param id="freq" name="Frequency" defaultmin="0.0" defaultmax="8.0" defaultval="3"/>
+      <param id="freq" name="Frequency" defaultmin="0.1" defaultmax="10.0" defaultval="3" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
     </params>
     <description> A simple low frequency oscillator with customizable frequency. </description>
@@ -70,7 +70,7 @@ Out.ar(out, SinOsc.ar(freq, 0, amp));
   <module id="lfsquare1" name="Low frequency square">
     <params>
       <outlet id="out"/>
-      <param id="freq" name="Frequency" defaultmin="0.0" defaultmax="8.0" defaultval="3"/>
+      <param id="freq" name="Frequency" defaultmin="0.1" defaultmax="10.0" defaultval="3" scale="log"/>
       <param id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
     </params>
@@ -110,7 +110,7 @@ Out.ar(out, gain * PinkNoise.ar());
   <module id="sine" name="Sine oscillator">
     <params>
       <outlet id="outbus"/>
-      <param id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
     </params>
     <description> A customizable sine oscillator. </description>
@@ -125,7 +125,7 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
   <module id="square" name="Square oscillator">
     <params>
       <outlet id="outbus"/>
-      <param id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
     </params>
@@ -140,7 +140,7 @@ Out.ar(outbus, Pulse.ar(freq,dc,amp));
   <module id="saw" name="Sawtooth oscillator">
     <params>
       <outlet id="outbus"/>
-      <param id="freq" name="Frequency" defaultmin="10.0" defaultmax="1000.0" defaultval="440.0"/>
+      <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
     </params>
     <description> A customizable sawtooth oscillator. </description>

@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Module.hpp"
 #include <algorithm>
+#include <cmath>
 #include "ModuleTemplate.hpp"
 #include "SCLang.hpp"
 #include "ModuleUI/StandardModuleGUI.hpp"
@@ -57,8 +58,24 @@ void ParamController::Set(float value){
   after_set.Happen(value, relative);
 }
 
-void ParamController::SetRelative(float value){
-  Set(range_min + value*(range_max - range_min));
+void ParamController::SetRelative(float q){
+  if(templ->scale == ParamTemplate::ParamScale::Linear){
+    Set(range_min + q*(range_max - range_min));
+  }else if(templ->scale == ParamTemplate::ParamScale::Logarithmic){
+    Set(range_min * pow(range_max / range_min, q));
+  }else{
+    // ??? Wil not happen.
+  }
+}
+
+float ParamController::GetRelative() const {
+  if(templ->scale == ParamTemplate::ParamScale::Linear){
+    return (current_val - range_min)/(range_max - range_min);
+  }else if(templ->scale == ParamTemplate::ParamScale::Logarithmic){
+    return log(current_val / range_min) / log(range_max / range_min);
+  }else{
+    return 0.0; // ??? Will not happen.
+  }
 }
 
 void ParamController::Reset(){

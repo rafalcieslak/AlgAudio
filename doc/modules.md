@@ -110,6 +110,8 @@ Child nodes: **(all are optional and may appear more than once!)**
 
     - `defaultmin`, `defaultmax` - *optional, default values: `0.0` and `1.0`* - The default range for this parameter.
 
+    - `scale` - *optional, default value: `lin`* - Defines the scale for this parameter. Can be `log` for logarithmic scale, or `lin` for linear.
+
     - `name` - *optional*. This attributes are only significant when automatically building module GUI. It will be passed to slider configuration. See `gui` node, especially `slider`, for details.
 
   - `reply` - Specifies a value reply from the synth to AlgAudio. This is useful if your synth performs some kind of signal analysis (e.g. amplitude measuring or pitch detection) and you want to send a result from the synth back to your module in AlgAudio.

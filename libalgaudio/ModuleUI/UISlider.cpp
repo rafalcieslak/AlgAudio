@@ -132,8 +132,8 @@ void UISlider::CustomDraw(DrawContext& c){
 
     auto contr = controller.lock();
     if(contr){
-      float q = (current_value - current_range_min)/(current_range_max - current_range_min);
-      float pos = std::max(0.0f, std::min(q, 1.0f));
+      float p = contr->GetRelative();
+      float pos = std::max(0.0f, std::min(p, 1.0f));
       float x = GetBodyStart() + pos*(GetBodyWidth());
 
       c.SetColor(Theme::Get("slider-marker"));
@@ -204,7 +204,7 @@ void UISlider::CustomMouseLeave(Point2D){
 
 void UISlider::DragStart(){
   dragged = true;
-  drag_start_q = (current_value - current_range_min)/(current_range_max - current_range_min);
+  drag_start_q = controller.lock()->GetRelative();
   SetNeedsRedrawing();
 }
 void UISlider::DragStep(Point2D_<float> offset){

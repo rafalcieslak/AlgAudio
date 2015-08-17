@@ -62,7 +62,7 @@ public:
   void SetRelative(float value);
   void Reset();
   inline float Get() const {return current_val;}
-  inline float GetRelative() const {return (current_val - range_min)/(range_max - range_min);}
+  float GetRelative() const;
   inline void SetRangeMin(float v) {range_min = v; }
   inline void SetRangeMax(float v) {range_max = v; }
   inline float GetRangeMin() const {return range_min;}

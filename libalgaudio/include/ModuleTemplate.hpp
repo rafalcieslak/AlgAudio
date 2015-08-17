@@ -58,13 +58,18 @@ public:
     Custom,
     None,
   };
+  ParamAction action;
   enum class ParamMode{
     Input,
     Output,
     None,
   };
-  ParamAction action;
   ParamMode mode = ParamMode::Input;
+  enum class ParamScale{
+    Linear,
+    Logarithmic
+  };
+  ParamScale scale;
   float default_min, default_max;
   float default_val;
 };

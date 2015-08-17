@@ -82,7 +82,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
         if(mode == "input") p->mode = ParamTemplate::ParamMode::Input;
         else if(mode == "output") p->mode = ParamTemplate::ParamMode::Output;
         else if(mode == "none") p->mode = ParamTemplate::ParamMode::None;
-        else throw ModuleParseException(id, "A param has invalid mode value: " + mode);
+        else throw ModuleParseException(id, "Param '" + p->id + "' has invalid mode value: " + mode);
       }
 
       xml_attribute<>* param_defaultmax = param_node->first_attribute("defaultmax");
@@ -94,6 +94,15 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       xml_attribute<>* param_defaultval = param_node->first_attribute("defaultval");
       if(!param_defaultval) p->default_val = 1.0;
       else p->default_val = std::stof(param_defaultval->value());
+
+      xml_attribute<>* param_scale = param_node->first_attribute("scale");
+      if(!param_scale) p->scale = ParamTemplate::ParamScale::Linear;
+      else{
+        std::string scale = param_scale->value();
+        if(scale == "lin") p->scale = ParamTemplate::ParamScale::Linear;
+        else if(scale == "log") p->scale = ParamTemplate::ParamScale::Logarithmic;
+        else throw ModuleParseException(id, "Param '" + p->id + "' has invalid scale value: " + scale);
+      }
 
       xml_attribute<>* action = param_node->first_attribute("action");
       if(!action){
