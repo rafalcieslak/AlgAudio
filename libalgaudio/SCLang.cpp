@@ -168,7 +168,7 @@ LateReturn<> SCLang::InstallTemplate(const std::shared_ptr<ModuleTemplate> t){
   if(!t->has_sc_code) return r.Return();
   SendOSCWithEmptyReply("/algaudioSC/installtemplate", "ss", t->GetFullID().c_str(), t->sc_code.c_str()).Then([=](){
     installed_templates.insert(t->GetFullID());
-    std::cout << "Got install reply!" << std::endl;
+    std::cout << "Template " << t->GetFullID() << " installed." << std::endl;
     r.Return();
   });
   return r;

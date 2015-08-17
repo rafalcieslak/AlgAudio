@@ -86,6 +86,7 @@ void LaunchConfigWindow::init(){
     statustext->SetBold(false);
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
+    std::cout << "Progress " << n << std::endl;
     progressbar->SetAmount(n/10.0);
     statustext->SetText(msg);
   });

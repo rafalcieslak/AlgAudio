@@ -110,25 +110,12 @@ std::shared_ptr<ModuleTemplate> ModuleCollection::GetTemplateByID(std::string id
   else return it->second;
 }
 
-LateReturn<> ModuleCollection::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleTemplate>>::iterator from){
-  auto r = Relay<>::Create();
-  if(from == templates_by_id.end()){
-    return r.Return();
-  };
-  std::cout << "Installing template " << (from->second)->name << std::endl;
-  SCLang::InstallTemplate(from->second).Then([=]()mutable{
-    from++;
-    InstallAllTemplatesIntoSC(from).Then([=](){
-      r.Return();
-    });
-  });
-  return r.GetLateReturn();
-}
-
 LateReturn<> ModuleCollection::InstallAllTemplatesIntoSC(){
-  auto r = Relay<>::Create();
-  InstallAllTemplatesIntoSC( templates_by_id.begin() ).ThenReturn(r);
-  return r.GetLateReturn();
+  Relay<> r;
+  Sync s(templates_by_id.size());
+  for(auto &t : templates_by_id) SCLang::InstallTemplate(t.second).ThenSync(s);
+  s.WhenAll([r](){ r.Return(); });
+  return r;
 }
 
 std::shared_ptr<ModuleCollection> ModuleCollectionBase::GetCollectionByID(std::string id){
@@ -194,27 +181,12 @@ std::string ModuleCollectionBase::ListInstalledTemplates(){
   return result;
 }
 
-
-
-LateReturn<> ModuleCollectionBase::InstallAllTemplatesIntoSC(std::map<std::string, std::shared_ptr<ModuleCollection>>::iterator from){
-  auto r = Relay<>::Create();
-  if(from == collections_by_id.end()){
-    return r.Return();
-  };
-  std::cout << "Installing collection " << from->second->name << std::endl;
-  (from->second)->InstallAllTemplatesIntoSC().Then([=]()mutable{
-    from++;
-    InstallAllTemplatesIntoSC(from).Then([=](){
-      r.Return();
-    });
-  });
-  return r.GetLateReturn();
-}
-
 LateReturn<> ModuleCollectionBase::InstallAllTemplatesIntoSC(){
-  auto r = Relay<>::Create();
-  InstallAllTemplatesIntoSC( collections_by_id.begin() ).ThenReturn(r);
-  return r.GetLateReturn();
+  Relay<> r;
+  Sync s(collections_by_id.size());
+  for(auto &t : collections_by_id) t.second->InstallAllTemplatesIntoSC().ThenSync(s);
+  s.WhenAll([r](){  r.Return(); });
+  return r;
 }
 
 const std::map<std::string, std::shared_ptr<ModuleCollection>>& ModuleCollectionBase::GetCollections(){
