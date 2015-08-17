@@ -44,6 +44,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
+// MIDI handlers
+~midinoteon = {arg src, chan, num, vel; ~addr.sendMsg("/algaudio/midiin", 1, chan, num, vel); };
+~midinoteoff = {arg src, chan, num, vel; ~addr.sendMsg("/algaudio/midiin", 2, chan, num, vel); };
+~midicontrol = { arg src, chan, num, val; ~addr.sendMsg("/algaudio/midiin", 3, chan, num, val); };
 
 // This method estabilishes two-way osc connection
 OSCdef.new( 'hello', {
@@ -54,6 +58,13 @@ OSCdef.new( 'hello', {
 		~minstances = Dictionary.new(0);
 		~buses = Dictionary.new(0);
 		"Hello World!".postln;
+		// Initialize MIDI
+		MIDIClient.free;
+		MIDIClient.init;
+		MIDIIn.connectAll;
+		MIDIIn.addFuncTo(\noteOn, ~midinoteon);
+		MIDIIn.addFuncTo(\noteOff, ~midinoteoff);
+		MIDIIn.addFuncTo(\control, ~midicontrol);
 		~addr.sendMsg("/algaudio/reply",msg[msg.size-1]);
 	}, '/algaudioSC/hello'
 ).postln;

@@ -65,6 +65,8 @@ public:
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
 
+  static Signal<MidiMessage> on_midi_message_received;
+
   // Various functions and type templates for OSC communication.
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
@@ -98,7 +100,7 @@ private:
   static bool osc_debug;
   static std::unique_ptr<OSC> osc;
   static void SendReplyCatcher(int synth_id, int reply_id, float value);
-
+  static void ProcessMIDIInput(lo::Message);
   static std::map<std::pair<int,int>, std::weak_ptr<SendReplyController>> sendreply_map;
   static int sendreply_id;
 };

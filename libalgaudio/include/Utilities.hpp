@@ -164,6 +164,19 @@ enum class MouseButton{
   Middle
 };
 
+struct MidiMessage{
+  enum class Type{
+    NoteOn,
+    NoteOff,
+    Control,
+  };
+  Type type;
+  unsigned char channel;
+  unsigned char number;
+  unsigned char velocity;
+  unsigned char value;
+};
+
 
 class Utilities{
 private:

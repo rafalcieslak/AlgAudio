@@ -95,6 +95,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
         );
     }
   }else{
+    res->PrepareParamControllers();
     res->enabled_by_factory = true;
     res->on_init();
     r.Return(res);

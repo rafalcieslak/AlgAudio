@@ -259,4 +259,20 @@ Out.ar(outbus,IFFT(chain));
     <gui type="standard auto"/>
   </module>
 
+  <module id="midiin-ctrl" name="Midi input - control">
+    <params>
+      <param id="ctrl0" mode="output" name="Ctrl 0" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl1" mode="output" name="Ctrl 1" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl2" mode="output" name="Ctrl 2" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl3" mode="output" name="Ctrl 3" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl4" mode="output" name="Ctrl 4" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl5" mode="output" name="Ctrl 5" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl6" mode="output" name="Ctrl 6" defaultmin="0" defaultmax="127"/>
+      <param id="ctrl7" mode="output" name="Ctrl 7" defaultmin="0" defaultmax="127"/>
+    </params>
+    <description> MIDI controler input is exposed via this module. </description>
+    <class name="MIDICtrl"/>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>

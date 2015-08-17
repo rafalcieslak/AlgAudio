@@ -36,6 +36,7 @@ std::set<std::string> SCLang::installed_templates;
 Signal<std::string> SCLang::on_line_received;
 Signal<bool, std::string> SCLang::on_start_completed;
 Signal<bool> SCLang::on_server_started;
+Signal<MidiMessage> SCLang::on_midi_message_received;
 Signal<int,std::string> SCLang::on_start_progress;
 bool SCLang::osc_debug = false;
 bool SCLang::ready = false;
@@ -70,6 +71,7 @@ void SCLang::Start(std::string command, bool supernova){
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
       osc = std::make_unique<OSC>("localhost", port);
+      osc->AddMethodHandler("/algaudio/midiin", ProcessMIDIInput);
       osc->AddMethodHandler("/algaudio/sendreply", [](lo::Message msg){SendReplyCatcher(msg.argv()[0]->i32, msg.argv()[1]->i32, msg.argv()[2]->f); });
       SendOSCWithEmptyReply("/algaudioSC/hello").Then([supernova](){
         on_start_progress.Happen(5,"Booting server...");
@@ -227,6 +229,32 @@ void SCLang::UnregisterSendReply(int synth_id, int reply_id){
     return;
   }
   sendreply_map.erase(it);
+}
+
+void SCLang::ProcessMIDIInput(lo::Message msg){
+  MidiMessage m;
+  int t = msg.argv()[0]->i32;
+  if(t == 1){
+    m.type = MidiMessage::Type::NoteOn;
+    m.channel = msg.argv()[1]->i32;
+    m.number = msg.argv()[2]->i32;
+    m.velocity = msg.argv()[3]->i32;
+  }else if(t == 2){
+    m.type = MidiMessage::Type::NoteOff;
+    m.channel = msg.argv()[1]->i32;
+    m.number = msg.argv()[2]->i32;
+    m.velocity = msg.argv()[3]->i32;
+  }else if(t == 3){
+    m.type = MidiMessage::Type::Control;
+    m.channel = msg.argv()[1]->i32;
+    m.number = msg.argv()[2]->i32;
+    m.value = msg.argv()[3]->i32;
+  }else{
+    std::cout << "WARNING: Unsupported MIDI message received." << std::endl;
+    return;
+  }
+  on_midi_message_received.Happen(m);
+  return;
 }
 
 } // namespace AlgAudio

@@ -98,7 +98,7 @@ Child nodes: **(all are optional and may appear more than once!)**
 
       - `none` - this parram shall be not used externally. It will not be presented to the user.
 
-    - `action` - *optional, default value: `sc` when `mode` is `input`, `none` when `mode` is `custom` or `none`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
+    - `action` - *optional, default value: `sc` when `mode` is `input`, `none` when `mode` is `output` or `none`*. This attribute is used to specify what action should be taken when this param's value changes. It should have one of following values:
 
       - `sc` - Set SuperCollider Synth's (the one's that corresponds to this module) argument, which has the name equal to this param's id, to this param's value. This is the default behavior. This way you can use `param`s to expose SynthDef's arguments to the user.
 
