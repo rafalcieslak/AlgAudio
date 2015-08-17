@@ -36,9 +36,9 @@ public:
   Rect GetOutputRect() const;
   Rect GetBodyRect() const;
 
-  void DragStart(Point2D pos);
-  void DragStep(Point2D pos);
-  void DragEnd(Point2D pos);
+  void DragStart();
+  void DragStep(Point2D_<float> offset);
+  void DragEnd();
 
   void SetName(std::string name);
   void SetRangeMin(float x);
@@ -68,7 +68,6 @@ private:
   std::shared_ptr<SDLTextTexture> range_min_texture, range_max_texture;
 
   bool dragged = false;
-  Point2D drag_start;
   float drag_start_q;
 
   Mode mode = Mode::Slider;

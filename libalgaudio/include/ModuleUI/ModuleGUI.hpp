@@ -58,13 +58,12 @@ public:
 
   // CanvasView uses this function to notify the ModuleGUI that a slider is
   // being dragged. This way the drag can continue outside the ModuleGUI.
-  // Arguments: The slider widget id (as returned by WhatIsHere), starting position
-  // (relative to moduleGUI position).
-  virtual void SliderDragStart(UIWidget::ID, Point2D){}
+  // Argument: The slider widget id (as returned by WhatIsHere)
+  virtual void SliderDragStart(UIWidget::ID){}
   // This method is called by CanvasView for each step of a slider drag.
-  // Note that current_pos values may be outside moduleGUI, or even negative.
-  virtual void SliderDragStep(UIWidget::ID, Point2D){}
-  virtual void SliderDragEnd(UIWidget::ID, Point2D){}
+  // Note that offset values may be outside moduleGUI, or even negative.
+  virtual void SliderDragStep(UIWidget::ID, Point2D_<float>){}
+  virtual void SliderDragEnd(UIWidget::ID){}
 
   enum class WhatIsHereType{
     Nothing,
@@ -85,7 +84,7 @@ public:
   // element is located at a given point. This way the CanvasView can handle
   // connections etc. and ModuleGUI does not have to bother about them.
   virtual WhatIsHere GetWhatIsHere(Point2D) const = 0;
-  
+
 protected:
   ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
   // A link to the module instance this GUI represents.

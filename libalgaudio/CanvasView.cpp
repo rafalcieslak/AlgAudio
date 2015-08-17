@@ -241,7 +241,12 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos){
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
       }else if(whatishere.type == ModuleGUI::WhatIsHereType::SliderBody){
-        module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+        if(!shift_held){
+          // Holding shift starts relative slider drag.
+          // So when the slider is clicked with shift held down, we don't want
+          // it to jump to the pointed position.
+          module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+        }
         mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
@@ -286,7 +291,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos){
     if(drag_in_progress){
       if(drag_mode == DragModeSlider){
         // Slider drag end
-        module_guis[mouse_down_id]->SliderDragEnd(mouse_down_elem_widgetid, pos - module_guis[mouse_down_id]->position);
+        module_guis[mouse_down_id]->SliderDragEnd(mouse_down_elem_widgetid);
       }else if(drag_mode == DragModeConnectAudioFromInlet || drag_mode == DragModeConnectAudioFromOutlet){
         // Connection drag end
         if(id >= 0){
@@ -508,7 +513,9 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       }
       SetNeedsRedrawing();
     }else if(drag_mode == DragModeSlider){
-      module_guis[mouse_down_id]->SliderDragStep(mouse_down_elem_widgetid, drag_position - module_guis[mouse_down_id]->position);
+      Point2D_<float> offset = drag_position - mouse_down_position;
+      if(shift_held) offset = offset/16.0;
+      module_guis[mouse_down_id]->SliderDragStep(mouse_down_elem_widgetid, offset);
     }else if(drag_mode == DragModeBBSelect){
       SetNeedsRedrawing();
     }
@@ -547,7 +554,7 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       drag_in_progress = true;
       drag_mode = DragModeSlider;
       //std::cout << "Slider drag." << std::endl;
-      module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid, to - module_guis[mouse_down_id]->position);
+      module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid);
     }
   }
 

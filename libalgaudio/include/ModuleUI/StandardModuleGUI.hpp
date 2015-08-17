@@ -46,9 +46,9 @@ public:
   virtual Point2D WhereIsParamInlet(std::string inlet) override;
   virtual Point2D WhereIsParamOutlet(std::string outlet) override;
   virtual WhatIsHere GetWhatIsHere(Point2D) const override;
-  virtual void SliderDragStart(UIWidget::ID id, Point2D start_pos) override;
-  virtual void SliderDragStep(UIWidget::ID id, Point2D current_pos) override;
-  virtual void SliderDragEnd(UIWidget::ID id, Point2D final_pos) override;
+  virtual void SliderDragStart(UIWidget::ID id) override;
+  virtual void SliderDragStep(UIWidget::ID id, Point2D_<float> current_offset) override;
+  virtual void SliderDragEnd(UIWidget::ID id) override;
   virtual std::string GetIoletParamID(UIWidget::ID) const override;
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override{ return main_margin->FindChild(id);}
 protected:

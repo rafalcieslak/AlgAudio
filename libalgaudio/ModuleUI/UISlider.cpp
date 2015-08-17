@@ -202,21 +202,19 @@ void UISlider::CustomMouseLeave(Point2D){
   SetNeedsRedrawing();
 }
 
-void UISlider::DragStart(Point2D pos){
+void UISlider::DragStart(){
   dragged = true;
-  drag_start = pos;
   drag_start_q = (current_value - current_range_min)/(current_range_max - current_range_min);
   SetNeedsRedrawing();
 }
-void UISlider::DragStep(Point2D pos){
+void UISlider::DragStep(Point2D_<float> offset){
   if(mode == Mode::Display) return;
 
-  float dq = ((float)pos.x - drag_start.x)/((float)GetBodyWidth());
+  float dq = (offset.x)/((float)GetBodyWidth());
   float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
   controller.lock()->SetRelative(q);
 }
-void UISlider::DragEnd(Point2D pos){
-  DragStep(pos);
+void UISlider::DragEnd(){
   dragged = false;
   SetNeedsRedrawing();
 }

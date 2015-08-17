@@ -369,14 +369,14 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
 }
 
 
-void StandardModuleGUI::SliderDragStart(UIWidget::ID id, Point2D start_pos){
-  param_sliders[id]->DragStart(start_pos);
+void StandardModuleGUI::SliderDragStart(UIWidget::ID id){
+  param_sliders[id]->DragStart();
 }
-void StandardModuleGUI::SliderDragStep(UIWidget::ID id, Point2D current_pos){
-  param_sliders[id]->DragStep(current_pos);
+void StandardModuleGUI::SliderDragStep(UIWidget::ID id, Point2D_<float> offset){
+  param_sliders[id]->DragStep(offset);
 }
-void StandardModuleGUI::SliderDragEnd(UIWidget::ID id, Point2D final_pos){
-  param_sliders[id]->DragEnd(final_pos);
+void StandardModuleGUI::SliderDragEnd(UIWidget::ID id){
+  param_sliders[id]->DragEnd();
 }
 
 } // namespace AlgAudio
