@@ -46,7 +46,7 @@ void StandardModuleGUI::CommonInit(){
   outlets_box = UIHBox::Create(window);
   params_box = UIVBox::Create(window);
   params_box->SetPadding(1);
-  caption = UILabel::Create(window, "", 16);
+  caption = UILabel::Create(window, "", 14);
   caption->SetTextColor("standardbox-caption");
 
   main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);

@@ -40,15 +40,17 @@ SendReply.kr(Impulse.kr(30), '/algaudioSC/sendreply', signal_db, amp_reply);
 
   <module id="exvco" name="Simple VCO">
     <params>
-      <inlet id="in"/>
-      <outlet id="out"/>
+      <inlet id="inbus"/>
+      <outlet id="outbus"/>
       <param id="base" name="Base freq" defaultmin="40.0" defaultmax="5000.0" defaultval="300" scale="log"/>
-      <param id="amt" name="Mod. amount" defaultmin="0.0" defaultmax="200.0" defaultval="50"/>
+      <param id="amt" name="Mod. amount %" defaultmin="0.0" defaultmax="100.0" defaultval="20"/>
     </params>
     <description> A simple voltage controlled oscillator. </description>
     <sc>
-arg in, out, base=300, amt=50;
-Out.ar(out, SinOsc.ar((In.ar(in)*amt)+base, 0, 1));
+arg inbus, outbus, base=300, amt=20;
+var in = In.ar(inbus);
+var freq = in*base*(amt/100)+base;
+Out.ar(outbus, SinOsc.ar(freq, 0, 1));
     </sc>
     <gui type="standard auto"/>
   </module>
@@ -235,6 +237,24 @@ sig = sig + (input ++ [0,0]);
 LocalOut.ar(DelayC.ar(sig,delays,delays));
 Out.ar(outbus1,sig[0]);
 Out.ar(outbus2,sig[1]);
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
+
+  <module id="phaseshift" name="Phase shift">
+    <params>
+      <inlet id="inbus"/>
+      <param id="offset" name="Offset" defaultmin="-1.0" defaultmax="1.0" defaultval="0.5"/>
+      <outlet id="outbus"/>
+    </params>
+    <description> FFT-based phase shift. </description>
+    <sc>
+arg inbus, outbus, offset;
+var in = In.ar(inbus);
+var chain = FFT(LocalBuf(2048),in);
+chain = PV_PhaseShift(chain, 1pi*offset);
+Out.ar(outbus,IFFT(chain));
     </sc>
     <gui type="standard auto"/>
   </module>
