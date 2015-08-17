@@ -3,7 +3,7 @@ add_definitions(
 	--std=c++14
 	-Wall
 	-Wextra
-	-g
+	-gdwarf-2
 )
 
 file(GLOB ALGAUDIO_SOURCES ./*.cpp)

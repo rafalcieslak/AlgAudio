@@ -31,7 +31,7 @@ public:
     TIGHT,
     WIDE
   };
-  virtual void CustomDraw(DrawContext& c) override;
+  virtual void CustomDraw(DrawContext& c) override __attribute__((hot));
   virtual void CustomResize(Size2D) override;
   virtual void OnChildRequestedSizeChanged() override;
   virtual void OnChildVisibilityChanged() override;

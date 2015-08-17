@@ -69,7 +69,9 @@ public:
   inline float GetRangeMax() const {return range_max;}
 
   // This signal passes two values: the absolute value of this param, and the relative fraction
-  // of the range it operates in.
+  // of the range it operates in. CAREFUL when subscribing to this signal: When a param
+  // changes quickly, subscriber will be called frequently. It is not a good idea
+  // to render any text textures in this handler. Schedule it for next Redraw.
   Signal<float, float> on_set;
   // Passing values to other controllers should be done once this controller has it value set.
   Signal<float, float> after_set;

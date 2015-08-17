@@ -69,7 +69,7 @@ public:
   static void PushNotifySubprocessEvent();
   static void PushNotifyOSCEvent();
   static std::atomic<int> notify_event_id;
-  
+
   static void SetTextInput(bool);
 
   static std::atomic_bool running;
@@ -77,6 +77,13 @@ private:
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
   static void ProcessEvent(const SDL_Event&);
   static int last_draw_time;
+
+  // These flags indicate whether a notify event is already in SDL queue.
+  // This allows limiting the number of such events in queue to 1, to avoid
+  // flooding the queue with same events, in case multile osc messages arrive
+  // simultaneously.
+  static std::atomic_flag ev_flag_notify_osc_already_pushed;
+  static std::atomic_flag ev_flag_notify_subprocess_already_pushed;
 };
 
 } // namespace AlgAudio

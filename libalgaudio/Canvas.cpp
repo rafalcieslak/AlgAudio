@@ -262,7 +262,9 @@ void Canvas::RecalculateOrder(){
   // assume that all .find()s return a valid iterator, i.e. each module always
   // has an entry in the map.
 
-  for(const std::shared_ptr<Module>& m : modules) indegrees[m] = 0;
+  for(const std::shared_ptr<Module>& m : modules)
+    if(m->templ->has_sc_code)
+      indegrees[m] = 0;
 
   // Calculate initial indegrees.
   for(auto &it : audio_connections) // For each connection
@@ -290,7 +292,7 @@ void Canvas::RecalculateOrder(){
         frontier.push(m);
   }
 
-  if(ordering.size() != modules.size()){
+  if(ordering.size() != indegrees.size()){
     // Failure. We did not traverse all modules. This can only happen
     // if the connection graph has a cycle.
     // The ordering is inconclusive.

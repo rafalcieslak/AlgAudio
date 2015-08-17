@@ -41,17 +41,11 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
   current_range_min = controller->GetRangeMin();
   current_range_max = controller->GetRangeMax();
 
-  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_min));
-  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_max));
-
   current_value = controller->Get();
-  value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
-  value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
 
   subscriptions += controller->on_set.Subscribe([this](float v, float){
     current_value = v;
-    value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
-    value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
+    text_textures_invalid = true;
     SetNeedsRedrawing();
   });
 }
@@ -63,11 +57,11 @@ void UISlider::SetName(std::string name){
 
 void UISlider::SetRangeMin(float x){
   current_range_min = x;
-  range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_min));
+  text_textures_invalid = true;
 }
 void UISlider::SetRangeMax(float x){
   current_range_max = x;
-  range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_max));
+  text_textures_invalid = true;
 }
 
 Rect UISlider::GetInputRect() const{
@@ -87,6 +81,16 @@ Rect UISlider::GetBodyRect() const{
 void UISlider::CustomDraw(DrawContext& c){
   int w = c.Size().width;
   int h = c.Size().height;
+
+  if(text_textures_invalid){
+    value_texture     = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_value));
+    value_texture_big = TextRenderer::Render(window,FontParams("FiraMono-Regular",16), Utilities::PrettyFloat(current_value));
+    range_min_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_min));
+    range_max_texture = TextRenderer::Render(window,FontParams("FiraMono-Regular",10), Utilities::PrettyFloat(current_range_max));
+    c.Restore();
+    text_textures_invalid = false;
+  }
+
 
   Color bg_color;
   if(mode == Mode::Slider) bg_color = Theme::Get("slider-bg");

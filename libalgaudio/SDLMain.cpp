@@ -28,6 +28,8 @@ std::atomic_bool SDLMain::running;
 Signal<float> SDLMain::on_before_frame;
 int SDLMain::last_draw_time = -1000000;
 std::atomic<int> SDLMain::notify_event_id;
+std::atomic_flag SDLMain::ev_flag_notify_osc_already_pushed = ATOMIC_FLAG_INIT;
+std::atomic_flag SDLMain::ev_flag_notify_subprocess_already_pushed = ATOMIC_FLAG_INIT;
 
 void SDLMain::Init(){
   notify_event_id = SDL_RegisterEvents(1);
@@ -38,10 +40,10 @@ void SDLMain::Loop(){
   running = true;
   while(running){
     SDL_Event ev;
-    // Sleep at most 5ms for new events, be it SDL event, or a custom
+    // Sleep at most 2ms for new events, be it SDL event, or a custom
     // OSC/Subprocess notify messsage.
     // If any event has arrived, deal with it.
-    if (SDL_WaitEventTimeout(&ev, 5)){
+    if (SDL_WaitEventTimeout(&ev, 2)){
       ProcessEvent(ev);
       while(SDL_PollEvent(&ev)) ProcessEvent(ev);
     }
@@ -74,8 +76,10 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
 
   if(ev.type == (unsigned int)notify_event_id){
     if(ev.user.code == NOTIFY_SUBPROCESS){
+      ev_flag_notify_subprocess_already_pushed.clear();
       SCLang::PollSubprocess();
     }else if(ev.user.code == NOTIFY_OSC){
+      ev_flag_notify_osc_already_pushed.clear();
       SCLang::PollOSC();
     }
     return;
@@ -117,6 +121,9 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
 }
 
 void SDLMain::PushNotifySubprocessEvent(){
+  // Do not push another notify event to the queue, is one is already present.
+  if(ev_flag_notify_subprocess_already_pushed.test_and_set()) return;
+
   SDL_Event event;
   SDL_zero(event);
   event.type = notify_event_id;
@@ -126,6 +133,9 @@ void SDLMain::PushNotifySubprocessEvent(){
   SDL_PushEvent(&event);
 }
 void SDLMain::PushNotifyOSCEvent(){
+  // Do not push another notify event to the queue, is one is already present.
+  if(ev_flag_notify_osc_already_pushed.test_and_set()) return;
+
   SDL_Event event;
   SDL_zero(event);
   event.type = notify_event_id;

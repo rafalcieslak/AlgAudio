@@ -62,9 +62,11 @@ private:
   std::shared_ptr<SDLTextTexture> name_texture;
 
   float current_value;
-  std::shared_ptr<SDLTextTexture> value_texture, value_texture_big;
-
   float current_range_min, current_range_max;
+  // This flag indicates whether text textures need to be re-rendered with new
+  // values.
+  bool text_textures_invalid = true;
+  std::shared_ptr<SDLTextTexture> value_texture, value_texture_big;
   std::shared_ptr<SDLTextTexture> range_min_texture, range_max_texture;
 
   bool dragged = false;
