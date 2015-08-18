@@ -275,4 +275,15 @@ Out.ar(outbus,IFFT(chain));
     <gui type="standard auto"/>
   </module>
 
+  <module id="midiin-note" name="Midi input - note">
+      <params>
+        <param id="note" mode="output" name="Frequency" defaultmin="8.17" defaultmax="12544" scale="log"/>
+        <param id="velocity" mode="output" name="Velocity" defaultmin="0" defaultmax="127"/>
+        <param id="gate" mode="output" name="Gate" defaultmin="0" defaultmax="1"/>
+      </params>
+      <description> This module is an interface for receiving MIDI note messages. </description>
+      <class name="MIDINote"/>
+      <gui type="standard auto"/>
+  </module>
+
 </collection>
