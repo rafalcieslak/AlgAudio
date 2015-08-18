@@ -1,5 +1,14 @@
 cmake_minimum_required(VERSION 3.0)
 
+
+message(STATUS "Current build mode: ${CMAKE_BUILD_TYPE}")
+
+IF(DEFINED CMAKE_BUILD_TYPE)
+   SET(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+ELSE()
+   SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build, options are: None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used) Debug Release RelWithDebInfo MinSizeRel.")
+ENDIF()
+
 project(
   AlgAudio
   VERSION 0.1
@@ -14,14 +23,19 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
 	set(EXTRA_SYS_LIBS dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 version uuid  wsock32 Ws2_32 comdlg32 opengl32)
 endif()
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-        set(EXTRA_SYS_LIBS GL)
+  set(EXTRA_SYS_LIBS GL)
 endif()
-
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 	message(STATUS "Using clang.")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
+
+
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -gdwarf-2")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -gdwarf-2")
+endif(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 
 # The libs subdir has to be processed first
 add_subdirectory(libs)

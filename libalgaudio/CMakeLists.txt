@@ -2,10 +2,17 @@
 
 add_definitions(
 	--std=c++14
-	-Wall
-	-Wextra
-	-gdwarf-2
 )
+
+if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
+	message(STATUS "ASDADSADSDASDas")
+	add_definitions(
+		-Wall
+		-Wextra
+		-Werror
+		-g
+	)
+endif(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 
 file(GLOB LIBALGAUDIO_SOURCES
 	./*.cpp
