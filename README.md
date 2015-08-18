@@ -25,6 +25,8 @@ To launch, you will also need sclang (SuperCollider). Execute [from `build` dire
 
 ## On Windows
 
+The supported way of building AlgAudio on Windows is to use MSYS2 environment.
+
 ### Using MSYS2
 
 From MSYS2 shell, use `pacman` to install following packages (choose an architecture you are compiling for):
@@ -34,6 +36,7 @@ From MSYS2 shell, use `pacman` to install following packages (choose an architec
 	mingw/SDL2
 	mingw/SDL2_ttf
 	mingw/cmake
+	mingw/freetype
 	make
 	automake
 	patch
@@ -51,6 +54,8 @@ In project directory, run:
 	make
 
 When ready, run `./algaudio.exe` to launch the application.
+
+If you would like to create a standalone redistributable version, pass `-DCMAKE_BUILD_TYPE=Release` to `cmake`. After complete build, use `make package-windows` to collect all files (including dll dependencies needed to redistribute AlgAudio) into  `package-windows` directory.
 
 ### Using other build environment (VisualStudio, Cygwin, others)
 
