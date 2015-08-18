@@ -173,7 +173,7 @@ void CanvasView::CustomDraw(DrawContext& c){
 
     if(from_mgui && to_mgui){
       if(fadeout_wire == PotentialWireMode::Remove) c.SetColor(Theme::Get("canvas-connection-remove").SetAlpha(fadeout_phase));
-      else                                          c.SetColor(Theme::Get("canvas-connection-new-TEMP").SetAlpha(fadeout_phase));
+      else                                          c.SetColor(Theme::Get("canvas-connection-new").SetAlpha(fadeout_phase));
 
       if(fadeout_wire_type == PotentialWireType::Audio){
         Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);

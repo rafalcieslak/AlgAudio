@@ -56,9 +56,8 @@ void Theme::Init(){
 
   thememap["canvas-connection-audio"] = Color(0x1b2737ff);
   thememap["canvas-connection-data-relative"] = Color(0x2c104eff);
-  thememap["canvas-connection-data-absolute"] = Color(0x7c0c78ff);
+  thememap["canvas-connection-data-absolute"] = Color(0x4e104aff);
   thememap["canvas-connection-new"] = Color(0x37a025ff);
-  thememap["canvas-connection-new-TEMP"] = Color(0x37ff2577);
   thememap["canvas-connection-remove"] = Color(0xb92b2bff);
   thememap["canvas-bb-body"] = Color(0x96b2e915);
   thememap["canvas-bb-border"] = Color(0x003caa79);
@@ -68,7 +67,7 @@ void Theme::Init(){
   thememap["slider-border"] = Color(0x293b53ff);
   thememap["slider-marker"] = Color(0x063373ff);
   thememap["slider-connector-relative"] = Color(0x666d96ff);
-  thememap["slider-connector-absolute"] = Color(0x8c6d8bff);
+  thememap["slider-connector-absolute"] = Color(0x7b6d8cff);
 
   thememap["textentry-bg"] = Color(0x52607cff);
   thememap["textentry-text"] = Color(0x212227ff);
