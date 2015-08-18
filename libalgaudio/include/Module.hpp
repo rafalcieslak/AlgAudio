@@ -152,30 +152,32 @@ public:
   class Outlet{
   public:
     std::string id;
+    std::string name;
     Module& mod;
     // The outlet is not the owner of the buses.
     std::list<std::weak_ptr<Bus>> buses;
     void ConnectToInlet(std::shared_ptr<Inlet> i);
     void DetachFromInlet(std::shared_ptr<Inlet> i);
     void DetachFromAll();
-    static std::shared_ptr<Outlet> Create(std::string id, std::shared_ptr<Module> mod);
+    static std::shared_ptr<Outlet> Create(std::string id, std::string name, std::shared_ptr<Module> mod);
     ~Outlet(){
       std::cout << "Outlet freed" << std::endl;
     }
   private:
     void SendConnections();
-    Outlet(std::string i, std::shared_ptr<Module> m) : id(i), mod(*m.get()) {}
+    Outlet(std::string i, std::string n, std::shared_ptr<Module> m) : id(i), name(n), mod(*m.get()) {}
   };
   class Inlet{
   public:
     // If fake is set to true, this inlet will have no corresponding bus. Pointless to use, great for debugging.
-    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, std::shared_ptr<Module> mod, bool fake = false);
+    static LateReturn<std::shared_ptr<Inlet>> Create(std::string id, std::string name, std::shared_ptr<Module> mod, bool fake = false);
     std::string id;
+    std::string name;
     Module& mod;
     // The inlet is the owner of a bus.
     std::shared_ptr<Bus> bus;
   private:
-    Inlet(std::string i, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), mod(*m.get()), bus(b) {}
+    Inlet(std::string i, std::string n, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), name(n), mod(*m.get()), bus(b) {}
   };
   /*
   void SetParam(std::string name, int value);

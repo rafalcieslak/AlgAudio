@@ -107,21 +107,21 @@ SendReplyController::~SendReplyController(){
   SCLang::UnregisterSendReply(module_id, sendreply_id);
 }
 
-std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::shared_ptr<Module> mod){
-  return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, mod));
+std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::string name, std::shared_ptr<Module> mod){
+  return std::shared_ptr<Module::Outlet>( new Module::Outlet(id, name, mod));
 }
 
-LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::shared_ptr<Module> mod, bool fake){
+LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::string name, std::shared_ptr<Module> mod, bool fake){
   auto r = Relay<std::shared_ptr<Module::Inlet>>::Create();
 
   if(fake){
-    r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, Bus::CreateFake())));
+    r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, name, mod, Bus::CreateFake())));
     return r;
   }
 
   Bus::CreateNew().Then([=](std::shared_ptr<Bus> b)mutable{
     SCLang::SendOSC("/algaudioSC/connectinlet", "isi", mod->sc_id, id.c_str(), b->GetID());
-    r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, mod, b)));
+    r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, name, mod, b)));
   });
   return r;
 }
@@ -164,23 +164,23 @@ void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::
 LateReturn<> Module::CreateIOFromTemplate(bool fake){
   auto r = Relay<>::Create();
   Sync s(templ->inlets.size());
-  for(std::string id : templ->inlets){
+  for(auto iolettempl : templ->inlets){
     if(!fake){
-      Inlet::Create(id,shared_from_this()).Then([=](std::shared_ptr<Inlet> inlet_ptr){
+      Inlet::Create(iolettempl.id,iolettempl.name,shared_from_this()).Then([=](std::shared_ptr<Inlet> inlet_ptr){
         inlets.emplace_back(inlet_ptr);
         s.Trigger();
       });
     }else{
       // Create a fake inlet
-      Inlet::Create(id,shared_from_this(), true).Then([=](std::shared_ptr<Inlet> inlet_ptr){
+      Inlet::Create(iolettempl.id,iolettempl.name,shared_from_this(), true).Then([=](std::shared_ptr<Inlet> inlet_ptr){
         inlets.emplace_back(inlet_ptr);
         s.Trigger();
       });
     }
   }
   // Meanwhile, create outlets. These own no bus, so creation is instant.
-  for(std::string id : templ->outlets)
-    outlets.emplace_back(Outlet::Create(id,shared_from_this()));
+  for(auto iolettempl : templ->outlets)
+    outlets.emplace_back(Outlet::Create(iolettempl.id,iolettempl.name,shared_from_this()));
   s.WhenAll([=](){
     //std::cout << "All IO READY!" << std::endl;
     r.Return();

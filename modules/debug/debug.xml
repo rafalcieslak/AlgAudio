@@ -23,29 +23,10 @@
     <gui type="standard auto"/>
   </module>
 
-  <module id="fork4" name="Fork   ">
-    <params>
-      <inlet id="in"/>
-      <outlet id="outbus1"/>
-      <outlet id="outbus2"/>
-      <outlet id="outbus3"/>
-      <outlet id="outbus4"/>
-    </params>
-    <description> A simple fork with 4 outlets. </description>
-    <sc>
-arg in, outbus1, outbus2, outbus3, outbus4;
-Out.ar(outbus1, In.ar(in));
-Out.ar(outbus2, In.ar(in));
-Out.ar(outbus3, In.ar(in));
-Out.ar(outbus4, In.ar(in));
-    </sc>
-    <gui type="standard auto"/>
-  </module>
-
   <module id="pipe" name="Pipe">
     <params>
-      <inlet id="inbus"/>
-      <outlet id="outbus"/>
+      <inlet id="inbus" name="in"/>
+      <outlet id="outbus" name="out"/>
     </params>
     <description> A pipe module. All signal passed throught this module is left untouched. </description>
     <sc>
@@ -58,7 +39,7 @@ Out.ar(outbus,in);
 
   <module id="measure" name="Amp measure">
     <params>
-      <inlet id="inbus"/>
+      <inlet id="inbus" name="signal"/>
       <param id="resultparam" mode="output" name="Amplitude" defaultmin="0.0" defaultmax="1.0" action="custom"/>
       <reply id="result" param="resultparam"/>
     </params>
@@ -74,7 +55,7 @@ SendReply.kr(Impulse.kr(20), '/algaudioSC/sendreply', amp, result);
 
   <module id="value" name="Signal value">
     <params>
-      <inlet id="inbus"/>
+      <inlet id="inbus" name="signal"/>
       <param id="value" mode="output" name="Value" defaultmin="-1.0" defaultmax="1.0"/>
       <reply id="valreply" param="value"/>
     </params>
@@ -90,11 +71,11 @@ SendReply.kr(Impulse.kr(20), '/algaudioSC/sendreply', in, valreply);
   <module id="guidemo" name="GUI demo">
     <class name="GUIDemo"/>
     <params>
-      <inlet id="inbus"/>
+      <inlet id="inbus" name="input"/>
       <param id="gain" defaultval="1.0" defaultmin="0.0" defaultmax="3.0" action="sc"/>
       <param id="stdout" defaultval="0.0" defaultmin="-10.0" defaultmax="10.0" action="custom"/>
       <param id="stdout2" defaultval="0.0" action="none" defaultmin="-100.0" defaultmax="100.0"/>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="output"/>
     </params>
     <description> Custom GUI demo. </description>
     <sc>
@@ -103,11 +84,11 @@ var in = In.ar(inbus);
 Out.ar(outbus, gain*in);
     </sc>
     <gui type="standard">
-      <inlet id="inbusGUI" inlet="inbus"/>
+      <inlet id="inbusGUI" inlet="inbus" name="INPUT"/>
       <slider id="gainslider" param="gain" name="Gain 1"/>
       <slider id="stdoutslider" param="stdout" name="C stdout"/>
       <display id="displaydemo" param="stdout2" name="Result display"/>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="OUTPUT"/>
     </gui>
   </module>
 

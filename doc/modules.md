@@ -77,11 +77,14 @@ Child nodes: **(all are optional and may appear more than once!)**
 
     AlgAudio will take care to set the SynthDef's argument value when the module is connected to another etc. so you just need to expose these values as SynthDef arguments, specify the `inlet` param, and AlgAudio will manage synth connections automatically.
 
+    - `name` - *optional, default value: equal to `id`* - Specifies inlet name which will be exposed to the user.
+
 
   - `outlet` - Specifies an audio output of this module. This node is analogous to `inlet` node. Attributes:
 
     - `id` - **required**. The outlet identifier. Similar to inlet identifier, see above.
 
+    - `name` - *optional, default value: equal to `id`* - Specifies outlet name which will be exposed to the user.
 
   - `param` - Specifies a parameter of the module. All parameters have values represented as IEEE floats. Quite frequently, classic params are associated with UI sliders, but they have a more universal semantics. Attributes:
 

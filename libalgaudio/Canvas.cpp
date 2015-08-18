@@ -46,7 +46,8 @@ LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
 void Canvas::RemoveModule(std::shared_ptr<Module> m){
   if(!m) std::cout << "WARNING: Canvas asked to remove module (nullptr) " << std::endl;
   // First, remove all audio connections that start at this module.
-  for(std::string &outid : m->templ->outlets){
+  for(auto iolettempl : m->templ->outlets){
+    std::string outid = iolettempl.id;
     auto it = audio_connections.find(IOID{m, outid});
     if(it != audio_connections.end()){
       GetOutletByIOID(IOID{m, outid})->DetachFromAll();
@@ -54,7 +55,8 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
     }
   }
   // Next, erase all audio connections that end at this module.
-  for(const std::string &inid : m->templ->inlets){
+  for(auto iolettempl : m->templ->inlets){
+    std::string inid = iolettempl.id;
     for(auto it = audio_connections.begin(); it != audio_connections.end(); /*--*/){
       IOID from = it->first;
       auto from_outlet = GetOutletByIOID(from);
@@ -356,7 +358,8 @@ bool Canvas::TestNewConnectionForLoop(IOID from, IOID to){
 
 std::list<std::shared_ptr<Module>> Canvas::GetConnectedModules(std::shared_ptr<Module> m){
   std::list<std::shared_ptr<Module>> result;
-  for(const std::string& outletid : m->templ->outlets){
+  for(const IOLetTemplate& iolettempl : m->templ->outlets){
+    std::string outletid = iolettempl.id;
     // For each outlet, get the list of connections from it
     auto it = audio_connections.find(IOID{m,outletid});
     if(it == audio_connections.end()) continue; // No connections from this outlet.

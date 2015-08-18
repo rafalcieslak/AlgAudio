@@ -76,8 +76,8 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       // Use the full ID to identify SynthDef.
       m.add_string(templ->GetFullID());
       // Prepare a list of params. Set all output buses to 999999.
-      for(const std::string& o : templ->outlets){
-        m.add_string(o);
+      for(auto& o : templ->outlets){
+        m.add_string(o.id);
         m.add_int32(999999999);
       }
       SCLang::SendOSCCustomWithReply<int>("/algaudioSC/newinstanceparams", m)

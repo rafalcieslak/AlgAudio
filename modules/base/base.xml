@@ -4,7 +4,7 @@
 
   <module id="simplein" name="Simple input">
     <params>
-      <outlet id="output"/>
+      <outlet id="output" name="signal"/>
     </params>
     <description> System's first audio input channel is accessible with this module. </description>
     <sc>
@@ -17,8 +17,8 @@ Out.ar(outbus,in);
 
   <module id="stereoout" name="Stereo output">
     <params>
-      <inlet id="inbus1"/>
-      <inlet id="inbus2"/>
+      <inlet id="inbus1" name="left input"/>
+      <inlet id="inbus2" name="right input"/>
       <param id="db" name="Volume (dB)" defaultmin="0.0" defaultmax="100.0" defaultval="85"/>
       <param id="measure" mode="output" name="Amplitude (dB)" defaultmin="0.0" defaultmax="100.0" action="custom"/>
       <reply id="amp_reply" param="measure"/>
@@ -40,8 +40,8 @@ SendReply.kr(Impulse.kr(30), '/algaudioSC/sendreply', signal_db, amp_reply);
 
   <module id="exvco" name="Simple VCO">
     <params>
-      <inlet id="inbus"/>
-      <outlet id="outbus"/>
+      <inlet id="inbus" name="freq input"/>
+      <outlet id="outbus" name="output"/>
       <param id="base" name="Base freq" defaultmin="40.0" defaultmax="5000.0" defaultval="300" scale="log"/>
       <param id="amt" name="Mod. amount %" defaultmin="0.0" defaultmax="100.0" defaultval="20"/>
     </params>
@@ -57,7 +57,7 @@ Out.ar(outbus, SinOsc.ar(freq, 0, 1));
 
   <module id="lfsine1" name="Low frequency sine">
     <params>
-      <outlet id="out"/>
+      <outlet id="out" name="output"/>
       <param id="freq" name="Frequency" defaultmin="0.1" defaultmax="10.0" defaultval="3" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
     </params>
@@ -71,7 +71,7 @@ Out.ar(out, SinOsc.ar(freq, 0, amp));
 
   <module id="lfsquare1" name="Low frequency square">
     <params>
-      <outlet id="out"/>
+      <outlet id="out" name="output"/>
       <param id="freq" name="Frequency" defaultmin="0.1" defaultmax="10.0" defaultval="3" scale="log"/>
       <param id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1"/>
@@ -111,7 +111,7 @@ Out.ar(out, gain * PinkNoise.ar());
 
   <module id="sine" name="Sine oscillator">
     <params>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="output"/>
       <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
     </params>
@@ -126,7 +126,7 @@ Out.ar(outbus, SinOsc.ar(freq,0,amp));
 
   <module id="square" name="Square oscillator">
     <params>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="output"/>
       <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="dc" name="Duty cycle" defaultmin="0.0" defaultmax="1.0" defaultval="0.5"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
@@ -141,7 +141,7 @@ Out.ar(outbus, Pulse.ar(freq,dc,amp));
 
   <module id="saw" name="Sawtooth oscillator">
     <params>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="output"/>
       <param id="freq" name="Frequency" defaultmin="40.0" defaultmax="5000.0" defaultval="440.0" scale="log"/>
       <param id="amp" name="Amplitude" defaultmin="0.0" defaultmax="1.0" defaultval="1.0"/>
     </params>
@@ -171,8 +171,8 @@ Out.ar(out, In.ar(in1) + In.ar(in2) + In.ar(in3) + In.ar(in4));
 
   <module id="gain1" name="Gain">
     <params>
-      <inlet id="inbus"/>
-      <outlet id="outbus"/>
+      <inlet id="inbus" name="input"/>
+      <outlet id="outbus" name="output"/>
       <param id="gain" name="Level" defaultmin="0.0" defaultmax="2.0" defaultval="1.0"/>
     </params>
     <description> Multiplies signal by a constant value. </description>
@@ -185,9 +185,9 @@ Out.ar(outbus, gain*In.ar(inbus));
 
   <module id="pan2" name="Panorama">
     <params>
-      <inlet id="inbus"/>
-      <outlet id="outbus1"/>
-      <outlet id="outbus2"/>
+      <inlet id="inbus" name="input"/>
+      <outlet id="outbus1" name="left output"/>
+      <outlet id="outbus2" name="right output"/>
       <param id="dir" name="Direction" defaultmin="-1.0" defaultmax="1.0" defaultval="0.0"/>
     </params>
     <description> Distributes a single signal to two outlets. </description>
@@ -202,9 +202,9 @@ Out.ar(outbus2, sin(q)*In.ar(inbus));
 
   <module id="cross2" name="Crossfade">
     <params>
-      <inlet id="inbus1"/>
-      <inlet id="inbus2"/>
-      <outlet id="outbus"/>
+      <inlet id="inbus1" name="left input"/>
+      <inlet id="inbus2" name="right input"/>
+      <outlet id="outbus" name="output"/>
       <param id="src" name="Source" defaultmin="-1.0" defaultmax="1.0" defaultval="0.0"/>
     </params>
     <description> Outputs a balanced mixture of two input signals. </description>
@@ -219,10 +219,10 @@ Out.ar(outbus, (cos(q)*In.ar(inbus1)) + (sin(q)*In.ar(inbus2)));
 
   <module id="exrev1" name="Example reverb">
     <params>
-      <inlet id="inbus1"/>
-      <inlet id="inbus2"/>
-      <outlet id="outbus1"/>
-      <outlet id="outbus2"/>
+      <inlet id="inbus1" name="left input"/>
+      <inlet id="inbus2" name="right input"/>
+      <outlet id="outbus1" name="left output"/>
+      <outlet id="outbus2" name="right output"/>
     </params>
     <description> A simple basic example reverb. </description>
     <sc>
@@ -244,9 +244,9 @@ Out.ar(outbus2,sig[1]);
 
   <module id="phaseshift" name="Phase shift">
     <params>
-      <inlet id="inbus"/>
+      <inlet id="inbus" name="input"/>
       <param id="offset" name="Offset" defaultmin="-1.0" defaultmax="1.0" defaultval="0.5"/>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="shifted output"/>
     </params>
     <description> FFT-based phase shift. </description>
     <sc>
@@ -293,7 +293,7 @@ Out.ar(outbus,IFFT(chain));
       <param id="sustain" name="Sustain" defaultmin="0" defaultmax="1" defaultval="0.5"/>
       <param id="release" name="Release" defaultmin="0.03" defaultmax="5" defaultval="0.5" scale="log"/>
       <param id="gate" name="Gate input" defaultmin="0" defaultmax="1" defaultval="0"/>
-      <outlet id="outbus"/>
+      <outlet id="outbus" name="envelope out"/>
     </params>
     <description>An ADSR envelope generator.</description>
     <sc>

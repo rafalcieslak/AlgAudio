@@ -67,6 +67,11 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
   std::cout << "Building GUI from XML " << std::endl;
   caption->SetText(templ->name);
 
+  // This forces the label to never become smaller than currently is.
+  // This way when caption text changes to show iolet name, the module
+  // will never shirink.
+  caption->SetCustomSize(caption->GetRequestedSize());
+
   unsigned int length = xml_data.length();
 
   char* buffer = new char[length+2];
@@ -78,7 +83,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
   for( ; node; node = node->next_sibling()){
     std::string name = node->name();
     if(name == "inlet"){
-      std::string id, inlet_id;
+      std::string id, inlet_id, inlet_name;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
       else throw GUIBuildException("An inlet is missing its corresponding param id");
@@ -86,13 +91,21 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       rapidxml::xml_attribute<>* attr_inlet = node->first_attribute("inlet");
       if(attr_inlet) inlet_id = attr_inlet->value();
       else inlet_id = id;
+      rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
+      if(attr_name) inlet_name = attr_name->value();
+      else inlet_name = id;
 
-      auto inlet = IOConn::Create(window, inlet_id, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+      auto inlet = IOConn::Create(window, inlet_id, inlet_name, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
       inlet->widget_id = UIWidget::ID(id);
       inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
       inlets[inlet->widget_id] = inlet;
+
+      subscriptions += inlet->on_connector_pointed.Subscribe([this,inlet_name,modulename = templ->name](bool pointed){
+        if(pointed) caption->SetText( inlet_name );
+        else caption->SetText( modulename );
+      });
     }else if(name == "outlet"){
-      std::string id, outlet_id;
+      std::string id, outlet_id, outlet_name;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
       else throw GUIBuildException("An outlet is missing its corresponding param id");
@@ -100,11 +113,19 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       rapidxml::xml_attribute<>* attr_outlet = node->first_attribute("outlet");
       if(attr_outlet) outlet_id = attr_outlet->value();
       else outlet_id = id;
+      rapidxml::xml_attribute<>* attr_name = node->first_attribute("name");
+      if(attr_name) outlet_name = attr_name->value();
+      else outlet_name = id;
 
-      auto outlet = IOConn::Create(window, id, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+      auto outlet = IOConn::Create(window, outlet_id, outlet_name, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
       outlet->widget_id = UIWidget::ID(id);
       outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
       outlets[outlet->widget_id] = outlet;
+
+      subscriptions += outlet->on_connector_pointed.Subscribe([this,outlet_name, modulename = templ->name](bool pointed){
+        if(pointed) caption->SetText( outlet_name );
+        else caption->SetText( modulename );
+      });
     }else if(name == "slider" || name == "display"){
       std::string id, param;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
@@ -143,17 +164,30 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   std::cout << "Building GUI from template" << std::endl;
   caption->SetText(templ->name);
 
+  // This forces the label to never become smaller than currently is.
+  // This way when caption text changes to show iolet name, the module
+  // will never shirink.
+  caption->SetCustomSize(caption->GetRequestedSize());
+
   for(auto& i : templ->inlets){
-    auto inlet = IOConn::Create(window, i, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
-    inlet->widget_id = UIWidget::ID("autoinlet_" + i);
+    auto inlet = IOConn::Create(window, i.id, i.name, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+    inlet->widget_id = UIWidget::ID("autoinlet_" + i.id);
     inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
     inlets[inlet->widget_id] = inlet;
+    subscriptions += inlet->on_connector_pointed.Subscribe([this,inletname = i.name, modulename = templ->name](bool pointed){
+      if(pointed) caption->SetText( inletname );
+      else caption->SetText( modulename );
+    });
   }
   for(auto& o : templ->outlets){
-    auto outlet = IOConn::Create(window, o, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
-    outlet->widget_id = UIWidget::ID("autooutlet_" + o);
+    auto outlet = IOConn::Create(window, o.id, o.name, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
+    outlet->widget_id = UIWidget::ID("autooutlet_" + o.id);
     outlets_box->Insert(outlet,UIBox::PackMode::WIDE);
     outlets[outlet->widget_id] = outlet;
+    subscriptions += outlet->on_connector_pointed.Subscribe([this,outletname = o.name, modulename = templ->name](bool pointed){
+      if(pointed) caption->SetText( outletname );
+      else caption->SetText( modulename );
+    });
   }
   // Param sliders.
   for(std::shared_ptr<ParamController>& p : GetModule()->param_controllers){
@@ -227,12 +261,12 @@ void StandardModuleGUI::SetHighlight(bool h){
   SetNeedsRedrawing();
 }
 
-std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std::weak_ptr<Window> w, std::string id, VertAlignment align, Color c){
-  return std::shared_ptr<IOConn>( new IOConn(w, id, align, c) );
+std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std::weak_ptr<Window> w, std::string id, std::string name, VertAlignment align, Color c){
+  return std::shared_ptr<IOConn>( new IOConn(w, id, name, align, c) );
 }
 
-StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c)
-  : UIWidget(w), iolet_id(id_), align(align_), main_color(c), border_color(c){
+StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, std::string name_, VertAlignment align_, Color c)
+  : UIWidget(w), iolet_id(id_), iolet_name(name_), align(align_), main_color(c), border_color(c){
   SetMinimalSize(GetRectSize() + Size2D(2,0));
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
@@ -261,6 +295,21 @@ bool StandardModuleGUI::IOConn::CustomMousePress(bool down, MouseButton b,Point2
     return true;
   }
   return false;
+}
+
+void StandardModuleGUI::IOConn::CustomMouseEnter(Point2D pos){
+  if(pos.IsInside(GetRectPos(),GetRectSize()))
+    on_connector_pointed.Happen(true);
+}
+void StandardModuleGUI::IOConn::CustomMouseLeave(Point2D pos){
+  if(pos.IsInside(GetRectPos(),GetRectSize()))
+    on_connector_pointed.Happen(false);
+}
+void StandardModuleGUI::IOConn::CustomMouseMotion(Point2D pos1, Point2D pos2){
+  if(pos1.IsInside(GetRectPos(),GetRectSize()) && !pos2.IsInside(GetRectPos(),GetRectSize()))
+    on_connector_pointed.Happen(false);
+  if(!pos1.IsInside(GetRectPos(),GetRectSize()) && pos2.IsInside(GetRectPos(),GetRectSize()))
+    on_connector_pointed.Happen(true);
 }
 
 void StandardModuleGUI::IOConn::CustomDraw(DrawContext& c){

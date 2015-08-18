@@ -74,6 +74,12 @@ public:
   float default_val;
 };
 
+class IOLetTemplate{
+public:
+  std::string id;
+  std::string name;
+};
+
 /* All modules are build according to a template. If multiple instances
  * of the same module type are present, they will share a single instance
  * of ModuleTemplate.
@@ -96,8 +102,8 @@ public:
   bool has_class = false;
   std::string class_name;
   ModuleCollection& collection;
-  std::list<std::string> inlets;
-  std::list<std::string> outlets;
+  std::list<IOLetTemplate> inlets;
+  std::list<IOLetTemplate> outlets;
   std::list<std::shared_ptr<ParamTemplate>> params;
   std::list<std::pair<std::string, std::string>> replies;
 };

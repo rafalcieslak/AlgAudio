@@ -73,22 +73,27 @@ private:
   class IOConn : public UIWidget{
   public:
     std::string iolet_id;
+    std::string iolet_name;
     VertAlignment align;
     Color main_color;
     Color border_color;
     Signal<bool> on_press;
+    Signal<bool> on_connector_pointed;
     // This flag is set iff the mouse pointer is not only pointing at this
     // widget, but also is inside the inlet/outlet rect.
     bool inside = false;
-    static std::shared_ptr<IOConn> Create(std::weak_ptr<Window> w, std::string id, VertAlignment align, Color c);
+    static std::shared_ptr<IOConn> Create(std::weak_ptr<Window> w, std::string id, std::string name, VertAlignment align, Color c);
     void CustomDraw(DrawContext& c) override;
     void SetBorderColor(Color c);
     virtual bool CustomMousePress(bool down, MouseButton b,Point2D pos) override;
+    virtual void CustomMouseMotion(Point2D p1,Point2D p2) override;
+    virtual void CustomMouseEnter(Point2D p) override;
+    virtual void CustomMouseLeave(Point2D p) override;
     friend class StandardModuleGUI;
     static const int width, height;
   private:
     void Init();
-    IOConn(std::weak_ptr<Window> w, std::string id_, VertAlignment align_, Color c);
+    IOConn(std::weak_ptr<Window> w, std::string id_, std::string name, VertAlignment align_, Color c);
     Point2D GetRectPos() const;
     inline Size2D  GetRectSize() const {return Size2D(width,height);}
     Point2D GetCenterPos() const;

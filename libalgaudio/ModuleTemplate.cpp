@@ -57,14 +57,24 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
   xml_node<>* params_node = node->first_node("params");
   if(params_node){
     for(xml_node<>* inlet_node = params_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
+      IOLetTemplate t;
       xml_attribute<>* inlet_id = inlet_node->first_attribute("id");
       if(!inlet_id) throw ModuleParseException(id, "An inlet is missing its id");
-      inlets.push_back(inlet_id->value());
+      t.id = inlet_id->value();
+      xml_attribute<>* inlet_name = inlet_node->first_attribute("name");
+      if(inlet_name) t.name = inlet_name->value();
+      else t.name = t.id;
+      inlets.push_back(t);
     }
     for(xml_node<>* outlet_node = params_node->first_node("outlet"); outlet_node; outlet_node = outlet_node->next_sibling("outlet")){
+      IOLetTemplate t;
       xml_attribute<>* outlet_id = outlet_node->first_attribute("id");
       if(!outlet_id) throw ModuleParseException(id, "An outlet is missing its id");
-      outlets.push_back(outlet_id->value());
+      t.id = outlet_id->value();
+      xml_attribute<>* outlet_name = outlet_node->first_attribute("name");
+      if(outlet_name) t.name = outlet_name->value();
+      else t.name = t.id;
+      outlets.push_back(t);
     }
     for(xml_node<>* param_node = params_node->first_node("param"); param_node; param_node = param_node->next_sibling("param")){
       auto p = std::make_shared<ParamTemplate>();
