@@ -69,7 +69,12 @@ Rect UISlider::GetInputRect() const{
     Rect(Point2D(0,0), Size2D(0,0)) :
     Rect(Point2D(0,0), Size2D(12, current_size.height));
 }
-Rect UISlider::GetOutputRect() const{
+Rect UISlider::GetAbsoluteOutputRect() const{
+  return (mode == Mode::Slider) ?
+    Rect(Point2D(0,0), Size2D(0,0)) :
+    Rect(Point2D(current_size.width - 24, 0), Size2D(12, current_size.height));
+}
+Rect UISlider::GetRelativeOutputRect() const{
   return Rect(Point2D(current_size.width - 12, 0), Size2D(12, current_size.height));
 }
 Rect UISlider::GetBodyRect() const{
@@ -102,15 +107,22 @@ void UISlider::CustomDraw(DrawContext& c){
 
   if(mode == Mode::Slider){
     // Left connector body
-    if(point_mode == PointMode::Left) c.SetColor(Theme::Get("slider-connector").Lighter(0.1));
-    else c.SetColor(Theme::Get("slider-connector"));
+    if(point_mode == PointMode::Input) c.SetColor(Theme::Get("slider-connector-relative").Lighter(0.1));
+    else c.SetColor(Theme::Get("slider-connector-relative"));
     c.DrawRect(0,0,12,h);
   }
 
   // Right connector body
-  if(point_mode == PointMode::Right) c.SetColor(Theme::Get("slider-connector").Lighter(0.1));
-  else c.SetColor(Theme::Get("slider-connector"));
+  if(point_mode == PointMode::OutputRelative) c.SetColor(Theme::Get("slider-connector-relative").Lighter(0.1));
+  else c.SetColor(Theme::Get("slider-connector-relative"));
   c.DrawRect(w-12,0,12,h);
+
+  // Right absolute connector body
+  if(mode == Mode::Display){
+    if(point_mode == PointMode::OutputAbsolute) c.SetColor(Theme::Get("slider-connector-absolute").Lighter(0.1));
+    else c.SetColor(Theme::Get("slider-connector-absolute"));
+    c.DrawRect(w-24,0,12,h);
+  }
 
   if(point_mode != PointMode::Center && !dragged){
     // NOT pointed on center
@@ -161,6 +173,7 @@ void UISlider::CustomDraw(DrawContext& c){
   c.DrawLine(w-1,0,w-1,h);
   if(mode == Mode::Slider) c.DrawLine(12,0,12,h);
   c.DrawLine(w-13,0,w-13,h);
+  if(mode == Mode::Display) c.DrawLine(w-25,0,w-25,h);
 
 }
 
@@ -176,13 +189,18 @@ bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){
 
 void UISlider::CustomMouseMotion(Point2D, Point2D pos2){
   if(pos2.IsInside(GetInputRect())){
-    if(point_mode != PointMode::Left){
-      point_mode = PointMode::Left;
+    if(point_mode != PointMode::Input){
+      point_mode = PointMode::Input;
       SetNeedsRedrawing();
     }
-  }else if(pos2.IsInside(GetOutputRect())) {
-    if(point_mode != PointMode::Right){
-      point_mode = PointMode::Right;
+  }else if(pos2.IsInside(GetRelativeOutputRect())) {
+    if(point_mode != PointMode::OutputRelative){
+      point_mode = PointMode::OutputRelative;
+      SetNeedsRedrawing();
+    }
+  }else if(pos2.IsInside(GetAbsoluteOutputRect())) {
+    if(point_mode != PointMode::OutputAbsolute){
+      point_mode = PointMode::OutputAbsolute;
       SetNeedsRedrawing();
     }
   }else{
@@ -194,9 +212,11 @@ void UISlider::CustomMouseMotion(Point2D, Point2D pos2){
 }
 void UISlider::CustomMouseEnter(Point2D pos){
   if(pos.IsInside(GetInputRect()))
-    point_mode = PointMode::Left;
-  else if(pos.IsInside(GetOutputRect()))
-    point_mode = PointMode::Right;
+    point_mode = PointMode::Input;
+  else if(pos.IsInside(GetRelativeOutputRect()))
+    point_mode = PointMode::OutputRelative;
+  else if(pos.IsInside(GetAbsoluteOutputRect()))
+    point_mode = PointMode::OutputAbsolute;
   else
     point_mode = PointMode::Center;
   SetNeedsRedrawing();

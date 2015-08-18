@@ -225,7 +225,7 @@ void Module::SetParam(std::string name, double value){
 }
 */
 
-std::shared_ptr<ModuleGUI> Module::GetGUI(){
+std::shared_ptr<ModuleGUI> Module::GetGUI() const{
   return modulegui.lock();
 }
 

@@ -306,10 +306,18 @@ Point2D StandardModuleGUI::WhereIsParamInlet(std::string id){
   std::cout << "WARNING: Queried position of an unexisting param inlet" << std::endl;
   return Point2D(0,0);
 }
-Point2D StandardModuleGUI::WhereIsParamOutlet(std::string id){
+Point2D StandardModuleGUI::WhereIsParamRelativeOutlet(std::string id){
   for(auto &it: param_sliders){
     if(it.second->param_id == id)
-      return it.second->GetPosInParent(main_margin) + it.second->GetOutputRect().Center();
+      return it.second->GetPosInParent(main_margin) + it.second->GetRelativeOutputRect().Center();
+  }
+  std::cout << "WARNING: Queried position of an unexisting param outlet" << std::endl;
+  return Point2D(0,0);
+}
+Point2D StandardModuleGUI::WhereIsParamAbsoluteOutlet(std::string id){
+  for(auto &it: param_sliders){
+    if(it.second->param_id == id)
+      return it.second->GetPosInParent(main_margin) + it.second->GetAbsoluteOutputRect().Center();
   }
   std::cout << "WARNING: Queried position of an unexisting param outlet" << std::endl;
   return Point2D(0,0);
@@ -361,8 +369,10 @@ void StandardModuleGUI::UpdateWhatIsHereCache(){
     Rect r;
     r = it.second->GetInputRect().MoveOffset(pos);
     rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderInput, it.second->widget_id, it.second->param_id}});
-    r = it.second->GetOutputRect().MoveOffset(pos);
-    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutput, it.second->widget_id, it.second->param_id}});
+    r = it.second->GetRelativeOutputRect().MoveOffset(pos);
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutputRelative, it.second->widget_id, it.second->param_id}});
+    r = it.second->GetAbsoluteOutputRect().MoveOffset(pos);
+    rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderOutputAbsolute, it.second->widget_id, it.second->param_id}});
     r = it.second->GetBodyRect().MoveOffset(pos);
     rect_cache.push_back({r,WhatIsHere{WhatIsHereType::SliderBody, it.second->widget_id, it.second->param_id}});
   }

@@ -73,7 +73,8 @@ private:
     ModeOutlet, // Mouse was over an outlet.
     ModeSlider, // Mouse was over a slider.
     ModeSliderInlet, // Mouse was over a slider.
-    ModeSliderOutlet, // Mouse was over a slider.
+    ModeSliderRelativeOutlet, // Mouse was over a slider's relative outlet.
+    ModeSliderAbsoluteOutlet, // Mouse was over a slider's relative outlet.
   };
   MouseDownMode mouse_down_mode;
   // The Widget id of the element corresponding to current mouse_down_mode.
@@ -102,7 +103,8 @@ private:
     DragModeConnectAudioFromInlet, // Creating an audio connection from an inlet to an outlet
     DragModeConnectAudioFromOutlet, // Creating an audio connection from an outlet to an inlet
     DragModeConnectDataFromInlet, // Creating a data connection from an inlet to an outlet
-    DragModeConnectDataFromOutlet, // Creating a data connection from an outlet to an inlet
+    DragModeConnectDataFromRelativeOutlet, // Creating a data connection from an outlet to an inlet
+    DragModeConnectDataFromAbsoluteOutlet, // Creating a data connection from an outlet to an inlet
     DragModeSlider, // Dragging a slider value
     DragModeBBSelect, // Bounding-box selection
   };
@@ -110,7 +112,7 @@ private:
   // Helper function which is called right after a connection drag is completed.
   // It checks the connection for validity and asks the Canvas to make it.
   void FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
-  void FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID inlet_slider_id, int outlet_module_id, UIWidget::ID outlet_slider_id);
+  void FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID inlet_slider_id, int outlet_module_id, UIWidget::ID outlet_slider_id, Canvas::DataConnectionMode);
 
   // Sets drag_in_progress to false, but also does extra cleanup.
   void StopDrag();
@@ -124,7 +126,8 @@ private:
   };
   enum class PotentialWireType{
     Audio,
-    Data,
+    DataRelative,
+    DataAbsolute,
   };
   // A potential wire connection is the name for a graphical wire that is alraedy
   // drawn on the canvas (bright green), but was not yet created.

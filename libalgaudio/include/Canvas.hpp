@@ -86,7 +86,7 @@ public:
   std::list<std::shared_ptr<Module>> GetConnectedModules(std::shared_ptr<Module> m);
   // Returns true iff the specified connection already exists.
   bool GetDirectAudioConnectionExists(IOID from, IOID to);
-  bool  GetDirectDataConnectionExists(IOID from, IOID to);
+  std::pair<bool, DataConnectionMode>  GetDirectDataConnectionExists(IOID from, IOID to);
 
   // Updates SC synth ordering. Calculates a topological ordering for the graph
   // of interconnections, and sends the result to SC so that it can reorder

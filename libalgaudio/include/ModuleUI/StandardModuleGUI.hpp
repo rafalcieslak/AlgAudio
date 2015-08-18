@@ -44,7 +44,8 @@ public:
   virtual Point2D WhereIsInlet(std::string inlet) override;
   virtual Point2D WhereIsOutlet(std::string outlet) override;
   virtual Point2D WhereIsParamInlet(std::string inlet) override;
-  virtual Point2D WhereIsParamOutlet(std::string outlet) override;
+  virtual Point2D WhereIsParamRelativeOutlet(std::string outlet) override;
+  virtual Point2D WhereIsParamAbsoluteOutlet(std::string outlet) override;
   virtual WhatIsHere GetWhatIsHere(Point2D) const override;
   virtual void SliderDragStart(UIWidget::ID id) override;
   virtual void SliderDragStep(UIWidget::ID id, Point2D_<float> current_offset) override;

@@ -33,7 +33,8 @@ public:
   virtual void CustomMouseEnter(Point2D pos) override;
   virtual void CustomMouseLeave(Point2D pos) override;
   Rect GetInputRect() const;
-  Rect GetOutputRect() const;
+  Rect GetAbsoluteOutputRect() const;
+  Rect GetRelativeOutputRect() const;
   Rect GetBodyRect() const;
 
   void DragStart();
@@ -74,12 +75,12 @@ private:
 
   Mode mode = Mode::Slider;
 
-  enum class PointMode{ None, Left, Center, Right };
+  enum class PointMode{ None, Input, Center, OutputAbsolute, OutputRelative };
   PointMode point_mode = PointMode::None;
 
   inline int GetBodyStart() const{ return (mode == Mode::Slider)?   12 : 0  ;}
-  inline int GetBodyEnd()   const{ return current_size.width - 12 ;}
-  inline int GetBodyWidth() const{ return (mode == Mode::Slider)? (current_size.width - 25) : (current_size.width - 13) ;}
+  inline int GetBodyEnd()   const{ return (mode == Mode::Slider)? (current_size.width - 12) : (current_size.width - 25) ;}
+  inline int GetBodyWidth() const{ return current_size.width - 25;}
 };
 
 

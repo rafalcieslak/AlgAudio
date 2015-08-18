@@ -48,7 +48,8 @@ public:
   virtual Point2D WhereIsInlet(std::string inlet) = 0;
   virtual Point2D WhereIsOutlet(std::string outlet) = 0;
   virtual Point2D WhereIsParamInlet(std::string inlet) = 0;
-  virtual Point2D WhereIsParamOutlet(std::string inlet) = 0;
+  virtual Point2D WhereIsParamRelativeOutlet(std::string inlet) = 0;
+  virtual Point2D WhereIsParamAbsoluteOutlet(std::string inlet) = 0;
 
   // This method shall translate an inlet/outlet widget id to the corresponding
   // param id.
@@ -70,7 +71,8 @@ public:
     Inlet,
     Outlet,
     SliderInput,
-    SliderOutput,
+    SliderOutputRelative,
+    SliderOutputAbsolute,
     SliderBody,
   };
   struct WhatIsHere{

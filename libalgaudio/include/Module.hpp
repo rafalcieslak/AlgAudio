@@ -190,7 +190,7 @@ public:
   // Returns a reference to the ModuleGUI that represents this particular module
   // instance. If the GUI was not yet build, or was already deleted, this
   // function will return nullptr.
-  std::shared_ptr<ModuleGUI> GetGUI();
+  std::shared_ptr<ModuleGUI> GetGUI() const;
 
   // This function is used to create a new ModuleGUI that will represent this
   // module instance in a CanvasView. Custom modules can override this function

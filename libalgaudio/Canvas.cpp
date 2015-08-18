@@ -230,13 +230,14 @@ bool Canvas::GetDirectAudioConnectionExists(IOID from, IOID to){
   return false;
 }
 
-bool Canvas::GetDirectDataConnectionExists(IOID from, IOID to){
+std::pair<bool, Canvas::DataConnectionMode> Canvas::GetDirectDataConnectionExists(IOID from, IOID to){
   auto it = data_connections.find(from);
-  if(it != data_connections.end())
-    if(std::find(it->second.begin(), it->second.end(), IOIDWithMode{to, DataConnectionMode::Relative} /* Note that connection mode is ignored in comparison. */ )
-         != it->second.end())
-      return true;
-  return false;
+  if(it != data_connections.end()){
+    auto it2 = std::find(it->second.begin(), it->second.end(), IOIDWithMode{to, DataConnectionMode::Relative}); /* Note that connection mode is ignored in comparison. */
+    if(it2 != it->second.end())
+      return {true, it2->mode};
+  }
+  return {false, DataConnectionMode()};
 }
 
 void Canvas::RecalculateOrder(){
