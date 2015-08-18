@@ -37,9 +37,9 @@ public:
 };
 
 class MIDINote : public AlgAudio::Module{
-public:
   std::shared_ptr<AlgAudio::ParamController> gate, note, velocity;
   int notecount;
+public:
   void on_init(){
 
     note     = GetParamControllerByID("note");
@@ -51,21 +51,28 @@ public:
         note->Set( mtof(m.number) );
         velocity->Set( m.velocity );
         notecount++;
-        if(notecount == 1){ // first note
+        if(notecount > 1) // not the first note
           gate->Set(0.0);
-          gate->Set(1.0);
-        }
+        gate->Set(1.0);
       }else if(m.type == AlgAudio::MidiMessage::Type::NoteOff){
         notecount--;
-        if(notecount == 0){ // last note
+        if(notecount == 0) // last note
           gate->Set(0.0);
-        }
       }
     });
   }
   float mtof(float m) const{
     return 440.0f * exp2((m - 69.0f)/12.0f);
   }
+};
+
+class DataLin : public AlgAudio::Module{
+public:
+    void on_param_set(std::string, float){
+      GetParamControllerByID("d")->Set(
+        GetParamControllerByID("a")->Get() * GetParamControllerByID("b")->Get() + GetParamControllerByID("c")->Get()
+      );
+    }
 };
 
 extern "C"{
@@ -75,6 +82,7 @@ void delete_instance(void* obj){
 void* create_instance(const char* name){
   if(strcmp(name,"MIDICtrl")==0) return new MIDICtrl();
   if(strcmp(name,"MIDINote")==0) return new MIDINote();
+  if(strcmp(name,"DataLin")==0) return new DataLin();
   return nullptr;
 }
 
