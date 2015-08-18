@@ -8,6 +8,8 @@ Algaudio is released under the terms of the GNU Lesser General Public License ve
 
 For developer documentation, browse the [wiki](https://github.com/rafalcieslak/algAudio/wiki).
 
+Module specification draft is available in `./doc/modules.md` ([see it here](https://github.com/rafalcieslak/AlgAudio/blob/master/doc/modules.md)).
+
 # Building and running
 
 ## On Linux
