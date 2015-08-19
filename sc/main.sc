@@ -260,6 +260,12 @@ OSCdef.new( 'sendreply', {
 	}, '/algaudioSC/sendreply'
 ).postln;
 
+OSCdef.new( 'sendreply2', {
+		arg msg;
+		msg.postln;
+	}, '/algaudioSC/sendreply2'
+).postln;
+
 // A dummy helper for listing all installed synthdefs
 OSCdef.new( 'listall', {
 		SynthDescLib.global.synthDescs.do { |desc|

@@ -293,14 +293,17 @@ Out.ar(outbus,IFFT(chain));
       <param id="sustain" name="Sustain" defaultmin="0" defaultmax="1" defaultval="0.5"/>
       <param id="release" name="Release" defaultmin="0.03" defaultmax="5" defaultval="0.5" scale="log"/>
       <param id="gate" name="Gate input" defaultmin="0" defaultmax="1" defaultval="0"/>
+      <param id="val" mode="output" name="Value" defaultmin="0.0" defaultmax="1.0" action="none"/>
+      <reply id="val_reply" param="val"/>
       <outlet id="outbus" name="envelope out"/>
     </params>
     <description>An ADSR envelope generator.</description>
     <sc>
-arg outbus, attack, decay, sustain, release, gate;
-var env = Env([0,1,sustain,0], [attack,decay,release], \lin, 2);
-var e = EnvGen.ar(env, max(gate,0));
-Out.ar(outbus, e*e);
+arg outbus, attack, decay, sustain, release, gate, val_reply;
+var env = Env.adsr(attack,decay,sustain,release);
+var e = EnvGen.ar(env, gate);
+Out.ar(outbus, e);
+SendReply.kr(Impulse.kr(30), '/algaudioSC/sendreply', e, val_reply);
     </sc>
     <gui type="standard auto"/>
   </module>

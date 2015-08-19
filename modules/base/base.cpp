@@ -51,13 +51,10 @@ public:
         note->Set( mtof(m.number) );
         velocity->Set( m.velocity );
         notecount++;
-        if(notecount > 1) // not the first note
-          gate->Set(0.0);
-        gate->Set(1.0);
+        gate->Set(notecount);
       }else if(m.type == AlgAudio::MidiMessage::Type::NoteOff){
         notecount--;
-        if(notecount == 0) // last note
-          gate->Set(0.0);
+        gate->Set(notecount);
       }
     });
   }
