@@ -51,6 +51,10 @@ public:
   // This method removes the currencly selected module from both the CanvasView
   // and the underlying Canvas.
   void RemoveSelected();
+
+  void SwitchCanvas(std::shared_ptr<Canvas> canvas);
+  std::shared_ptr<Canvas> GetCanvas() { return canvas; }
+
 private:
   CanvasView(std::shared_ptr<Window> parent);
   // The link to the canvas containing Modules.

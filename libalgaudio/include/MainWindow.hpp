@@ -53,16 +53,28 @@ public:
   ) override;
   LateReturn<> ShowErrorAlert(std::string message, std::string button_text) override;
   void ProcessKeyboardEvent(KeyData data) override;
+  
+  void SaveAs();
+  void Save();
+  void Save(std::string path);
+  void Open();
+  void New();
 private:
   MainWindow();
   void init();
 
+
   std::shared_ptr<UIVBox> mainvbox;
   std::shared_ptr<UIButton> addbutton;
   std::shared_ptr<UIButton> removebutton;
+  std::shared_ptr<UIButton> newbutton;
+  std::shared_ptr<UIButton> openbutton;
+  std::shared_ptr<UIButton> savebutton;
+  std::shared_ptr<UIButton> saveasbutton;
   std::shared_ptr<UIButton> quitbutton;
   std::shared_ptr<UIHBox> toolbarbox;
-  std::shared_ptr<UISeparator> toolbar_separator;
+  std::shared_ptr<UISeparator> toolbar_separator1;
+  std::shared_ptr<UISeparator> toolbar_separator2;
   std::shared_ptr<ModuleSelector> selector;
   std::shared_ptr<UILayered> layered;
   std::shared_ptr<UILayered> layered_alert;
@@ -70,6 +82,9 @@ private:
   std::shared_ptr<UIAlert> alert;
   std::shared_ptr<CanvasView> canvasview;
   Subscription sub_alert_reply;
+  
+  // Stored for SaveAs.
+  std::string current_file_path = "";
 };
 
 } //namespace AlgAudio

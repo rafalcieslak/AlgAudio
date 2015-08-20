@@ -5,7 +5,6 @@ add_definitions(
 )
 
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
-	message(STATUS "ASDADSADSDASDas")
 	add_definitions(
 		-Wall
 		-Wextra
@@ -46,7 +45,7 @@ add_library(
   ${LIBALGAUDIO_INCLUDES}
 )
 
-add_dependencies(libalgaudio liblo)
+add_dependencies(libalgaudio liblo nativefiledialog)
 
 # Disables the addition of one more "lib" prefix on libalgaudio
 SET_TARGET_PROPERTIES(libalgaudio PROPERTIES PREFIX "")
@@ -56,6 +55,7 @@ target_link_libraries(
 	${SDL2_LIBRARY}
 	${SDL2_TTF_LIBRARY}
 	${LIBLO_LIBRARY}
+	${NFD_LIBRARY}
 	freetype
 	${EXTRA_SYS_LIBS}
 )

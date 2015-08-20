@@ -22,7 +22,8 @@ namespace AlgAudio{
 
 bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
   bool result = CustomMousePress(down,b,p);
-  if(result) return true; // The custom handler captured the event
+  (void)result;
+  //if(result) return true; // The custom handler captured the event
   // In other case, execute our own code
   if(down == true && b == MouseButton::Left){
     pressed = true;
@@ -31,7 +32,7 @@ bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
   }else if(down == false && b == MouseButton::Left && pressed == true){
     pressed = false;
     result = on_pressed.Happen(false);
-    if(result) return true;
+    //if(result) return true;
     return on_clicked.Happen();
   }
   return false;

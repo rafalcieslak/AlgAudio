@@ -17,6 +17,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "MainWindow.hpp"
+#include <fstream>
+#include "nfd.h"
 
 namespace AlgAudio{
 
@@ -27,9 +29,14 @@ void MainWindow::init(){
   mainvbox = UIVBox::Create(shared_from_this());
   addbutton = UIButton::Create(shared_from_this()," Add new ");
   removebutton = UIButton::Create(shared_from_this(),"Remove selected");
+  newbutton = UIButton::Create(shared_from_this()," New ");
   quitbutton = UIButton::Create(shared_from_this()," Quit ");
+  openbutton = UIButton::Create(shared_from_this()," Open ");
+  savebutton = UIButton::Create(shared_from_this()," Save ");
+  saveasbutton = UIButton::Create(shared_from_this()," Save as... ");
   toolbarbox = UIHBox::Create(shared_from_this());
-  toolbar_separator = UISeparator::Create(shared_from_this());
+  toolbar_separator1 = UISeparator::Create(shared_from_this());
+  toolbar_separator2 = UISeparator::Create(shared_from_this());
   selector = ModuleSelector::Create(shared_from_this());
   layered = UILayered::Create(shared_from_this());
   canvasview = CanvasView::CreateEmpty(shared_from_this());
@@ -59,10 +66,20 @@ void MainWindow::init(){
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
+  subscriptions += newbutton->on_clicked.Subscribe([this](){New();});
+  subscriptions += saveasbutton->on_clicked.Subscribe([this](){SaveAs();});
+  subscriptions += savebutton->on_clicked.Subscribe([this](){Save();});
+  subscriptions += openbutton->on_clicked.Subscribe([this](){Open();});
 
   toolbarbox->Insert(addbutton, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(removebutton, UIBox::PackMode::TIGHT);
-  toolbarbox->Insert(toolbar_separator, UIBox::PackMode::WIDE);
+  toolbarbox->Insert(toolbar_separator1, UIBox::PackMode::TIGHT);
+  toolbar_separator1->SetCustomSize(Size2D(30,0));
+  toolbarbox->Insert(newbutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(openbutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(savebutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(saveasbutton, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(toolbar_separator2, UIBox::PackMode::WIDE);
   toolbarbox->Insert(quitbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);
@@ -88,6 +105,46 @@ void MainWindow::init(){
     */
   });
 
+}
+
+
+void MainWindow::SaveAs(){
+  std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : current_file_path;
+  nfdchar_t* path;
+  nfdresult_t result = NFD_SaveDialog(
+    NULL, // TODO: Investigate errors that happen when this is not set to null.
+    (Utilities::GetCurrentDir()).c_str(),
+    &path
+  );
+  if(result == NFD_OKAY){
+    std::string p(path);
+    free(path);
+    Save(p);
+  }
+}
+void MainWindow::Save(){
+  if(current_file_path == ""){
+    SaveAs();
+  }else{
+    Save(current_file_path);
+  }
+}
+void MainWindow::Save(std::string path){
+  std::ofstream file(path);
+  if(!file){
+    ShowErrorAlert("Save unsuccessful.\nFailed to access file " + path, "Cancel");
+    return;
+  }
+  file << canvasview->GetCanvas()->XML_SaveAll() << std::endl;
+  current_file_path = path;
+  file.close();
+}
+void MainWindow::Open(){
+  // TODO
+}
+void MainWindow::New(){
+  canvasview->SwitchCanvas( Canvas::CreateEmpty() );
+  current_file_path = "";
 }
 
 void MainWindow::ProcessKeyboardEvent(KeyData data){

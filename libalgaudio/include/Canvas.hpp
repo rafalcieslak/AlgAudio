@@ -93,6 +93,8 @@ public:
   // synths.
   void RecalculateOrder();
 
+  std::string XML_SaveAll() const;
+
   // The list of all audio connections "from-to", in the format of one-to-many.
   std::map<IOID, std::list<IOID>> audio_connections;
 
@@ -111,6 +113,7 @@ public:
 private:
   // Private constructor. Use CreateEmpty() instead.
   Canvas();
+
 };
 
 } // namespace AlgAudio

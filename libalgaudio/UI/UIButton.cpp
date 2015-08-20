@@ -32,7 +32,7 @@ UIButton::UIButton(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
-  on_pressed.Subscribe([this](bool){
+  on_pressed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
 }

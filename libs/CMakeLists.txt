@@ -34,3 +34,25 @@ else()
     COMMAND ln -sf "${CMAKE_BINARY_DIR}/liblo.so.7" "${CMAKE_BINARY_DIR}/liblo.so"
   )
 endif()
+
+
+ExternalProject_Add(
+  nativefiledialog
+  PREFIX nativefiledialog
+  # GIT_REPOSITORY https://github.com/mlabbe/nativefiledialog
+  GIT_REPOSITORY https://github.com/rafalcieslak/nativefiledialog
+  # TODO: Periodically update which version to download (tag).
+  # GIT_TAG 828bc71dcad6d28ab246a9a1fa9bb9ac69df6521
+  GIT_TAG 2ec8d20ce8fe15564e7ad0f6a3502e7acf6845ab
+  CONFIGURE_COMMAND ""
+  UPDATE_COMMAND ""
+  BUILD_IN_SOURCE 1
+  BUILD_COMMAND cd src && scons debug=0
+  INSTALL_COMMAND
+    cp ${CMAKE_CURRENT_BINARY_DIR}/nativefiledialog/src/nativefiledialog/src/include/nfd.h ${CMAKE_CURRENT_BINARY_DIR}/install/include/. &&
+    cp ${CMAKE_CURRENT_BINARY_DIR}/nativefiledialog/src/nativefiledialog/src/libnfd.a ${CMAKE_CURRENT_BINARY_DIR}/install/lib/.
+  INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/install
+)
+
+ExternalProject_Get_Property(nativefiledialog INSTALL_DIR)
+set(NFD_LIBRARY "${INSTALL_DIR}/lib/libnfd.a" PARENT_SCOPE)
