@@ -52,7 +52,11 @@ public:
   // and the underlying Canvas.
   void RemoveSelected();
 
-  void SwitchCanvas(std::shared_ptr<Canvas> canvas);
+  // Switches the canvas this CV displays. If the second argument is true,
+  // all ModuleGUIs will be build - so when switching the view context you
+  // can ignore that argument, but when loading a file you should set it
+  // to true.
+  void SwitchCanvas(std::shared_ptr<Canvas> canvas, bool build_guis = false);
   std::shared_ptr<Canvas> GetCanvas() { return canvas; }
 
 private:

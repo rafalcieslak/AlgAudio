@@ -36,6 +36,13 @@ struct DoubleConnectionException : public Exception{
   DoubleConnectionException(std::string t) : Exception(t) {}
 };
 
+struct SaveFileException : public Exception{
+  SaveFileException(std::string t) : Exception(t) {}
+}
+struct MissingTemplateException : public Exception{
+  MissingTemplateException(std::string template_id) : Exception("Module template \"" + template_id "\" is missing.") {}
+}
+
 /* A Canvas represents a set of interconnected modules. The Canvas manages
  * connections between them, calculates topological ordering and detects loops.
  * It also sends control data between modules.
@@ -47,6 +54,9 @@ class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   // Creates a new instance of a Canvas with no modules inside.
   static std::shared_ptr<Canvas> CreateEmpty();
+  // Opens a file and parses the saved state. Creates a new canvas based on that
+  // state.
+  static LateReturn<std::shared_ptr<Canvas>> CreateFromFile(std::string path);
 
   virtual ~Canvas();
   // Creates a new module according to the given template id, and places the

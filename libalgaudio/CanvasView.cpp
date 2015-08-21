@@ -32,7 +32,7 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
   return ptr;
 }
 
-void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c){
+void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
   canvas = c;
   drag_in_progress = false;
   module_guis.clear();
@@ -42,18 +42,19 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c){
   fadeout_anim.Release();
   ClearSelection();
 
-  for(auto& m : c->modules){
-    // TODO: What do do if a module already had a gui build? Can this even happen?
-    try{
-      auto modulegui = m->BuildGUI(window.lock());
-      Size2D guisize = modulegui->GetRequestedSize();
-      modulegui->Resize(guisize);
-      // TODO: modulegui->position =
-      modulegui->parent = shared_from_this();
-      module_guis.push_back(modulegui);
-    }catch(GUIBuildException ex){
-      canvas->RemoveModule(m);
-      window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+  if(build_guis){
+    for(auto& m : c->modules){
+      try{
+        auto modulegui = m->BuildGUI(window.lock());
+        Size2D guisize = modulegui->GetRequestedSize();
+        modulegui->Resize(guisize);
+        // TODO: modulegui->position =
+        modulegui->parent = shared_from_this();
+        module_guis.push_back(modulegui);
+      }catch(GUIBuildException ex){
+        canvas->RemoveModule(m);
+        window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+      }
     }
   }
 

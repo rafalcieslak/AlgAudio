@@ -426,7 +426,7 @@ std::string Canvas::XML_SaveAll() const{
 void XML_AppendModule(rapidxml::xml_node<>* parent, std::shared_ptr<Module> m, saveid_state& s){
   auto d = parent->document();
   rapidxml::xml_node<>* modulenode = d->allocate_node(rapidxml::node_type::node_element, "module");
-  int id = s.counter++;
+  int id = ++s.counter;
   s.ids[m] = id;
   modulenode->append_attribute( d->allocate_attribute("saveid",alloc2s(id)) );
   modulenode->append_attribute( d->allocate_attribute("template",allocs(m->templ->GetFullID())) );
@@ -478,6 +478,77 @@ void XML_AppendDataConnection(rapidxml::xml_node<>* parent, Canvas::IOID from, C
     connnode->append_attribute( d->allocate_attribute(  "mode","relative") );
 
   parent->append_node(connnode);
+}
+
+// ====  Reading from XML file ==== 
+
+typedef std::map<int, std::shared_ptr<Module>> saveid_map;
+
+LateReturn<> XML_AddModuleFromNode(std::shared_ptr<Canvas>, xml_node<> module_node, std::shared_ptr<saveid_map> map);
+
+LateReturn<std::shared_ptr<Canvas>> Canvas::CreateFromFile(std::string path){
+  auto canvas = CreateEmpty();
+  
+  ifstream f(path);
+  if(!f) throw SaveFileException("Unable to read save file.\n" + path);
+  
+  std::shared_ptr<saveid_map> map;
+  
+  try{
+    std::unique_ptr<xml_document<>> doc = std::make_unique<xml_document<>>();
+    rapidxml::file<> file_buffer(file);
+    if(file_buffer.size() < 5) throw SaveFileException("The save file is clearly too short");
+
+    doc->parse<0>(file_buffer.data());
+
+    xml_node<>* root = doc->first_node("algaudio");
+    if(!root) throw SaveFileException("Missing root node");
+    xml_attribute<>* version_attr = root->first_attribute("version");
+    if(!version_attr) throw SaveFileException("Missing version information");
+    std::string version(version_attr->value());
+    // Version check!
+    if(version != "1") throw SaveFileException("Invalid file version (" + version + ")");
+    
+    // Assuming version 1
+    int module_count = 0;
+    for(xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
+      counter++;
+      
+    Sync s(counter);
+    for(xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
+        XML_AddModuleFromNode(canvas, module_node, map).ThenSync(s);
+    s.WhenAll([this,root](){
+      
+    });
+    
+  
+  }catch(rapidxml::parse_error ex){
+    throw SaveFileException(std::string("XML parse error: ") + ex.what());
+  }catch(std::runtime_error ex){
+    throw SaveFileException(std::string("XML file error: ") + ex.what());
+  }
+}
+
+LateReturn<> XML_AddModuleFromNode(std::shared_ptr<Canvas> c, xml_node<> module_node, std::shared_ptr<saveid_map> map){
+  Relay<> r;
+  xml_attribute<>* saveid_attr = module_node->first_attribute("saveid");
+  if(!saveid_attr) throw SaveFileException("A module has missing fileid.");
+  int saveid = std::stoi(saveid_attr->value());
+  if(saveid <= 0) thdow SaveFileException("A module has invalid fileid.");
+  xml_attribute<>* template_attr = module_node->first_attribute("template");
+  if(!template_attr) throw SaveFileException("A module has missing template.");
+  std::string template_id = template_attr->value();
+  
+  auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
+  if(!templptr) throw MissingTemplateException(template_id);
+  
+  ModuleFactory::CreateNewInstance(templptr).Then([this,r,map,saveid](std::shared_ptr<Module> m){
+    modules.emplace(m);
+    map[m] = saveid;
+    m->canvas = shared_from_this();
+    r.Return();
+  });
+  return r;
 }
 
 } // namespace AlgAudio

@@ -113,7 +113,7 @@ void MainWindow::SaveAs(){
   nfdchar_t* path;
   nfdresult_t result = NFD_SaveDialog(
     NULL, // TODO: Investigate errors that happen when this is not set to null.
-    (Utilities::GetCurrentDir()).c_str(),
+    def.c_str(),
     &path
   );
   if(result == NFD_OKAY){
@@ -140,7 +140,23 @@ void MainWindow::Save(std::string path){
   file.close();
 }
 void MainWindow::Open(){
-  // TODO
+  std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : GetDir(current_file_path);
+  nfdchar_t *outPath = nullptr;
+  nfdresult_t result = NFD_OpenDialog( NULL, def.c_str(), &outPath );
+  if(result == NFD_OKAY){
+    try{
+      auto newcanvas = Canvas::CreateFromFile(path);
+      canvasview->SwitchCanvas(newcanvas, true);
+      current_file_path = path;
+      free(path);
+    }catch(SaveFileException ex){
+      ShowErrorAlert("Opening file failed:\n\n" + ex.what());
+      return;
+    }catch(MissingTemplateException ex){
+      // TODO: warning altert
+      ShowErrorAlert("Opening file failed:\n\n" + ex.what());
+    }
+  }
 }
 void MainWindow::New(){
   canvasview->SwitchCanvas( Canvas::CreateEmpty() );
