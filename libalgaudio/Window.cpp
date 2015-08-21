@@ -33,11 +33,19 @@ Window::Window(std::string t, int w, int h, bool centered) :
   window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
   if(!window) throw SDLException("Unable to create a window");
   context = SDL_GL_CreateContext(window);
-#ifdef __unix__
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
-#else
-  renderer = SDL_CreateRenderer(window, SDL_VIDEO_RENDER_OGL, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
-#endif
+  int n = SDL_GetNumRenderDrivers();
+  int opengl_id = -1;
+  for(int i = 0; i < n; i++){
+    SDL_RendererInfo info;
+    SDL_GetRenderDriverInfo(i, &info);
+    std::string drivername = info.name;
+    if(drivername == "opengl"){
+        opengl_id = i;
+        break;
+    }
+  }
+  if(opengl_id == -1) throw SDLException("OpenGL renderer is not available.");
+  renderer = SDL_CreateRenderer(window, opengl_id, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
   if(!renderer) throw SDLException("Unable to create a renderer");
   SDL_RendererInfo r;
   SDL_GetRendererInfo(renderer,&r);
