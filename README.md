@@ -43,6 +43,7 @@ From MSYS2 shell, use `pacman` to install following packages (choose an architec
 	automake
 	patch
 	git
+	scons
 	pkg-config
 
 Note that even if you have CMake or gcc installed on your host system, you will still need to install them in your MSYS environment.
