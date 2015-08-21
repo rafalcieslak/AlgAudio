@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
 #include <algorithm>
+#include "rapidxml/rapidxml.hpp"
 #include "Window.hpp"
 #include "SDLMain.hpp"
 
@@ -48,7 +49,28 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
         auto modulegui = m->BuildGUI(window.lock());
         Size2D guisize = modulegui->GetRequestedSize();
         modulegui->Resize(guisize);
-        // TODO: modulegui->position =
+        // Load stored data (e.g. loaded from save file or clipboard)
+        if(m->guidata != ""){
+          try{
+            char buffer[10000];
+            strncpy(buffer,m->guidata.c_str(),10000);
+            rapidxml::xml_document<> doc;
+            doc.parse<0>(buffer);
+            rapidxml::xml_node<>* root = doc.first_node("gui");
+            if(root){
+              rapidxml::xml_attribute<>* x_attr = root->first_attribute("x");
+              rapidxml::xml_attribute<>* y_attr = root->first_attribute("y");
+              if(x_attr && y_attr){
+                // Set modulegui position in canvas
+                modulegui->position = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
+              }
+            }
+          }catch(rapidxml::parse_error){
+            /*ignore*/
+          }catch(std::runtime_error){
+            /*ignore*/
+          }
+        }
         modulegui->parent = shared_from_this();
         module_guis.push_back(modulegui);
       }catch(GUIBuildException ex){

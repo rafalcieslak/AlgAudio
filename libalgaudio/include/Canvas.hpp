@@ -36,13 +36,6 @@ struct DoubleConnectionException : public Exception{
   DoubleConnectionException(std::string t) : Exception(t) {}
 };
 
-struct SaveFileException : public Exception{
-  SaveFileException(std::string t) : Exception(t) {}
-}
-struct MissingTemplateException : public Exception{
-  MissingTemplateException(std::string template_id) : Exception("Module template \"" + template_id "\" is missing.") {}
-}
-
 /* A Canvas represents a set of interconnected modules. The Canvas manages
  * connections between them, calculates topological ordering and detects loops.
  * It also sends control data between modules.
@@ -55,8 +48,10 @@ public:
   // Creates a new instance of a Canvas with no modules inside.
   static std::shared_ptr<Canvas> CreateEmpty();
   // Opens a file and parses the saved state. Creates a new canvas based on that
-  // state.
-  static LateReturn<std::shared_ptr<Canvas>> CreateFromFile(std::string path);
+  // state. A pair of values is late-returned. If openinf file failed, the returned
+  // pointer to canvas will be set to null, and the string will contain a
+  // human-readable explanation of the error.
+  static LateReturn<std::pair<std::shared_ptr<Canvas>,std::string>> CreateFromFile(std::string path) noexcept;
 
   virtual ~Canvas();
   // Creates a new module according to the given template id, and places the

@@ -140,22 +140,25 @@ void MainWindow::Save(std::string path){
   file.close();
 }
 void MainWindow::Open(){
-  std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : GetDir(current_file_path);
+  std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : Utilities::GetDir(current_file_path);
   nfdchar_t *outPath = nullptr;
-  nfdresult_t result = NFD_OpenDialog( NULL, def.c_str(), &outPath );
+  //nfdresult_t result = NFD_OpenDialog( NULL, def.c_str(), &outPath );
+  nfdresult_t result = NFD_OpenDialog( NULL, NULL, &outPath );
+  std::cout << "After dialog" << std::endl;
   if(result == NFD_OKAY){
-    try{
-      auto newcanvas = Canvas::CreateFromFile(path);
-      canvasview->SwitchCanvas(newcanvas, true);
-      current_file_path = path;
-      free(path);
-    }catch(SaveFileException ex){
-      ShowErrorAlert("Opening file failed:\n\n" + ex.what());
-      return;
-    }catch(MissingTemplateException ex){
-      // TODO: warning altert
-      ShowErrorAlert("Opening file failed:\n\n" + ex.what());
-    }
+    std::string path = outPath;
+    // TODO: Block window (progress bar?) while opening file.
+    // TODO: Pass a sharedptr instaed of this, to avoid crashes when the window is closed while opening file.
+    Canvas::CreateFromFile(path).Then([this,path](std::pair<std::shared_ptr<Canvas>, std::string> pair){
+      if(!pair.first){ // an error occured
+        ShowErrorAlert("Opening file failed:\n\n" + pair.second, "Cancel");
+      }else{
+        canvasview->SwitchCanvas(pair.first, true);
+        std::cout << "File opened sucessfuly." << std::endl;
+        this->current_file_path = path;
+      }
+    });
+    free(outPath);
   }
 }
 void MainWindow::New(){

@@ -231,6 +231,8 @@ public:
 
   // The canvas this module belongs to.
   std::weak_ptr<Canvas> canvas;
+
+  std::string guidata;
 private:
   std::weak_ptr<ModuleGUI> modulegui;
 };
