@@ -56,7 +56,7 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
   int len = string.length();
   res->input_buffer = new char[len + 1];
   strncpy(res->input_buffer, string.c_str(), len);
-  int n2 = strlen(res->input_buffer);
+  res->input_buffer[len] = '\0';
   try{
     // Parse the XML into doc
     res->doc.parse< rapidxml::parse_validate_closing_tags >( res->input_buffer );
@@ -73,7 +73,6 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
     if(version != "1") throw XMLParseException("Invalid file version (" + version + ")");
   
   }catch(rapidxml::parse_error ex){
-    std::cout << string << "\n" << n2  << " " << len << std::endl;
     throw XMLParseException("The XML data is not valid.\nChar: " + std::to_string((int)(ex.where<char>() - res->input_buffer)) + "\n" + ex.what());
   }catch(std::runtime_error ex){
     throw XMLParseException("Failed to parse XML data.");
