@@ -52,11 +52,21 @@ public:
     Color button2_color = Theme::Get("bg-button-neutral")
   ) override;
   LateReturn<> ShowErrorAlert(std::string message, std::string button_text) override;
+  enum class SaveAlertReply{ Cancel, Discard, Save};
+  LateReturn<SaveAlertReply> ShowDoYouWantToSaveAlert();
+  
+  void ProcessCloseEvent() override;
   void ProcessKeyboardEvent(KeyData data) override;
   
-  void SaveAs();
-  void Save();
-  void Save(std::string path);
+  // Returns true on successful save 
+  bool SaveAs();
+  bool Save();
+  bool Save(std::string path);
+  
+  // This helper method asks the user to save the file, potentially saves it,
+  // and afterwards invokes a function.
+  void AskToSaveBeforeCalling(std::function<void()> f);
+  
   void Open();
   void New();
 private:

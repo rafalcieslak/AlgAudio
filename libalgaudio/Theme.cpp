@@ -51,7 +51,7 @@ void Theme::Init(){
   thememap["bg-alert"] = Color(0x52607cff);
   thememap["alert-border-none"] = Color(0x52607cff);
   thememap["alert-border-info"] = Color(0x3a945eff);
-  thememap["alert-border-warning"] = Color(0x94913aff);
+  thememap["alert-border-warning"] = Color(0x9f742fff);
   thememap["alert-border-error"] = Color(0x943a3aff);
 
   thememap["canvas-connection-audio"] = Color(0x1b2737ff);

@@ -65,7 +65,7 @@ void MainWindow::init(){
     canvasview->RemoveSelected();
   });
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
-    on_close.Happen();
+    ProcessCloseEvent(); // Pretend the window is getting closed
   });
   subscriptions += newbutton->on_clicked.Subscribe([this](){New();});
   subscriptions += saveasbutton->on_clicked.Subscribe([this](){SaveAs();});
@@ -109,7 +109,7 @@ void MainWindow::init(){
 }
 
 
-void MainWindow::SaveAs(){
+bool MainWindow::SaveAs(){
   std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : current_file_path;
   nfdchar_t* path;
   nfdresult_t result = NFD_SaveDialog(
@@ -120,60 +120,99 @@ void MainWindow::SaveAs(){
   if(result == NFD_OKAY){
     std::string p(path);
     free(path);
-    Save(p);
+    return Save(p);
   }
+  return false;
 }
-void MainWindow::Save(){
+bool MainWindow::Save(){
   if(current_file_path == ""){
-    SaveAs();
+    return SaveAs();
   }else{
-    Save(current_file_path);
+    return Save(current_file_path);
   }
 }
-void MainWindow::Save(std::string path){
+bool MainWindow::Save(std::string path){
   try{
-    // TODO: Get TOP-LEVEL canvas from canvasview.
+    // TODO: Get the TOP-LEVEL canvas from canvasview.
     auto canvasxml = CanvasXML::CreateFromCanvas( canvasview->GetCanvas() );
     canvasxml->SaveToFile(path);
     current_file_path = path;
+    return true;
   }catch(XMLFileAccessException ex){
     ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
+    return false;
   }
 }
 
+
 void MainWindow::Open(){
-  std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : Utilities::GetDir(current_file_path);
-  nfdchar_t *outPath = nullptr;
-  //nfdresult_t result = NFD_OpenDialog( NULL, def.c_str(), &outPath );
-  nfdresult_t result = NFD_OpenDialog( NULL, NULL, &outPath );
-  std::cout << "After dialog" << std::endl;
-  if(result == NFD_OKAY){
-    std::string path = outPath;
-    // TODO: Block window (progress bar?) while opening file.
-    // TODO: Pass a sharedptr instaed of this, to avoid crashes when the window is closed while opening file.
-    try{
-      auto canvasxml = CanvasXML::CreateFromFile(path);
-      canvasxml->CreateNewCanvas().Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
-        if(!c){
-          ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
-        }else{
-          canvasview->SwitchCanvas(c, true);
-          std::cout << "File opened sucessfuly." << std::endl;
-          this->current_file_path = path;
-        }
-      });
-    }catch(XMLFileAccessException ex){
-      ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
-    }catch(XMLParseException ex){
-      ShowErrorAlert("Failed to parse file:\n\n" + ex.what(), "Cancel");
-    }
+
+  AskToSaveBeforeCalling([this](){
     
-    free(outPath);
-  }
+    std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : Utilities::GetDir(current_file_path);
+    nfdchar_t *outPath = nullptr;
+    //nfdresult_t result = NFD_OpenDialog( NULL, def.c_str(), &outPath );
+    nfdresult_t result = NFD_OpenDialog( NULL, NULL, &outPath );
+    std::cout << "After dialog" << std::endl;
+    if(result == NFD_OKAY){
+      std::string path = outPath;
+      // TODO: Block window (progress bar?) while opening file.
+      // TODO: Pass a sharedptr instaed of this, to avoid crashes when the window is closed while opening file.
+      try{
+        auto canvasxml = CanvasXML::CreateFromFile(path);
+        canvasxml->CreateNewCanvas().Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
+          if(!c){
+            ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
+          }else{
+            canvasview->SwitchCanvas(c, true);
+            std::cout << "File opened sucessfuly." << std::endl;
+            this->current_file_path = path;
+          }
+        });
+      }catch(XMLFileAccessException ex){
+        ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
+      }catch(XMLParseException ex){
+        ShowErrorAlert("Failed to parse file:\n\n" + ex.what(), "Cancel");
+      }
+      
+      free(outPath);
+    } // If result == OKAY
+    
+  }); // AskToSaveBeforeCalling
 }
+
+void MainWindow::AskToSaveBeforeCalling(std::function<void()> f){
+  if(current_file_path == "" && canvasview->GetCanvas()->modules.size() <= 1){
+    // Almost empty canvas w/o file. Continue without saving/asking.
+    f();
+    return;
+  }
+  // Ask the user about saving current file
+  ShowDoYouWantToSaveAlert().Then([this,f](SaveAlertReply reply){
+    if(reply == SaveAlertReply::Discard){
+      f();
+    }else if(reply == SaveAlertReply::Save){
+      if(Save()){
+        f();
+      }else{
+        // If file was not saved, do not create new canvas, giving the user a
+        // chance to fix their path etc.
+      }
+    }
+  });
+}
+
 void MainWindow::New(){
-  canvasview->SwitchCanvas( Canvas::CreateEmpty() );
-  current_file_path = "";
+  AskToSaveBeforeCalling([this](){
+    canvasview->SwitchCanvas( Canvas::CreateEmpty() );
+    current_file_path = "";
+  });
+}
+
+void MainWindow::ProcessCloseEvent(){
+  AskToSaveBeforeCalling([this](){
+    Window::ProcessCloseEvent();
+  });
 }
 
 void MainWindow::ProcessKeyboardEvent(KeyData data){
@@ -188,10 +227,8 @@ std::shared_ptr<MainWindow> MainWindow::Create(){
 }
 
 LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string button1_text, std::string button2_text, AlertType type, Color button1_color, Color button2_color){
-  auto r = Relay<int>::Create();
-  if(alert){
-    std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
-  }
+  Relay<int> r;
+  if(alert) std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
   alert = UIAlert::Create(shared_from_this(),message);
   alert->SetButtons({UIAlert::ButtonData(button1_text, ButtonID::CUSTOM1, button1_color),
                      UIAlert::ButtonData(button2_text, ButtonID::CUSTOM2, button2_color)});
@@ -208,10 +245,8 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
   return r;
 }
 LateReturn<> MainWindow::ShowErrorAlert(std::string message, std::string button_text){
-  auto r = Relay<>::Create();
-  if(alert){
-    std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
-  }
+  Relay<> r;
+  if(alert) std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
   alert = UIAlert::Create(shared_from_this(),message);
   alert->SetButtons({UIAlert::ButtonData(button_text, ButtonID::OK, Theme::Get("bg-button-neutral"))});
   alert->SetType(AlertType::ERROR);
@@ -229,6 +264,31 @@ LateReturn<> MainWindow::ShowErrorAlert(std::string message, std::string button_
     alert = nullptr; // loose reference
     if(id == ButtonID::OK) r.Return();
   });
+  return r;
+}
+
+LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
+  Relay<SaveAlertReply> r;
+  if(alert) std::cout << "WARNING: alert removed before it replied, because a new one is issued." << std::endl;
+  alert = UIAlert::Create(shared_from_this(),"WARNING: If you continue, changes to current file will be lost.\nDo you wish to save the file?");
+  alert->SetButtons({UIAlert::ButtonData("Cancel", ButtonID::CANCEL, Theme::Get("bg-button-neutral")),
+                     UIAlert::ButtonData("Discard changes", ButtonID::NO, Theme::Get("bg-button-negative")),
+                     UIAlert::ButtonData("Save file", ButtonID::YES, Theme::Get("bg-button-positive"))}
+                   );
+  alert->SetType(AlertType::WARNING);
+  
+  centered_alert->RemoveChild();
+  centered_alert->SetVisible(true);
+  centered_alert->Insert(alert);
+  sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
+    centered_alert->SetVisible(false);
+    // centered_alert->RemoveChild(); // See ShowErrorAlert
+    alert = nullptr; // loose reference
+    if(id == ButtonID::CANCEL) r.Return(SaveAlertReply::Cancel);
+    if(id == ButtonID::NO    ) r.Return(SaveAlertReply::Discard);
+    if(id == ButtonID::YES   ) r.Return(SaveAlertReply::Save);
+  });
+  
   return r;
 }
 

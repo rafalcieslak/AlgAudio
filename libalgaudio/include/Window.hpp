@@ -50,7 +50,7 @@ public:
 
   void SetNeedsRedrawing();
 
-  void ProcessCloseEvent();
+  virtual void ProcessCloseEvent();
   void ProcessMouseButtonEvent(bool down, MouseButton button, Point2D);
   void ProcessMotionEvent(Point2D);
   void ProcessEnterEvent();
