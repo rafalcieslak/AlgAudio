@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "MainWindow.hpp"
 #include <fstream>
 #include "nfd.h"
+#include "CanvasXML.hpp"
 
 namespace AlgAudio{
 
@@ -130,15 +131,16 @@ void MainWindow::Save(){
   }
 }
 void MainWindow::Save(std::string path){
-  std::ofstream file(path);
-  if(!file){
-    ShowErrorAlert("Save unsuccessful.\nFailed to access file " + path, "Cancel");
-    return;
+  try{
+    // TODO: Get TOP-LEVEL canvas from canvasview.
+    auto canvasxml = CanvasXML::CreateFromCanvas( canvasview->GetCanvas() );
+    canvasxml->SaveToFile(path);
+    current_file_path = path;
+  }catch(XMLFileAccessException ex){
+    ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
   }
-  file << canvasview->GetCanvas()->XML_SaveAll() << std::endl;
-  current_file_path = path;
-  file.close();
 }
+
 void MainWindow::Open(){
   std::string def = (current_file_path == "") ? Utilities::GetCurrentDir() : Utilities::GetDir(current_file_path);
   nfdchar_t *outPath = nullptr;
@@ -149,15 +151,23 @@ void MainWindow::Open(){
     std::string path = outPath;
     // TODO: Block window (progress bar?) while opening file.
     // TODO: Pass a sharedptr instaed of this, to avoid crashes when the window is closed while opening file.
-    Canvas::CreateFromFile(path).Then([this,path](std::pair<std::shared_ptr<Canvas>, std::string> pair){
-      if(!pair.first){ // an error occured
-        ShowErrorAlert("Opening file failed:\n\n" + pair.second, "Cancel");
-      }else{
-        canvasview->SwitchCanvas(pair.first, true);
-        std::cout << "File opened sucessfuly." << std::endl;
-        this->current_file_path = path;
-      }
-    });
+    try{
+      auto canvasxml = CanvasXML::CreateFromFile(path);
+      canvasxml->CreateNewCanvas().Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
+        if(!c){
+          ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
+        }else{
+          canvasview->SwitchCanvas(c, true);
+          std::cout << "File opened sucessfuly." << std::endl;
+          this->current_file_path = path;
+        }
+      });
+    }catch(XMLFileAccessException ex){
+      ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
+    }catch(XMLParseException ex){
+      ShowErrorAlert("Failed to parse file:\n\n" + ex.what(), "Cancel");
+    }
+    
     free(outPath);
   }
 }

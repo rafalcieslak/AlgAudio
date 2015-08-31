@@ -1,0 +1,55 @@
+<algaudio version="1">
+	<module saveid="1" template="base/midiin-ctrl">
+		<param id="ctrl0" value="102.000000"/>
+		<param id="ctrl1" value="51.000000"/>
+		<param id="ctrl2" value="84.000000"/>
+		<param id="ctrl3" value="90.000000"/>
+		<param id="ctrl4" value="82.000000"/>
+		<param id="ctrl5" value="83.000000"/>
+		<param id="ctrl6" value="0.000000"/>
+		<param id="ctrl7" value="0.000000"/>
+		<gui x="273" y="193"/>
+	</module>
+	<module saveid="2" template="base/mult">
+		<gui x="671" y="349"/>
+	</module>
+	<module saveid="3" template="base/pinknoise">
+		<param id="gain" value="1.000000"/>
+		<gui x="704" y="255"/>
+	</module>
+	<module saveid="4" template="base/stereoout">
+		<param id="db" value="85.000000"/>
+		<param id="measure" value="81.081497"/>
+		<gui x="515" y="535"/>
+	</module>
+	<module saveid="5" template="base/saw">
+		<param id="freq" value="974.972961"/>
+		<param id="amp" value="1.000000"/>
+		<gui x="634" y="166"/>
+	</module>
+	<module saveid="6" template="base/lfsine1">
+		<param id="freq" value="4.039236"/>
+		<param id="amp" value="0.401575"/>
+		<gui x="454" y="132"/>
+	</module>
+	<module saveid="7" template="base/exvco">
+		<param id="base" value="1224.783325"/>
+		<param id="amt" value="64.566925"/>
+		<gui x="492" y="330"/>
+	</module>
+	<audioconn frommodule="2" tomodule="4" fromioletid="out" toioletid="inbus2"/>
+	<audioconn frommodule="2" tomodule="4" fromioletid="out" toioletid="inbus1"/>
+	<audioconn frommodule="3" tomodule="2" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="5" tomodule="7" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="6" tomodule="7" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="6" tomodule="2" fromioletid="out" toioletid="in1"/>
+	<audioconn frommodule="7" tomodule="4" fromioletid="outbus" toioletid="inbus1"/>
+	<audioconn frommodule="7" tomodule="4" fromioletid="outbus" toioletid="inbus2"/>
+	<dataconn frommodule="1" tomodule="6" fromparamid="ctrl0" toparamid="freq" mode="relative"/>
+	<dataconn frommodule="1" tomodule="6" fromparamid="ctrl1" toparamid="amp" mode="relative"/>
+	<dataconn frommodule="1" tomodule="5" fromparamid="ctrl2" toparamid="freq" mode="relative"/>
+	<dataconn frommodule="1" tomodule="7" fromparamid="ctrl3" toparamid="base" mode="relative"/>
+	<dataconn frommodule="1" tomodule="7" fromparamid="ctrl4" toparamid="amt" mode="relative"/>
+</algaudio>
+
+

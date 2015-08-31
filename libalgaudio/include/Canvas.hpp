@@ -47,11 +47,6 @@ class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   // Creates a new instance of a Canvas with no modules inside.
   static std::shared_ptr<Canvas> CreateEmpty();
-  // Opens a file and parses the saved state. Creates a new canvas based on that
-  // state. A pair of values is late-returned. If openinf file failed, the returned
-  // pointer to canvas will be set to null, and the string will contain a
-  // human-readable explanation of the error.
-  static LateReturn<std::pair<std::shared_ptr<Canvas>,std::string>> CreateFromFile(std::string path) noexcept;
 
   virtual ~Canvas();
   // Creates a new module according to the given template id, and places the
@@ -97,8 +92,6 @@ public:
   // of interconnections, and sends the result to SC so that it can reorder
   // synths.
   void RecalculateOrder();
-
-  std::string XML_SaveAll() const;
 
   // The list of all audio connections "from-to", in the format of one-to-many.
   std::map<IOID, std::list<IOID>> audio_connections;

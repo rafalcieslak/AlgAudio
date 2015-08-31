@@ -19,15 +19,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include <algorithm>
 #include <queue>
-#include <sstream>
-#include <fstream>
 #include <unordered_set>
-#include "rapidxml/rapidxml_print.hpp"
-#include "rapidxml/rapidxml_utils.hpp"
 #include "ModuleFactory.hpp"
 #include "ModuleCollection.hpp"
 #include "SCLang.hpp"
-#include "ModuleUI/ModuleGUI.hpp"
 
 namespace AlgAudio{
 
@@ -382,108 +377,7 @@ Canvas::~Canvas(){
   std::cout << "NOTE: A canvas instance is destroyed." << std::endl;
   for(auto& m : modules) ModuleFactory::DestroyInstance(m);
 }
-
-
-// ===== Saving to XML file =====
-
-// Helper structure for tracking temporary savefile module identifiers.
-struct saveid_state{
-  int counter = 0;
-  std::map<std::shared_ptr<Module>, int> ids;
-};
-
-void XML_AppendModule(rapidxml::xml_node<>* parent, std::shared_ptr<Module> m, saveid_state& s);
-void XML_AppendAudioConnection(rapidxml::xml_node<>* parent, Canvas::IOID from, Canvas::IOID to, saveid_state& s);
-void XML_AppendDataConnection(rapidxml::xml_node<>* parent, Canvas::IOID from, Canvas::IOIDWithMode to, saveid_state& s);
-
-std::string Canvas::XML_SaveAll() const{
-  rapidxml::xml_document<> doc;
-  // Prepare temporary save ids map
-  saveid_state s;
-
-  // Preparet the root node
-  rapidxml::xml_node<>* root = doc.allocate_node(rapidxml::node_type::node_element, "algaudio");
-  root->append_attribute( doc.allocate_attribute("version","1") );
-  doc.append_node( root );
-  // Save all modules
-  for(const auto &m : modules) XML_AppendModule(root, m ,s);
-  // Save all audio connections
-  for(const auto &p : audio_connections){
-    IOID from = p.first;
-    for(const IOID& to : p.second)
-      XML_AppendAudioConnection(root, from, to, s);
-  }
-  // Save all data connections
-  for(const auto &p : data_connections){
-    IOID from = p.first;
-    for(const IOIDWithMode& to : p.second)
-      XML_AppendDataConnection(root, from, to, s);
-  }
-  std::stringstream ss;
-  ss << doc;
-  return ss.str();
-}
-
-#define allocs(x) d->allocate_string((x).c_str())
-#define alloc2s(x) d->allocate_string(std::to_string(x).c_str())
-
-void XML_AppendModule(rapidxml::xml_node<>* parent, std::shared_ptr<Module> m, saveid_state& s){
-  auto d = parent->document();
-  rapidxml::xml_node<>* modulenode = d->allocate_node(rapidxml::node_type::node_element, "module");
-  int id = ++s.counter;
-  s.ids[m] = id;
-  modulenode->append_attribute( d->allocate_attribute("saveid",alloc2s(id)) );
-  modulenode->append_attribute( d->allocate_attribute("template",allocs(m->templ->GetFullID())) );
-  // Save paramcontrollers state
-  for(std::shared_ptr<ParamController> pc : m->param_controllers){
-    rapidxml::xml_node<>* pcnode = d->allocate_node(rapidxml::node_type::node_element, "param");
-    pcnode->append_attribute( d->allocate_attribute("id", allocs(pc->id) ));
-    pcnode->append_attribute( d->allocate_attribute("value", alloc2s( pc->Get() )));
-    modulenode->append_node(pcnode);
-  }
-  auto gui = m->GetGUI();
-  if(gui){
-    rapidxml::xml_node<>* guinode = d->allocate_node(rapidxml::node_type::node_element, "gui");
-    guinode->append_attribute( d->allocate_attribute("x", alloc2s( gui->position.x )));
-    guinode->append_attribute( d->allocate_attribute("y", alloc2s( gui->position.y )));
-    modulenode->append_node(guinode);
-  }
-  parent->append_node(modulenode);
-}
-void XML_AppendAudioConnection(rapidxml::xml_node<>* parent, Canvas::IOID from, Canvas::IOID to, saveid_state& s){
-  auto d = parent->document();
-  rapidxml::xml_node<>* connnode = d->allocate_node(rapidxml::node_type::node_element, "audioconn");
-  auto it1 = s.ids.find(from.module); auto it2 = s.ids.find(to.module);
-  if(it1 == s.ids.end() || it2 == s.ids.end()){
-    std::cout << "WARNING: Cannot save an invalid audio connection from/to unknown module, skipping." << std::endl;
-    return;
-  }
-  connnode->append_attribute( d->allocate_attribute("fromsaveid",alloc2s(it1->second)) );
-  connnode->append_attribute( d->allocate_attribute(  "tosaveid",alloc2s(it2->second)) );
-  connnode->append_attribute( d->allocate_attribute("fromioletid",allocs(from.iolet)) );
-  connnode->append_attribute( d->allocate_attribute(  "toioletid",allocs(  to.iolet)) );
-  parent->append_node(connnode);
-}
-void XML_AppendDataConnection(rapidxml::xml_node<>* parent, Canvas::IOID from, Canvas::IOIDWithMode to, saveid_state& s){
-  auto d = parent->document();
-  rapidxml::xml_node<>* connnode = d->allocate_node(rapidxml::node_type::node_element, "dataconn");
-  auto it1 = s.ids.find(from.module); auto it2 = s.ids.find(to.ioid.module);
-  if(it1 == s.ids.end() || it2 == s.ids.end()){
-    std::cout << "WARNING: Cannot save an invalid audio connection from/to unknown module, skipping." << std::endl;
-    return;
-  }
-  connnode->append_attribute( d->allocate_attribute("fromsaveid",alloc2s(it1->second)) );
-  connnode->append_attribute( d->allocate_attribute(  "tosaveid",alloc2s(it2->second)) );
-  connnode->append_attribute( d->allocate_attribute("fromparamid",allocs(from.iolet)) );
-  connnode->append_attribute( d->allocate_attribute(  "toparamid",allocs(to.ioid.iolet)) );
-  if(to.mode == Canvas::DataConnectionMode::Absolute)
-    connnode->append_attribute( d->allocate_attribute(  "mode","absolute") );
-  else
-    connnode->append_attribute( d->allocate_attribute(  "mode","relative") );
-
-  parent->append_node(connnode);
-}
-
+/*
 // ====  Reading from XML file ====
 
 typedef std::map<int, std::shared_ptr<Module>> saveid_map;
@@ -659,5 +553,6 @@ LateReturn<std::string> XML_AddModuleFromNode(std::shared_ptr<rapidxml::xml_docu
   });
   return r;
 }
+*/
 
 } // namespace AlgAudio

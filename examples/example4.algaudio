@@ -1,0 +1,187 @@
+<algaudio version="1">
+	<module saveid="1" template="base/datalin">
+		<param id="a" value="146.832382"/>
+		<param id="b" value="0.500001"/>
+		<param id="c" value="0.000000"/>
+		<param id="d" value="73.416328"/>
+		<gui x="374" y="89"/>
+	</module>
+	<module saveid="2" template="base/datalin">
+		<param id="a" value="73.416328"/>
+		<param id="b" value="3.000001"/>
+		<param id="c" value="0.000000"/>
+		<param id="d" value="220.249054"/>
+		<gui x="653" y="89"/>
+	</module>
+	<module saveid="3" template="base/midiin-note">
+		<param id="note" value="146.832382"/>
+		<param id="velocity" value="61.000000"/>
+		<param id="gate" value="0.000000"/>
+		<gui x="120" y="179"/>
+	</module>
+	<module saveid="4" template="base/datalin">
+		<param id="a" value="73.416328"/>
+		<param id="b" value="2.000000"/>
+		<param id="c" value="0.000000"/>
+		<param id="d" value="146.832657"/>
+		<gui x="514" y="89"/>
+	</module>
+	<module saveid="5" template="base/saw">
+		<param id="freq" value="367.081635"/>
+		<param id="amp" value="0.409524"/>
+		<gui x="936" y="357"/>
+	</module>
+	<module saveid="6" template="base/gain1">
+		<param id="gain" value="0.342857"/>
+		<gui x="934" y="290"/>
+	</module>
+	<module saveid="7" template="base/exvco">
+		<param id="base" value="367.081635"/>
+		<param id="amt" value="1.607144"/>
+		<gui x="933" y="203"/>
+	</module>
+	<module saveid="8" template="base/gain1">
+		<param id="gain" value="0.960630"/>
+		<gui x="332" y="537"/>
+	</module>
+	<module saveid="9" template="base/saw">
+		<param id="freq" value="293.665375"/>
+		<param id="amp" value="0.400000"/>
+		<gui x="797" y="356"/>
+	</module>
+	<module saveid="10" template="base/saw">
+		<param id="freq" value="220.249054"/>
+		<param id="amp" value="0.523810"/>
+		<gui x="656" y="357"/>
+	</module>
+	<module saveid="11" template="base/gain1">
+		<param id="gain" value="0.590476"/>
+		<gui x="794" y="289"/>
+	</module>
+	<module saveid="12" template="base/gain1">
+		<param id="gain" value="0.476191"/>
+		<gui x="654" y="291"/>
+	</module>
+	<module saveid="13" template="base/exvco">
+		<param id="base" value="293.665375"/>
+		<param id="amt" value="1.607144"/>
+		<gui x="793" y="202"/>
+	</module>
+	<module saveid="14" template="base/exvco">
+		<param id="base" value="220.249054"/>
+		<param id="amt" value="2.202381"/>
+		<gui x="654" y="202"/>
+	</module>
+	<module saveid="15" template="base/saw">
+		<param id="freq" value="146.832657"/>
+		<param id="amp" value="0.685714"/>
+		<gui x="514" y="357"/>
+	</module>
+	<module saveid="16" template="base/gain1">
+		<param id="gain" value="0.533333"/>
+		<gui x="512" y="290"/>
+	</module>
+	<module saveid="17" template="base/lfsine1">
+		<param id="freq" value="3.000000"/>
+		<param id="amp" value="1.000000"/>
+		<gui x="129" y="55"/>
+	</module>
+	<module saveid="18" template="base/exvco">
+		<param id="base" value="146.832657"/>
+		<param id="amt" value="1.250000"/>
+		<gui x="514" y="202"/>
+	</module>
+	<module saveid="19" template="base/gain1">
+		<param id="gain" value="1.000000"/>
+		<gui x="373" y="291"/>
+	</module>
+	<module saveid="20" template="base/adsr1">
+		<param id="attack" value="0.080000"/>
+		<param id="decay" value="0.200000"/>
+		<param id="sustain" value="0.500000"/>
+		<param id="release" value="0.500000"/>
+		<param id="gate" value="0.000000"/>
+		<param id="val" value="0.000000"/>
+		<gui x="227" y="291"/>
+	</module>
+	<module saveid="21" template="base/exrev1">
+		<gui x="359" y="622"/>
+	</module>
+	<module saveid="22" template="base/mult">
+		<gui x="383" y="478"/>
+	</module>
+	<module saveid="23" template="base/stereoout">
+		<param id="db" value="85.000000"/>
+		<param id="measure" value="-42.373199"/>
+		<gui x="338" y="681"/>
+	</module>
+	<module saveid="24" template="base/saw">
+		<param id="freq" value="73.416328"/>
+		<param id="amp" value="1.000000"/>
+		<gui x="374" y="357"/>
+	</module>
+	<module saveid="25" template="base/exvco">
+		<param id="base" value="73.416328"/>
+		<param id="amt" value="1.369048"/>
+		<gui x="375" y="203"/>
+	</module>
+	<module saveid="26" template="base/datalin">
+		<param id="a" value="73.416328"/>
+		<param id="b" value="4.000001"/>
+		<param id="c" value="0.000000"/>
+		<param id="d" value="293.665375"/>
+		<gui x="792" y="90"/>
+	</module>
+	<module saveid="27" template="base/datalin">
+		<param id="a" value="73.416328"/>
+		<param id="b" value="5.000000"/>
+		<param id="c" value="0.000000"/>
+		<param id="d" value="367.081635"/>
+		<gui x="931" y="89"/>
+	</module>
+	<audioconn frommodule="5" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="6" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="7" tomodule="6" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="8" tomodule="21" fromioletid="outbus" toioletid="inbus1"/>
+	<audioconn frommodule="8" tomodule="21" fromioletid="outbus" toioletid="inbus2"/>
+	<audioconn frommodule="9" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="10" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="11" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="12" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="13" tomodule="11" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="14" tomodule="12" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="15" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="16" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="17" tomodule="25" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="17" tomodule="18" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="17" tomodule="14" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="17" tomodule="13" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="17" tomodule="7" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="18" tomodule="16" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="19" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="20" tomodule="22" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="21" tomodule="23" fromioletid="outbus1" toioletid="inbus1"/>
+	<audioconn frommodule="21" tomodule="23" fromioletid="outbus2" toioletid="inbus2"/>
+	<audioconn frommodule="22" tomodule="8" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="24" tomodule="22" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="25" tomodule="19" fromioletid="outbus" toioletid="inbus"/>
+	<dataconn frommodule="1" tomodule="25" fromparamid="d" toparamid="base" mode="absolute"/>
+	<dataconn frommodule="1" tomodule="24" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="1" tomodule="4" fromparamid="d" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="1" tomodule="2" fromparamid="d" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="1" tomodule="26" fromparamid="d" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="1" tomodule="27" fromparamid="d" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="2" tomodule="14" fromparamid="d" toparamid="base" mode="absolute"/>
+	<dataconn frommodule="2" tomodule="10" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="3" tomodule="20" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="3" tomodule="1" fromparamid="note" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="3" tomodule="8" fromparamid="velocity" toparamid="gain" mode="relative"/>
+	<dataconn frommodule="4" tomodule="15" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="4" tomodule="18" fromparamid="d" toparamid="base" mode="absolute"/>
+	<dataconn frommodule="26" tomodule="13" fromparamid="d" toparamid="base" mode="absolute"/>
+	<dataconn frommodule="26" tomodule="9" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="27" tomodule="7" fromparamid="d" toparamid="base" mode="absolute"/>
+	<dataconn frommodule="27" tomodule="5" fromparamid="d" toparamid="freq" mode="absolute"/>
+</algaudio>
+
+

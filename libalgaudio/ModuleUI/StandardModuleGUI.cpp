@@ -59,7 +59,7 @@ void StandardModuleGUI::CommonInit(){
    inlets_box->SetCustomSize(Size2D(0,4));
   outlets_box->SetCustomSize(Size2D(0,4));
 
-  SetBackColor(Theme::Get("standardbox-bg"));
+  SetHighlight(false); // Preps colors.
 }
 
 void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ){
@@ -267,10 +267,14 @@ std::shared_ptr<StandardModuleGUI::IOConn> StandardModuleGUI::IOConn::Create(std
 
 StandardModuleGUI::IOConn::IOConn(std::weak_ptr<Window> w, std::string id_, std::string name_, VertAlignment align_, Color c)
   : UIWidget(w), iolet_id(id_), iolet_name(name_), align(align_), main_color(c), border_color(c){
+    
   SetMinimalSize(GetRectSize() + Size2D(2,0));
+  border_color = Theme::Get("standardbox-border");
+  
   on_pointed.SubscribeForever([this](bool){
     SetNeedsRedrawing();
   });
+  
   on_motion.SubscribeForever([this](Point2D pos){
     bool new_inside = pos.IsInside(GetRectPos(),GetRectSize());
     if(inside != new_inside){

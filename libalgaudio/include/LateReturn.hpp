@@ -158,8 +158,11 @@ public:
       s.Trigger();
     });
   }
-  template<typename... Ts>
-  void ThenReturn(Relay<Ts...> r, Ts... args){ r.Return(args...);}
+  void ThenReturn(Relay<Types...> r){
+    Then([r](Types... result){
+      r.Return(result...);
+    });
+  }
   LateReturn(const Relay<Types...>& r) : id(r.id) {}
   LateReturn(const LateReturn& other) = delete;
   LateReturn& operator=(const LateReturn& other) = delete;
