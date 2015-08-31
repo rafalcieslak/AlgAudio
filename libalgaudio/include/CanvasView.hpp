@@ -51,6 +51,10 @@ public:
   // This method removes the currencly selected module from both the CanvasView
   // and the underlying Canvas.
   void RemoveSelected();
+  
+  // Resets a view position to the one at the center of the bounding box that
+  // has al module guis inside.
+  void CenterView();
 
   // Switches the canvas this CV displays. If the second argument is true,
   // all ModuleGUIs will be build - so when switching the view context you

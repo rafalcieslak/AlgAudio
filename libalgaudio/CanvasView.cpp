@@ -78,6 +78,8 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
         window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
       }
     }
+  
+    CenterView();
   }
 
   SetNeedsRedrawing();
@@ -706,7 +708,9 @@ void CanvasView::OnKeyboard(KeyData k){
   if(k.type == KeyData::KeyType::Shift) shift_held = k.pressed;
   if(k.type == KeyData::KeyType::Alt) alt_held = k.pressed;
   if(k.type == KeyData::KeyType::Ctrl) ctrl_held = k.pressed;
-
+  if(k.type == KeyData::KeyType::Letter && k.symbol == "c" && k.IsTrig())
+    CenterView();
+    
   // TODO: pass events to children
 }
 
@@ -748,6 +752,19 @@ void CanvasView::FadeoutWireStep(float delta){
     fadeout_anim.Release();
   }
   SetNeedsRedrawing();
+}
+
+void CanvasView::CenterView(){
+  std::cout << "CENTERING" << std::endl;
+  if(module_guis.size() == 0){
+    view_offset = Point2D(0,0);
+  }else{
+    /*int minx = INT_MAX, miny = INT_MAX;
+    int maxx = -INT_MAX, maxy = -INT_MAX;
+    for(auto mgui : module_guis){
+      
+    }*/
+  }
 }
 
 } // namespace AlgAudio

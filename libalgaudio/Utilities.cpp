@@ -235,6 +235,33 @@ void KeyData::InitKeymap(){
   keymap[SDLK_RSHIFT] = {"RShift", Shift}; keymap[SDLK_LSHIFT] = {"LShift", Shift};
   keymap[SDLK_RCTRL] = {"RCtrl", Ctrl}; keymap[SDLK_LCTRL] = {"LCtrl", Ctrl};
   keymap[SDLK_RALT] = {"RAlt", Alt}; keymap[SDLK_LALT] = {"LAlt", Alt};
+  
+  keymap[SDLK_a] = {"a", Letter};
+  keymap[SDLK_b] = {"c", Letter};
+  keymap[SDLK_c] = {"c", Letter};
+  keymap[SDLK_d] = {"d", Letter};
+  keymap[SDLK_e] = {"e", Letter};
+  keymap[SDLK_f] = {"f", Letter};
+  keymap[SDLK_g] = {"g", Letter};
+  keymap[SDLK_h] = {"h", Letter};
+  keymap[SDLK_i] = {"i", Letter};
+  keymap[SDLK_j] = {"j", Letter};
+  keymap[SDLK_k] = {"k", Letter};
+  keymap[SDLK_l] = {"l", Letter};
+  keymap[SDLK_m] = {"m", Letter};
+  keymap[SDLK_n] = {"n", Letter};
+  keymap[SDLK_o] = {"o", Letter};
+  keymap[SDLK_p] = {"p", Letter};
+  keymap[SDLK_q] = {"q", Letter};
+  keymap[SDLK_r] = {"r", Letter};
+  keymap[SDLK_s] = {"s", Letter};
+  keymap[SDLK_t] = {"t", Letter};
+  keymap[SDLK_u] = {"u", Letter};
+  keymap[SDLK_v] = {"v", Letter};
+  keymap[SDLK_w] = {"w", Letter};
+  keymap[SDLK_x] = {"x", Letter};
+  keymap[SDLK_y] = {"y", Letter};
+  keymap[SDLK_z] = {"z", Letter};
 }
 
 

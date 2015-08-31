@@ -49,7 +49,7 @@ struct Size2D{
   Point2D ToPoint() const;
 };
 
-// Same as size2d, but never interchangable. TODO: Turn both into a common base class.
+// Similar to Size2D, but never interchangable.
 template <typename T>
 struct Point2D_{
   Point2D_(T x_ = 0, T y_ = 0) : x(x_), y(y_) {}
@@ -157,6 +157,7 @@ struct KeyData{
   KeyType type;
   std::string symbol = "";
   bool IsPrintable() const {return type == Letter || type == Digit || type == Symbol || type == Text;}
+  bool IsTrig() const {return pressed && !repeat;}
 };
 
 // Custom enum for identifying mouse buttons
