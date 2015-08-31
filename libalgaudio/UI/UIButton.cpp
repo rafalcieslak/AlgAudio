@@ -59,14 +59,8 @@ void UIButton::CustomDraw(DrawContext& c){
 
   if(border_enabled){
     c.SetColor(bg_color.Darker(0.15));
-    c.DrawLine(0,0,w-1,0);
-    c.DrawLine(0,0,0,h-1);
-    c.DrawLine(w-1,0,w-1,h-1);
-    c.DrawLine(0,h-1,w-1,h-1);
-    c.DrawLine(1,1,w-2,1);
-    c.DrawLine(1,1,1,h-2);
-    c.DrawLine(w-2,1,w-2,h-2);
-    c.DrawLine(1,h-2,w-2,h-2);
+    c.DrawRectBorder(Rect(Point2D(0,0),Size2D(w-1,h-1)));
+    c.DrawRectBorder(Rect(Point2D(1,1),Size2D(w-2,h-2)));
   }
 
   c.SetColor(text_color);

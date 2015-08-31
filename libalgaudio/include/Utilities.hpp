@@ -66,6 +66,8 @@ struct Point2D_{
   Point2D_<T> operator*(const T& t) const {return Point2D_<T>(x*t, y*t);}
   Point2D_<T> operator+(const Size2D& other) const { return Point2D_<T>(x + other.width, y + other.height);}
   Point2D_<T> operator-(const Size2D& other) const { return Point2D_<T>(x - other.width, y - other.height);}
+  Point2D_<T>& operator+=(const Point2D_<T>& other) { x += other.x; y += other.y; return *this;}
+  Point2D_<T>& operator-=(const Point2D_<T>& other) { x -= other.x; y -= other.y; return *this;}
   bool IsInside(Point2D_<T> r, Size2D s) const { return (x >= r.x) && (x < r.x + s.width) && (y >= r.y) && (y < r.y + s.height);}
   bool IsInside(const Rect& r) const;
   static float Distance(Point2D_<T> a, Point2D_<T> b){return sqrt(float((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y)));}

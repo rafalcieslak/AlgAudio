@@ -69,8 +69,9 @@ private:
   int InWhich(Point2D);
   int CurveStrengthFuncA(Point2D a, Point2D b);
   int CurveStrengthFuncB(Point2D a, Point2D b);
-  // This flag is set according to the LMB state.
+  // These flags are set according to the mouse buttons state.
   bool lmb_down = false;
+  bool mmb_down = false;
   // What happened the last time the mouse button was pressed down?
   // This information is important to determine what to do when a drag starts.
   enum MouseDownMode{
@@ -105,6 +106,7 @@ private:
 
   // Is there any dragging action in progress?
   bool drag_in_progress = false;
+  bool view_move_in_progress = false;
   // This enum determines what is the currrent drag action.
   enum DragMode{
     DragModeMove, // Changing a ModuleGUI position
@@ -121,6 +123,12 @@ private:
   // It checks the connection for validity and asks the Canvas to make it.
   void FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID inlet_id, int outlet_module_id, UIWidget::ID outlet_id);
   void FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID inlet_slider_id, int outlet_module_id, UIWidget::ID outlet_slider_id, Canvas::DataConnectionMode);
+
+  // The position where mmb was pressed.
+  Point2D mmb_down_pos_abs;
+  // This variable stores what was the view_offset value when the view drag
+  // started.
+  Point2D view_move_start_view_offset;
 
   // Sets drag_in_progress to false, but also does extra cleanup.
   void StopDrag();
@@ -153,6 +161,9 @@ private:
 
   // Flags remebering held keys.
   bool shift_held, ctrl_held, alt_held;
+  
+  // A global offset for drawing all contents.
+  Point2D view_offset = Point2D(100,100);
 };
 
 } // namespace AlgAudio

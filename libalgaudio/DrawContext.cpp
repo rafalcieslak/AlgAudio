@@ -34,6 +34,8 @@ DrawContext::DrawContext(SDL_Window* win, SDL_Renderer* r, SDL_GLContext c, int 
   UpdateClipRect();
 }
 void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
+  from += offset;
+  to += offset;
   //std::cout << "Making current " << context << std::endl;
   if(smooth){
     SDLFix::RenderSetLineSmoothing(renderer, true);
@@ -49,6 +51,11 @@ SDL_FPoint PointToSDL(Point2D_<float> p){
 
 void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines, float width){
   // TODO :: De casteljeu
+
+  p1 += offset;
+  p2 += offset;
+  p3 += offset;
+  p4 += offset;
 
   SDLFix::RenderSetLineSmoothing(renderer, true);
   SDLFix::RenderSetLineWidth(renderer, width);
@@ -75,6 +82,10 @@ void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4
 
 
 void DrawContext::DrawLineEx(float x1, float y1, float x2, float y2, float width){
+  x1 += offset.x;
+  y1 += offset.y;
+  x2 += offset.x;
+  y2 += offset.y;
   SDL_FPoint points[2];
   points[0].x = x1; points[0].y = y1;
   points[1].x = x2; points[1].y = y2;
@@ -84,6 +95,8 @@ void DrawContext::DrawLineEx(float x1, float y1, float x2, float y2, float width
 }
 
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y_){
+  x_ += offset.x;
+  y_ += offset.y;
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
   if(!texture->valid) return; // Silently skip null textures.
   const Size2D texture_size = texture->GetSize();
@@ -94,6 +107,8 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, int x_, int y
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
 void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int x_, int y_){
+  x_ += offset.x;
+  y_ += offset.y;
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
   if(!texture->valid) return; // Silently skip null textures.
   const Size2D texture_size = texture->GetSize();
@@ -107,6 +122,8 @@ void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, int
 }
 
 void DrawContext::DrawRect(int x, int y, int w, int h){
+  x += offset.x;
+  y += offset.y;
   SDL_Rect rect{x,y,w,h};
   SDL_RenderFillRect(renderer,&rect);
 }
@@ -138,10 +155,12 @@ void DrawContext::Clear(Color c){
 }
 void DrawContext::Push(Point2D p, Size2D s){
   // Remember the previous state
-  context_stack.push(DCLevel(current_target, x, y, width, height));
+  context_stack.push(DCLevel(current_target, x, y, width, height, offset));
   // Set new state
+  p += offset;
   x = p.x; y = p.y;
   width = s.width; height = s.height;
+  offset = Point2D(0,0);
   UpdateClipRect();
 }
 void DrawContext::Restore(){
@@ -150,11 +169,12 @@ void DrawContext::Restore(){
 }
 void DrawContext::Push(std::shared_ptr<SDLTexture> t, int width_, int height_){
   // Remember the previous state
-  context_stack.push(DCLevel(current_target, x, y, width, height));
+  context_stack.push(DCLevel(current_target, x, y, width, height, offset));
   // Set new state
   SwitchToTarget(t);
   x = 0; y = 0;
   width = width_; height = height_;
+  offset = Point2D(0,0);
   UpdateClipRect();
 }
 void DrawContext::Pop(){
@@ -168,6 +188,7 @@ void DrawContext::Pop(){
   SwitchToTarget(state.target);
   x = state.xoffset; y = state.yoffset;
   width = state.width; height = state.height;
+  offset = state.offset;
   UpdateClipRect();
 }
 

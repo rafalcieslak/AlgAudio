@@ -221,14 +221,8 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   else c.SetColor(border_color);
   int w = c.Size().width;
   int h = c.Size().height;
-  c.DrawLine(0,0,w-1,0);
-  c.DrawLine(0,0,0,h-1);
-  c.DrawLine(w-1,0,w-1,h-1);
-  c.DrawLine(0,h-1,w-1,h-1);
-  c.DrawLine(1,1,w-2,1);
-  c.DrawLine(1,1,1,h-2);
-  c.DrawLine(w-2,1,w-2,h-2);
-  c.DrawLine(1,h-2,w-2,h-2);
+  c.DrawRectBorder(Rect(Point2D(0,0),Size2D(w-1,h-1)));
+  c.DrawRectBorder(Rect(Point2D(1,1),Size2D(w-3,h-3)));
 
   c.Push(Point2D(0,0),c.Size());
   main_margin->Draw(c);

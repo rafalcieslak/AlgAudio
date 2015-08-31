@@ -86,6 +86,9 @@ public:
   // context state.
   void Pop();
 
+  void SetOffset(Point2D off){offset = off;}
+  void ResetOffset(){offset = Point2D(0,0);}
+
   // Reapplies the current context params. It is useful if your context was
   // messed up by a different context using the same window.
   // For example, if you use TextRenderer::Render inside a CustomDraw, then
@@ -97,6 +100,8 @@ private:
   // Current DrawContext state.
   int width, height;
   int x,y;
+  
+  Point2D offset;
 
   // Internal variables
   SDL_Window* window;
@@ -107,10 +112,11 @@ private:
   std::shared_ptr<SDLTexture> current_target = nullptr;
   // A helper structure for storing context state onto a stack.
   struct DCLevel{
-    DCLevel(std::shared_ptr<SDLTexture> t, int x, int y, int w, int h) :
-      target(t), xoffset(x), yoffset(y), width(w), height(h) {}
+    DCLevel(std::shared_ptr<SDLTexture> t, int x, int y, int w, int h, Point2D off) :
+      target(t), xoffset(x), yoffset(y), width(w), height(h), offset(off) {}
     std::shared_ptr<SDLTexture> target;
     int xoffset, yoffset, width, height;
+    Point2D offset;
   };
   // The state stack.
   std::stack<DCLevel> context_stack;

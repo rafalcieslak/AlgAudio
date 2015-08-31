@@ -167,10 +167,8 @@ void UISlider::CustomDraw(DrawContext& c){
 
   }
   c.SetColor(Theme::Get("slider-border"));
-  c.DrawLine(0,0,w,0);
-  c.DrawLine(0,0,0,h);
-  c.DrawLine(0,h-1,w,h-1);
-  c.DrawLine(w-1,0,w-1,h);
+  c.DrawRectBorder(Rect(Point2D(0,0),Size2D(w-1,h-1)));
+  
   if(mode == Mode::Slider) c.DrawLine(12,0,12,h);
   c.DrawLine(w-13,0,w-13,h);
   if(mode == Mode::Display) c.DrawLine(w-25,0,w-25,h);

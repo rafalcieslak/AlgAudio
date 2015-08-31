@@ -110,6 +110,8 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
+  c.SetOffset(view_offset);
+  
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
     c.Push(modulegui->position, modulegui->GetRequestedSize());
@@ -243,6 +245,7 @@ void CanvasView::CustomDraw(DrawContext& c){
     }
   } // if fadeout wire is not none
 
+  c.ResetOffset();
 }
 
 int CanvasView::CurveStrengthFuncA(Point2D a, Point2D b){
@@ -260,7 +263,16 @@ int CanvasView::InWhich(Point2D p){
   return -1;
 }
 
-bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos){
+bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
+  
+  // Apply offset. from_abs/to_abs/pos_abs are coordinates expressed in absolute form,
+  // i.e. screenwise. They are not affected by the view position, and thus
+  // can be useful for calculating canvas drag. from/to/pos are expressed in
+  // relative form, so that they represent the position ON the movable
+  // plane. Therefore these are handy for e.g. detecting which module was clicked
+  // etc.
+  Point2D pos = pos_abs - view_offset;
+  
   int id = InWhich(pos);
   Point2D offset;
 
@@ -402,6 +414,15 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos){
       // No drag in progress.
       if(id >= 0) module_guis[id]->OnMousePress(false, MouseButton::Left, offset);
     }
+  }else if(down == true && b == MouseButton::Middle){
+    mmb_down = true;
+    mmb_down_pos_abs = pos_abs;  
+  }else if(down == false && b == MouseButton::Middle){
+    mmb_down = false;
+    if(view_move_in_progress){
+      view_move_in_progress = false;
+      std::cout << "View move ended" << std::endl;
+    }
   }
   return true;
 }
@@ -491,12 +512,14 @@ void CanvasView::ClearSelection(){
 }
 
 void CanvasView::CustomMouseEnter(Point2D pos){
+  pos -= view_offset;
   int id = InWhich(pos);
   if(id != -1){
     module_guis[id]->OnMouseEnter(pos);
   }
 }
 void CanvasView::CustomMouseLeave(Point2D pos){
+  pos -= view_offset;
   if(lmb_down) lmb_down = false;
   if(drag_in_progress) StopDrag();
   int id = InWhich(pos);
@@ -504,7 +527,17 @@ void CanvasView::CustomMouseLeave(Point2D pos){
     module_guis[id]->OnMouseLeave(pos);
   }
 }
-void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
+void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
+  
+  // Apply offset. from_abs/to_abs are coordinates expressed in absolute form,
+  // i.e. screenwise. They are not affected by the view position, and thus
+  // can be useful for calculating canvas drag. from/to are expressed in
+  // relative form, so that they represent the position ON the movable
+  // plane. Therefore these are handy for e.g. detecting which module was clicked
+  // etc.
+  Point2D from = from_abs - view_offset;
+  Point2D to = to_abs - view_offset;
+  
   if(drag_in_progress){
     // A drag is already in progress.
     drag_position = to;
@@ -637,6 +670,19 @@ void CanvasView::CustomMouseMotion(Point2D from,Point2D to){
       drag_mode = DragModeSlider;
       //std::cout << "Slider drag." << std::endl;
       module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid);
+    }
+  }
+  
+  // Independent view move
+  if(view_move_in_progress){
+    Point2D diff = to_abs - mmb_down_pos_abs;
+    view_offset = view_move_start_view_offset + diff;
+    SetNeedsRedrawing();
+  }else{
+    if(mmb_down){
+      view_move_in_progress = true;
+      view_move_start_view_offset = view_offset;
+      std::cout << "View move started" << std::endl;
     }
   }
 
