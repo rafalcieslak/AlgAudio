@@ -154,8 +154,9 @@ void DrawContext::Clear(Color c){
 void DrawContext::Push(Point2D p, Size2D s){
   // Remember the previous state
   context_stack.push(DCLevel(current_target, x, y, width, height, offset, base_scale, scale));
-  // Set new state
+  // Transform
   p = Transform(p);
+  // Set new state
   x = p.x; y = p.y;
   width = s.width; height = s.height;
   base_scale = base_scale * scale;
@@ -206,8 +207,8 @@ void DrawContext::SwitchToTarget(std::shared_ptr<SDLTexture> t){
 
 void DrawContext::UpdateClipRect(){
   //std::cout << "Clip set: " << x << " " << y << " " << width << " " << height << std::endl;
-  //SDL_Rect clip{x,y,int(width*TotalScale()),int(height*TotalScale())};
-  SDL_Rect clip{x,y,width,height};
+  SDL_Rect clip{x,y,int(width*base_scale),int(height*base_scale)};
+  //SDL_Rect clip{x,y,width,height};
   SDL_RenderSetClipRect(renderer, &clip);
 }
 

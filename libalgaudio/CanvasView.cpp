@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "CanvasView.hpp"
 #include <algorithm>
+#include <cmath>
 #include "rapidxml/rapidxml.hpp"
 #include "Window.hpp"
 #include "SDLMain.hpp"
@@ -275,7 +276,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   // plane. Therefore these are handy for e.g. detecting which module was clicked
   // etc.
   Point2D pos = PositionAbsToRel(pos_abs);
-  std::cout << pos_abs.ToString() << " " << pos.ToString() << std::endl;
+  //std::cout << pos_abs.ToString() << " " << pos.ToString() << std::endl;
   
   int id = InWhich(pos);
   Point2D offset;
@@ -360,8 +361,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
         }
       }
     }
-  }
-  if(down == false && b == MouseButton::Left){
+  }else if(down == false && b == MouseButton::Left){
     // Mouse button up
     lmb_down = false;
 
@@ -427,6 +427,10 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
       view_move_in_progress = false;
       std::cout << "View move ended" << std::endl;
     }
+  }else if(b == MouseButton::WheelUp){
+    IncreaseZoom();
+  }else if(b == MouseButton::WheelDown){
+    DecreaseZoom();
   }
   return true;
 }
@@ -539,8 +543,26 @@ void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
   // relative form, so that they represent the position ON the movable
   // plane. Therefore these are handy for e.g. detecting which module was clicked
   // etc.
-  Point2D from = PositionAbsToRel(from_abs);
-  Point2D to   = PositionAbsToRel(  to_abs);
+  Point2D from_rel = PositionAbsToRel(from_abs);
+  Point2D to_rel   = PositionAbsToRel(  to_abs);
+  
+  // Independent view move. View panning works on absolute coordinates.
+  if(view_move_in_progress){
+    Point2D diff = to_abs - mmb_down_pos_abs;
+    view_position = view_move_start_view_position - diff / view_zoom;
+    SetNeedsRedrawing();
+  }else{
+    if(mmb_down){
+      view_move_in_progress = true;
+      view_move_start_view_position = view_position;
+      std::cout << "View move started" << std::endl;
+    }
+  }
+  
+  MouseMotionOverCanvasPlane(from_rel, to_rel);
+}
+
+void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
   
   if(drag_in_progress){
     // A drag is already in progress.
@@ -676,19 +698,6 @@ void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
       module_guis[mouse_down_id]->SliderDragStart(mouse_down_elem_widgetid);
     }
   }
-  
-  // Independent view move
-  if(view_move_in_progress){
-    Point2D diff = to_abs - mmb_down_pos_abs;
-    view_position = view_move_start_view_position - diff / view_zoom;
-    SetNeedsRedrawing();
-  }else{
-    if(mmb_down){
-      view_move_in_progress = true;
-      view_move_start_view_position = view_position;
-      std::cout << "View move started" << std::endl;
-    }
-  }
 
   // standard motion?
   int id1 = InWhich(from), id2 = InWhich(to);
@@ -713,6 +722,13 @@ void CanvasView::OnKeyboard(KeyData k){
   if(k.type == KeyData::KeyType::Letter && k.symbol == "c" && k.IsTrig())
     CenterView();
     
+  if(ctrl_held && k.IsTrig()){
+    if(k.symbol == "-"){
+      DecreaseZoom();
+    }else if(k.symbol == "+" || k.symbol == "="){
+      IncreaseZoom();
+    }
+  }
   // TODO: pass events to children
 }
 
@@ -773,12 +789,52 @@ void CanvasView::CenterView(){
         if(r > maxx) maxx = r;
         if(b > maxy) maxy = b;
     }
+    // Calculate center position
     int avgx = (maxx + minx)/2;
     int avgy = (maxy + miny)/2;
-    std::cout << avgx << " " << avgy << std::endl;
     view_position = Point2D(avgx, avgy);
+    
+    // If needed, decrease zoom to fit all modules.
+    int xdist = maxx - minx;
+    int ydist = maxy - miny;
+    int dist = (xdist>ydist) ? xdist : ydist;
+    int size = (xdist>ydist) ? current_size.width : current_size.height;
+    float scale = float(size)/dist;
+    if(scale > 1.0) scale = 1.0;
+    // round the zoom DOWN to a power of two
+    scale = exp2(floor(log2(scale)*2.0f)/2.0f);
+    std::cout << dist << " " << size << " " << scale << std::endl;
+    SetZoom(scale);
   }
   SetNeedsRedrawing();
+}
+
+#define SQ2 1.4142135627
+void CanvasView::IncreaseZoom(){
+  SetZoom(view_zoom * SQ2);
+}
+void CanvasView::DecreaseZoom(){
+  SetZoom(view_zoom / SQ2);
+}
+void CanvasView::SetZoom(float level){
+  
+  Point2D mouse_rel_pos_before_zoom_change = PositionAbsToRel(last_mouse_pos);
+  
+  view_zoom = exp2(round(log2(level)*2.0f)/2.0f);
+  if(view_zoom > 2.0f) view_zoom = 2.0f;
+  if(view_zoom < 0.125f) view_zoom = 0.125f;
+  
+  Point2D mouse_rel_pos_after_zoom_change = PositionAbsToRel(last_mouse_pos);
+  
+  if(view_move_in_progress){
+    // Do a single view move step
+    Point2D diff = last_mouse_pos - mmb_down_pos_abs;
+    view_position = view_move_start_view_position - diff / view_zoom;
+  }
+  MouseMotionOverCanvasPlane(mouse_rel_pos_before_zoom_change, mouse_rel_pos_after_zoom_change);
+  
+  SetNeedsRedrawing();
+  std::cout << "Zoom: " << view_zoom << std::endl;
 }
 
 } // namespace AlgAudio

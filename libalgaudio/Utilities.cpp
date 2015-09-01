@@ -262,6 +262,12 @@ void KeyData::InitKeymap(){
   keymap[SDLK_x] = {"x", Letter};
   keymap[SDLK_y] = {"y", Letter};
   keymap[SDLK_z] = {"z", Letter};
+  
+  keymap[SDLK_EQUALS] = {"=", Symbol};
+  keymap[SDLK_MINUS] = {"-", Symbol};
+  keymap[SDLK_KP_PLUS] = {"+", Symbol};
+  keymap[SDLK_KP_MINUS] = {"-", Symbol};
+  
 }
 
 

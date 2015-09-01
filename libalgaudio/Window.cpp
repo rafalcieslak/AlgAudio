@@ -110,6 +110,7 @@ void Window::ProcessEnterEvent(){
 }
 
 void Window::ProcessMotionEvent(Point2D p){
+  last_mouse_pos = p;
   if(child){
     if(mouse_just_entered){
       child->OnMouseEnter(p);
@@ -135,10 +136,14 @@ void Window::ProcessResizeEvent(){
 }
 
 void Window::ProcessMouseButtonEvent(bool d, MouseButton b, Point2D p){
+  last_mouse_pos = p;
   if(child)
     child->OnMousePress(d,b,p);
 }
-
+void Window::ProcessWheelEvent(MouseButton button){
+  if(child)
+    child->OnMousePress(true,button,last_mouse_pos);
+}
 void Window::ProcessKeyboardEvent(KeyData k){
   if(child)
     child->OnKeyboard(k);

@@ -111,6 +111,12 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
     if(ev.button.button == SDL_BUTTON_RIGHT) b = MouseButton::Right;
     if(ev.button.button == SDL_BUTTON_MIDDLE) b = MouseButton::Middle;
     window->ProcessMouseButtonEvent( (ev.type == SDL_MOUSEBUTTONDOWN), b, Point2D(ev.button.x, ev.button.y));
+  }else if(ev.type == SDL_MOUSEWHEEL){
+    MouseButton b;
+    if(ev.wheel.y > 0) b = MouseButton::WheelUp;
+    else b = MouseButton::WheelDown;
+    int n = ev.wheel.y > 0 ? ev.wheel.y : -ev.wheel.y; // abs
+    while(n-->0) window->ProcessWheelEvent(b);
   }else if(ev.type == SDL_MOUSEMOTION){
     window->ProcessMotionEvent(Point2D(ev.motion.x, ev.motion.y));
   }else if(ev.type == SDL_KEYDOWN || ev.type == SDL_KEYUP){

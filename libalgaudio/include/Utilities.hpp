@@ -179,7 +179,9 @@ struct KeyData{
 enum class MouseButton{
   Left,
   Right,
-  Middle
+  Middle,
+  WheelUp,
+  WheelDown
 };
 
 struct MidiMessage{

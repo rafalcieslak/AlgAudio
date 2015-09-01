@@ -52,6 +52,7 @@ public:
 
   virtual void ProcessCloseEvent();
   void ProcessMouseButtonEvent(bool down, MouseButton button, Point2D);
+  void ProcessWheelEvent(MouseButton button);
   void ProcessMotionEvent(Point2D);
   void ProcessEnterEvent();
   void ProcessLeaveEvent();
@@ -87,8 +88,9 @@ private:
   // Note: SDL_GLContext is defined as a typedef for void*, so it's a pointer type.
   SDL_GLContext context;
 
-  Point2D prev_motion = Point2D(-1,-1);
+  Point2D prev_motion = Point2D(0,0);
   bool mouse_just_entered = false;
+  Point2D last_mouse_pos = Point2D(0,0);
 
   bool needs_redrawing = true;
 

@@ -40,9 +40,18 @@ public:
   virtual bool CustomMousePress(bool,MouseButton,Point2D);
   virtual void CustomMouseEnter(Point2D);
   virtual void CustomMouseLeave(Point2D);
-  virtual void CustomMouseMotion(Point2D,Point2D);
   virtual void OnKeyboard(KeyData);
 
+  
+  // This routine is called on mouse movement over the widget. See also MouseMotionOverCanvasPlane.
+  virtual void CustomMouseMotion(Point2D from_abs,Point2D to_abs) override;
+  // This routine is called when mouse pointer is moved over the canvas. This is
+  // slightly different from CustomMouseMotion, because there are cases when
+  // the pointer IS moved over canvas, but not over widget (e.g. when scrolling
+  // mouse wheel, the absolute pointer position is the same, but the relative
+  // position slightly changes, as the canvas slightly moves when zoomed).
+  void MouseMotionOverCanvasPlane(Point2D from_rel, Point2D to_rel);
+  
   // This method (usually called by the parent) creates a new Module instance
   // on the underlying canvas according to the template with the given ID,
   // prepares its ModuleGUI and places it on the given position.
@@ -55,6 +64,12 @@ public:
   // Resets a view position to the one at the center of the bounding box that
   // has al module guis inside.
   void CenterView();
+  
+  // This is what happens on mouse scroll or ctrl+plus/minus. Can be also
+  // invoked manually.
+  void IncreaseZoom();
+  void DecreaseZoom();
+  void SetZoom(float level);
 
   // Switches the canvas this CV displays. If the second argument is true,
   // all ModuleGUIs will be build - so when switching the view context you
@@ -180,7 +195,7 @@ private:
   
   // A global offset for drawing all contents. This allows canvas view panning.
   Point2D view_position = Point2D(0,0);
-  float view_zoom = 0.5;
+  float view_zoom = 1.0;
 };
 
 } // namespace AlgAudio
