@@ -4,6 +4,10 @@ add_definitions(
 	--std=c++14
 )
 
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+	add_definitions( -fPIC)
+endif()
+
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	add_definitions(
 		-Wall

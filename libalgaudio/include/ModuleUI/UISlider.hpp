@@ -22,7 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-struct ParamController;
+class ParamController;
 
 class UISlider : public UIWidget{
 public:

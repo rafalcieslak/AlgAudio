@@ -313,7 +313,7 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
   auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
   if(!templptr) return r.Return("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
 
-  ModuleFactory::CreateNewInstance(templptr).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m){
+  ModuleFactory::CreateNewInstance(templptr).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m) -> void{
     c->modules.emplace(m);
     saveids_to_modules.insert(std::make_pair(saveid,m));
     m->canvas = c;
@@ -322,13 +322,22 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
     for(rapidxml::xml_node<>* param_node = module_node->first_node("param"); param_node; param_node = param_node->next_sibling("param") ){
       rapidxml::xml_attribute<>* id_attr  = param_node->first_attribute("id");
       rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
-      if(!id_attr)  return r.Return("A param node is missing id attribute. saveid = " + std::to_string(saveid));
-      if(!val_attr) return r.Return("A param node is missing value attribute. saveid = " + std::to_string(saveid));
+      if(!id_attr){
+        r.Return("A param node is missing id attribute. saveid = " + std::to_string(saveid));
+        return;
+      }
+      if(!val_attr){
+        r.Return("A param node is missing value attribute. saveid = " + std::to_string(saveid));
+        return;
+      }
       std::string paramid = id_attr->value();
       float value = std::stof(val_attr->value());
 
       auto pc = m->GetParamControllerByID(paramid);
-      if(!pc) return r.Return("A param node has invalid id attribute: " + paramid);
+      if(!pc){
+        r.Return("A param node has invalid id attribute: " + paramid);
+        return;
+      }
 
       pc->Set(value);
     }
@@ -337,10 +346,10 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
     rapidxml::xml_node<>* guinode = module_node->first_node("gui");
     if(guinode) rapidxml::print(std::back_inserter(m->guidata), *guinode, rapidxml::print_no_indenting);
 
-    return r.Return("");
+    r.Return("");
   });
   return r;
 }
-  
-  
+
+
 } // namespace AlgAudio

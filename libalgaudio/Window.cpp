@@ -67,14 +67,14 @@ Window::~Window(){
 }
 
 void Window::Render(){
-#ifdef __unix__
+/*#ifdef __unix__
   if(!needs_redrawing){
 	  SDL_RenderPresent(renderer);
     return;
   }
-#else
+#else*/
   if(!needs_redrawing) return;
-#endif
+//#endif
   Size2D size = GetSize();
   DrawContext c(window, renderer, context, 0, 0, size.width, size.height); // Full window DC
   c.SetColor(Theme::Get("bg-main"));

@@ -42,8 +42,7 @@ ExternalProject_Add(
   # GIT_REPOSITORY https://github.com/mlabbe/nativefiledialog
   GIT_REPOSITORY https://github.com/rafalcieslak/nativefiledialog
   # TODO: Periodically update which version to download (tag).
-  # GIT_TAG 828bc71dcad6d28ab246a9a1fa9bb9ac69df6521
-  GIT_TAG 2ec8d20ce8fe15564e7ad0f6a3502e7acf6845ab
+  GIT_TAG algaudio
   CONFIGURE_COMMAND ""
   UPDATE_COMMAND ""
   BUILD_IN_SOURCE 1

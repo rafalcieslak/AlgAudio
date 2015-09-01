@@ -125,7 +125,7 @@ Point2D UIWidget::GetPosInParent(std::shared_ptr<UIWidget> ancestor){
   }else if(contmulti){
     res = contmulti->GetChildPos(shared_from_this());
   }else{
-    std::cout << "WARNING: GetPosInParent: The parent is not a container. This widget is a " << typeid(*this).name() << " and the parent is " << typeid(*p).name() << std::endl;
+    std::cout << "WARNING: GetPosInParent: The parent is not a container. This widget is a " << typeid(*this).name() << " and the parent is " << typeid(*(p.get())).name() << std::endl;
     return Point2D(0,0);
   }
   if(p != ancestor){
