@@ -70,7 +70,7 @@ private:
   // The collection of all maintained ModuleGUIs.
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
   // Used to determine which module was clicked knowing the click position.
-  int InWhich(Point2D);
+  int InWhich(Point2D relative_pos);
   int CurveStrengthFuncA(Point2D a, Point2D b);
   int CurveStrengthFuncB(Point2D a, Point2D b);
   // These flags are set according to the mouse buttons state.
@@ -108,6 +108,18 @@ private:
   void SelectSingle(std::shared_ptr<ModuleGUI>);
   void AddToSelection(std::shared_ptr<ModuleGUI>);
 
+  // The positions on the canvas are represented in two forms. The absolute
+  // coordinates express the position in screenwise position, so that the top
+  // left corner of the canvasview is always at 0,0 abs. Mouse events etc. will
+  // receive absolute position information. In order to take view position into
+  // account, the coordinates need to be transformed to relative format. All
+  // module GUIs are placed at some fixed place in relative coordinates, and that
+  // place does not change with zoom or view paning. Thus, when reacting on a
+  // mouse event it is desirable to transform coordinates to relative format
+  // before checking what lies on the clicked spot.
+  inline Point2D PositionRelToAbs(Point2D rel){ return rel + current_size/2 - view_position; }
+  inline Point2D PositionAbsToRel(Point2D abs){ return abs - current_size/2 + view_position; }
+
   // Is there any dragging action in progress?
   bool drag_in_progress = false;
   bool view_move_in_progress = false;
@@ -130,9 +142,9 @@ private:
 
   // The position where mmb was pressed.
   Point2D mmb_down_pos_abs;
-  // This variable stores what was the view_offset value when the view drag
+  // This variable stores what was the view_position value when the view drag
   // started.
-  Point2D view_move_start_view_offset;
+  Point2D view_move_start_view_position;
 
   // Sets drag_in_progress to false, but also does extra cleanup.
   void StopDrag();
@@ -167,7 +179,8 @@ private:
   bool shift_held, ctrl_held, alt_held;
   
   // A global offset for drawing all contents.
-  Point2D view_offset = Point2D(0,0);
+  Point2D view_position = Point2D(0,0);
+  float view_scale = 0.5;
 };
 
 } // namespace AlgAudio

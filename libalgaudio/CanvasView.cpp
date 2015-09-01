@@ -112,7 +112,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
-  c.SetOffset(view_offset);
+  c.SetOffset(-view_position + c.Size()/2);
   
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
@@ -257,9 +257,9 @@ int CanvasView::CurveStrengthFuncB(Point2D a, Point2D b){
   return std::min(std::abs(a.x - b.x)/3 + std::abs(a.y - b.y)/4, 90);
 }
 
-int CanvasView::InWhich(Point2D p){
+int CanvasView::InWhich(Point2D relative_pos){
   for(int i = module_guis.size() - 1; i >= 0; i--){
-    if(p.IsInside(module_guis[i]->position, module_guis[i]->GetRequestedSize()) )
+    if(relative_pos.IsInside(module_guis[i]->position, module_guis[i]->GetRequestedSize()) )
       return i;
   }
   return -1;
@@ -273,7 +273,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   // relative form, so that they represent the position ON the movable
   // plane. Therefore these are handy for e.g. detecting which module was clicked
   // etc.
-  Point2D pos = pos_abs - view_offset;
+  Point2D pos = PositionAbsToRel(pos_abs);
   
   int id = InWhich(pos);
   Point2D offset;
@@ -513,15 +513,15 @@ void CanvasView::ClearSelection(){
   selection.clear();
 }
 
-void CanvasView::CustomMouseEnter(Point2D pos){
-  pos -= view_offset;
+void CanvasView::CustomMouseEnter(Point2D pos_abs){
+  Point2D pos = PositionAbsToRel(pos_abs);
   int id = InWhich(pos);
   if(id != -1){
     module_guis[id]->OnMouseEnter(pos);
   }
 }
-void CanvasView::CustomMouseLeave(Point2D pos){
-  pos -= view_offset;
+void CanvasView::CustomMouseLeave(Point2D pos_abs){
+  Point2D pos = PositionAbsToRel(pos_abs);
   if(lmb_down) lmb_down = false;
   if(drag_in_progress) StopDrag();
   int id = InWhich(pos);
@@ -537,8 +537,8 @@ void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
   // relative form, so that they represent the position ON the movable
   // plane. Therefore these are handy for e.g. detecting which module was clicked
   // etc.
-  Point2D from = from_abs - view_offset;
-  Point2D to = to_abs - view_offset;
+  Point2D from = PositionAbsToRel(from_abs);
+  Point2D to   = PositionAbsToRel(  to_abs);
   
   if(drag_in_progress){
     // A drag is already in progress.
@@ -678,12 +678,12 @@ void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
   // Independent view move
   if(view_move_in_progress){
     Point2D diff = to_abs - mmb_down_pos_abs;
-    view_offset = view_move_start_view_offset + diff;
+    view_position = view_move_start_view_position - diff;
     SetNeedsRedrawing();
   }else{
     if(mmb_down){
       view_move_in_progress = true;
-      view_move_start_view_offset = view_offset;
+      view_move_start_view_position = view_position;
       std::cout << "View move started" << std::endl;
     }
   }
@@ -757,7 +757,7 @@ void CanvasView::FadeoutWireStep(float delta){
 void CanvasView::CenterView(){
   std::cout << "CENTERING" << std::endl;
   if(module_guis.size() == 0){
-    view_offset = Point2D(0,0);
+    view_position = Point2D(0,0);
   }else{
     int minx = INT_MAX, miny = INT_MAX;
     int maxx = -INT_MAX, maxy = -INT_MAX;
@@ -774,7 +774,7 @@ void CanvasView::CenterView(){
     int avgx = (maxx + minx)/2;
     int avgy = (maxy + miny)/2;
     std::cout << avgx << " " << avgy << std::endl;
-    view_offset = -Point2D(avgx, avgy) + current_size/2;
+    view_position = Point2D(avgx, avgy);
   }
   SetNeedsRedrawing();
 }
