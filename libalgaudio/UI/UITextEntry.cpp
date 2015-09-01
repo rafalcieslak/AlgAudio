@@ -39,7 +39,7 @@ void UITextEntry::CustomDraw(DrawContext& c){
   int h = c.Size().height;
   c.DrawRect(0,0,w,h);
 
-  c.DrawText(text_texture, Theme::Get("textentry-text"), 1,0);
+  c.DrawText(text_texture, Theme::Get("textentry-text"), Point2D(1,0));
 }
 
 void UITextEntry::SetText(std::string t){

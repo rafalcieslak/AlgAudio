@@ -35,7 +35,7 @@ std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string te
 
 void UILabel::CustomDraw(DrawContext& c){
   Point2D pos = Utilities::Align(horiz_alignment, vert_alignment, texture->GetSize(), c.Size());
-  c.DrawText(texture, Theme::Get(color), pos.x, pos.y);
+  c.DrawText(texture, Theme::Get(color), pos);
 }
 
 void UILabel::SetText(std::string t){

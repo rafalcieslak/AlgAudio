@@ -128,7 +128,7 @@ void UISlider::CustomDraw(DrawContext& c){
     // NOT pointed on center
 
     // Slider name
-    c.DrawText(name_texture, Color(0,0,0), (mode == Mode::Display)?1:13,3);
+    c.DrawText(name_texture, Color(0,0,0), Point2D((mode == Mode::Display)?1:13,3));
 
     auto contr = controller.lock();
     if(contr){
@@ -140,7 +140,7 @@ void UISlider::CustomDraw(DrawContext& c){
       c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(value_texture, Color(0,0,0), GetBodyEnd() - 1 - value_texture->GetSize().width ,3);
+      c.DrawText(value_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - value_texture->GetSize().width ,3));
     }
 
   }else{
@@ -156,13 +156,13 @@ void UISlider::CustomDraw(DrawContext& c){
       c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(value_texture_big, Color(0,0,0), w/2 - value_texture_big->GetSize().width/2, 0);
+      c.DrawText(value_texture_big, Color(0,0,0), Point2D(w/2 - value_texture_big->GetSize().width/2, 0));
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(range_max_texture, Color(0,0,0), GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3);
+      c.DrawText(range_max_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3));
 
       c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(range_min_texture, Color(0,0,0), GetBodyStart() + 1 ,3);
+      c.DrawText(range_min_texture, Color(0,0,0), Point2D(GetBodyStart() + 1 ,3));
     }
 
   }

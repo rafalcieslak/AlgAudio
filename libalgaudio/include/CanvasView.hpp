@@ -117,8 +117,8 @@ private:
   // place does not change with zoom or view paning. Thus, when reacting on a
   // mouse event it is desirable to transform coordinates to relative format
   // before checking what lies on the clicked spot.
-  inline Point2D PositionRelToAbs(Point2D rel){ return rel + current_size/2 - view_position; }
-  inline Point2D PositionAbsToRel(Point2D abs){ return abs - current_size/2 + view_position; }
+  inline Point2D_<float> PositionRelToAbs(Point2D_<float> rel){ return (rel - view_position)*view_zoom + current_size/2; }
+  inline Point2D_<float> PositionAbsToRel(Point2D_<float> abs){ return view_position + (abs - current_size/2)/view_zoom; }
 
   // Is there any dragging action in progress?
   bool drag_in_progress = false;
@@ -161,7 +161,7 @@ private:
     DataRelative,
     DataAbsolute,
   };
-  // A potential wire connection is the name for a graphical wire that is alraedy
+  // A potential wire connection is the name for a graphical wire that is already
   // drawn on the canvas (bright green), but was not yet created.
   PotentialWireMode potential_wire = PotentialWireMode::None;
   PotentialWireType potential_wire_type;
@@ -178,9 +178,9 @@ private:
   // Flags remebering held keys.
   bool shift_held, ctrl_held, alt_held;
   
-  // A global offset for drawing all contents.
+  // A global offset for drawing all contents. This allows canvas view panning.
   Point2D view_position = Point2D(0,0);
-  float view_scale = 0.5;
+  float view_zoom = 0.5;
 };
 
 } // namespace AlgAudio

@@ -57,10 +57,10 @@ public:
   inline void DrawLine(int x1, int y1, int x2, int y2) {DrawLine(Point2D(x1,y1),Point2D(x2,y2));}
   void DrawLine(Point2D from, Point2D to, bool smooth=false);
   void DrawLineEx(float x1, float y1, float x2, float y2, float width = 1.0);
-  void DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, unsigned int lines = 15, float width = 2.0);
+  void DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, float width, unsigned int segments = 15);
   // Rendering textures onto a context.
-  void DrawTexture(std::shared_ptr<SDLTexture> texture, int x = 0, int y = 0);
-  void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, int x = 0, int y = 0);
+  void DrawTexture(std::shared_ptr<SDLTexture> texture, Point2D p = Point2D(0,0));
+  void DrawText(std::shared_ptr<SDLTextTexture> text, Color c, Point2D p = Point2D(0,0));
   // Drawing rectangles.
   void DrawRect(int x, int y, int w, int h);
   inline void DrawRect(Rect r){DrawRect(r.a.x, r.a.y, r.Size().width, r.Size().height);}
@@ -88,6 +88,7 @@ public:
 
   void SetOffset(Point2D off){offset = off;}
   void ResetOffset(){offset = Point2D(0,0);}
+  void SetScale(float s){scale = s;}
 
   // Reapplies the current context params. It is useful if your context was
   // messed up by a different context using the same window.
@@ -96,12 +97,20 @@ public:
   // carried by your Draw context. Use Restore to fix the context after text
   // rendering is completed.
   void Restore();
+  
 private:
   // Current DrawContext state.
   int width, height;
   int x,y;
   
   Point2D offset;
+  // Base scale is the cumulative scale from all above levels. scale is the
+  // current scale set by this level. Thanks to this differenciation, setting
+  // a scale on any level does not override what upper levels set, but is
+  // accumulated.
+  float base_scale = 1.0, scale = 1.0;
+  inline Point2D_<float> Transform(Point2D_<float> p){return p*TotalScale() + offset;}
+  inline float TotalScale(){return base_scale * scale;}
 
   // Internal variables
   SDL_Window* window;
@@ -112,11 +121,12 @@ private:
   std::shared_ptr<SDLTexture> current_target = nullptr;
   // A helper structure for storing context state onto a stack.
   struct DCLevel{
-    DCLevel(std::shared_ptr<SDLTexture> t, int x, int y, int w, int h, Point2D off) :
-      target(t), xoffset(x), yoffset(y), width(w), height(h), offset(off) {}
+    DCLevel(std::shared_ptr<SDLTexture> t, int x, int y, int w, int h, Point2D off, float bs, float s) :
+      target(t), xoffset(x), yoffset(y), width(w), height(h), offset(off), base_scale(bs), scale(s) {}
     std::shared_ptr<SDLTexture> target;
     int xoffset, yoffset, width, height;
     Point2D offset;
+    float base_scale, scale;
   };
   // The state stack.
   std::stack<DCLevel> context_stack;

@@ -80,6 +80,20 @@ Point2D_<T> operator*(const T& t, const Point2D_<T>& a) {
   return Point2D_<T>(a.x*t, a.y*t);
 }
 
+// Special case for multiplying and dividing a classic point with a float. To
+// prevent accuracy loss specialisations below return a float point. Also, if
+// it was not for these specialisations, multiplying a point by 0.5 would 
+// implicitly convert 0.5 to an int and thus cause a SIGFPE.
+inline Point2D_<float> operator*(const float& t, const Point2D_<int>& a) {
+  return Point2D_<float>(a.x*t, a.y*t);
+}
+inline Point2D_<float> operator*(const Point2D_<int>& a, const float& t) {
+  return Point2D_<float>(a.x*t, a.y*t);
+}
+inline Point2D_<float> operator/(const Point2D_<int>& a, const float& t) {
+  return Point2D_<float>(a.x/t, a.y/t);
+}
+
 struct Rect{
   Point2D a;
   Point2D b;

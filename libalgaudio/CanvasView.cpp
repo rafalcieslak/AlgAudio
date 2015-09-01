@@ -112,7 +112,8 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
-  c.SetOffset(-view_position + c.Size()/2);
+  c.SetOffset( PositionRelToAbs(Point2D(0,0))  );
+  c.SetScale(view_zoom);
   
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
@@ -133,7 +134,7 @@ void CanvasView::CustomDraw(DrawContext& c){
     for(auto to : to_list){
       Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
       int strength = CurveStrengthFuncA(from_pos, to_pos);
-      c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos);
+      c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos, 2.0f);
     }
   }
   // Next, data connections.
@@ -148,7 +149,7 @@ void CanvasView::CustomDraw(DrawContext& c){
       Point2D to_pos = to.ioid.module->GetGUI()->position + to.ioid.module->GetGUI()->WhereIsParamInlet(to.ioid.iolet);
       Point2D from_pos = (to.mode == Canvas::DataConnectionMode::Relative) ? from_pos_relative : from_pos_absolute;
       int strength = CurveStrengthFuncB(from_pos, to_pos);
-      c.DrawCubicBezier(from_pos, from_pos + Point2D(strength,0), to_pos + Point2D(-strength, 0), to_pos, 15, 1.0f);
+      c.DrawCubicBezier(from_pos, from_pos + Point2D(strength,0), to_pos + Point2D(-strength, 0), to_pos, 1.0f);
     }
   }
 
@@ -168,7 +169,7 @@ void CanvasView::CustomDraw(DrawContext& c){
       Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
       Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncA(p1, p2);
-      c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2);
+      c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2, 2.0f);
     }else{
       // Potential data wire
       Point2D outlet_pos = (potential_wire_type == PotentialWireType::DataRelative) ?
@@ -177,7 +178,7 @@ void CanvasView::CustomDraw(DrawContext& c){
       Point2D p1 = from_mgui->position + outlet_pos;
       Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncB(p1, p2);
-      c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 15, 1.0f);
+      c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 1.0f);
     }
 
 
@@ -188,27 +189,27 @@ void CanvasView::CustomDraw(DrawContext& c){
       c.SetColor(Theme::Get("canvas-connection-audio"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
-      c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position);
+      c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position, 2.0f);
     }else if(drag_mode == DragModeConnectAudioFromInlet){
       c.SetColor(Theme::Get("canvas-connection-audio"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
-      c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position);
+      c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position, 2.0f);
     }else if(drag_mode == DragModeConnectDataFromRelativeOutlet){
       c.SetColor(Theme::Get("canvas-connection-data-relative"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamRelativeOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
-      c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 15, 1.0f);
+      c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeConnectDataFromAbsoluteOutlet){
       c.SetColor(Theme::Get("canvas-connection-data-absolute"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamAbsoluteOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
-      c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 15, 1.0f);
+      c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeConnectDataFromInlet){
       c.SetColor(Theme::Get("canvas-connection-data-relative"));
       Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
-      c.DrawCubicBezier(p, p + Point2D(-strength,0), drag_position + Point2D(strength/2, 0), drag_position, 15, 1.0f);
+      c.DrawCubicBezier(p, p + Point2D(-strength,0), drag_position + Point2D(strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeBBSelect){
       c.SetColor(Theme::Get("canvas-bb-body"));
       Rect r(drag_position, mouse_down_position);
@@ -233,7 +234,7 @@ void CanvasView::CustomDraw(DrawContext& c){
         Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
         Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
         int strength = CurveStrengthFuncA(p1, p2);
-        c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2);
+        c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2, 2.0f);
       }else{
 
         Point2D outlet_pos = (fadeout_wire_type == PotentialWireType::DataRelative) ?
@@ -242,7 +243,7 @@ void CanvasView::CustomDraw(DrawContext& c){
         Point2D p1 = from_mgui->position + outlet_pos;
         Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
         int strength = CurveStrengthFuncB(p1, p2);
-        c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 15, 1.0f);
+        c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 1.0f);
       }
     }
   } // if fadeout wire is not none
@@ -274,6 +275,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   // plane. Therefore these are handy for e.g. detecting which module was clicked
   // etc.
   Point2D pos = PositionAbsToRel(pos_abs);
+  std::cout << pos_abs.ToString() << " " << pos.ToString() << std::endl;
   
   int id = InWhich(pos);
   Point2D offset;
@@ -678,7 +680,7 @@ void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
   // Independent view move
   if(view_move_in_progress){
     Point2D diff = to_abs - mmb_down_pos_abs;
-    view_position = view_move_start_view_position - diff;
+    view_position = view_move_start_view_position - diff / view_zoom;
     SetNeedsRedrawing();
   }else{
     if(mmb_down){

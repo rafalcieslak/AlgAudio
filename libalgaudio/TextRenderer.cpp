@@ -84,7 +84,7 @@ std::shared_ptr<SDLTextTexture> TextRenderer::Render(std::weak_ptr<Window> w,Fon
   dc.Push(res,maxw,totalh);
   int currenty = 0;
   for(auto& texture : textures){
-    dc.DrawTexture(texture,0,currenty);
+    dc.DrawTexture(texture,Point2D(0,currenty));
     currenty += texture->GetSize().height;
   }
   dc.Pop();

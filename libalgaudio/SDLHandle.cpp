@@ -41,6 +41,7 @@ SDLHandle::SDLHandle(){
     //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,16);
     if(TTF_Init() != 0 )
       throw SDLException("TTF_Init failed");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
   }
   reference_counter++;
   //std::cout << "Created a new SDLHandle " << reference_counter << std::endl;

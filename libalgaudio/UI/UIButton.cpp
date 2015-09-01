@@ -60,15 +60,16 @@ void UIButton::CustomDraw(DrawContext& c){
   if(border_enabled){
     c.SetColor(bg_color.Darker(0.15));
     c.DrawRectBorder(Rect(Point2D(0,0),Size2D(w-1,h-1)));
-    c.DrawRectBorder(Rect(Point2D(1,1),Size2D(w-2,h-2)));
+    c.DrawRectBorder(Rect(Point2D(1,1),Size2D(w-3,h-3)));
   }
 
   c.SetColor(text_color);
   c.DrawText(
     texture,
     text_color,
-    w/2  - texture->GetSize().width/2  + ((pressed)?2:0),
-    h/2 - texture->GetSize().height/2 + ((pressed)?1:0)
+    Point2D( w/2  - texture->GetSize().width/2  + ((pressed)?2:0),
+             h/2 - texture->GetSize().height/2 + ((pressed)?1:0)
+           )
   );
 }
 
