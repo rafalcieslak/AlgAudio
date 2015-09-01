@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "CanvasView.hpp"
 #include <algorithm>
 #include <cmath>
+#include <climits>
 #include "rapidxml/rapidxml.hpp"
 #include "Window.hpp"
 #include "SDLMain.hpp"
