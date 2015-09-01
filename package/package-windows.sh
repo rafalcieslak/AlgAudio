@@ -1,6 +1,6 @@
 #!/bin/sh
 
-#Run this package inside the build dir once everything has been compiled
+# Run this package inside the build dir once everything has been compiled
 
 DIR=package-windows
 
@@ -10,6 +10,7 @@ cp -r fonts sc $DIR
 mkdir $DIR/modules
 cp modules/*.xml $DIR/modules/.
 cp modules/*.aa.dll $DIR/modules/.
+cp -r ../examples $DIR 
 
 # Copy all necessary dlls
 ldd $DIR/*.dll | grep mingw | cut -d ' ' -f 3 | xargs -i cp {} $DIR/.
