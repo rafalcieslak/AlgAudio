@@ -62,6 +62,7 @@ struct Point2D_{
   std::string ToString() const {return "{" + std::to_string(x) + ", " + std::to_string(y) + " }"; }
   Point2D_<T> operator+(const Point2D_<T>& other) const { return Point2D_<T>(x + other.x, y + other.y);}
   Point2D_<T> operator-(const Point2D_<T>& other) const { return Point2D_<T>(x - other.x, y - other.y);}
+  Point2D_<T> operator-() const { return Point2D_<T>(-x,-y);}
   Point2D_<T> operator/(const T& t) const {return Point2D_<T>(x/t, y/t);}
   Point2D_<T> operator*(const T& t) const {return Point2D_<T>(x*t, y*t);}
   Point2D_<T> operator+(const Size2D& other) const { return Point2D_<T>(x + other.width, y + other.height);}

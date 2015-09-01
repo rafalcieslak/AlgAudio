@@ -167,7 +167,7 @@ private:
   bool shift_held, ctrl_held, alt_held;
   
   // A global offset for drawing all contents.
-  Point2D view_offset = Point2D(100,100);
+  Point2D view_offset = Point2D(0,0);
 };
 
 } // namespace AlgAudio

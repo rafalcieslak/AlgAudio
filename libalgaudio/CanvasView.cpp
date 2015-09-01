@@ -759,12 +759,24 @@ void CanvasView::CenterView(){
   if(module_guis.size() == 0){
     view_offset = Point2D(0,0);
   }else{
-    /*int minx = INT_MAX, miny = INT_MAX;
+    int minx = INT_MAX, miny = INT_MAX;
     int maxx = -INT_MAX, maxy = -INT_MAX;
     for(auto mgui : module_guis){
-      
-    }*/
+        int l = mgui->position.x;
+        int t = mgui->position.y;
+        int r = l + mgui->GetRequestedSize().width;
+        int b = t + mgui->GetRequestedSize().height;
+        if(l < minx) minx = l;
+        if(t < miny) miny = t;
+        if(r > maxx) maxx = r;
+        if(b > maxy) maxy = b;
+    }
+    int avgx = (maxx + minx)/2;
+    int avgy = (maxy + miny)/2;
+    std::cout << avgx << " " << avgy << std::endl;
+    view_offset = -Point2D(avgx, avgy) + current_size/2;
   }
+  SetNeedsRedrawing();
 }
 
 } // namespace AlgAudio
