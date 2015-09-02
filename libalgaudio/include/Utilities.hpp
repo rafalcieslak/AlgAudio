@@ -206,6 +206,7 @@ public:
   static void WaitOS(int ms);
   static bool GetFileExists(std::string name);
   static std::string GetDir(std::string);
+  static std::string GetFilename(std::string);
   static std::string GetCurrentDir();
   static const char OSDirSeparator;
   static const std::string OSLibSuffix;

@@ -82,7 +82,7 @@ void LaunchConfigWindow::init(){
       statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
       startbutton->SetText("Start AlgAudio");
     }
-    statustext->SetTextColor("text-generic");
+    statustext->SetTextColor(Theme::Get("text-generic"));
     statustext->SetBold(false);
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
@@ -124,7 +124,7 @@ void LaunchConfigWindow::init(){
     }else{
       statustext->SetText(message);
       statustext->SetBold(true);
-      statustext->SetTextColor("text-error");
+      statustext->SetTextColor(Theme::Get("text-error"));
       progressbar->SetAmount(0);
     }
   });

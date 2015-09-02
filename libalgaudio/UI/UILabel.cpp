@@ -24,25 +24,25 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UILabel::UILabel(std::weak_ptr<Window> w, std::string t, int size, std::string c) : UIWidget(w), text(t), color(c), fontsize(size){
+UILabel::UILabel(std::weak_ptr<Window> w, std::string t, int size) : UIWidget(w), text(t), fontsize(size){
   UpdateTexture();
 }
 
-std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string text, int size, std::string color){
-  std::shared_ptr<UILabel> res(new UILabel(w,text,size,color));
+std::shared_ptr<UILabel> UILabel::Create(std::weak_ptr<Window> w, std::string text, int size){
+  std::shared_ptr<UILabel> res(new UILabel(w,text,size));
   return res;
 }
 
 void UILabel::CustomDraw(DrawContext& c){
   Point2D pos = Utilities::Align(horiz_alignment, vert_alignment, texture->GetSize(), c.Size());
-  c.DrawText(texture, Theme::Get(color), pos);
+  c.DrawText(texture, color, pos);
 }
 
 void UILabel::SetText(std::string t){
   text = t;
   UpdateTexture();
 }
-void UILabel::SetTextColor(std::string c){
+void UILabel::SetTextColor(Color c){
   color = c;
   UpdateTexture();
 }

@@ -43,11 +43,14 @@ void StandardModuleGUI::CommonInit(){
   main_margin = UIMarginBox::Create(window,0,3,0,3);
   main_box = UIVBox::Create(window);
   inlets_box = UIHBox::Create(window);
+  inlets_box->widget_id = UIWidget::ID("inletsbox");
   outlets_box = UIHBox::Create(window);
+  outlets_box->widget_id = UIWidget::ID("outletsbox");
   params_box = UIVBox::Create(window);
+  params_box->widget_id = UIWidget::ID("paramsbox");
   params_box->SetPadding(1);
   caption = UILabel::Create(window, "", 14);
-  caption->SetTextColor("standardbox-caption");
+  caption->SetTextColor(Theme::Get("standardbox-caption"));
 
   main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);
   main_box->Insert(caption, UIBox::PackMode::TIGHT);

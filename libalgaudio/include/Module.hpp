@@ -206,6 +206,8 @@ public:
   // it will not be owned by the module instance.
   virtual std::shared_ptr<ModuleGUI> BuildGUI(std::shared_ptr<Window> parent_window);
 
+  void DropGUI() {modulegui.reset();}
+  
   // Creates and allocates Inlets and Outlets for this instance, according to
   // the data in template info.
   LateReturn<> CreateIOFromTemplate(bool fake = false);

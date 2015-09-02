@@ -32,12 +32,14 @@ CanvasView::CanvasView(std::shared_ptr<Window> parent) : UIWidget(parent){
 
 std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> parent){
   auto ptr = std::shared_ptr<CanvasView>( new CanvasView(parent) );
-  ptr->canvas = Canvas::CreateEmpty();
+  ptr->canvas_stack.push_back( {Canvas::CreateEmpty(), ""} );
   return ptr;
 }
 
-void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
-  canvas = c;
+void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool restore_guidata){
+  canvas_stack.clear();
+  canvas_stack.push_back({c,""});
+  
   drag_in_progress = false;
   module_guis.clear();
   mouse_down_mode = ModeNone;
@@ -46,52 +48,75 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
   fadeout_anim.Release();
   ClearSelection();
 
-  if(build_guis){
-    for(auto& m : c->modules){
-      try{
-        auto modulegui = m->BuildGUI(window.lock());
-        Size2D guisize = modulegui->GetRequestedSize();
-        modulegui->Resize(guisize);
-        // Load stored data (e.g. loaded from save file or clipboard)
-        if(m->guidata != ""){
-          try{
-            char buffer[10000];
-            strncpy(buffer,m->guidata.c_str(),10000);
-            rapidxml::xml_document<> doc;
-            doc.parse<0>(buffer);
-            rapidxml::xml_node<>* root = doc.first_node("gui");
-            if(root){
-              rapidxml::xml_attribute<>* x_attr = root->first_attribute("x");
-              rapidxml::xml_attribute<>* y_attr = root->first_attribute("y");
-              if(x_attr && y_attr){
-                // Set modulegui position in canvas
-                modulegui->position = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
-              }
-            }
-          }catch(rapidxml::parse_error){
-            /*ignore*/
-          }catch(std::runtime_error){
-            /*ignore*/
-          }
-        }
-        modulegui->parent = shared_from_this();
-        module_guis.push_back(modulegui);
-      }catch(GUIBuildException ex){
-        canvas->RemoveModule(m);
-        window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+  for(auto& m : c->modules){
+      auto modulegui = m->GetGUI();
+      // If the module already has a gui, but it does not recognize us as a parent
+      if(modulegui && modulegui->parent.lock() != shared_from_this()){
+        // Get rid of the gui.
+        m->DropGUI();
+        modulegui = nullptr;
       }
-    }
-  
-    CenterView();
+      if(modulegui){
+        // The gui already exists. No need to apply it's settings.
+      }else{
+        // The GUI was not yet build. Let's make it.
+        try{
+          modulegui = m->BuildGUI(window.lock());
+          // Mark us as the modulegui parent
+          modulegui->parent = shared_from_this();
+          // Resize the gui
+          Size2D guisize = modulegui->GetRequestedSize();
+          modulegui->Resize(guisize);
+          // Load stored data (e.g. loaded from save file or clipboard)
+          if(restore_guidata && m->guidata != ""){
+            try{
+              char buffer[10000];
+              strncpy(buffer,m->guidata.c_str(),10000);
+              rapidxml::xml_document<> doc;
+              doc.parse<0>(buffer);
+              rapidxml::xml_node<>* root = doc.first_node("gui");
+              if(root){
+                rapidxml::xml_attribute<>* x_attr = root->first_attribute("x");
+                rapidxml::xml_attribute<>* y_attr = root->first_attribute("y");
+                if(x_attr && y_attr){
+                  // Set modulegui position in canvas
+                  modulegui->position = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
+                }
+              }
+            }catch(rapidxml::parse_error){
+              /*ignore*/
+            }catch(std::runtime_error){
+              /*ignore*/
+            }
+          }
+        }catch(GUIBuildException ex){
+          GetCurrentCanvas()->RemoveModule(m);
+          window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+        }
+        
+      } // if no modulegui
+      module_guis.push_back(modulegui);
   }
+  CenterView();
 
   SetNeedsRedrawing();
+}
+
+
+void CanvasView::EnterCanvas(std::shared_ptr<Canvas> ){
+  
+}
+void CanvasView::ExitCanvas(){
+  
+}
+std::string CanvasView::GetCanvasStackPath(){
+  return ""; //TODO
 }
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
   try{
-    canvas->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
+    GetCurrentCanvas()->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
       if(m){ // Do not create the GUI if module instance creation failed.
         try{
           auto modulegui = m->BuildGUI(window.lock());
@@ -107,7 +132,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
           drag_mode = DragModeMove;
           SetNeedsRedrawing();
         }catch(GUIBuildException ex){
-          canvas->RemoveModule(m);
+          GetCurrentCanvas()->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
       } // if m
@@ -133,7 +158,7 @@ void CanvasView::CustomDraw(DrawContext& c){
   // about the io position every time when redrawing is not going to be
   // efficient when there are 100+ modules present.
   c.SetColor(Theme::Get("canvas-connection-audio"));
-  for(auto it : canvas->audio_connections){
+  for(auto it : GetCurrentCanvas()->audio_connections){
     Canvas::IOID from = it.first;
     Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutlet(from.iolet);
     // For each target of this outlet
@@ -145,7 +170,7 @@ void CanvasView::CustomDraw(DrawContext& c){
     }
   }
   // Next, data connections.
-  for(auto it : canvas->data_connections){
+  for(auto it : GetCurrentCanvas()->data_connections){
     Canvas::IOID from = it.first;
     Point2D from_pos_relative = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsParamRelativeOutlet(from.iolet);
     Point2D from_pos_absolute = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsParamAbsoluteOutlet(from.iolet);
@@ -454,10 +479,10 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
   std::cout << "Which corresponds to " << inlet_module_id << "/" << inlet_id << " to " << outlet_module_id << "/" << outlet_id << std::endl;
   Canvas::IOID from = {from_module,outlet_id};
   Canvas::IOID   to = {  to_module,inlet_id };
-  if(!canvas->GetDirectAudioConnectionExists(from, to)){
+  if(!GetCurrentCanvas()->GetDirectAudioConnectionExists(from, to)){
     // There is no such connection, connect!
     try{
-      canvas->Connect(from,to);
+      GetCurrentCanvas()->Connect(from,to);
       FadeoutWireStart(PotentialWireMode::New);
     }catch(MultipleConnectionsException ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
@@ -468,7 +493,7 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
     }
   }else{
     // This connection already exists, remove it.
-    canvas->Disconnect(from,to);
+    GetCurrentCanvas()->Disconnect(from,to);
     FadeoutWireStart(PotentialWireMode::Remove);
   }
   SetNeedsRedrawing();
@@ -489,9 +514,9 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
 
   Canvas::IOID from = {from_module,param1_id};
   Canvas::IOID   to = {  to_module,param2_id };
-  if(!canvas->GetDirectDataConnectionExists(from, to).first){
+  if(!GetCurrentCanvas()->GetDirectDataConnectionExists(from, to).first){
     try{
-      canvas->ConnectData(from,to,mode);
+      GetCurrentCanvas()->ConnectData(from,to,mode);
       FadeoutWireStart(PotentialWireMode::New);
     }catch(MultipleConnectionsException ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
@@ -502,7 +527,7 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
     }
   }else{
     // This connection already exists, remove it.
-    canvas->DisconnectData(from,to);
+    GetCurrentCanvas()->DisconnectData(from,to);
     FadeoutWireStart(PotentialWireMode::Remove);
   }
 }
@@ -604,7 +629,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
         from_outlet_paramid = mouse_down_elem_paramid;
         to_inlet_paramid =  whatishere.param_id;
       }
-      if(canvas->GetDirectAudioConnectionExists( // If there is already an audio connection between these two
+      if(GetCurrentCanvas()->GetDirectAudioConnectionExists( // If there is already an audio connection between these two
         {module_guis[from_id]->GetModule(), from_outlet_paramid},
         {module_guis[to_id]->GetModule(),    to_inlet_paramid})
       )
@@ -620,7 +645,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
               drag_mode == DragModeConnectDataFromInlet && // and it's data connecting drag from inlet
               (whatishere.type == ModuleGUI::WhatIsHereType::SliderOutputRelative || whatishere.type == ModuleGUI::WhatIsHereType::SliderOutputAbsolute) // and the mouse is now over an output connector
             ){
-      auto res = canvas-> GetDirectDataConnectionExists( // Test if there is already some connection between these params
+      auto res = GetCurrentCanvas()-> GetDirectDataConnectionExists( // Test if there is already some connection between these params
         { module_guis[id]->GetModule(), whatishere.param_id},
         { module_guis[mouse_down_id]->GetModule(), mouse_down_elem_paramid});
       if(res.first){
@@ -639,7 +664,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
              (drag_mode == DragModeConnectDataFromRelativeOutlet || drag_mode == DragModeConnectDataFromAbsoluteOutlet) && // and it's data connecting drag from outlet
              whatishere.type == ModuleGUI::WhatIsHereType::SliderInput // and the mouse is now over an inlet
            ){
-      auto res = canvas-> GetDirectDataConnectionExists( // Test if there is already some connection between these params
+      auto res = GetCurrentCanvas()-> GetDirectDataConnectionExists( // Test if there is already some connection between these params
         { module_guis[mouse_down_id]->GetModule(), mouse_down_elem_paramid},
         { module_guis[id]->GetModule(), whatishere.param_id});
       if(res.first){
@@ -748,7 +773,7 @@ void CanvasView::RemoveSelected(){
   for(auto p : selection){
     std::shared_ptr<ModuleGUI> mgui = p.first;
     std::shared_ptr<Module> module = mgui->GetModule();
-    if(module) canvas->RemoveModule(module);
+    if(module) GetCurrentCanvas()->RemoveModule(module);
     module_guis.erase(std::remove(module_guis.begin(), module_guis.end(), mgui), module_guis.end());
   }
   selection.clear();

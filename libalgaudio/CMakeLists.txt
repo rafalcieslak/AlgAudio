@@ -22,6 +22,7 @@ file(GLOB LIBALGAUDIO_SOURCES
 	./UI/*.cpp
 	./ModuleUI/*.cpp
 	./SDLFix/*.cpp
+	./BuiltinModules/*.cpp
 )
 file(GLOB LIBALGAUDIO_INCLUDES ./include/*.hpp)
 

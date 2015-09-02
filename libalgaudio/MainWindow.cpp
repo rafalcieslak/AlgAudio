@@ -44,12 +44,29 @@ void MainWindow::init(){
   layered_alert = UILayered::Create(shared_from_this());
   centered_alert = UICentered::Create(shared_from_this());
   //alert = UIAlert::Create(shared_from_this(),"");
+  canvaspathlabel = UILabel::Create(shared_from_this(),"   Currently editting: Unsaved file", 13);
+  canvaspathlabel->SetAlignment(HorizAlignment_LEFT);
+  canvaspathlabel->SetTextColor(Theme::Get("text-button"));
+  canvaspathback = UIButton::Create(shared_from_this(),"<--");
+  canvaspathback->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
+  canvaspathback->SetBorder(false);
+  canvaspathback->SetFontSize(12);
+  canvaspathback->SetVisible(false);
+  canvasbox = UIVBox::Create(shared_from_this());
+  canvaspathbox = UIHBox::Create(shared_from_this());
 
   addbutton ->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
   toolbarbox->SetBackColor(Theme::Get("bg-main-alt"));
+  
+  canvaspathbox->Insert(canvaspathback, UIBox::PackMode::TIGHT);
+  canvaspathbox->Insert(canvaspathlabel, UIBox::PackMode::WIDE);
+  canvaspathbox->SetBackColor(Theme::Get("bg-main-alt2"));
+  
+  canvasbox->Insert(canvaspathbox, UIBox::PackMode::TIGHT);
+  canvasbox->Insert(canvasview, UIBox::PackMode::WIDE);
 
-  layered->Insert(canvasview);
+  layered->Insert(canvasbox);
   layered->Insert(selector);
 
   selector->Populate();
@@ -133,10 +150,11 @@ bool MainWindow::Save(){
 }
 bool MainWindow::Save(std::string path){
   try{
-    // TODO: Get the TOP-LEVEL canvas from canvasview.
-    auto canvasxml = CanvasXML::CreateFromCanvas( canvasview->GetCanvas() );
+    auto canvasxml = CanvasXML::CreateFromCanvas( canvasview->GetTopCanvas() );
     canvasxml->SaveToFile(path);
     current_file_path = path;
+    file_name = Utilities::GetFilename(path);
+    UpdatePathLabel("");
     return true;
   }catch(XMLFileAccessException ex){
     ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
@@ -167,6 +185,8 @@ void MainWindow::Open(){
             canvasview->SwitchCanvas(c, true);
             std::cout << "File opened sucessfuly." << std::endl;
             this->current_file_path = path;
+            this->file_name = Utilities::GetFilename(path);
+            UpdatePathLabel("");
           }
         });
       }catch(XMLFileAccessException ex){
@@ -182,8 +202,8 @@ void MainWindow::Open(){
 }
 
 void MainWindow::AskToSaveBeforeCalling(std::function<void()> f){
-  if(current_file_path == "" && canvasview->GetCanvas()->modules.size() <= 1){
-    // Almost empty canvas w/o file. Continue without saving/asking.
+  if(current_file_path == "" && canvasview->GetTopCanvas()->modules.size() == 0){
+    // Empty canvas w/o file. Continue without saving/asking.
     f();
     return;
   }
@@ -206,6 +226,8 @@ void MainWindow::New(){
   AskToSaveBeforeCalling([this](){
     canvasview->SwitchCanvas( Canvas::CreateEmpty() );
     current_file_path = "";
+    file_name = "Unsaved file";
+    UpdatePathLabel("");
   });
 }
 
@@ -292,5 +314,13 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
   return r;
 }
 
+void MainWindow::UpdatePathLabel(std::string inner_path){
+  if(inner_path == ""){
+    canvaspathback->SetVisible(false);
+    canvaspathlabel->SetText("   Currently editting: " + file_name);
+  }else{
+    
+  }
+}
 
 } // namespace AlgAudio

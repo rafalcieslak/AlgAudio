@@ -29,6 +29,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIAlert.hpp"
 #include "UI/UISeparator.hpp"
 #include "UI/UICentered.hpp"
+#include "UI/UILabel.hpp"
 #include "CanvasView.hpp"
 #include "Alertable.hpp"
 
@@ -72,29 +73,37 @@ public:
 private:
   MainWindow();
   void init();
+  
+  void UpdatePathLabel(std::string inner_path);
 
-
-  std::shared_ptr<UIVBox> mainvbox;
-  std::shared_ptr<UIButton> addbutton;
-  std::shared_ptr<UIButton> removebutton;
-  std::shared_ptr<UIButton> newbutton;
-  std::shared_ptr<UIButton> openbutton;
-  std::shared_ptr<UIButton> savebutton;
-  std::shared_ptr<UIButton> saveasbutton;
-  std::shared_ptr<UIButton> quitbutton;
-  std::shared_ptr<UIHBox> toolbarbox;
-  std::shared_ptr<UISeparator> toolbar_separator1;
-  std::shared_ptr<UISeparator> toolbar_separator2;
-  std::shared_ptr<ModuleSelector> selector;
-  std::shared_ptr<UILayered> layered;
-  std::shared_ptr<UILayered> layered_alert;
-  std::shared_ptr<UICentered> centered_alert;
-  std::shared_ptr<UIAlert> alert;
-  std::shared_ptr<CanvasView> canvasview;
+std::shared_ptr<UIVBox> mainvbox;
+   std::shared_ptr<UIHBox> toolbarbox;
+      std::shared_ptr<UIButton> addbutton;
+      std::shared_ptr<UIButton> removebutton;
+      std::shared_ptr<UISeparator> toolbar_separator1;
+      std::shared_ptr<UIButton> newbutton;
+      std::shared_ptr<UIButton> openbutton;
+      std::shared_ptr<UIButton> savebutton;
+      std::shared_ptr<UIButton> saveasbutton;
+      std::shared_ptr<UISeparator> toolbar_separator2;
+      std::shared_ptr<UIButton> quitbutton;
+   std::shared_ptr<UILayered> layered;
+      std::shared_ptr<UIVBox> canvasbox;
+         std::shared_ptr<UIHBox> canvaspathbox;
+            std::shared_ptr<UIButton> canvaspathback;
+            std::shared_ptr<UILabel> canvaspathlabel;
+         std::shared_ptr<CanvasView> canvasview;
+      std::shared_ptr<ModuleSelector> selector;
+      std::shared_ptr<UILayered> layered_alert;
+         std::shared_ptr<UICentered> centered_alert;
+            std::shared_ptr<UIAlert> alert;    
+  
+  
   Subscription sub_alert_reply;
   
   // Stored for SaveAs.
   std::string current_file_path = "";
+  std::string file_name = "Unsaved file";
 };
 
 } //namespace AlgAudio

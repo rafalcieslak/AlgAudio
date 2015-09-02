@@ -83,6 +83,15 @@ std::string Utilities::GetDir(std::string path){
     return path.substr(0,pos);
   }
 }
+std::string Utilities::GetFilename(std::string path){
+  auto pos = path.rfind(OSDirSeparator);
+  if(pos == std::string::npos){
+    return path;
+  }else{
+    return path.substr(pos+1);
+  }
+}
+
 
 std::string Utilities::GetCurrentDir(){
   char buffer[1000];

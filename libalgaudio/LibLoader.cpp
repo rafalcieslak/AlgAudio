@@ -51,11 +51,24 @@ LibLoader::~LibLoader(){
 #endif
 }
 
-Module* LibLoader::AskForInstance(std::string name){
+std::shared_ptr<Module> LibLoader::AskForInstance(std::string name){
   auto ptr = reinterpret_cast<Module*>(create_instance_func(name.c_str()));
   if(ptr == nullptr) return nullptr;
   ptr->SetDeleter(deleter_func);
-  return ptr;
+  /*
+  Wrapping the returned instance pointer in a shared_ptr is a bit tricky.
+   When wrapped, we claim the ownership of the pointer, and we will be
+   responsible of deleting it when all references are released. However,
+   the pointer was originally created and allocated within the dynamically
+   loaded library. It also has to be deleted there, deleting a pointer in
+   a different module then it was created is undefined behavior. Therefore,
+   a custom deleter is used. It calls the selfdestruct method, which refers
+   to the internally remembered, library-specific deleter function, which
+   deallocates the pointed instance from within the module.
+  */
+  return std::shared_ptr<Module>(ptr, [](Module* mod){
+    mod->SelfDestruct();
+  });
 }
 
 std::shared_ptr<LibLoader> LibLoader::GetByPath(std::string path){

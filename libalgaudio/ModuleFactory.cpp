@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SCLang.hpp"
 #include "ModuleFactory.hpp"
 #include "ModuleCollection.hpp"
+#include "BuiltinModules.hpp"
 #include "LibLoader.hpp"
 
 namespace AlgAudio{
@@ -37,34 +38,20 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   }else{
     // Ask the corresponding libloader to create a class.
     // TODO: non-default libs
-    Module* module = nullptr;
     if(templ->collection.id == "builtin"){
       // Special case for builtin modules
-      // module = BuiltinModules::CreateInstance(templ->class_name);
-      if(module == nullptr) throw ModuleInstanceCreationFailedException("The corresponding class is not a builtin.", templ->GetFullID());
+      res = Builtin::CreateInstance(templ->class_name);
+      if(res == nullptr) throw ModuleInstanceCreationFailedException("The corresponding class is not a builtin.", templ->GetFullID());
     }else if(templ->collection.defaultlib == nullptr){
       // If there is no default AA library for this collection
       throw ModuleInstanceCreationFailedException("The collection has no .aa library defined.", templ->GetFullID());
     }else{
-      module = templ->collection.defaultlib->AskForInstance(templ->class_name);
-      if(module == nullptr)
+      res = templ->collection.defaultlib->AskForInstance(templ->class_name);
+      if(res == nullptr)
         throw ModuleInstanceCreationFailedException("The collection's .aa library did not return a '" + templ->class_name + "' class.", templ->GetFullID());
     }
-    module->templ = templ;
-    /*
-    Wrapping the returned instance pointer in a shared_ptr is a bit tricky.
-     When wrapped, we claim the ownership of the pointer, and we will be
-     responsible of deleting it when all references are released. However,
-     the pointer was originally created and allocated within the dynamically
-     loaded library. It also has to be deleted there, deleting a pointer in
-     a different module then it was created is undefined behavior. Therefore,
-     a custom deleter is used. It calls the selfdestruct method, which refers
-     to the internally remembered, library-specific deleter function, which
-     deallocates the pointed instance from within the module.
-    */
-    res = std::shared_ptr<Module>(module, [](Module* mod){
-      mod->SelfDestruct();
-    });
+    // Set the module template link
+    res->templ = templ;
   }
   // Create SC instance
   if(templ->has_sc_code){

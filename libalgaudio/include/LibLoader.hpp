@@ -48,7 +48,7 @@ struct LibLoadingException : public Exception{
 class LibLoader{
 public:
   // Calls create_instance asking for a new module instance of a given class name.
-  Module* AskForInstance(std::string);
+  std::shared_ptr<Module> AskForInstance(std::string);
   // Returns the deleter function from the shared library.
   deleter_t* GetDeleter() {return deleter_func;}
   // Loads (or returns an existing instance, if cached) of a library from the

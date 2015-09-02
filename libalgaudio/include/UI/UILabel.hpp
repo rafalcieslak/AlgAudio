@@ -19,22 +19,23 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UIWidget.hpp"
+#include "Theme.hpp"
 
 namespace AlgAudio{
 
 class UILabel : public UIWidget{
 public:
-  static std::shared_ptr<UILabel> Create(std::weak_ptr<Window> parent_window, std::string text, int size = 16, std::string color = "text-generic");
+  static std::shared_ptr<UILabel> Create(std::weak_ptr<Window> parent_window, std::string text, int size = 16);
   void SetText(std::string);
-  void SetTextColor(std::string colorname);
+  void SetTextColor(Color colorname);
   void SetTextSize(int fontsize);
   void SetBold(bool);
   void SetAlignment(HorizAlignment h, VertAlignment v = VertAlignment_CENTERED);
   virtual void CustomDraw(DrawContext& c) override;
 private:
-  UILabel(std::weak_ptr<Window> parent_window, std::string text, int size = 16, std::string color = "text-generic");
+  UILabel(std::weak_ptr<Window> parent_window, std::string text, int size = 16);
   std::string text;
-  std::string color;
+  Color color = Theme::Get("text-generic");
   HorizAlignment horiz_alignment = HorizAlignment_CENTERED;
   VertAlignment vert_alignment = VertAlignment_CENTERED;
   int fontsize;

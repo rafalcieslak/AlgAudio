@@ -154,6 +154,8 @@ public:
   // if the child actually has focus now, or not. When implementing a custom
   // override, you may use GetIsFocused() to check for current focus state.
   virtual void OnFocusChanged() {}
+  
+  std::shared_ptr<Window> GetWindow() {return window.lock();}
 protected:
   Size2D current_size;
   /* Calling this method marks the widget's (as well as its ancestor's) render

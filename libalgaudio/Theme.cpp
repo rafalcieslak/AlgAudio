@@ -28,6 +28,7 @@ void Theme::Init(){
   // A possible example theme
   thememap["bg-main"] = Color(0x424c5fff);
   thememap["bg-main-alt"] = Color(0x363f4fff);
+  thememap["bg-main-alt2"] = Color(0x3a4455ff);
   thememap["bg-button-positive"] = Color(0x5c786cff);
   thememap["bg-button-negative"] = Color(0x785c6aff);
   thememap["bg-button-neutral"] = Color(0x415a8aff);

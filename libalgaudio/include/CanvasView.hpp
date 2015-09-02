@@ -19,6 +19,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <queue>
 #include "UI/UIWidget.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
 #include "Canvas.hpp"
@@ -76,12 +77,23 @@ public:
   // can ignore that argument, but when loading a file you should set it
   // to true.
   void SwitchCanvas(std::shared_ptr<Canvas> canvas, bool build_guis = false);
-  std::shared_ptr<Canvas> GetCanvas() { return canvas; }
+  std::shared_ptr<Canvas> GetCurrentCanvas() { return canvas_stack.back().first; }
+  std::shared_ptr<Canvas> GetTopCanvas() { return canvas_stack.front().first; }
+  
+  
+  // These methods are used for switching to another canvas that is *inside*
+  // current, and for going back.
+  void EnterCanvas(std::shared_ptr<Canvas> canvas);
+  void ExitCanvas();
+  std::string GetCanvasStackPath();
+  Signal<> on_canvas_stack_path_changed;
 
 private:
   CanvasView(std::shared_ptr<Window> parent);
-  // The link to the canvas containing Modules.
-  std::shared_ptr<Canvas> canvas;
+  
+  // The stack of all currently entered canvases, with their correseponding names.
+  std::deque<std::pair<std::shared_ptr<Canvas>, std::string>> canvas_stack;
+  
   // The collection of all maintained ModuleGUIs.
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
   // Used to determine which module was clicked knowing the click position.
