@@ -122,6 +122,8 @@ void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, Poi
 void DrawContext::DrawRect(int x, int y, int w, int h){
   x = x*TotalScale() + offset.x;
   y = y*TotalScale() + offset.y;
+  w *= TotalScale();
+  h *= TotalScale();
   SDL_Rect rect{x,y,w,h};
   SDL_RenderFillRect(renderer,&rect);
 }
