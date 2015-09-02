@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "rapidxml/rapidxml.hpp"
 #include "Window.hpp"
 #include "SDLMain.hpp"
+#include "ModuleFactory.hpp"
 
 namespace AlgAudio{
 
@@ -89,28 +90,32 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool build_guis){
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
-  canvas->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
-    if(m){ // Do not create the GUI if module instance creation failed.
-      try{
-        auto modulegui = m->BuildGUI(window.lock());
-        Size2D guisize = modulegui->GetRequestedSize();
-        modulegui->position = pos - guisize/2;
-        modulegui->parent = shared_from_this();
-        modulegui->Resize(guisize);
-        module_guis.push_back(modulegui);
-        ClearSelection();
-        selection.push_back({modulegui, (guisize/2).ToPoint()});
-        modulegui->SetHighlight(true);
-        drag_in_progress = true;
-        drag_mode = DragModeMove;
-        SetNeedsRedrawing();
-      }catch(GUIBuildException ex){
-        canvas->RemoveModule(m);
-        window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
-      }
-    } // if m
-    r.Return();
-  });
+  try{
+    canvas->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
+      if(m){ // Do not create the GUI if module instance creation failed.
+        try{
+          auto modulegui = m->BuildGUI(window.lock());
+          Size2D guisize = modulegui->GetRequestedSize();
+          modulegui->position = pos - guisize/2;
+          modulegui->parent = shared_from_this();
+          modulegui->Resize(guisize);
+          module_guis.push_back(modulegui);
+          ClearSelection();
+          selection.push_back({modulegui, (guisize/2).ToPoint()});
+          modulegui->SetHighlight(true);
+          drag_in_progress = true;
+          drag_mode = DragModeMove;
+          SetNeedsRedrawing();
+        }catch(GUIBuildException ex){
+          canvas->RemoveModule(m);
+          window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+        }
+      } // if m
+      r.Return();
+    });
+  }catch(ModuleInstanceCreationFailedException ex){
+    window.lock()->ShowErrorAlert(ex.what(),"Dismiss");
+  }
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){

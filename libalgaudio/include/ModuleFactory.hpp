@@ -27,6 +27,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+struct ModuleInstanceCreationFailedException : public Exception{
+  ModuleInstanceCreationFailedException(std::string t, std::string id_) : Exception(t), id(id_) {};
+  virtual std::string what() override {return "Failed to create module instance '" + id + "': " + text;}
+  std::string id;
+};
+
 class ModuleFactory{
 private:
   ModuleFactory() = delete; // static class

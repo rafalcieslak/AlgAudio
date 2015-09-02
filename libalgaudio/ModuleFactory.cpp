@@ -37,14 +37,18 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   }else{
     // Ask the corresponding libloader to create a class.
     // TODO: non-default libs
-    if(templ->collection.defaultlib == nullptr){
-      std::cout << "WARNING: Failed to create module '" << templ->name << "' instance, because the collection has no default library." << std::endl;
-      return r.Return(nullptr);
-    }
-    Module* module = templ->collection.defaultlib->AskForInstance(templ->class_name);
-    if(module == nullptr){
-      std::cout << "WARNING: Failed to create class instance '" << templ->class_name << "' from library." << std::endl;
-      return r.Return(nullptr);
+    Module* module = nullptr;
+    if(templ->collection.id == "builtin"){
+      // Special case for builtin modules
+      // module = BuiltinModules::CreateInstance(templ->class_name);
+      if(module == nullptr) throw ModuleInstanceCreationFailedException("The corresponding class is not a builtin.", templ->GetFullID());
+    }else if(templ->collection.defaultlib == nullptr){
+      // If there is no default AA library for this collection
+      throw ModuleInstanceCreationFailedException("The collection has no .aa library defined.", templ->GetFullID());
+    }else{
+      module = templ->collection.defaultlib->AskForInstance(templ->class_name);
+      if(module == nullptr)
+        throw ModuleInstanceCreationFailedException("The collection's .aa library did not return a '" + templ->class_name + "' class.", templ->GetFullID());
     }
     module->templ = templ;
     /*
