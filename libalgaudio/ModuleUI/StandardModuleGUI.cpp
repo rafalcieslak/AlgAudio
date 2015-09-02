@@ -245,7 +245,7 @@ void StandardModuleGUI::CustomResize(Size2D s){
 void StandardModuleGUI::SetHighlight(bool h){
   highlight = h;
 
-  if(highlight) SetBackColor(Theme::Get("standardbox-bg").Lighter(0.03));
+  if(highlight) SetBackColor(Theme::Get("standardbox-bg").Lighter(0.08));
   else  SetBackColor(Theme::Get("standardbox-bg"));
 
   Color border_color = Theme::Get("standardbox-border");
