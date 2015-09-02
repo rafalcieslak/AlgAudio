@@ -115,6 +115,8 @@ Child nodes: **(all are optional and may appear more than once!)**
     - `defaultmin`, `defaultmax` - *optional, default values: `0.0` and `1.0`* - The default range for this parameter.
 
     - `scale` - *optional, default value: `lin`* - Defines the scale for this parameter. Can be `log` for logarithmic scale, or `lin` for linear.
+    
+    - `step` = *optional, default value: 0* - If step is set to zero, or step attribute is not present, then this param will assume continuous values. Otherwise it will become a discrete param with step size defined by the value of this attribute.
 
     - `name` - *optional*. This attributes are only significant when automatically building module GUI. It will be passed to slider configuration. See `gui` node, especially `slider`, for details.
 

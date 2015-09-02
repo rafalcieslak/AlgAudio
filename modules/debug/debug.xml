@@ -78,4 +78,18 @@ Out.ar(outbus, gain*in);
     </gui>
   </module>
 
+  <module id="gain" name="Gain">
+    <params>
+      <inlet id="inbus" name="input"/>
+      <outlet id="outbus" name="output"/>
+      <param id="gain" name="Level" defaultmin="0.0" defaultmax="5.0" defaultval="1.0" step="1" />
+    </params>
+    <description> Multiplies signal by a constant value. </description>
+    <sc>
+arg inbus, outbus, gain=1;
+Out.ar(outbus, gain*In.ar(inbus));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>

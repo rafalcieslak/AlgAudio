@@ -104,6 +104,10 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collecti
       xml_attribute<>* param_defaultval = param_node->first_attribute("defaultval");
       if(!param_defaultval) p->default_val = 1.0;
       else p->default_val = std::stof(param_defaultval->value());
+      
+      xml_attribute<>* param_step = param_node->first_attribute("step");
+      if(!param_step) p->step = 0.0;
+      else p->step = std::stof(param_step->value());
 
       xml_attribute<>* param_scale = param_node->first_attribute("scale");
       if(!param_scale) p->scale = ParamTemplate::ParamScale::Linear;

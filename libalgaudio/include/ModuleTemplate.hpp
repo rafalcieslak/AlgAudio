@@ -72,6 +72,7 @@ public:
   ParamScale scale;
   float default_min, default_max;
   float default_val;
+  float step = 0.0;
 };
 
 class IOLetTemplate{

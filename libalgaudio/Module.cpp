@@ -42,9 +42,14 @@ std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module>
 }
 
 void ParamController::Set(float value){
+  if(templ->step > 0.0f){
+    value = round(value/templ->step)*templ->step;
+  }
   current_val = value;
+  
   float relative = GetRelative();
-  on_set.Happen(value, relative);
+  on_set.Happen(current_val, relative);
+  
   auto m = module.lock();
   if(m){
     if(templ->action == ParamTemplate::ParamAction::SC){
