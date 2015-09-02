@@ -37,8 +37,10 @@ std::shared_ptr<Canvas> Canvas::CreateEmpty(){
 LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
   Relay<std::shared_ptr<Module>> r;
   ModuleFactory::CreateNewInstance(id).Then([this,r](std::shared_ptr<Module> m){
-    modules.emplace(m);
-    m->canvas = shared_from_this();
+    if(m){
+      modules.emplace(m);
+      m->canvas = shared_from_this();
+    }
     r.Return(m);
   });
   return r;

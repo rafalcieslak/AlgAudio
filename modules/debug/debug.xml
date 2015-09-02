@@ -23,20 +23,6 @@
     <gui type="standard auto"/>
   </module>
 
-  <module id="pipe" name="Pipe">
-    <params>
-      <inlet id="inbus" name="in"/>
-      <outlet id="outbus" name="out"/>
-    </params>
-    <description> A pipe module. All signal passed throught this module is left untouched. </description>
-    <sc>
-arg inbus, outbus;
-var in = In.ar(inbus);
-Out.ar(outbus,in);
-    </sc>
-    <gui type="standard auto"/>
-  </module>
-
   <module id="measure" name="Amp measure">
     <params>
       <inlet id="inbus" name="signal"/>

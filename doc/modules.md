@@ -34,6 +34,7 @@ Attributes:
   - `id` - **required**. The identifier of this collection. It is your responsibility to ensure that this name is unique, i.e. AlgAudio will refuse to load two collections with the same `id`. This value can be any text you wish, but:
     1. It may not contain a `/` char.
     2. It is recommended to choose an identified that makes it easy to recognize the collection, as all modules contained within this collection will have their id prefixed with collection id.
+    3. No custom collection can be named `builtin`.
 
 Child nodes:
 

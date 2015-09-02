@@ -6,5 +6,6 @@ set(CMAKE_STATIC_LIBRARY_PREFIX "")
 # All modules will want to use this dir
 include_directories(../libalgaudio/include)
 
+add_subdirectory(builtin)
 add_subdirectory(base)
 add_subdirectory(debug)

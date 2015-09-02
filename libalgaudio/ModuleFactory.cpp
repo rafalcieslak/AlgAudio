@@ -37,9 +37,13 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   }else{
     // Ask the corresponding libloader to create a class.
     // TODO: non-default libs
+    if(templ->collection.defaultlib == nullptr){
+      std::cout << "WARNING: Failed to create module '" << templ->name << "' instance, because the collection has no default library." << std::endl;
+      return r.Return(nullptr);
+    }
     Module* module = templ->collection.defaultlib->AskForInstance(templ->class_name);
     if(module == nullptr){
-      std::cout << "Warning: Failed to create class instance '" << templ->class_name << "' from library." << std::endl;
+      std::cout << "WARNING: Failed to create class instance '" << templ->class_name << "' from library." << std::endl;
       return r.Return(nullptr);
     }
     module->templ = templ;
