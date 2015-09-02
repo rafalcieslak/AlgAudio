@@ -28,8 +28,8 @@ namespace AlgAudio{
 Bus::Bus(int i) : id(i) {}
 
 Bus::~Bus(){
-  /// TODO: Ask SC to remove the bus
-  // std::cout << "Bus freed" << std::endl;
+  std::cout << "Bus freed" << std::endl;
+  SCLang::SendOSC("/algaudioSC/removebus", "i", id);
 }
 
 

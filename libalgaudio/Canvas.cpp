@@ -18,6 +18,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Canvas.hpp"
 #include <algorithm>
+#include <stack>
 #include <queue>
 #include <unordered_set>
 #include "ModuleFactory.hpp"
@@ -278,7 +279,7 @@ void Canvas::RecalculateOrder(){
     for(const IOID& i : it.second) // For each ending
       indegrees[i.module]++; // Increase the indeg for that module
 
-  std::queue<std::shared_ptr<Module>> frontier;
+  std::stack<std::shared_ptr<Module>> frontier;
 
   // Initialize the frontier
   for(auto &it : indegrees) // Look at all modules...
@@ -289,7 +290,7 @@ void Canvas::RecalculateOrder(){
 
   while(!frontier.empty()){
     // Get a new module from frontier.
-    std::shared_ptr<Module> current = frontier.front(); frontier.pop();
+    std::shared_ptr<Module> current = frontier.top(); frontier.pop();
     // Add the current module to the resulting ordering.
     ordering.push_back(current);
     std::list<std::shared_ptr<Module>> next_list = GetConnectedModules(current);

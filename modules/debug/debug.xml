@@ -92,4 +92,34 @@ Out.ar(outbus, gain*In.ar(inbus));
     <gui type="standard auto"/>
   </module>
 
+
+  <module id="portalin" name="PortalIn">
+    <class name="PortalBase"/>
+    <params>
+      <inlet id="inbus"/>
+      <param id="channel" name="Channel" defaultmin="0" defaultmax="15" defaultval="0" step="1" action="custom"/>
+      <param id="portalbus" mode="none" action="sc"/>
+    </params>
+    <description> This module behaves as a portal input, transmitting the signal to some of the outputs </description>
+    <sc>
+arg inbus, portalbus;
+Out.ar(portalbus, In.ar(inbus));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+  <module id="portalout" name="PortalOut">
+    <class name="PortalBase"/>
+    <params>
+      <param id="channel" name="Channel" defaultmin="0" defaultmax="15" defaultval="0" step="1" action="custom"/>
+      <param id="portalbus" mode="none" action="sc"/>
+      <outlet id="outbus"/>
+    </params>
+    <description> This module behaves as a portal output, transmitting the signal from some of the inputs </description>
+    <sc>
+arg outbus, portalbus;
+Out.ar(outbus, In.ar(portalbus));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>

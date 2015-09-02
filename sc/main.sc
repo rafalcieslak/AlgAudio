@@ -155,9 +155,19 @@ OSCdef.new( 'newbus', {
 		var newbus = Bus.audio(s,1);
 		var id = newbus.index;
 		("Creating new bus " ++ id.asString).postln;
-		~buses.add( id -> newbus); // TODO: default args
+		~buses.add( id -> newbus);
 		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
 	}, '/algaudioSC/newbus'
+).postln;
+
+// reply value: bus instance id
+OSCdef.new( 'removebus', {
+		arg msg;
+		var id = msg[1];
+		("Freeing new bus " ++ id.asString).postln;
+		~buses[id].free;
+		~buses.removeAt( id );
+	}, '/algaudioSC/removebus'
 ).postln;
 
 // Args: instance id, param name, value
