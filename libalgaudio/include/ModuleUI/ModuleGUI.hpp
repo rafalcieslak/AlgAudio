@@ -34,7 +34,8 @@ struct GUIBuildException : public Exception{
 class ModuleGUI : public UIWidget{
 public:
   // The position of this module on the parent CanvasView.
-  Point2D position;
+  Point2D& position() { return module.lock()->position_in_canvas; }
+  
   // When set to true, the module shall draw itself in it's "highlighted"
   // variant.
   virtual void SetHighlight(bool) = 0;

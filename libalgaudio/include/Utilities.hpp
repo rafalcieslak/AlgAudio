@@ -162,7 +162,8 @@ struct KeyData{
     Text, Letter, Digit, Symbol,
     Backspace, Delete,
     Return,
-    Shift, Ctrl, Alt
+    Shift, Ctrl, Alt,
+    Escape
   };
   KeyData(const SDL_KeyboardEvent&);
   KeyData(std::string);

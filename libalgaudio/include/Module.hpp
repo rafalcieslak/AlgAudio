@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include "DynamicallyLoadableClass.hpp"
 #include "Signal.hpp"
+#include "Utilities.hpp"
 #include "LateReturn.hpp"
 
 namespace AlgAudio{
@@ -139,6 +140,8 @@ public:
   // manages.
   int sc_id = -1;
 
+  // This variable stores the widget position in canvas.
+  Point2D position_in_canvas;
 
   // This flag marks whether this module was initialized by ModuleFactory.
   // When ModuleFactory destoys a module, this flag is set back to false.
@@ -233,9 +236,8 @@ public:
 
   // The canvas this module belongs to.
   std::weak_ptr<Canvas> canvas;
-
-  std::string guidata;
-private:
+  
+protected:
   std::weak_ptr<ModuleGUI> modulegui;
 };
 

@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIButton.hpp"
 #include "UI/UIBox.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
+#include "CanvasView.hpp"
 
 namespace AlgAudio{
 namespace Builtin{
@@ -37,8 +38,15 @@ void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
   auto paramsbox = std::dynamic_pointer_cast<UIVBox>( gui->FindChild(UIWidget::ID("paramsbox")) );
   auto button = UIButton::Create(gui->GetWindow(), "Edit...");
   paramsbox->Insert(button, UIBox::PackMode::TIGHT);
-  subscriptions += button->on_clicked.Subscribe([](){
+  
+  subscriptions += button->on_clicked.Subscribe([this](){
     std::cout << "Edit clicked." << std::endl;
+    auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui.lock()->parent.lock());
+    if(!canvasview){
+      std::cout << "Whoops, failed to get a reference to a canvasview, unable to switch displayed canvas." << std::endl;
+      return;
+    }
+    canvasview->EnterCanvas(canvas, "Subpatch");
   });
 }
 

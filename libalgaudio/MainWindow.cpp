@@ -71,6 +71,13 @@ void MainWindow::init(){
 
   selector->Populate();
 
+  subscriptions += canvaspathback->on_clicked.Subscribe([this](){
+    canvasview->ExitCanvas();
+  });
+  subscriptions += canvasview->on_canvas_stack_path_changed.Subscribe([this](){
+    UpdatePathLabel();
+  });
+
   subscriptions += addbutton->on_clicked.Subscribe([this](){
     if(selector->IsExposed()){
       selector->Hide();
@@ -154,7 +161,7 @@ bool MainWindow::Save(std::string path){
     canvasxml->SaveToFile(path);
     current_file_path = path;
     file_name = Utilities::GetFilename(path);
-    UpdatePathLabel("");
+    UpdatePathLabel();
     return true;
   }catch(XMLFileAccessException ex){
     ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
@@ -182,11 +189,11 @@ void MainWindow::Open(){
           if(!c){
             ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
           }else{
-            canvasview->SwitchCanvas(c, true);
+            canvasview->SwitchTopLevelCanvas(c);
             std::cout << "File opened sucessfuly." << std::endl;
             this->current_file_path = path;
             this->file_name = Utilities::GetFilename(path);
-            UpdatePathLabel("");
+            UpdatePathLabel();
           }
         });
       }catch(XMLFileAccessException ex){
@@ -224,10 +231,10 @@ void MainWindow::AskToSaveBeforeCalling(std::function<void()> f){
 
 void MainWindow::New(){
   AskToSaveBeforeCalling([this](){
-    canvasview->SwitchCanvas( Canvas::CreateEmpty() );
+    canvasview->SwitchTopLevelCanvas( Canvas::CreateEmpty() );
     current_file_path = "";
     file_name = "Unsaved file";
-    UpdatePathLabel("");
+    UpdatePathLabel();
   });
 }
 
@@ -314,12 +321,17 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
   return r;
 }
 
-void MainWindow::UpdatePathLabel(std::string inner_path){
-  if(inner_path == ""){
+void MainWindow::UpdatePathLabel(){
+  auto vs = canvasview->GetCanvasStackPath();
+  if(vs.size() <= 1){
     canvaspathback->SetVisible(false);
     canvaspathlabel->SetText("   Currently editting: " + file_name);
   }else{
+    vs.erase(vs.begin()); // Yeah, this is slow, but this vector will never have many elements.
+    std::string path = Utilities::JoinString(vs," -> ");
     
+    canvaspathback->SetVisible(true);
+    canvaspathlabel->SetText("   Currently editting: " + file_name + " -> " + path);
   }
 }
 

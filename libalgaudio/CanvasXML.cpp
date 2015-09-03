@@ -140,8 +140,8 @@ void CanvasXML::AppendModule(std::shared_ptr<Module> m){
   auto gui = m->GetGUI();
   if(gui){
     rapidxml::xml_node<>* guinode = doc.allocate_node(rapidxml::node_type::node_element, "gui");
-    guinode->append_attribute( doc.allocate_attribute("x", alloc2s( gui->position.x )));
-    guinode->append_attribute( doc.allocate_attribute("y", alloc2s( gui->position.y )));
+    guinode->append_attribute( doc.allocate_attribute("x", alloc2s( gui->position().x )));
+    guinode->append_attribute( doc.allocate_attribute("y", alloc2s( gui->position().y )));
     modulenode->append_node(guinode);
   }
   root->append_node(modulenode);
@@ -342,9 +342,16 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
       pc->Set(value);
     }
 
-    // Store GUI data.
+    // Read GUI data.
     rapidxml::xml_node<>* guinode = module_node->first_node("gui");
-    if(guinode) rapidxml::print(std::back_inserter(m->guidata), *guinode, rapidxml::print_no_indenting);
+    if(guinode){
+      rapidxml::xml_attribute<>* x_attr = guinode->first_attribute("x");
+      rapidxml::xml_attribute<>* y_attr = guinode->first_attribute("y");
+      if(x_attr && y_attr){
+        // Set modulegui position in canvas
+        m->position_in_canvas = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
+      }
+    }
 
     r.Return("");
   });

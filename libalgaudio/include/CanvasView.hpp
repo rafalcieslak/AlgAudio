@@ -76,16 +76,15 @@ public:
   // all ModuleGUIs will be build - so when switching the view context you
   // can ignore that argument, but when loading a file you should set it
   // to true.
-  void SwitchCanvas(std::shared_ptr<Canvas> canvas, bool build_guis = false);
+  void SwitchTopLevelCanvas(std::shared_ptr<Canvas> canvas);
   std::shared_ptr<Canvas> GetCurrentCanvas() { return canvas_stack.back().first; }
   std::shared_ptr<Canvas> GetTopCanvas() { return canvas_stack.front().first; }
   
-  
   // These methods are used for switching to another canvas that is *inside*
   // current, and for going back.
-  void EnterCanvas(std::shared_ptr<Canvas> canvas);
+  void EnterCanvas(std::shared_ptr<Canvas> canvas, std::string name="");
   void ExitCanvas();
-  std::string GetCanvasStackPath();
+  std::vector<std::string> GetCanvasStackPath();
   Signal<> on_canvas_stack_path_changed;
 
 private:
@@ -96,6 +95,10 @@ private:
   
   // The collection of all maintained ModuleGUIs.
   std::vector<std::shared_ptr<ModuleGUI>> module_guis;
+  
+  void CreateModuleGUIs();
+  void ResetUI();
+  
   // Used to determine which module was clicked knowing the click position.
   int InWhich(Point2D relative_pos);
   int CurveStrengthFuncA(Point2D a, Point2D b);

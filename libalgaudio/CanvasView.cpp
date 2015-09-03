@@ -36,19 +36,42 @@ std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> pare
   return ptr;
 }
 
-void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool restore_guidata){
+void CanvasView::SwitchTopLevelCanvas(std::shared_ptr<Canvas> c){
   canvas_stack.clear();
-  canvas_stack.push_back({c,""});
-  
-  drag_in_progress = false;
-  module_guis.clear();
-  mouse_down_mode = ModeNone;
-  potential_wire = PotentialWireMode::None;
-  fadeout_wire = PotentialWireMode::None;
-  fadeout_anim.Release();
-  ClearSelection();
+  EnterCanvas(c);
+}
 
-  for(auto& m : c->modules){
+void CanvasView::EnterCanvas(std::shared_ptr<Canvas> c, std::string name){
+  ResetUI();
+  canvas_stack.push_back({c,name});
+  CreateModuleGUIs();
+  on_canvas_stack_path_changed.Happen();
+  CenterView();
+  SetNeedsRedrawing();
+}
+void CanvasView::ExitCanvas(){
+  if(canvas_stack.size() == 1) return;
+  ResetUI();
+  canvas_stack.pop_back();
+  CreateModuleGUIs();
+  on_canvas_stack_path_changed.Happen();
+  CenterView();
+  SetNeedsRedrawing();
+}
+
+std::vector<std::string> CanvasView::GetCanvasStackPath(){
+  std::vector<std::string> vs;
+  for(auto it = canvas_stack.begin(); it != canvas_stack.end(); it++)
+    vs.push_back(it->second);
+  return vs;
+}
+
+void CanvasView::CreateModuleGUIs(){
+  // Get rid of all currently stored guis
+  module_guis.clear();
+
+  // Regain or rebuild guis
+  for(auto& m : GetCurrentCanvas()->modules){
       auto modulegui = m->GetGUI();
       // If the module already has a gui, but it does not recognize us as a parent
       if(modulegui && modulegui->parent.lock() != shared_from_this()){
@@ -67,28 +90,7 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool restore_guidata){
           // Resize the gui
           Size2D guisize = modulegui->GetRequestedSize();
           modulegui->Resize(guisize);
-          // Load stored data (e.g. loaded from save file or clipboard)
-          if(restore_guidata && m->guidata != ""){
-            try{
-              char buffer[10000];
-              strncpy(buffer,m->guidata.c_str(),10000);
-              rapidxml::xml_document<> doc;
-              doc.parse<0>(buffer);
-              rapidxml::xml_node<>* root = doc.first_node("gui");
-              if(root){
-                rapidxml::xml_attribute<>* x_attr = root->first_attribute("x");
-                rapidxml::xml_attribute<>* y_attr = root->first_attribute("y");
-                if(x_attr && y_attr){
-                  // Set modulegui position in canvas
-                  modulegui->position = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
-                }
-              }
-            }catch(rapidxml::parse_error){
-              /*ignore*/
-            }catch(std::runtime_error){
-              /*ignore*/
-            }
-          }
+          
         }catch(GUIBuildException ex){
           GetCurrentCanvas()->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
@@ -97,20 +99,15 @@ void CanvasView::SwitchCanvas(std::shared_ptr<Canvas> c, bool restore_guidata){
       } // if no modulegui
       module_guis.push_back(modulegui);
   }
-  CenterView();
-
-  SetNeedsRedrawing();
 }
 
-
-void CanvasView::EnterCanvas(std::shared_ptr<Canvas> ){
-  
-}
-void CanvasView::ExitCanvas(){
-  
-}
-std::string CanvasView::GetCanvasStackPath(){
-  return ""; //TODO
+void CanvasView::ResetUI(){
+  drag_in_progress = false;
+  mouse_down_mode = ModeNone;
+  potential_wire = PotentialWireMode::None;
+  fadeout_wire = PotentialWireMode::None;
+  fadeout_anim.Release();
+  ClearSelection();
 }
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
@@ -121,7 +118,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
         try{
           auto modulegui = m->BuildGUI(window.lock());
           Size2D guisize = modulegui->GetRequestedSize();
-          modulegui->position = pos - guisize/2;
+          modulegui->position() = pos - guisize/2;
           modulegui->parent = shared_from_this();
           modulegui->Resize(guisize);
           module_guis.push_back(modulegui);
@@ -149,7 +146,7 @@ void CanvasView::CustomDraw(DrawContext& c){
   
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
-    c.Push(modulegui->position, modulegui->GetRequestedSize());
+    c.Push(modulegui->position(), modulegui->GetRequestedSize());
     modulegui->Draw(c);
     c.Pop();
   }
@@ -160,11 +157,11 @@ void CanvasView::CustomDraw(DrawContext& c){
   c.SetColor(Theme::Get("canvas-connection-audio"));
   for(auto it : GetCurrentCanvas()->audio_connections){
     Canvas::IOID from = it.first;
-    Point2D from_pos = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsOutlet(from.iolet);
+    Point2D from_pos = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsOutlet(from.iolet);
     // For each target of this outlet
     std::list<Canvas::IOID> to_list = it.second;
     for(auto to : to_list){
-      Point2D to_pos = to.module->GetGUI()->position + to.module->GetGUI()->WhereIsInlet(to.iolet);
+      Point2D to_pos = to.module->GetGUI()->position() + to.module->GetGUI()->WhereIsInlet(to.iolet);
       int strength = CurveStrengthFuncA(from_pos, to_pos);
       c.DrawCubicBezier(from_pos, from_pos + Point2D(0,strength), to_pos + Point2D(0, -strength), to_pos, 2.0f);
     }
@@ -172,13 +169,13 @@ void CanvasView::CustomDraw(DrawContext& c){
   // Next, data connections.
   for(auto it : GetCurrentCanvas()->data_connections){
     Canvas::IOID from = it.first;
-    Point2D from_pos_relative = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsParamRelativeOutlet(from.iolet);
-    Point2D from_pos_absolute = from.module->GetGUI()->position + from.module->GetGUI()->WhereIsParamAbsoluteOutlet(from.iolet);
+    Point2D from_pos_relative = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsParamRelativeOutlet(from.iolet);
+    Point2D from_pos_absolute = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsParamAbsoluteOutlet(from.iolet);
     // For each target of this data outlet:
     std::list<Canvas::IOIDWithMode> to_list = it.second;
     for(auto to : to_list){
       c.SetColor(Theme::Get( (to.mode == Canvas::DataConnectionMode::Relative) ? "canvas-connection-data-relative" : "canvas-connection-data-absolute"));
-      Point2D to_pos = to.ioid.module->GetGUI()->position + to.ioid.module->GetGUI()->WhereIsParamInlet(to.ioid.iolet);
+      Point2D to_pos = to.ioid.module->GetGUI()->position() + to.ioid.module->GetGUI()->WhereIsParamInlet(to.ioid.iolet);
       Point2D from_pos = (to.mode == Canvas::DataConnectionMode::Relative) ? from_pos_relative : from_pos_absolute;
       int strength = CurveStrengthFuncB(from_pos, to_pos);
       c.DrawCubicBezier(from_pos, from_pos + Point2D(strength,0), to_pos + Point2D(-strength, 0), to_pos, 1.0f);
@@ -198,8 +195,8 @@ void CanvasView::CustomDraw(DrawContext& c){
 
     if(potential_wire_type == PotentialWireType::Audio){
       // Potential audio wire
-      Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
-      Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
+      Point2D p1 = from_mgui->position() + from_mgui->WhereIsOutlet(from_outlet_paramid);
+      Point2D p2 =   to_mgui->position() +   to_mgui->WhereIsInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncA(p1, p2);
       c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2, 2.0f);
     }else{
@@ -207,8 +204,8 @@ void CanvasView::CustomDraw(DrawContext& c){
       Point2D outlet_pos = (potential_wire_type == PotentialWireType::DataRelative) ?
                             from_mgui->WhereIsParamRelativeOutlet(from_outlet_paramid) :
                             from_mgui->WhereIsParamAbsoluteOutlet(from_outlet_paramid);
-      Point2D p1 = from_mgui->position + outlet_pos;
-      Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
+      Point2D p1 = from_mgui->position() + outlet_pos;
+      Point2D p2 =   to_mgui->position() +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
       int strength = CurveStrengthFuncB(p1, p2);
       c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 1.0f);
     }
@@ -219,27 +216,27 @@ void CanvasView::CustomDraw(DrawContext& c){
     // Simply draw the currently dragged line...
     if(drag_mode == DragModeConnectAudioFromOutlet){
       c.SetColor(Theme::Get("canvas-connection-audio"));
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_elem_paramid);
+      Point2D p = module_guis[mouse_down_id]->position() + module_guis[mouse_down_id]->WhereIsOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,strength), drag_position + Point2D(0, -strength/2), drag_position, 2.0f);
     }else if(drag_mode == DragModeConnectAudioFromInlet){
       c.SetColor(Theme::Get("canvas-connection-audio"));
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_elem_paramid);
+      Point2D p = module_guis[mouse_down_id]->position() + module_guis[mouse_down_id]->WhereIsInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncA(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(0,-strength), drag_position + Point2D(0, strength/2), drag_position, 2.0f);
     }else if(drag_mode == DragModeConnectDataFromRelativeOutlet){
       c.SetColor(Theme::Get("canvas-connection-data-relative"));
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamRelativeOutlet(mouse_down_elem_paramid);
+      Point2D p = module_guis[mouse_down_id]->position() + module_guis[mouse_down_id]->WhereIsParamRelativeOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeConnectDataFromAbsoluteOutlet){
       c.SetColor(Theme::Get("canvas-connection-data-absolute"));
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamAbsoluteOutlet(mouse_down_elem_paramid);
+      Point2D p = module_guis[mouse_down_id]->position() + module_guis[mouse_down_id]->WhereIsParamAbsoluteOutlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(strength,0), drag_position + Point2D(-strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeConnectDataFromInlet){
       c.SetColor(Theme::Get("canvas-connection-data-relative"));
-      Point2D p = module_guis[mouse_down_id]->position + module_guis[mouse_down_id]->WhereIsParamInlet(mouse_down_elem_paramid);
+      Point2D p = module_guis[mouse_down_id]->position() + module_guis[mouse_down_id]->WhereIsParamInlet(mouse_down_elem_paramid);
       int strength = CurveStrengthFuncB(p, drag_position);
       c.DrawCubicBezier(p, p + Point2D(-strength,0), drag_position + Point2D(strength/2, 0), drag_position, 1.0f);
     }else if(drag_mode == DragModeBBSelect){
@@ -263,8 +260,8 @@ void CanvasView::CustomDraw(DrawContext& c){
       else                                          c.SetColor(Theme::Get("canvas-connection-new").SetAlpha(fadeout_phase));
 
       if(fadeout_wire_type == PotentialWireType::Audio){
-        Point2D p1 = from_mgui->position + from_mgui->WhereIsOutlet(from_outlet_paramid);
-        Point2D p2 =   to_mgui->position +   to_mgui->WhereIsInlet (   to_inlet_paramid);
+        Point2D p1 = from_mgui->position() + from_mgui->WhereIsOutlet(from_outlet_paramid);
+        Point2D p2 =   to_mgui->position() +   to_mgui->WhereIsInlet (   to_inlet_paramid);
         int strength = CurveStrengthFuncA(p1, p2);
         c.DrawCubicBezier(p1, p1 + Point2D(0, strength), p2 + Point2D(0, -strength), p2, 2.0f);
       }else{
@@ -272,8 +269,8 @@ void CanvasView::CustomDraw(DrawContext& c){
         Point2D outlet_pos = (fadeout_wire_type == PotentialWireType::DataRelative) ?
                               from_mgui->WhereIsParamRelativeOutlet(from_outlet_paramid) :
                               from_mgui->WhereIsParamAbsoluteOutlet(from_outlet_paramid);
-        Point2D p1 = from_mgui->position + outlet_pos;
-        Point2D p2 =   to_mgui->position +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
+        Point2D p1 = from_mgui->position() + outlet_pos;
+        Point2D p2 =   to_mgui->position() +   to_mgui->WhereIsParamInlet (   to_inlet_paramid);
         int strength = CurveStrengthFuncB(p1, p2);
         c.DrawCubicBezier(p1, p1 + Point2D(strength,0), p2 + Point2D(-strength, 0), p2, 1.0f);
       }
@@ -292,7 +289,7 @@ int CanvasView::CurveStrengthFuncB(Point2D a, Point2D b){
 
 int CanvasView::InWhich(Point2D relative_pos){
   for(int i = module_guis.size() - 1; i >= 0; i--){
-    if(relative_pos.IsInside(module_guis[i]->position, module_guis[i]->GetRequestedSize()) )
+    if(relative_pos.IsInside(module_guis[i]->position(), module_guis[i]->GetRequestedSize()) )
       return i;
   }
   return -1;
@@ -313,7 +310,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   Point2D offset;
 
   if(id >=0 ){
-    offset = pos - module_guis[id]->position;
+    offset = pos - module_guis[id]->position();
   }
   if(down == true && b == MouseButton::Left){
 
@@ -437,7 +434,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
         ClearSelection();
         Rect bb = {drag_position, mouse_down_position};
         for(auto mgui : module_guis){
-          Rect r = {mgui->position,  mgui->GetCurrentSize()};
+          Rect r = {mgui->position(),  mgui->GetCurrentSize()};
           if(r.IsFullyInside(bb))
             AddToSelection(mgui);
         }
@@ -602,7 +599,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
     // Gather drag position data
     int id = InWhich(drag_position);
     ModuleGUI::WhatIsHere whatishere;
-    if(id >= 0) whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position);
+    if(id >= 0) whatishere = module_guis[id]->GetWhatIsHere(drag_position - module_guis[id]->position());
 
     // By default, there is not potential wire. This will be overriden to a wire
     // type soon below.
@@ -611,7 +608,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
     if(drag_mode == DragModeMove){
       // Update selected widgets positions.
       for(auto& p : selection)
-        p.first->position = drag_position - p.second;
+        p.first->position() = drag_position - p.second;
 
     }else if(id >= 0 && // If the drag is over some widget
             ( (whatishere.type == ModuleGUI::WhatIsHereType::Outlet && drag_mode == DragModeConnectAudioFromInlet ) || // and it's a audio connecting drag over outlet
@@ -705,7 +702,7 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
         drag_mode = DragModeMove;
         // Store move drag offsets.
         for(auto &p : selection)
-          p.second = mouse_down_position - p.first->position;
+          p.second = mouse_down_position - p.first->position();
 
       }else if(mouse_down_mode == ModeInlet){
         drag_mode = DragModeConnectAudioFromInlet;
@@ -733,8 +730,8 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
   // standard motion?
   int id1 = InWhich(from), id2 = InWhich(to);
   Point2D offset1, offset2;
-  if(id1 != -1) offset1 = from - module_guis[id1]->position;
-  if(id2 != -1) offset2 = to   - module_guis[id2]->position;
+  if(id1 != -1) offset1 = from - module_guis[id1]->position();
+  if(id2 != -1) offset2 = to   - module_guis[id2]->position();
   if(id1 != id2){
     if(id1 != -1) module_guis[id1]->OnMouseLeave(offset1);
     if(id2 != -1) module_guis[id2]->OnMouseEnter(offset2);
@@ -760,6 +757,8 @@ void CanvasView::OnKeyboard(KeyData k){
       IncreaseZoom();
     }
   }
+  
+  if(k.type == KeyData::KeyType::Escape && k.IsTrig()) ExitCanvas();
   // TODO: pass events to children
 }
 
@@ -811,8 +810,8 @@ void CanvasView::CenterView(){
     int minx = INT_MAX, miny = INT_MAX;
     int maxx = -INT_MAX, maxy = -INT_MAX;
     for(auto mgui : module_guis){
-        int l = mgui->position.x;
-        int t = mgui->position.y;
+        int l = mgui->position().x;
+        int t = mgui->position().y;
         int r = l + mgui->GetRequestedSize().width;
         int b = t + mgui->GetRequestedSize().height;
         if(l < minx) minx = l;

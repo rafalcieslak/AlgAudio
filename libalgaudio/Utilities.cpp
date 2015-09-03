@@ -277,6 +277,7 @@ void KeyData::InitKeymap(){
   keymap[SDLK_KP_PLUS] = {"+", Symbol};
   keymap[SDLK_KP_MINUS] = {"-", Symbol};
   
+  keymap[SDLK_ESCAPE] = {"Escape", Escape};
 }
 
 

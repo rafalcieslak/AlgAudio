@@ -74,7 +74,7 @@ private:
   MainWindow();
   void init();
   
-  void UpdatePathLabel(std::string inner_path);
+  void UpdatePathLabel();
 
 std::shared_ptr<UIVBox> mainvbox;
    std::shared_ptr<UIHBox> toolbarbox;
