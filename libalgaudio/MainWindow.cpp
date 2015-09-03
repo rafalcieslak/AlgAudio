@@ -20,6 +20,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include "nfd.h"
 #include "CanvasXML.hpp"
+#include "SCLang.hpp"
+
+#undef ERROR
 
 namespace AlgAudio{
 
@@ -35,9 +38,11 @@ void MainWindow::init(){
   openbutton = UIButton::Create(shared_from_this()," Open ");
   savebutton = UIButton::Create(shared_from_this()," Save ");
   saveasbutton = UIButton::Create(shared_from_this()," Save as... ");
+  allnodes = UIButton::Create(shared_from_this()," QAN ");
   toolbarbox = UIHBox::Create(shared_from_this());
   toolbar_separator1 = UISeparator::Create(shared_from_this());
   toolbar_separator2 = UISeparator::Create(shared_from_this());
+  toolbar_separator3 = UISeparator::Create(shared_from_this());
   selector = ModuleSelector::Create(shared_from_this());
   layered = UILayered::Create(shared_from_this());
   canvasview = CanvasView::CreateEmpty(shared_from_this());
@@ -89,6 +94,11 @@ void MainWindow::init(){
   subscriptions += removebutton->on_clicked.Subscribe([this](){
     canvasview->RemoveSelected();
   });
+  
+  subscriptions += allnodes->on_clicked.Subscribe([this](){
+    SCLang::QueryAllNodes();
+  });
+  
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     ProcessCloseEvent(); // Pretend the window is getting closed
   });
@@ -105,7 +115,10 @@ void MainWindow::init(){
   toolbarbox->Insert(openbutton, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(savebutton, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(saveasbutton, UIBox::PackMode::TIGHT);
-  toolbarbox->Insert(toolbar_separator2, UIBox::PackMode::WIDE);
+  toolbarbox->Insert(toolbar_separator2, UIBox::PackMode::TIGHT);
+  toolbar_separator2->SetCustomSize(Size2D(30,0));
+  toolbarbox->Insert(allnodes, UIBox::PackMode::TIGHT);
+  toolbarbox->Insert(toolbar_separator3, UIBox::PackMode::WIDE);
   toolbarbox->Insert(quitbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
   mainvbox->Insert(layered, UIBox::PackMode::WIDE);

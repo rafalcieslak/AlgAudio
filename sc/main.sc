@@ -287,6 +287,11 @@ OSCdef.new( 'listall', {
 	}, '/algaudioSC/listall'
 ).postln;
 
+// Displays the node tree
+OSCdef.new( 'allnodes', {
+	s.queryAllNodes;
+}, '/algaudioSC/allnodes'
+).postln;
 
 SynthDef.new("builtin/fork2",{ arg in, o1, o2; var i = In.ar(in); Out.ar(o1,i); Out.ar(o2,i); }).add;
 SynthDef.new("builtin/fork3",{ arg in, o1, o2, o3; var i = In.ar(in); Out.ar(o1,i); Out.ar(o2,i); Out.ar(o3,i); }).add;

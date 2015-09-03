@@ -86,6 +86,8 @@ std::shared_ptr<UIVBox> mainvbox;
       std::shared_ptr<UIButton> savebutton;
       std::shared_ptr<UIButton> saveasbutton;
       std::shared_ptr<UISeparator> toolbar_separator2;
+      std::shared_ptr<UIButton> allnodes;
+      std::shared_ptr<UISeparator> toolbar_separator3;
       std::shared_ptr<UIButton> quitbutton;
    std::shared_ptr<UILayered> layered;
       std::shared_ptr<UIVBox> canvasbox;

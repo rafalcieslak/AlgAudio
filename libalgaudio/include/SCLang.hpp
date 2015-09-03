@@ -64,6 +64,7 @@ public:
   static LateReturn<> InstallTemplate(const std::shared_ptr<ModuleTemplate> templ);
   static bool WasInstalled(const std::string&);
   static void DebugQueryInstalled();
+  static void QueryAllNodes();
 
   static Signal<MidiMessage> on_midi_message_received;
 

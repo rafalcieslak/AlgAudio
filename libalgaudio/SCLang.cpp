@@ -179,6 +179,9 @@ bool SCLang::WasInstalled(const std::string& s){
   auto it = installed_templates.find(s);
   return (it != installed_templates.end());
 }
+void SCLang::QueryAllNodes(){
+  SendOSC("/algaudioSC/allnodes");
+}
 void SCLang::BootServer(bool supernova){
   // TODO: Device selection
   SendInstruction("s.options.device = \"ASIO\"");
