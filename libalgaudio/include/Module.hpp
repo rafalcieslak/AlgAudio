@@ -133,6 +133,12 @@ public:
   // This method is used if a param is defined with action="custom" attribute.
   virtual void on_param_set(std::string, float) {}
 
+  // These methods are used for storing and loading internal module state.
+  // They are mostly used when a canvas is saved, or when a module is copied
+  // to clipboard. State loading will never happen before on_init.
+  virtual std::string state_store() {return "";}
+  virtual void state_load(std::string) {}
+
   // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;
 
@@ -238,7 +244,7 @@ public:
   std::weak_ptr<Canvas> canvas;
   
 protected:
-  std::weak_ptr<ModuleGUI> modulegui;
+  std::shared_ptr<ModuleGUI> modulegui;
 };
 
 } // namespace AlgAudio

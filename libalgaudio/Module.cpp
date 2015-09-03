@@ -231,7 +231,7 @@ void Module::SetParam(std::string name, double value){
 */
 
 std::shared_ptr<ModuleGUI> Module::GetGUI() const{
-  return modulegui.lock();
+  return modulegui;
 }
 
 std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_window){

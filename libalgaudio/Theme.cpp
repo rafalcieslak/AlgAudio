@@ -36,7 +36,7 @@ void Theme::Init(){
   thememap["mg_main"] = Color(0x5c6878ff);
   thememap["text-generic"] = Color(0xaaaeb8ff); // White
   //thememap["text-generic"] = Color(0x1b2737ff); // Dark blue
-  thememap["text-button"] = Color(0x212227ff);
+  thememap["text-button"] = Color(0x0d0d0fff);
   thememap["text-error"] = Color(0xdc8c96ff);
   thememap["progress-bar"] = Color(0x346d97ff);
   thememap["selector-button-normal"] = Color(0x52607cff);

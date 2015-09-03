@@ -17,10 +17,17 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/UIMouseEventsBase.hpp"
+#include "UI/UIWidget.hpp"
 
 namespace AlgAudio{
 
 bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
+  // Prolong instance lifetime in case this widget would get destroyed as a
+  // result of a subscriber
+  std::shared_ptr<UIWidget> ptr;
+  auto widg = dynamic_cast<UIWidget*>(this);
+  if(widg) ptr = widg->shared_from_this();
+  
   bool result = CustomMousePress(down,b,p);
   (void)result;
   //if(result) return true; // The custom handler captured the event

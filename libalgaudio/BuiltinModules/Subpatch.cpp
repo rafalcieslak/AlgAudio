@@ -41,7 +41,7 @@ void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
   
   subscriptions += button->on_clicked.Subscribe([this](){
     std::cout << "Edit clicked." << std::endl;
-    auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui.lock()->parent.lock());
+    auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui->parent.lock());
     if(!canvasview){
       std::cout << "Whoops, failed to get a reference to a canvasview, unable to switch displayed canvas." << std::endl;
       return;

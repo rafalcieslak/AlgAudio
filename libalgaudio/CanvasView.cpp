@@ -74,6 +74,7 @@ void CanvasView::CreateModuleGUIs(){
   for(auto& m : GetCurrentCanvas()->modules){
       auto modulegui = m->GetGUI();
       // If the module already has a gui, but it does not recognize us as a parent
+      if(!modulegui) std::cout << "There is none " << std::endl;
       if(modulegui && modulegui->parent.lock() != shared_from_this()){
         // Get rid of the gui.
         m->DropGUI();
@@ -81,6 +82,7 @@ void CanvasView::CreateModuleGUIs(){
       }
       if(modulegui){
         // The gui already exists. No need to apply it's settings.
+        std::cout << "Reusing GUI" << std::endl;
       }else{
         // The GUI was not yet build. Let's make it.
         try{
