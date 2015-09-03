@@ -79,9 +79,13 @@ public:
 
   std::weak_ptr<UIWidget> parent;
 
-  // Toggles widget display
+  // Toggles widget display. An invisible widget takes up zero space, and is
+  // never drawn. A notdrawn widget takes up as much space as it normally would,
+  // but is empty and never drawn.
   void SetVisible(bool);
-  bool IsVisible(){return visible;}
+  bool IsVisible() const {return visible;}
+  void SetNotDrawn(bool);
+  bool IsNotDrawn() const {return notdrawn;}
 
   /* The requested size depends on both minimal size and custom size.
      The minimal size is set by the particular widget implementation. For
@@ -214,7 +218,9 @@ private:
   // This flag is used to track incorrect usage of SetMinimalSize()
   bool in_custom_resize = false;
 
+  // TODO: Merge these two flags into a single enum
   bool visible = true;
+  bool notdrawn = false;
 
   std::shared_ptr<SDLTexture> cache_texture;
   void RedrawToCache(Size2D size);

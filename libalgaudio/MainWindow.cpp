@@ -44,14 +44,15 @@ void MainWindow::init(){
   layered_alert = UILayered::Create(shared_from_this());
   centered_alert = UICentered::Create(shared_from_this());
   //alert = UIAlert::Create(shared_from_this(),"");
-  canvaspathlabel = UILabel::Create(shared_from_this(),"   Currently editting: Unsaved file", 13);
+  canvaspathlabel = UILabel::Create(shared_from_this(),"   Currently editting: Unsaved file", 14);
   canvaspathlabel->SetAlignment(HorizAlignment_LEFT);
   canvaspathlabel->SetTextColor(Theme::Get("text-button"));
   canvaspathback = UIButton::Create(shared_from_this(),"<--");
   canvaspathback->SetColors(Theme::Get("text-button"),Theme::Get("bg-button-negative"));
   canvaspathback->SetBorder(false);
+  canvaspathback->SetInnerMargin(1);
   canvaspathback->SetFontSize(12);
-  canvaspathback->SetVisible(false);
+  canvaspathback->SetNotDrawn(true);
   canvasbox = UIVBox::Create(shared_from_this());
   canvaspathbox = UIHBox::Create(shared_from_this());
 
@@ -324,13 +325,13 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
 void MainWindow::UpdatePathLabel(){
   auto vs = canvasview->GetCanvasStackPath();
   if(vs.size() <= 1){
-    canvaspathback->SetVisible(false);
+    canvaspathback->SetNotDrawn(true);
     canvaspathlabel->SetText("   Currently editting: " + file_name);
   }else{
     vs.erase(vs.begin()); // Yeah, this is slow, but this vector will never have many elements.
     std::string path = Utilities::JoinString(vs," -> ");
     
-    canvaspathback->SetVisible(true);
+    canvaspathback->SetNotDrawn(false);
     canvaspathlabel->SetText("   Currently editting: " + file_name + " -> " + path);
   }
 }

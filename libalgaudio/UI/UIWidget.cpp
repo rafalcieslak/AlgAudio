@@ -41,10 +41,14 @@ void UIWidget::Draw(DrawContext& c){
     if(needs_redrawing){
       //std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
       c.Push(cache_texture, drawsize.width, drawsize.height);
-      c.Clear(clear_color);
-      CustomDraw(c);
-      c.SetColor(overlay_color);
-      c.Fill();
+      if(notdrawn){
+        c.Clear();
+      }else{
+        c.Clear(clear_color);
+        CustomDraw(c);
+        c.SetColor(overlay_color);
+        c.Fill();
+      }
       c.Pop();
     }else{
       //std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;
@@ -83,6 +87,12 @@ void UIWidget::SetVisible(bool v){
   if(v) SetNeedsRedrawing();
   auto p = parent.lock();
   if(p) p->OnChildVisibilityChanged();
+}
+
+void UIWidget::SetNotDrawn(bool v){
+  if(v == notdrawn) return;
+  notdrawn = v;
+  SetNeedsRedrawing();
 }
 
 void UIWidget::SetMinimalSize(Size2D s){
