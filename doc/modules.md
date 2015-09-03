@@ -241,5 +241,23 @@ However, most modules will simply want to override these several useful methods 
   - `void AlgAudio::Module::on_param_set(std::string, float)`
 
     This method is called when a param is set, and its `mode` is set to `custom`. Place here the code that reacts on param change. The arguments passed to this method are: param's `id` and the new value.
-
+    
+If you wish to store your module's internal state in to the save file, override aome of the state storing methods explained below. Note that you do not have to store param values, they are saved separately. You can save a custom string into the save file, or a custom xml subtree (or both).
+    
+  - `std::string AlgAudio::Module::state_store_string()`
+  
+    Use this method to return a string you wish to save. The string should somehow represent your module internal state, but the exact format is entirely up to the implementation. The string will be saved within an xml tree, so quites and triangle brackets may be escaped. If you return an empty string, no data will be saved to the file, and `state_load_string` will not get called.
+    
+  - `void AlgAudio::Module::state_load_string(std::string)`
+  
+    When loading a file, if a module has some custom string saved, this method will be called with that loaded string. The module is expected to set its internal state according to the data in the string.
+    
+  - `void AlgAudio::Module::state_save_xml(rapidxml::xml_node<>* target)`
+  
+    Use this method if you wish to save an xml subtree. This method will be called when a file is saved. The `target` node will point to the custom xml subtree in the file. You can add child nodes to the target node, you can set its attributes, but you **can not** modify target node name or overwrite it. Comment nodes will be ignored.
+    
+  - `void AlgAudio::Module::state_load_xml(rapidxml::xml_node<>* source)`
+  
+    This method is called when, during file loading, an xml subtree is available for a given module instance. That subtree will be passed as the `source` argument. The module should set its state according to that data. The source node (subtree) will be in identical state as it was when the corresponding `save_state_xml` returned.
+    
 Browse the header files, especially `Module.hpp` for useful method you can call from your custom module subclass. For example, you may be interested in `AlgAudio::Module::GetParamControllerByID(std::string)`, which returns a pointer to a ParamController, allowing you to set a param value as you wish.

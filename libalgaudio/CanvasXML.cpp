@@ -79,6 +79,26 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
   }
   return res;
 }
+
+std::shared_ptr<CanvasXML> CanvasXML::CreateFromNode(rapidxml::xml_node<>* node){
+  if(node == nullptr) throw XMLParseException("Root node is missing");
+  
+  auto res = std::shared_ptr<CanvasXML>( new CanvasXML() );
+  res->doc.clear();
+  
+  res->root = res->doc.allocate_node(rapidxml::node_type::node_element);
+  rapidxml::clone_node_copying(node, res->root, &res->doc);
+  
+  // Get version attribute
+  rapidxml::xml_attribute<>* version_attr = res->root->first_attribute("version");
+  if(!version_attr) throw XMLParseException("Version information is missing");
+  std::string version(version_attr->value());
+  // Version check!
+  if(version != "1") throw XMLParseException("Invalid file version (" + version + ")");
+  
+  return res;
+}
+
 std::shared_ptr<CanvasXML> CanvasXML::CreateFromCanvas(std::shared_ptr<Canvas> canvas){
   
   auto res = std::shared_ptr<CanvasXML>( new CanvasXML() );
@@ -126,6 +146,8 @@ void CanvasXML::UpdateStringFromDoc(){
 
 void CanvasXML::AppendModule(std::shared_ptr<Module> m){
   rapidxml::xml_node<>* modulenode = doc.allocate_node(rapidxml::node_type::node_element, "module");
+  root->append_node(modulenode);
+  
   int id = ++saveid_counter;
   modules_to_saveids[m] = id;
   modulenode->append_attribute( doc.allocate_attribute("saveid",alloc2s(id)) );
@@ -137,6 +159,7 @@ void CanvasXML::AppendModule(std::shared_ptr<Module> m){
     pcnode->append_attribute( doc.allocate_attribute("value", alloc2s( pc->Get() )));
     modulenode->append_node(pcnode);
   }
+  // Gui data
   auto gui = m->GetGUI();
   if(gui){
     rapidxml::xml_node<>* guinode = doc.allocate_node(rapidxml::node_type::node_element, "gui");
@@ -144,7 +167,22 @@ void CanvasXML::AppendModule(std::shared_ptr<Module> m){
     guinode->append_attribute( doc.allocate_attribute("y", alloc2s( gui->position().y )));
     modulenode->append_node(guinode);
   }
-  root->append_node(modulenode);
+  // Custom string
+  std::string customstring = m->state_store_string();
+  if(customstring != ""){
+    rapidxml::xml_node<>* customnode = doc.allocate_node(rapidxml::node_type::node_element, "customstring");
+    customnode->value(allocs(customstring));
+    modulenode->append_node(customnode);
+  }
+  // Custom xml subtree
+  rapidxml::xml_node<>* xmlnode = doc.allocate_node(rapidxml::node_type::node_element, "customxml");
+  modulenode->append_node(xmlnode); // This sets the parent document.
+  m->state_store_xml(xmlnode);
+  auto childnode = xmlnode->first_node();
+  auto childattr = xmlnode->first_attribute();
+  if(!childnode && !childattr){ // Do not save the node if it has no custom data.
+    modulenode->remove_node(xmlnode);
+  }
   
   UpdateStringFromDoc();
 }
@@ -352,7 +390,18 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
         m->position_in_canvas = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
       }
     }
-
+    
+    // Read custom data.
+    rapidxml::xml_node<>* customstringnode = module_node->first_node("customstring");
+    if(customstringnode){
+      // Pass the value to the module.
+      m->state_load_string(customstringnode->value());
+    }
+    rapidxml::xml_node<>* customxmlnode = module_node->first_node("customxml");
+    if(customxmlnode){
+      // Pass the subtree to the module.
+      m->state_load_xml(customxmlnode);
+    }
     r.Return("");
   });
   return r;

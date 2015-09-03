@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
+#include "rapidxml_algaudio.hpp"
 
 namespace AlgAudio{
   
@@ -40,10 +41,15 @@ class CanvasXML{
 public:
   static std::shared_ptr<CanvasXML> CreateFromFile(std::string path);
   static std::shared_ptr<CanvasXML> CreateFromString(std::string string);
+  static std::shared_ptr<CanvasXML> CreateFromNode(rapidxml::xml_node<>* node);
   static std::shared_ptr<CanvasXML> CreateFromCanvas(std::shared_ptr<Canvas> canvas);
   
   void SaveToFile(std::string path);
   std::string GetXMLAsString();
+  
+  void CloneToAnotherXMLTree(rapidxml::xml_node<>* node, rapidxml::xml_document<>* doc){
+    rapidxml::clone_node_copying(root, node, doc);
+  }
   
   // On success, latereturns the same canvas pointer. Otherwise it returns a
   // null pointer, and stores an error message to be read using GetLastError.

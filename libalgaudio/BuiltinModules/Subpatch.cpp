@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIBox.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
 #include "CanvasView.hpp"
+#include "CanvasXML.hpp"
 
 namespace AlgAudio{
 namespace Builtin{
@@ -32,6 +33,22 @@ void Subpatch::on_init(){
 
 void Subpatch::on_destroy(){
   std::cout << "Subpatch destroy" << std::endl;
+}
+
+void Subpatch::state_store_xml(rapidxml::xml_node<char>* node) const {
+  auto canvasxml = CanvasXML::CreateFromCanvas(canvas);
+  auto filesave_node = node->document()->allocate_node(rapidxml::node_type::node_element,"algaudio");
+  node->append_node(filesave_node);
+  canvasxml->CloneToAnotherXMLTree(filesave_node, node->document());
+}
+void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
+  auto filesave_node = node->first_node("algaudio");
+  if(!filesave_node) return; // ??? No save node? Apparently custom save data has no subpatch information, so ignore it.
+  
+  auto canvasxml = CanvasXML::CreateFromNode(filesave_node);
+  // TODO: This may be possibly dangerous. If the canvas is not yet assigned before view is switched,
+  // the CV may end up trying to display a nullptr canvas.
+  LateAssign(canvas, canvasxml->CreateNewCanvas());
 }
 
 void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){

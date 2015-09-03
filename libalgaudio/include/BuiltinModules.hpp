@@ -28,6 +28,8 @@ public:
   void on_init() override;
   void on_destroy() override;
   void on_gui_build(std::shared_ptr<ModuleGUI> gui) override;
+  void state_store_xml(rapidxml::xml_node<char>*) const override;
+  void state_load_xml(rapidxml::xml_node<char>*) override;
 private:
   std::shared_ptr<Canvas> canvas;
 };

@@ -25,6 +25,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "LateReturn.hpp"
 
+// Forward declaration to strip rapidxml header dependecncy
+namespace rapidxml{
+  template <class Ch>
+  class xml_node;
+}
+
 namespace AlgAudio{
 
 class ModuleTemplate;
@@ -136,8 +142,10 @@ public:
   // These methods are used for storing and loading internal module state.
   // They are mostly used when a canvas is saved, or when a module is copied
   // to clipboard. State loading will never happen before on_init.
-  virtual std::string state_store() {return "";}
-  virtual void state_load(std::string) {}
+  virtual std::string state_store_string() const {return "";}
+  virtual void state_load_string(std::string) {}
+  virtual void state_store_xml(rapidxml::xml_node<char>*) const {}
+  virtual void state_load_xml(rapidxml::xml_node<char>*) {}
 
   // The template this module instance is based on.
   std::shared_ptr<ModuleTemplate> templ;
