@@ -28,7 +28,7 @@ class SubpatchEntrance;
 
 class Subpatch : public Module{
 public:
-  void on_init() override;
+  LateReturn<> on_init_latereturn() override;
   void on_destroy() override;
   void on_gui_build(std::shared_ptr<ModuleGUI> gui) override;
   void state_store_xml(rapidxml::xml_node<char>*) const override;

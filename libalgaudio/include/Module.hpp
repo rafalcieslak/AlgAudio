@@ -152,6 +152,11 @@ public:
   // SC instance was created etc. Similarly, on_destroy is called before the SC
   // instance is removed, while the buses still exist etc.
   virtual void on_init() {};
+  virtual LateReturn<> on_init_latereturn() {
+    Relay<> r;
+    on_init();
+    return r.Return();
+  };
   virtual void on_destroy() {};
   // This method will be called when the module GUI is ready to be displayed.
   // If you wish to modify the GUI but do not want to override BuildGUI with

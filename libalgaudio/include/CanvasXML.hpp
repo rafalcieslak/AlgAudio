@@ -37,7 +37,7 @@ struct XMLParseException : public Exception{
 /* An instanceable class that exports canvas state to an XML document, and
  * vice versa.
  */
-class CanvasXML{
+class CanvasXML : public std::enable_shared_from_this<CanvasXML>{
 public:
   static std::shared_ptr<CanvasXML> CreateFromFile(std::string path);
   static std::shared_ptr<CanvasXML> CreateFromString(std::string string);

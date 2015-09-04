@@ -235,8 +235,9 @@ std::string CanvasXML::GetXMLAsString(){
 
 LateReturn<std::shared_ptr<Canvas>> CanvasXML::CreateNewCanvas(std::shared_ptr<Canvas> parent){
   Relay<std::shared_ptr<Canvas>> r;
-  Canvas::CreateEmpty(parent).Then([this,r](std::shared_ptr<Canvas> res){
-    ApplyToCanvas(res).ThenReturn(r);
+  // Captturing a shared pointer to self to extend lifetime.
+  Canvas::CreateEmpty(parent).Then([me = shared_from_this(),r](std::shared_ptr<Canvas> res){
+    me->ApplyToCanvas(res).ThenReturn(r);
   });
   return r;
 }
@@ -266,7 +267,9 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
         if(errormsg != "" && *msg == "") *msg = errormsg;
         s.Trigger();
       });
-  s.WhenAll([this,r,c,msg](){
+      
+  // Capturing me as shared_ptr to extend lifetime
+  s.WhenAll([this,me = shared_from_this(),r,c,msg](){
     
     if(*msg != "") // An error occured with at least one of the modules
       parseerror(*msg);

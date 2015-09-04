@@ -68,12 +68,13 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
       res->PrepareParamControllers();
       res->enabled_by_factory = true;
       try{
-        res->on_init(); // temporary!
+        res->on_init_latereturn().Then([=](){
+          res->ResetControllers();
+          r.Return(res, "");
+        });
       }catch(ModuleDoesNotWantToBeCreatedException ex){
         throw ModuleInstanceCreationFailedException("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
       }
-      res->ResetControllers();
-      r.Return(res, "");
     }else{
       lo::Message m;
       // Use the full ID to identify SynthDef.
@@ -93,23 +94,26 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
             res->PrepareParamControllers();
             res->enabled_by_factory = true;
             try{
-              res->on_init();
+              res->on_init_latereturn().Then([=](){
+                res->ResetControllers();
+                r.Return(res, "");
+              });
             }catch(ModuleDoesNotWantToBeCreatedException ex){
               DestroyInstance(res);
               r.Return(nullptr, "This module does not want to be created:\n" + ex.what());
               return;
             }
-            res->ResetControllers();
-            r.Return(res, "");
           });
           }
         );
     }
   }else{
+    // Modules w/o SC code
     res->PrepareParamControllers();
     res->enabled_by_factory = true;
-    res->on_init();
-    r.Return(res, "");
+    res->on_init_latereturn().Then([=](){
+      r.Return(res, "");
+    });
   }
   return r;
 }

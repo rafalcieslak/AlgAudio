@@ -28,32 +28,44 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 namespace Builtin{
 
-void Subpatch::on_init(){
-  Canvas::CreateEmpty(canvas.lock()).Then([this](auto canvas){
+LateReturn<> Subpatch::on_init_latereturn(){
+  Relay<> r;
+  Sync s(5);
+  Canvas::CreateEmpty(canvas.lock()).Then([this,s](auto canvas){
     canvas->owner_hint = shared_from_this();
     internal_canvas = canvas;
+    s.Trigger();
   });
+  std::cout << "Subpatch initting!" << std::endl;
   inlets.resize(4);
-  Module::Inlet::Create("in1","Inlet 1",shared_from_this()).Then([this](auto inlet){
+  // TODO : USe global config to run w/o SC
+  bool fake = !SCLang::ready;
+  Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;
     if(entrance) entrance->LinkOutput(0, inlet->bus->GetID());
     if(modulegui) modulegui->OnInletsChanged();
+    s.Trigger();
   });
-  Module::Inlet::Create("in2","Inlet 2",shared_from_this()).Then([this](auto inlet){
+  Module::Inlet::Create("in2","Inlet 2",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[1] = inlet;
     if(entrance) entrance->LinkOutput(1, inlet->bus->GetID());
     if(modulegui) modulegui->OnInletsChanged();
+    s.Trigger();
   });
-  Module::Inlet::Create("in3","Inlet 3",shared_from_this()).Then([this](auto inlet){
+  Module::Inlet::Create("in3","Inlet 3",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[2] = inlet;
     if(entrance) entrance->LinkOutput(2, inlet->bus->GetID());
     if(modulegui) modulegui->OnInletsChanged();
+    s.Trigger();
   });
-  Module::Inlet::Create("in4","Inlet 4",shared_from_this()).Then([this](auto inlet){
+  Module::Inlet::Create("in4","Inlet 4",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[3] = inlet;
     if(entrance) entrance->LinkOutput(3, inlet->bus->GetID());
     if(modulegui) modulegui->OnInletsChanged();
+    s.Trigger();
   });
+  s.WhenAll([r](){r.Return();});
+  return r;
 }
 
 void Subpatch::on_destroy(){
@@ -67,13 +79,17 @@ void Subpatch::state_store_xml(rapidxml::xml_node<char>* node) const {
   canvasxml->CloneToAnotherXMLTree(filesave_node, node->document());
 }
 void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
+  std::cout << "Subpatch load XML" << std::endl;
   auto filesave_node = node->first_node("algaudio");
   if(!filesave_node) return; // ??? No save node? Apparently custom save data has no subpatch information, so ignore it.
   
   auto canvasxml = CanvasXML::CreateFromNode(filesave_node);
-  // TODO: This may be possibly dangerous. If the canvas is not yet assigned before view is switched,
-  // the CV may end up trying to display a nullptr canvas.
-  LateAssign(internal_canvas, canvasxml->CreateNewCanvas(canvas.lock()));
+  
+  Canvas::CreateEmpty(canvas.lock()).Then([this,canvasxml](auto c){
+    c->owner_hint = shared_from_this();
+    internal_canvas = c;
+    canvasxml->ApplyToCanvas(c);
+  });
 }
 
 void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
@@ -107,6 +123,7 @@ void Subpatch::LinkToEntrance(std::shared_ptr<SubpatchEntrance> e){
 // ============= SubpatchEntrnace ===========
 
 void SubpatchEntrance::on_init(){
+  std::cout << "Subpatch entrance initting!" << std::endl;
   // Check if parent canvas is managed by a subpatch.
   std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
   auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
