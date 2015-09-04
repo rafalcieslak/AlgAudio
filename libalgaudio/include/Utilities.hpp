@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <cmath>
 #include "Signal.hpp"
+#include "Exception.hpp"
 
 struct SDL_Color;
 struct SDL_KeyboardEvent;
@@ -138,20 +139,6 @@ typedef enum {
   VertAlignment_CENTERED,
   VertAlignment_BOTTOM
 } VertAlignment;
-
-class Exception{
-public:
-  Exception(std::string t);
-  virtual std::string what() {return text;}
-  virtual ~Exception() {}
-protected:
-  std::string text;
-};
-class UnimplementedException : public Exception{
-public:
-  UnimplementedException(std::string t) : Exception(t){}
-};
-
 
 // A custom structure representing keypress info.
 struct KeyData{

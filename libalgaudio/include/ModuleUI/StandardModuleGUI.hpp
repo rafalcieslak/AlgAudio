@@ -52,6 +52,7 @@ public:
   virtual void SliderDragEnd(UIWidget::ID id) override;
   virtual std::string GetIoletParamID(UIWidget::ID) const override;
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override{ return main_margin->FindChild(id);}
+  virtual void OnInletsChanged();
 protected:
   StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
 private:

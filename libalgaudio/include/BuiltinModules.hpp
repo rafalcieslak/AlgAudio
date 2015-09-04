@@ -19,9 +19,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Module.hpp"
+#include <array>
 
 namespace AlgAudio{
 namespace Builtin{
+
+class SubpatchEntrance;
 
 class Subpatch : public Module{
 public:
@@ -30,8 +33,24 @@ public:
   void on_gui_build(std::shared_ptr<ModuleGUI> gui) override;
   void state_store_xml(rapidxml::xml_node<char>*) const override;
   void state_load_xml(rapidxml::xml_node<char>*) override;
+  
+  // Marks the given entrance as an entrance to this subpatch. If buses
+  // are ready, it applies their ids to the entrance. If buses are not
+  // ready, the ids will be applied as soon as the buses are ready.
+  void LinkToEntrance(std::shared_ptr<SubpatchEntrance>);
+  bool HasEntrance() const {return entrance != nullptr;};
+  
+  // Used for ordering calculation. TODO: Move to an interface imlpemented by both subpatch and poly.
+  int GetGroupID() const;
 private:
   std::shared_ptr<Canvas> internal_canvas;
+  std::shared_ptr<SubpatchEntrance> entrance;
+};
+class SubpatchEntrance : public Module{
+public:
+  void on_init() override;
+  void LinkOutput(int output_no, int busid);
+private:
 };
   
 std::shared_ptr<Module> CreateInstance(std::string id);

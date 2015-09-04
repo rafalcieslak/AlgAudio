@@ -27,12 +27,12 @@ namespace AlgAudio{
 
 std::set<std::shared_ptr<Module>> ModuleFactory::instances;
 
-LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent){
+LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent){
   return CreateNewInstance( GetTemplateByID(id), parent );
 }
 
-LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent){
-  auto r = Relay<std::shared_ptr<Module>>::Create();
+LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent){
+  auto r = Relay<std::shared_ptr<Module>, std::string>::Create();
   std::shared_ptr<Module> res;
   if(!templ->has_class){
     res = std::make_shared<Module>(templ);
@@ -67,9 +67,13 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       res->CreateIOFromTemplate(true); // Create fake io
       res->PrepareParamControllers();
       res->enabled_by_factory = true;
-      res->on_init(); // temporary!
+      try{
+        res->on_init(); // temporary!
+      }catch(ModuleDoesNotWantToBeCreatedException ex){
+        throw ModuleInstanceCreationFailedException("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
+      }
       res->ResetControllers();
-      r.Return(res);
+      r.Return(res, "");
     }else{
       lo::Message m;
       // Use the full ID to identify SynthDef.
@@ -88,9 +92,15 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
           res->CreateIOFromTemplate().Then([=](){
             res->PrepareParamControllers();
             res->enabled_by_factory = true;
-            res->on_init();
+            try{
+              res->on_init();
+            }catch(ModuleDoesNotWantToBeCreatedException ex){
+              DestroyInstance(res);
+              r.Return(nullptr, "This module does not want to be created:\n" + ex.what());
+              return;
+            }
             res->ResetControllers();
-            r.Return(res);
+            r.Return(res, "");
           });
           }
         );
@@ -99,7 +109,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
     res->PrepareParamControllers();
     res->enabled_by_factory = true;
     res->on_init();
-    r.Return(res);
+    r.Return(res, "");
   }
   return r;
 }

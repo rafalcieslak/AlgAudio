@@ -172,16 +172,8 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   // will never shirink.
   caption->SetCustomSize(caption->GetRequestedSize());
 
-  for(auto& i : templ->inlets){
-    auto inlet = IOConn::Create(window, i.id, i.name, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
-    inlet->widget_id = UIWidget::ID("autoinlet_" + i.id);
-    inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
-    inlets[inlet->widget_id] = inlet;
-    subscriptions += inlet->on_connector_pointed.Subscribe([this,inletname = i.name, modulename = templ->name](bool pointed){
-      if(pointed) caption->SetText( inletname );
-      else caption->SetText( modulename );
-    });
-  }
+  OnInletsChanged();
+  
   for(auto& o : templ->outlets){
     auto outlet = IOConn::Create(window, o.id, o.name, VertAlignment_BOTTOM, Theme::Get("standardbox-outlet"));
     outlet->widget_id = UIWidget::ID("autooutlet_" + o.id);
@@ -204,6 +196,24 @@ void StandardModuleGUI::LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ){
   }
   UpdateMinimalSize();
 }
+void StandardModuleGUI::OnInletsChanged(){
+  inlets_box->Clear();
+  inlets.clear();
+  
+  auto mod = module.lock();
+  
+  for(auto& i : mod->inlets){
+    if(!i) continue;
+    auto inlet = IOConn::Create(window, i->id, i->name, VertAlignment_TOP, Theme::Get("standardbox-inlet"));
+    inlet->widget_id = UIWidget::ID(i->id);
+    inlets_box->Insert(inlet,UIBox::PackMode::WIDE);
+    inlets[inlet->widget_id] = inlet;
+    subscriptions += inlet->on_connector_pointed.Subscribe([this,inletname = i->name, modulename = mod->templ->name](bool pointed){
+      if(pointed) caption->SetText( inletname );
+      else caption->SetText( modulename );
+    });
+  }
+};
 
 void StandardModuleGUI::OnChildRequestedSizeChanged(){
   UpdateMinimalSize();

@@ -51,7 +51,7 @@ public:
   virtual ~Canvas();
   // Creates a new module according to the given template id, and places the
   // new module instance on this Canvas.
-  LateReturn<std::shared_ptr<Module>> CreateModule(std::string id);
+  LateReturn<std::shared_ptr<Module>, std::string> CreateModule(std::string id);
   // Removes a particular module instance from the Canvas.
   void RemoveModule(std::shared_ptr<Module>);
 
@@ -112,6 +112,10 @@ public:
   // Returns the SC server group corresponding to this canvas. The returned pointer
   // will never be null.
   std::shared_ptr<Group> GetGroup() const {return group;}
+  
+  // It this canvas is managed by a module, it should set this pointer to itself,
+  // so that everyone else can easlily that module.
+  std::shared_ptr<Module> owner_hint = nullptr;
 private:
   // Private constructor. Use CreateEmpty() instead.
   Canvas();

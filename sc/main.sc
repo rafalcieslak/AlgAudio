@@ -29,7 +29,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 		from algaudio identify synths by these ids, so such dict is convenient.
 
 	A module_instance is an array of exactly 3 elements.
-	First one, is the group. The synth and it's forks are gouped together in
+	First one is the group. The synth and it's forks are gouped together in
 		order to simplify toposort and ordering.
 	The second element is the synth instance itself. This is where param sets
 		are passed to. It is build basing on a module-defined synthdef.
@@ -280,23 +280,46 @@ OSCdef.new( 'connectoutlet', {
 // Args: instance id, inlet id, bus id
 OSCdef.new( 'connectinlet', {
 		arg msg;
-		("Connecting inlet " ++ msg[1].asString ++ "/" ++ msg[2].asString ++ " to bus " ++ msg[3]).postln;
-		~minstances[msg[1]][1].set(
-			msg[2].asString,
-			msg[3]
-		);
+		if((msg[1] != -1),{
+			("Connecting inlet " ++ msg[1].asString ++ "/" ++ msg[2].asString ++ " to bus " ++ msg[3]).postln;
+			~minstances[msg[1]][1].set(
+				msg[2].asString,
+				msg[3]
+			);
+		});
 	}, '/algaudioSC/connectinlet'
 ).postln;
+
+// Returns the top node for given synthid or groupid. Basically the returned node
+// is the handle that should be used for reordering.
+~getOrderable = {
+	arg id;
+	var result;
+	if((~minstances.includesKey(id)),{
+		result = ~minstances[id][0];
+	},{
+		if((~subgroups.includesKey(id)),{
+			result = ~subgroups[id];
+		},{
+			result = nil;
+		});
+	});
+	result;
+};
 
 // This is the helper method that realizes a synth ordering.
 OSCdef.new( 'ordering', {
 		arg msg;
 		var first = msg[1];
 		var all = msg[1..(msg.size-2)];
+		var firstnode = ~getOrderable.value(first);
+		var prev = firstnode, curr;
 		("Applying ordering: " ++ all.asString).postln;
-		~minstances[first][0].moveToHead(~minstances[first][0].group);
+		firstnode.moveToHead(firstnode.group);
 		for(1,msg.size-3,{ arg i;
-			~minstances[all[i]][0].moveAfter(~minstances[all[i-1]][0]);
+			curr = ~getOrderable.value(all[i]);
+			curr.moveAfter(prev);
+			prev = curr;
 		});
 	}, '/algaudioSC/ordering'
 ).postln;

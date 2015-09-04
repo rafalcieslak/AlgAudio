@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleFactory.hpp"
 #include "ModuleCollection.hpp"
 #include "SCLang.hpp"
+#include "BuiltinModules.hpp"
 
 namespace AlgAudio{
 
@@ -54,14 +55,14 @@ LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> 
   return r;
 }
 
-LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
-  Relay<std::shared_ptr<Module>> r;
-  ModuleFactory::CreateNewInstance(id, shared_from_this()).Then([this,r](std::shared_ptr<Module> m){
+LateReturn<std::shared_ptr<Module>, std::string> Canvas::CreateModule(std::string id){
+  Relay<std::shared_ptr<Module>, std::string> r;
+  ModuleFactory::CreateNewInstance(id, shared_from_this()).Then([this,r](std::shared_ptr<Module> m, std::string error){
     if(m){
       modules.emplace(m);
       m->canvas = shared_from_this();
     }
-    r.Return(m);
+    r.Return(m, error);
   });
   return r;
 }
@@ -335,8 +336,17 @@ void Canvas::RecalculateOrder(){
 
   // Send the ordering to SC.
   lo::Message msg;
-  for(const std::shared_ptr<Module> &m : ordering)
-    msg.add_int32(m->sc_id);
+  for(const std::shared_ptr<Module> &m : ordering){
+    int id_for_ordering;
+    auto subpatch = std::dynamic_pointer_cast<Builtin::Subpatch>(m);
+    if(subpatch){
+      // Special cas for builtin subpatch module. Ordering full node groups (subtrees)
+      id_for_ordering = subpatch->GetGroupID();
+    }else{
+      id_for_ordering = m->sc_id;
+    }
+    msg.add_int32(id_for_ordering);
+  }
   SCLang::SendOSCCustom("/algaudioSC/ordering", msg);
 
 }

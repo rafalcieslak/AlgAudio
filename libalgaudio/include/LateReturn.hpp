@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include <tuple>
 #include <iostream>
+#include "Exception.hpp"
 
 namespace AlgAudio{
 
@@ -135,11 +136,11 @@ inline std::function<void()> bind_tuple(std::function<void()> f, std::tuple<>){
 template <typename... Types>
 class LateReturn{
 public:
-  void Then(std::function<void(Types...)> f) const{
+  const LateReturn& Then(std::function<void(Types...)> f) const{
     auto it = LateReturnEntryBase::entries.find(id);
     if(it == LateReturnEntryBase::entries.end()){
       std::cout << "ERROR: LateReturn Then called, but it is not in the base!" << std::endl;
-      return;
+      return *this;
     }
     LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
     if(!entry->triggered){
@@ -152,16 +153,19 @@ public:
       delete entry;
       LateReturnEntryBase::entries.erase(it);
     }
+    return *this;
   }
-  void ThenSync(Sync& s) const{
+  const LateReturn& ThenSync(Sync& s) const{
     Then([=](Types...)mutable{
       s.Trigger();
     });
+    return *this;
   }
-  void ThenReturn(Relay<Types...> r){
+  const LateReturn& ThenReturn(Relay<Types...> r) const{
     Then([r](Types... result){
       r.Return(result...);
     });
+    return *this;
   }
   LateReturn(const Relay<Types...>& r) : id(r.id) {}
   LateReturn(const LateReturn& other) = delete;

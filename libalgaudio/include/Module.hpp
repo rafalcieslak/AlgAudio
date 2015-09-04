@@ -33,6 +33,13 @@ namespace rapidxml{
 
 namespace AlgAudio{
 
+// Third pardy modules may throw this from on_init if conditions for creating
+// and instance of this module are not met, for example, if multiple instances
+// of SubpatchEntrance would exist on the same canvas.
+struct ModuleDoesNotWantToBeCreatedException : public Exception{
+  ModuleDoesNotWantToBeCreatedException(std::string t) : Exception(t){};
+};
+
 class ModuleTemplate;
 class ParamTemplate;
 class Canvas;

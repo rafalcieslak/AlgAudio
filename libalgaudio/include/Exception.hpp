@@ -1,3 +1,5 @@
+#ifndef EXCEPTION_HPP
+#define EXCEPTION_HPP
 /*
 This file is part of AlgAudio.
 
@@ -17,15 +19,31 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "BuiltinModules.hpp"
+#include <string>
 
 namespace AlgAudio{
-namespace Builtin{
   
-std::shared_ptr<Module> CreateInstance(std::string id){
-  if(id == "BuiltinSubpatch") return std::make_shared<Subpatch>();
-  if(id == "BuiltinSubpatchEntrance") return std::make_shared<SubpatchEntrance>();
-  return nullptr;
-}
+class Exception{
+public:
+  Exception(std::string t) : text(t){
+#ifdef SILLY_GDB
+    // if your GDB cannot break
+    std::cout << "Builtin trap to mark exception creation stack for exception: `" << text << "`" << std::endl;
+    // *((int*)nullptr) = 0;
+    __builtin_trap();
+#endif // SILLY_GDB
+  }
+  virtual std::string what() {return text;}
+  virtual ~Exception() {}
+protected:
+  std::string text;
+};
+class UnimplementedException : public Exception{
+public:
+  UnimplementedException(std::string t) : Exception(t){}
+};
 
-}} // namespace AlgAudio::Builtin
+  
+} // namespcae AlgAudio
+
+#endif // EXCEPTION_HPP

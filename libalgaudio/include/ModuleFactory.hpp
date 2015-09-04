@@ -40,8 +40,9 @@ private:
   ModuleFactory() = delete; // static class
   static std::set<std::shared_ptr<Module>> instances;
 public:
-  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
-  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);
+  // These methods latereturn two values - a pointer to new module, which is nullptr on failure, and an error message string, which is empty on success.
+  static LateReturn<std::shared_ptr<Module>, std::string> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
+  static LateReturn<std::shared_ptr<Module>, std::string> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);
   static LateReturn<> DestroyInstance(std::shared_ptr<Module>);
   static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string);
 };

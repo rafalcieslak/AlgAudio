@@ -130,7 +130,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   }
   
   try{
-    current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m){
+    current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m, std::string error){
       if(m){ // Do not create the GUI if module instance creation failed.
         try{
           auto modulegui = m->BuildGUI(window.lock());
@@ -149,7 +149,9 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
           current_canvas->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
-      } // if m
+      }else{
+        window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + error,"Dismiss");
+      }
       r.Return();
     });
   }catch(ModuleInstanceCreationFailedException ex){

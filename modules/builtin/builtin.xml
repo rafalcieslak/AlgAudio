@@ -21,4 +21,23 @@ Out.ar(outbus,in);
     <gui type="standard auto"/>
   </module>
   
+  <module id="subentry" name="Subpatch entrance">
+    <class name="BuiltinSubpatchEntrance"/>
+    <description> This module outputs whatever has entered the parent subpatch module. </description>
+    <params>
+      <outlet id="out1" name="Inlet 1"/>
+      <outlet id="out2" name="Inlet 2"/>
+      <outlet id="out3" name="Inlet 3"/>
+      <outlet id="out4" name="Inlet 4"/>
+    </params>
+    <sc>
+arg subin1, subin2, subin3, subin4, out1, out2, out3, out4;
+Out.ar(out1,In.ar(subin1));
+Out.ar(out2,In.ar(subin2));
+Out.ar(out3,In.ar(subin3));
+Out.ar(out4,In.ar(subin4));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+  
 </collection>

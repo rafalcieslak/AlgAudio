@@ -67,6 +67,8 @@ public:
   virtual void SliderDragStep(UIWidget::ID, Point2D_<float>){}
   virtual void SliderDragEnd(UIWidget::ID){}
 
+  virtual void OnInletsChanged() {};
+
   enum class WhatIsHereType{
     Nothing,
     Inlet,

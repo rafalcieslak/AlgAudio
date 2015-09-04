@@ -23,14 +23,37 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleUI/ModuleGUI.hpp"
 #include "CanvasView.hpp"
 #include "CanvasXML.hpp"
+#include "SCLang.hpp"
 
 namespace AlgAudio{
 namespace Builtin{
 
 void Subpatch::on_init(){
-  if(canvas.lock() == nullptr) std::cout << "AAAAAAAA nullptr" << std::endl;
-    else std::cout << "BBBBBBB not nullptr" << std::endl;
-  LateAssign(internal_canvas, Canvas::CreateEmpty(canvas.lock()));
+  Canvas::CreateEmpty(canvas.lock()).Then([this](auto canvas){
+    canvas->owner_hint = shared_from_this();
+    internal_canvas = canvas;
+  });
+  inlets.resize(4);
+  Module::Inlet::Create("in1","Inlet 1",shared_from_this()).Then([this](auto inlet){
+    inlets[0] = inlet;
+    if(entrance) entrance->LinkOutput(0, inlet->bus->GetID());
+    if(modulegui) modulegui->OnInletsChanged();
+  });
+  Module::Inlet::Create("in2","Inlet 2",shared_from_this()).Then([this](auto inlet){
+    inlets[1] = inlet;
+    if(entrance) entrance->LinkOutput(1, inlet->bus->GetID());
+    if(modulegui) modulegui->OnInletsChanged();
+  });
+  Module::Inlet::Create("in3","Inlet 3",shared_from_this()).Then([this](auto inlet){
+    inlets[2] = inlet;
+    if(entrance) entrance->LinkOutput(2, inlet->bus->GetID());
+    if(modulegui) modulegui->OnInletsChanged();
+  });
+  Module::Inlet::Create("in4","Inlet 4",shared_from_this()).Then([this](auto inlet){
+    inlets[3] = inlet;
+    if(entrance) entrance->LinkOutput(3, inlet->bus->GetID());
+    if(modulegui) modulegui->OnInletsChanged();
+  });
 }
 
 void Subpatch::on_destroy(){
@@ -67,6 +90,35 @@ void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
     }
     canvasview->EnterCanvas(internal_canvas, "Subpatch");
   });
+}
+
+void Subpatch::LinkToEntrance(std::shared_ptr<SubpatchEntrance> e){  
+  entrance = e;
+  if(inlets[0] != nullptr) e->LinkOutput(0, inlets[0]->bus->GetID());
+  if(inlets[1] != nullptr) e->LinkOutput(1, inlets[1]->bus->GetID());
+  if(inlets[2] != nullptr) e->LinkOutput(2, inlets[2]->bus->GetID());
+  if(inlets[3] != nullptr) e->LinkOutput(3, inlets[3]->bus->GetID());
+}
+
+ int Subpatch::GetGroupID() const {
+   return internal_canvas->GetGroup()->GetID();
+ }
+
+// ============= SubpatchEntrnace ===========
+
+void SubpatchEntrance::on_init(){
+  // Check if parent canvas is managed by a subpatch.
+  std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
+  auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
+  // If not, throw a DoNotWantToBeCreated exception.
+  if(!owner_subpatch) throw ModuleDoesNotWantToBeCreatedException("This module can only be created inside a subpatch.");
+  if(owner_subpatch->HasEntrance()) throw ModuleDoesNotWantToBeCreatedException("Currently it is not possible to create multiple entrances inside the same subpatch.");
+  // Otherwise link to that entrance.
+  owner_subpatch->LinkToEntrance(std::static_pointer_cast<SubpatchEntrance>( shared_from_this() ));
+}
+
+void SubpatchEntrance::LinkOutput(int output_no, int busid){
+  SCLang::SendOSC("/algaudioSC/setparam", "isi", sc_id, ("subin" + std::to_string(output_no + 1)).c_str(), busid);
 }
 
 }} // namespace AlgAudio:::Builtin

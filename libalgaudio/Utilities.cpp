@@ -45,15 +45,6 @@ static std::unordered_map<SDL_Keycode, std::pair<std::string, KeyData::KeyType>>
   const std::string Utilities::OSLibSuffix = ".dll";
 #endif
 
-Exception::Exception(std::string t) : text(t){
-#ifdef SILLY_GDB
-  // if your GDB cannot break
-  std::cout << "Builtin trap to mark exception creation stack for exception: `" << text << "`" << std::endl;
-  // *((int*)nullptr) = 0;
-  __builtin_trap();
-#endif // SILLY_GDB
-}
-
 void Utilities::Wait(int ms){
   SDL_Delay(ms);
 }
