@@ -31,14 +31,18 @@ CanvasView::CanvasView(std::shared_ptr<Window> parent) : UIWidget(parent){
 }
 
 std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> parent){
-  auto ptr = std::shared_ptr<CanvasView>( new CanvasView(parent) );
-  ptr->canvas_stack.push_back( {Canvas::CreateEmpty(), ""} );
-  return ptr;
+  auto res = std::shared_ptr<CanvasView>( new CanvasView(parent) );
+  // TODO: Empty stack while waiting for the first canvas
+  // ptr->canvas_stack.push_back( {Canvas::CreateEmpty(nullptr), ""} );
+  Canvas::CreateEmpty(nullptr).Then([res](std::shared_ptr<Canvas> c){
+    res->SwitchTopLevelCanvas(c, "");
+  });
+  return res;
 }
 
-void CanvasView::SwitchTopLevelCanvas(std::shared_ptr<Canvas> c){
+void CanvasView::SwitchTopLevelCanvas(std::shared_ptr<Canvas> c, std::string name){
   canvas_stack.clear();
-  EnterCanvas(c);
+  EnterCanvas(c, name);
 }
 
 void CanvasView::EnterCanvas(std::shared_ptr<Canvas> c, std::string name){
@@ -69,9 +73,15 @@ std::vector<std::string> CanvasView::GetCanvasStackPath(){
 void CanvasView::CreateModuleGUIs(){
   // Get rid of all currently stored guis
   module_guis.clear();
+  
+  auto current_canvas = GetCurrentCanvas();
+  if(!current_canvas){
+    std::cout << "Unable to CreateModuleGUIs, there is no top canvas." << std::endl;
+    return;
+  }
 
   // Regain or rebuild guis
-  for(auto& m : GetCurrentCanvas()->modules){
+  for(auto& m : current_canvas->modules){
       auto modulegui = m->GetGUI();
       // If the module already has a gui, but it does not recognize us as a parent
       if(modulegui && modulegui->parent.lock() != shared_from_this()){
@@ -92,7 +102,7 @@ void CanvasView::CreateModuleGUIs(){
           modulegui->Resize(guisize);
           
         }catch(GUIBuildException ex){
-          GetCurrentCanvas()->RemoveModule(m);
+          current_canvas->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
         
@@ -112,8 +122,15 @@ void CanvasView::ResetUI(){
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   auto r = Relay<>::Create();
+  
+  auto current_canvas = GetCurrentCanvas();
+  if(!current_canvas){
+    std::cout << "Failed to AddModule, there is no current canvas." << std::endl;
+    return r;
+  }
+  
   try{
-    GetCurrentCanvas()->CreateModule(id).Then([this,r,pos](std::shared_ptr<Module> m){
+    current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m){
       if(m){ // Do not create the GUI if module instance creation failed.
         try{
           auto modulegui = m->BuildGUI(window.lock());
@@ -129,7 +146,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
           drag_mode = DragModeMove;
           SetNeedsRedrawing();
         }catch(GUIBuildException ex){
-          GetCurrentCanvas()->RemoveModule(m);
+          current_canvas->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
       } // if m
@@ -141,6 +158,14 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){
+  auto current_canvas = GetCurrentCanvas();
+  if(!current_canvas){
+    c.SetColor(Color(0xffffffff));
+    c.DrawLine(Point2D(0,0), Point2D(c.Size().width,c.Size().height));
+    c.DrawLine(Point2D(c.Size().width,0), Point2D(0,c.Size().height));
+    return;
+  }
+  
   c.SetOffset( PositionRelToAbs(Point2D(0,0))  );
   c.SetScale(view_zoom);
   
@@ -155,7 +180,7 @@ void CanvasView::CustomDraw(DrawContext& c){
   // about the io position every time when redrawing is not going to be
   // efficient when there are 100+ modules present.
   c.SetColor(Theme::Get("canvas-connection-audio"));
-  for(auto it : GetCurrentCanvas()->audio_connections){
+  for(auto it : current_canvas->audio_connections){
     Canvas::IOID from = it.first;
     Point2D from_pos = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsOutlet(from.iolet);
     // For each target of this outlet
@@ -167,7 +192,7 @@ void CanvasView::CustomDraw(DrawContext& c){
     }
   }
   // Next, data connections.
-  for(auto it : GetCurrentCanvas()->data_connections){
+  for(auto it : current_canvas->data_connections){
     Canvas::IOID from = it.first;
     Point2D from_pos_relative = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsParamRelativeOutlet(from.iolet);
     Point2D from_pos_absolute = from.module->GetGUI()->position() + from.module->GetGUI()->WhereIsParamAbsoluteOutlet(from.iolet);

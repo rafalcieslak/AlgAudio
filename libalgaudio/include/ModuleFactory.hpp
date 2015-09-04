@@ -33,13 +33,15 @@ struct ModuleInstanceCreationFailedException : public Exception{
   std::string id;
 };
 
+class Canvas;
+
 class ModuleFactory{
 private:
   ModuleFactory() = delete; // static class
   static std::set<std::shared_ptr<Module>> instances;
 public:
-  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ);
-  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id);
+  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
+  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);
   static LateReturn<> DestroyInstance(std::shared_ptr<Module>);
   static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string);
 };

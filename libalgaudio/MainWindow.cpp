@@ -170,8 +170,13 @@ bool MainWindow::Save(){
   }
 }
 bool MainWindow::Save(std::string path){
+  auto top_canvas = canvasview->GetTopCanvas();
+  if(!top_canvas){
+    std::cout << "WARNING: Not saving file, because there is no canvas in CV." << std::endl;
+    return false;
+  }
   try{
-    auto canvasxml = CanvasXML::CreateFromCanvas( canvasview->GetTopCanvas() );
+    auto canvasxml = CanvasXML::CreateFromCanvas( top_canvas );
     canvasxml->SaveToFile(path);
     current_file_path = path;
     file_name = Utilities::GetFilename(path);
@@ -199,14 +204,14 @@ void MainWindow::Open(){
       // TODO: Pass a sharedptr instaed of this, to avoid crashes when the window is closed while opening file.
       try{
         auto canvasxml = CanvasXML::CreateFromFile(path);
-        canvasxml->CreateNewCanvas().Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
+        canvasxml->CreateNewCanvas(nullptr).Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
           if(!c){
             ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
           }else{
-            canvasview->SwitchTopLevelCanvas(c);
             std::cout << "File opened sucessfuly." << std::endl;
             this->current_file_path = path;
             this->file_name = Utilities::GetFilename(path);
+            canvasview->SwitchTopLevelCanvas(c, file_name);
             UpdatePathLabel();
           }
         });
@@ -223,7 +228,7 @@ void MainWindow::Open(){
 }
 
 void MainWindow::AskToSaveBeforeCalling(std::function<void()> f){
-  if(current_file_path == "" && canvasview->GetTopCanvas()->modules.size() == 0){
+  if(canvasview->GetTopCanvas() == nullptr  || (current_file_path == "" && canvasview->GetTopCanvas()->modules.size() == 0)){
     // Empty canvas w/o file. Continue without saving/asking.
     f();
     return;
@@ -245,7 +250,9 @@ void MainWindow::AskToSaveBeforeCalling(std::function<void()> f){
 
 void MainWindow::New(){
   AskToSaveBeforeCalling([this](){
-    canvasview->SwitchTopLevelCanvas( Canvas::CreateEmpty() );
+    Canvas::CreateEmpty(nullptr).Then([this](std::shared_ptr<Canvas> c){
+      canvasview->SwitchTopLevelCanvas( c, "Unsaved file");  
+    });
     current_file_path = "";
     file_name = "Unsaved file";
     UpdatePathLabel();
@@ -337,16 +344,10 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
 
 void MainWindow::UpdatePathLabel(){
   auto vs = canvasview->GetCanvasStackPath();
-  if(vs.size() <= 1){
-    canvaspathback->SetNotDrawn(true);
-    canvaspathlabel->SetText("   Currently editting: " + file_name);
-  }else{
-    vs.erase(vs.begin()); // Yeah, this is slow, but this vector will never have many elements.
-    std::string path = Utilities::JoinString(vs," -> ");
-    
-    canvaspathback->SetNotDrawn(false);
-    canvaspathlabel->SetText("   Currently editting: " + file_name + " -> " + path);
-  }
+  if(vs.size() <= 1) canvaspathback->SetNotDrawn(true);
+  else               canvaspathback->SetNotDrawn(false);
+  std::string path = Utilities::JoinString(vs," -> ");
+  canvaspathlabel->SetText("   Currently editting: " + path);
 }
 
 } // namespace AlgAudio

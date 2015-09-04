@@ -28,16 +28,35 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 Canvas::Canvas(){
-
+  
 }
 
-std::shared_ptr<Canvas> Canvas::CreateEmpty(){
-  return std::shared_ptr<Canvas>( new Canvas() );
+LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> parent){
+  Relay<std::shared_ptr<Canvas>> r;
+  auto res = std::shared_ptr<Canvas>( new Canvas() );
+  res->parent = parent;
+  auto parentgroup = (parent)? parent->GetGroup() : nullptr;
+  // TODO: Instead of checking whether the server is ready, check global config
+  // if we are running detached from SC.
+  if(SCLang::ready){
+    Group::CreateNew( parentgroup ).Then([r,res](std::shared_ptr<Group> g){
+      res->group = g;
+      r.Return(res);
+    });
+  }else{
+    std::cout << "Note: Using a FAKE group to create a new empty canvas" << std::endl;
+    Group::CreateFake( parentgroup ).Then([r,res](std::shared_ptr<Group> g){
+      res->group = g;
+      r.Return(res);
+    });
+  }
+  
+  return r;
 }
 
 LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
   Relay<std::shared_ptr<Module>> r;
-  ModuleFactory::CreateNewInstance(id).Then([this,r](std::shared_ptr<Module> m){
+  ModuleFactory::CreateNewInstance(id, shared_from_this()).Then([this,r](std::shared_ptr<Module> m){
     if(m){
       modules.emplace(m);
       m->canvas = shared_from_this();
@@ -380,182 +399,5 @@ Canvas::~Canvas(){
   std::cout << "NOTE: A canvas instance is destroyed." << std::endl;
   for(auto& m : modules) ModuleFactory::DestroyInstance(m);
 }
-/*
-// ====  Reading from XML file ====
-
-typedef std::map<int, std::shared_ptr<Module>> saveid_map;
-
-/// ###### TODO: Reorganize file loding into a loader class, which will correctly maintain
-// all nodes lifetime, as well as document's memory allocation.
-
-LateReturn<std::string> XML_AddModuleFromNode(std::shared_ptr<rapidxml::xml_document<>> doc, std::shared_ptr<Canvas>, rapidxml::xml_node<>* module_node, std::shared_ptr<saveid_map> map);
-
-LateReturn<std::pair<std::shared_ptr<Canvas>,std::string>> Canvas::CreateFromFile(std::string path) noexcept{
-  Relay<std::pair<std::shared_ptr<Canvas>,std::string>> r;
-
-  auto canvas = CreateEmpty();
-
-  std::cout << "Inside create" << std::endl;
-
-  std::ifstream f(path);
-  if(!f) return r.Return({nullptr,"Unable to read save file.\n" + path});
-
-  std::shared_ptr<saveid_map> map = std::make_shared<saveid_map>();
-
-  std::cout << "Before try" << std::endl;
-
-  try{
-    std::shared_ptr<rapidxml::xml_document<>> doc = std::make_shared<rapidxml::xml_document<>>();
-    //std::unique_ptr<rapidxml::xml_document<>> doc = std::make_unique<rapidxml::xml_document<>>();
-    
-    rapidxml::file<> file_buffer(f);
-    if(file_buffer.size() < 5) return r.Return({nullptr,"The save file is clearly too short"});
-
-    doc->parse<0>(file_buffer.data());
-
-    rapidxml::xml_node<>* root = doc->first_node("algaudio");
-    std::cout << *root << std::endl;
-    if(!root) return r.Return({nullptr,"Missing root node"});
-    rapidxml::xml_attribute<>* version_attr = root->first_attribute("version");
-    if(!version_attr) return r.Return({nullptr,"Missing version information"});
-    std::string version(version_attr->value());
-    // Version check!
-    if(version != "1") return r.Return({nullptr,"Invalid file version (" + version + ")"});
-
-    // Assuming version 1
-    int module_count = 0;
-    for(rapidxml::xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
-      module_count++;
-
-    Sync s(module_count);
-    std::shared_ptr<std::string> msg = std::make_shared<std::string>("");
-    for(rapidxml::xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
-        XML_AddModuleFromNode(doc,canvas, module_node, map).Then([s,msg](std::string errormsg){
-          if(errormsg != "" && *msg == "") *msg = errormsg;
-          s.Trigger();
-        });
-    s.WhenAll([r,root,canvas,msg,map](){
-      //std::cout << "use count " << doc.use_count() << std::endl;
-      //std::cout << *root << std::endl;
-      
-      if(*msg != ""){ // An error occured with at least one of the modules
-        return r.Return({nullptr,*msg});
-      }
-      
-      std::cout << "Modules parsed, now connections." << std::endl;
-
-      // Next, parse audio connections.
-      for(rapidxml::xml_node<>* audioconn_node = root->first_node("audioconn"); audioconn_node; audioconn_node = audioconn_node->next_sibling("audioconn")){
-        std::cout << "Parsing audio connection." << std::endl;
-        
-        rapidxml::xml_attribute<>*  fromsaveid_attr = audioconn_node->first_attribute( "fromsaveid");
-        rapidxml::xml_attribute<>*    tosaveid_attr = audioconn_node->first_attribute(   "tosaveid");
-        rapidxml::xml_attribute<>* fromioletid_attr = audioconn_node->first_attribute("fromioletid");
-        rapidxml::xml_attribute<>*   toioletid_attr = audioconn_node->first_attribute(  "toioletid");
-        if(!fromioletid_attr || !toioletid_attr || !fromsaveid_attr || !tosaveid_attr)
-          return r.Return({nullptr,"Audioconn node is missing one of its attributes"});
-        int fromsaveid = std::stoi(fromsaveid_attr->value());
-        int tosaveid = std::stoi(tosaveid_attr->value());
-        std::string fromioletid = fromioletid_attr->value();
-        std::string toioletid = toioletid_attr->value();
-        auto from_it = map->find(fromsaveid);
-        auto   to_it = map->find(  tosaveid);
-        if(from_it == map->end() || to_it == map->end())
-          return r.Return({nullptr,"Audioconn has invalid from/to save id"});
-        std::shared_ptr<Module> from = from_it->second;
-        std::shared_ptr<Module>   to =   to_it->second;
-
-        canvas->Connect({from, fromioletid},{to, toioletid});
-      }
-
-      // Then, parse data connections.
-      for(rapidxml::xml_node<>* dataconn_node = root->first_node("dataconn"); dataconn_node; dataconn_node = dataconn_node->next_sibling("dataconn")){
-        std::cout << "Parsing data connection." << std::endl;
-        
-        rapidxml::xml_attribute<>*  fromsaveid_attr = dataconn_node->first_attribute( "fromsaveid");
-        rapidxml::xml_attribute<>*    tosaveid_attr = dataconn_node->first_attribute(   "tosaveid");
-        rapidxml::xml_attribute<>* fromparamid_attr = dataconn_node->first_attribute("fromparamid");
-        rapidxml::xml_attribute<>*   toparamid_attr = dataconn_node->first_attribute(  "toparamid");
-        rapidxml::xml_attribute<>*        mode_attr = dataconn_node->first_attribute(       "mode");
-        if(!fromparamid_attr || !toparamid_attr || !fromsaveid_attr || !tosaveid_attr || !mode_attr)
-          return r.Return({nullptr,"Dataconn node is missing one of its attributes"});
-        int fromsaveid = std::stoi(fromsaveid_attr->value());
-        int tosaveid = std::stoi(tosaveid_attr->value());
-        std::string fromparamid = fromparamid_attr->value();
-        std::string toparamid = toparamid_attr->value();
-        auto from_it = map->find(fromsaveid);
-        auto   to_it = map->find(  tosaveid);
-        if(from_it == map->end() || to_it == map->end())
-          return r.Return({nullptr,"Dataconn has invalid from/to save id"});
-        std::shared_ptr<Module> from = from_it->second;
-        std::shared_ptr<Module>   to =   to_it->second;
-        std::string mode = mode_attr->value();
-        Canvas::DataConnectionMode connmode;
-        if(mode == "absolute"){
-          connmode = Canvas::DataConnectionMode::Absolute;
-        }else if(mode == "relative"){
-          connmode = Canvas::DataConnectionMode::Relative;
-        }else{
-          return r.Return({nullptr,"Dataconn has invalid mode value"});
-        }
-
-        canvas->ConnectData({from, fromparamid},{to, toparamid},connmode);
-      }
-
-      //doc->clear();
-      return r.Return({canvas,""});
-    });
-
-
-  }catch(rapidxml::parse_error ex){
-    return r.Return({nullptr,std::string("XML parse error: ") + ex.what()});
-  }catch(std::runtime_error ex){
-    return r.Return({nullptr,std::string("XML file error: ") + ex.what()});
-  }
-  return r;
-}
-
-LateReturn<std::string> XML_AddModuleFromNode(std::shared_ptr<rapidxml::xml_document<>> doc, std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node, std::shared_ptr<saveid_map> map){
-  Relay<std::string> r;
-  rapidxml::xml_attribute<>* saveid_attr = module_node->first_attribute("saveid");
-  if(!saveid_attr) return r.Return("A module has missing fileid.");
-  int saveid = std::stoi(saveid_attr->value());
-  if(saveid <= 0) return r.Return("A module has invalid fileid.");
-  rapidxml::xml_attribute<>* template_attr = module_node->first_attribute("template");
-  if(!template_attr) return r.Return("A module has missing template.");
-  std::string template_id = template_attr->value();
-
-  auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
-  if(!templptr) return r.Return("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
-
-  ModuleFactory::CreateNewInstance(templptr).Then([c,r,map,saveid,module_node,doc](std::shared_ptr<Module> m){
-    c->modules.emplace(m);
-    map->insert(std::make_pair(saveid,m));
-    m->canvas = c;
-
-    // Parse param data.
-    for(rapidxml::xml_node<>* param_node = module_node->first_node("param"); param_node; param_node = param_node->next_sibling("param") ){
-      rapidxml::xml_attribute<>* id_attr  = param_node->first_attribute("id");
-      rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
-      if(!id_attr)  return r.Return("A param node is missing id attribute. saveid = " + std::to_string(saveid));
-      if(!val_attr) return r.Return("A param node is missing value attribute. saveid = " + std::to_string(saveid));
-      std::string paramid = id_attr->value();
-      float value = std::stof(val_attr->value());
-
-      auto pc = m->GetParamControllerByID(paramid);
-      if(!pc) return r.Return("A param node has invalid id attribute: " + paramid);
-
-      pc->Set(value);
-    }
-
-    // Store GUI data.
-    rapidxml::xml_node<>* guinode = module_node->first_node("gui");
-    if(guinode) rapidxml::print(std::back_inserter(m->guidata), *guinode, rapidxml::print_no_indenting);
-
-    return r.Return("");
-  });
-  return r;
-}
-*/
 
 } // namespace AlgAudio

@@ -55,6 +55,20 @@ private:
   int id;
 };
 
+/* This is a wrapper class for SC groups */
+class Group{
+public:
+  int GetID() const {return id;}
+  // Asks SC for a new group id, and returns a new Group instance wrapping that group.
+  static LateReturn<std::shared_ptr<Group>> CreateNew(std::shared_ptr<Group> parent);
+  // Creates a group that has no corresponding SC instance.
+  static LateReturn<std::shared_ptr<Group>> CreateFake(std::shared_ptr<Group> parent);
+  ~Group();
+private:
+  Group(int id);
+  int id;
+};
+
 /* A ParamController is the representation of a Param state.
  * All ParamControllers belong to some Module, and are always build according to
  * a ParramTemplate. The internal state of a ParamController represents it's

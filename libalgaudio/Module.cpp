@@ -25,13 +25,46 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+// ========= Bus ==========
+
 Bus::Bus(int i) : id(i) {}
 
 Bus::~Bus(){
   std::cout << "Bus freed" << std::endl;
   SCLang::SendOSC("/algaudioSC/removebus", "i", id);
 }
+LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
+  auto r = Relay<std::shared_ptr<Bus>>::Create();
+  SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
+    r.Return( std::shared_ptr<Bus>(new Bus(id)) );
+  });
+  return r;
+}
+std::shared_ptr<Bus> Bus::CreateFake(){
+  return std::shared_ptr<Bus>(new Bus(-42));
+}
 
+// ========= Group ==========
+
+Group::Group(int i) : id(i) {}
+
+Group::~Group(){
+  std::cout << "Group freed" << std::endl;
+  SCLang::SendOSC("/algaudioSC/removegroup", "i", id);
+}
+LateReturn<std::shared_ptr<Group>> Group::CreateNew(std::shared_ptr<Group> parent){
+  auto r = Relay<std::shared_ptr<Group>>::Create();
+  SCLang::SendOSCWithReply<int>("/algaudioSC/newgroup","i",parent? parent->GetID() : -1).Then( [r](int id){
+    r.Return( std::shared_ptr<Group>(new Group(id)) );
+  });
+  return r;
+}
+LateReturn<std::shared_ptr<Group>> Group::CreateFake(std::shared_ptr<Group>){
+  auto r = Relay<std::shared_ptr<Group>>::Create();
+  return r.Return( std::shared_ptr<Group>(new Group(-42)) );
+}
+
+// ========== ParamController ==========
 
 ParamController::ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t)
   : id(t->id), templ(t), range_min(t->default_min), range_max(t->default_max), module(m){
@@ -85,17 +118,6 @@ float ParamController::GetRelative() const {
 
 void ParamController::Reset(){
   Set(templ->default_val);
-}
-
-LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
-  auto r = Relay<std::shared_ptr<Bus>>::Create();
-  SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
-    r.Return( std::shared_ptr<Bus>(new Bus(id)) );
-  });
-  return r;
-}
-std::shared_ptr<Bus> Bus::CreateFake(){
-  return std::shared_ptr<Bus>(new Bus(-42));
 }
 
 SendReplyController::SendReplyController(std::shared_ptr<Module> m, std::string i, std::shared_ptr<ParamController> ctrl) : id(i), controller(ctrl), module(m){

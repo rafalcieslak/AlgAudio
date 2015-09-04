@@ -57,6 +57,7 @@ OSCdef.new( 'hello', {
 		~addr = addr;
 		~minstances = Dictionary.new(0);
 		~buses = Dictionary.new(0);
+		~subgroups = Dictionary.new(0);
 		"Hello World!".postln;
 		// Initialize MIDI
 		MIDIClient.free;
@@ -105,12 +106,25 @@ OSCdef.new( 'boothelper', {
 	}, '/algaudioSC/boothelper'
 ).postln;
 
-// 1 argument: the template name
+
+~getParentGroup = {
+	arg i;
+	var result;
+	if((i == -1),{
+		result = nil;
+	},{
+		result = ~subgroups[i];
+	});
+	result;
+};
+
+// 2 arguments: the template name, and the parent group id (or -1 to use the root group)
 // reply value: instance id
 OSCdef.new( 'newinstance', {
 		arg msg;
 		var name = "aa/" ++ msg[1];
-		var group = Group.new();
+		var parent_group = ~getParentGroup.value( msg[2] );
+		var group = Group.new(parent_group);
 		var synth = Synth.new(name, [], group);
 		var forkdict = Dictionary.new(0);
 		var id = synth.nodeID;
@@ -120,13 +134,14 @@ OSCdef.new( 'newinstance', {
 	}, '/algaudioSC/newinstance'
 ).postln;
 
-// args: the template name + a list of params and values
+// args: the template name, the parent group id (or -1 to use the root group), and a list of params and values
 // reply value: instance id
 OSCdef.new( 'newinstanceparams', {
 		arg msg;
 		var name = "aa/" ++ msg[1];
-		var params = msg[2..(msg.size-2)];
-		var group = Group.new();
+		var parent_group = ~getParentGroup.value( msg[2] );
+		var params = msg[3..(msg.size-2)];
+		var group = Group.new(parent_group);
 		var synth = Synth.new(name, params, group);
 		var forkdict = Dictionary.new(0);
 		var id = synth.nodeID;
@@ -160,14 +175,37 @@ OSCdef.new( 'newbus', {
 	}, '/algaudioSC/newbus'
 ).postln;
 
-// reply value: bus instance id
+// arg: bus id
 OSCdef.new( 'removebus', {
 		arg msg;
 		var id = msg[1];
-		("Freeing new bus " ++ id.asString).postln;
+		("Freeing bus " ++ id.asString).postln;
 		~buses[id].free;
 		~buses.removeAt( id );
 	}, '/algaudioSC/removebus'
+).postln;
+
+// Argument: parent group id (or -1 to use the root group)
+// reply value: groups instance id
+OSCdef.new( 'newgroup', {
+		arg msg;
+		var parent_group = ~getParentGroup.value( msg[1] );
+		var newgroup = Group.new(parent_group);
+		var id = newgroup.nodeID;
+		("Creating new group " ++ id.asString).postln;
+		~subgroups.add( id -> newgroup);
+		~addr.sendMsg("/algaudio/reply", id, msg[msg.size-1]);
+	}, '/algaudioSC/newgroup'
+).postln;
+
+// arg: group id
+OSCdef.new( 'removegroup', {
+		arg msg;
+		var id = msg[1];
+		("Freeing a group " ++ id.asString).postln;
+		~subgroups[id].free;
+		~subgroups.removeAt( id );
+	}, '/algaudioSC/removegroup'
 ).postln;
 
 // Args: instance id, param name, value

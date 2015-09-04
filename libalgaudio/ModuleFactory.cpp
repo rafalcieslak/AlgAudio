@@ -21,16 +21,17 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleCollection.hpp"
 #include "BuiltinModules.hpp"
 #include "LibLoader.hpp"
+#include "Canvas.hpp"
 
 namespace AlgAudio{
 
 std::set<std::shared_ptr<Module>> ModuleFactory::instances;
 
-LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id){
-  return CreateNewInstance( GetTemplateByID(id) );
+LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent){
+  return CreateNewInstance( GetTemplateByID(id), parent );
 }
 
-LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ){
+LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent){
   auto r = Relay<std::shared_ptr<Module>>::Create();
   std::shared_ptr<Module> res;
   if(!templ->has_class){
@@ -53,6 +54,9 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
     // Set the module template link
     res->templ = templ;
   }
+  
+  res->canvas = parent;
+  
   // Create SC instance
   if(templ->has_sc_code){
     if(!SCLang::ready){
@@ -70,6 +74,8 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
       lo::Message m;
       // Use the full ID to identify SynthDef.
       m.add_string(templ->GetFullID());
+      // Parent group id.
+      m.add_int32(parent->GetGroup()->GetID());
       // Prepare a list of params. Set all output buses to 999999.
       for(auto& o : templ->outlets){
         m.add_string(o.id);

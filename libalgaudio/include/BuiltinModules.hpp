@@ -31,7 +31,7 @@ public:
   void state_store_xml(rapidxml::xml_node<char>*) const override;
   void state_load_xml(rapidxml::xml_node<char>*) override;
 private:
-  std::shared_ptr<Canvas> canvas;
+  std::shared_ptr<Canvas> internal_canvas;
 };
   
 std::shared_ptr<Module> CreateInstance(std::string id);

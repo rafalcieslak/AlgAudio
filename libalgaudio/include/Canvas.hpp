@@ -46,7 +46,7 @@ struct DoubleConnectionException : public Exception{
 class Canvas : public std::enable_shared_from_this<Canvas>{
 public:
   // Creates a new instance of a Canvas with no modules inside.
-  static std::shared_ptr<Canvas> CreateEmpty();
+  static LateReturn<std::shared_ptr<Canvas>> CreateEmpty(std::shared_ptr<Canvas> parent);
 
   virtual ~Canvas();
   // Creates a new module according to the given template id, and places the
@@ -108,10 +108,19 @@ public:
   void PassData(IOID source, float value, float relative);
   // The set of all modules that are placed onto (and maintained by) this Canvas.
   std::set<std::shared_ptr<Module>> modules;
+  
+  // Returns the SC server group corresponding to this canvas. The returned pointer
+  // will never be null.
+  std::shared_ptr<Group> GetGroup() const {return group;}
 private:
   // Private constructor. Use CreateEmpty() instead.
   Canvas();
 
+  // The server node group that encapsulates all contents of this canvas.
+  std::shared_ptr<Group> group;
+  
+  // The parent canvas.
+  std::weak_ptr<Canvas> parent;
 };
 
 } // namespace AlgAudio

@@ -233,10 +233,11 @@ std::string CanvasXML::GetXMLAsString(){
   return doc_text;
 }
 
-LateReturn<std::shared_ptr<Canvas>> CanvasXML::CreateNewCanvas(){
+LateReturn<std::shared_ptr<Canvas>> CanvasXML::CreateNewCanvas(std::shared_ptr<Canvas> parent){
   Relay<std::shared_ptr<Canvas>> r;
-  auto res = Canvas::CreateEmpty();
-  ApplyToCanvas(res).ThenReturn(r);
+  Canvas::CreateEmpty(parent).Then([this,r](std::shared_ptr<Canvas> res){
+    ApplyToCanvas(res).ThenReturn(r);
+  });
   return r;
 }
 
@@ -351,7 +352,7 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
   auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
   if(!templptr) return r.Return("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
 
-  ModuleFactory::CreateNewInstance(templptr).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m) -> void{
+  ModuleFactory::CreateNewInstance(templptr, c).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m) -> void{
     c->modules.emplace(m);
     saveids_to_modules.insert(std::make_pair(saveid,m));
     m->canvas = c;

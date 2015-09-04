@@ -60,7 +60,7 @@ public:
   // Creates a new canvas basing on the stored document.
   // WARNING: CreateNewCanvas is strictly NOT late-reentrant! (it shall not be
   // invoked again before the previous call latereturns)
-  LateReturn<std::shared_ptr<Canvas>> CreateNewCanvas();
+  LateReturn<std::shared_ptr<Canvas>> CreateNewCanvas(std::shared_ptr<Canvas> parent);
   
   // Since CreateNewCanvas is a lateReturn, it cannot throw exceptions.
   // Thus if it fails, it returns a nullptr, and the error cause can be

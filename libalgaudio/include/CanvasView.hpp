@@ -76,9 +76,9 @@ public:
   // all ModuleGUIs will be build - so when switching the view context you
   // can ignore that argument, but when loading a file you should set it
   // to true.
-  void SwitchTopLevelCanvas(std::shared_ptr<Canvas> canvas);
-  std::shared_ptr<Canvas> GetCurrentCanvas() { return canvas_stack.back().first; }
-  std::shared_ptr<Canvas> GetTopCanvas() { return canvas_stack.front().first; }
+  void SwitchTopLevelCanvas(std::shared_ptr<Canvas> canvas, std::string name);
+  std::shared_ptr<Canvas> GetCurrentCanvas() { if(canvas_stack.size() == 0) return nullptr; else return canvas_stack.back().first; }
+  std::shared_ptr<Canvas> GetTopCanvas() { if(canvas_stack.size() == 0) return nullptr; else return canvas_stack.front().first; }
   
   // These methods are used for switching to another canvas that is *inside*
   // current, and for going back.

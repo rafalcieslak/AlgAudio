@@ -28,7 +28,9 @@ namespace AlgAudio{
 namespace Builtin{
 
 void Subpatch::on_init(){
-  canvas = Canvas::CreateEmpty();
+  if(canvas.lock() == nullptr) std::cout << "AAAAAAAA nullptr" << std::endl;
+    else std::cout << "BBBBBBB not nullptr" << std::endl;
+  LateAssign(internal_canvas, Canvas::CreateEmpty(canvas.lock()));
 }
 
 void Subpatch::on_destroy(){
@@ -36,7 +38,7 @@ void Subpatch::on_destroy(){
 }
 
 void Subpatch::state_store_xml(rapidxml::xml_node<char>* node) const {
-  auto canvasxml = CanvasXML::CreateFromCanvas(canvas);
+  auto canvasxml = CanvasXML::CreateFromCanvas(internal_canvas);
   auto filesave_node = node->document()->allocate_node(rapidxml::node_type::node_element,"algaudio");
   node->append_node(filesave_node);
   canvasxml->CloneToAnotherXMLTree(filesave_node, node->document());
@@ -48,7 +50,7 @@ void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
   auto canvasxml = CanvasXML::CreateFromNode(filesave_node);
   // TODO: This may be possibly dangerous. If the canvas is not yet assigned before view is switched,
   // the CV may end up trying to display a nullptr canvas.
-  LateAssign(canvas, canvasxml->CreateNewCanvas());
+  LateAssign(internal_canvas, canvasxml->CreateNewCanvas(canvas.lock()));
 }
 
 void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
@@ -63,7 +65,7 @@ void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
       std::cout << "Whoops, failed to get a reference to a canvasview, unable to switch displayed canvas." << std::endl;
       return;
     }
-    canvasview->EnterCanvas(canvas, "Subpatch");
+    canvasview->EnterCanvas(internal_canvas, "Subpatch");
   });
 }
 
