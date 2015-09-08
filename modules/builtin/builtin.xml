@@ -17,7 +17,20 @@ Out.ar(outbus,in);
   
   <module id="sub" name="Subpatch">
     <class name="BuiltinSubpatch"/>
-    <description> This module can encapsulate an internal path. </description>
+    <description> This module encapsulates an internal path. </description>
+    <params>
+      <outlet id="out1" name="Inlet 1"/>
+      <outlet id="out2" name="Inlet 2"/>
+      <outlet id="out3" name="Inlet 3"/>
+      <outlet id="out4" name="Inlet 4"/>
+    </params>
+    <sc>
+arg subout1=99999999, subout2=99999999, subout3=99999999, subout4=99999999, out1, out2, out3, out4;
+Out.ar(out1,In.ar(subout1));
+Out.ar(out2,In.ar(subout2));
+Out.ar(out3,In.ar(subout3));
+Out.ar(out4,In.ar(subout4));
+    </sc>
     <gui type="standard auto"/>
   </module>
   
@@ -31,13 +44,22 @@ Out.ar(outbus,in);
       <outlet id="out4" name="Inlet 4"/>
     </params>
     <sc>
-arg subin1, subin2, subin3, subin4, out1, out2, out3, out4;
+arg subin1=99999999, subin2=99999999, subin3=99999999, subin4=99999999, out1, out2, out3, out4;
 Out.ar(out1,In.ar(subin1));
 Out.ar(out2,In.ar(subin2));
 Out.ar(out3,In.ar(subin3));
 Out.ar(out4,In.ar(subin4));
     </sc>
     <gui type="standard auto"/>
+  </module>
+  
+  <module id="subexit" name="Subpatch exit">
+    <class name="BuiltinSubpatchExit"/>
+    <description> Any signal passed to this module is outputted by the parent subpatch module </description>
+    <gui type="standard auto"/>
+    <sc>
+      // Empty sc synth to make this module orderable
+    </sc>
   </module>
   
 </collection>

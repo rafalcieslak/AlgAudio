@@ -27,39 +27,35 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace AlgAudio;
 
+Relay<int> r;
 
-void TestSignals(){
-  Signal<> s1;
-  Subscription ss1 = s1.Subscribe([&](){
-    auto ss2 = s1.Subscribe([](){
-      std::cout << "Hola!" << std::endl;
-    });
-    ss1.Release();
-    s1.Happen();
-  });
-  s1.Happen();
-  std::cout << &s1 << std::endl;
+LateReturn<int> CheckFunc(){
+  r.LateThrow<UnimplementedException>("Blah.");
+  return r;
 }
+
+LateReturn<int> CheckFuncB(){
+  Relay<int> a;
+  CheckFunc().Then([a](auto i){
+    a.Return(i);
+  }).Catch(a);
+  return a;
+}
+
+void LRCatchCheck(){
+  CheckFuncB().Then([](int x){
+    std::cout << x << std::endl;
+  }).Catch<UnimplementedException>([](auto ex){
+    std::cout << "EXCEPTION " << ex->what() << std::endl;
+  });
+  r.Return(5);
+};
 
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
-/*
-  std::cout << Utilities::PrettyFloat(0.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(0.00012345) << std::endl;
-  std::cout << Utilities::PrettyFloat(2.12345678) << std::endl;
-  std::cout << Utilities::PrettyFloat(2.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(9.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(11.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(99.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(100.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(150.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(1000.0) << std::endl;
-  std::cout << Utilities::PrettyFloat(1111.1111) << std::endl;
-  std::cout << Utilities::PrettyFloat(1500.0) << std::endl;
-  return 0;
-*/
-  //TestSignals(); return 0;
+  
+  //LRCatchCheck(); return 0;
 
   try{
     Theme::Init();

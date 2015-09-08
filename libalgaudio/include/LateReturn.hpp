@@ -23,6 +23,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include <tuple>
 #include <iostream>
+#include <typeinfo>
+#include <typeindex>
+#include <memory>
 #include "Exception.hpp"
 
 namespace AlgAudio{
@@ -97,26 +100,6 @@ private:
   static unsigned int id_counter;
 };
 
-class LateReturnEntryBase{
-protected:
-  virtual ~LateReturnEntryBase(){}
-  bool triggered = false;
-public:
-  static std::map<int, LateReturnEntryBase*> entries;
-  static int id_counter;
-};
-template <typename... Types>
-class LateReturnEntry : public LateReturnEntryBase{
-public:
-  friend class LateReturn<Types...>;
-  friend class Relay<Types...>;
-private:
-  LateReturnEntry(){};
-  std::function<void(Types...)> stored_func;
-  std::tuple<Types...> stored_args;
-  bool stored = false;
-};
-
 template <typename T>
 std::function<void()> bind_tuple(std::function<void(T)> f, std::tuple<T> t){
   return std::bind(f, std::get<0>(t));
@@ -133,6 +116,37 @@ inline std::function<void()> bind_tuple(std::function<void()> f, std::tuple<>){
   return f;
 }
 
+class LateReturnEntryBase{
+protected:
+  virtual ~LateReturnEntryBase(){}
+  bool triggered = false;
+public:
+  static std::map<int, LateReturnEntryBase*> entries;
+  static int id_counter;
+};
+template <typename... Types>
+class LateReturnEntry : public LateReturnEntryBase{
+public:
+  friend class LateReturn<Types...>;
+  friend class Relay<Types...>;
+private:
+  LateReturnEntry(){};
+  void Invoke(){
+    std::function<void()> f = bind_tuple(stored_func, stored_args);
+    try{
+      f();
+    }catch(...){
+      std::cout << "Exception while invoking a latereturn continuation" << std::endl;
+    }
+  }
+  std::function<void(Types...)> stored_func;
+  std::tuple<Types...> stored_args;
+  std::map<std::type_index, std::function<void(std::shared_ptr<Exception>)>> catchers;
+  std::shared_ptr<Exception> stored_exception;
+  std::function<void(std::shared_ptr<Exception>)> default_catcher;
+  bool stored = false;
+};
+
 template <typename... Types>
 class LateReturn{
 public:
@@ -148,13 +162,79 @@ public:
       entry->stored = true;
     }else{
       // The Relay has already returned, but it was not bound until now.
-      std::function<void()> g = bind_tuple(f,entry->stored_args);
-      g();
+      entry->stored_func = f;
+      entry->Invoke();
       delete entry;
       LateReturnEntryBase::entries.erase(it);
     }
     return *this;
   }
+  
+  template<typename Ex>
+  const LateReturn& Catch(std::function<void(std::shared_ptr<Exception>)> func) const{
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it == LateReturnEntryBase::entries.end()){
+      // Catch is called, but the entry has already returned. Therefore, ignore the catcher.
+      return *this;
+    }
+    LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
+    if(entry->stored_exception){
+      std::cout << "There is a stored exception already" << std::endl;
+      func(entry->stored_exception);
+    }else{
+      entry->catchers[typeid(Ex)] = func;
+    }
+    return *this;
+  }
+  
+  template<typename Ex>
+  const LateReturn& CatchAll(std::function<void(std::shared_ptr<Exception>)> func) const{
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it == LateReturnEntryBase::entries.end()){
+      // Catch is called, but the entry has already returned. Therefore, ignore the catcher.
+      return *this;
+    }
+    LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
+    if(entry->default_catcher){
+      std::cout << "ERROR: Cannot add another default cather to the same latereturn" << std::endl;
+      return;
+    }
+    if(entry->stored_exception){
+      std::cout << "There is a stored exception already" << std::endl;
+      func(entry->stored_exception);
+    }else{
+      entry->default_catcher = func;
+    }
+    return *this;
+  }
+  
+  // Tells a latereturn to pass all latethrown exceptions to another relay.
+  // Chaining relays this way enables correct logical stack unwinding.
+  template<typename... X>
+  const LateReturn& Catch(const Relay<X...>& r) const{
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it == LateReturnEntryBase::entries.end()){
+      // Catch is called, but the entry has already returned. Therefore, ignore the catcher.
+      return *this;
+    }
+    LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
+    if(entry->default_catcher){
+      std::cout << "ERROR: Cannot add another default cather to the same latereturn" << std::endl;
+      return *this;
+    }
+    if(entry->stored_exception){
+      std::cout << "There is a stored exception already" << std::endl;
+      // Pass the exception to that parent relay
+      r.PassException(entry->stored_exception);
+    }else{
+      // Pass all exceptions to parent relay
+      entry->default_catcher = [r](std::shared_ptr<Exception> ex){
+        r.PassException(ex);
+      };
+    }
+    return *this;
+  }
+  
   const LateReturn& ThenSync(Sync& s) const{
     Then([=](Types...)mutable{
       s.Trigger();
@@ -196,12 +276,78 @@ public:
     }
     LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
     if(entry->stored){
-      (entry->stored_func)(args...);
+      entry->stored_args = std::tuple<Types...>(args...);
+      entry->Invoke();
       delete entry;
       LateReturnEntryBase::entries.erase(it);
     }else{
       entry->stored_args = std::tuple<Types...>(args...);
       entry->triggered = true;
+    }
+    return *this;
+  }
+  template<typename Ex, typename... ConstructArgs>
+  const Relay& LateThrow(ConstructArgs... args) const{
+    std::shared_ptr<Ex> exception = std::make_shared<Ex>(args...);
+    
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it != LateReturnEntryBase::entries.end()){
+      LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
+      // Check if there is a catcher registered for this exception.
+      auto it2 = entry->catchers.find(typeid(Ex));
+      if(it2 != entry->catchers.end()){
+        // If so, call the cather.
+        (it2->second)(exception);
+      }else{
+        if(entry->default_catcher){
+          // Use the default catcher.
+          (entry->default_catcher)(exception);
+        }else{
+          // Otherwise store it for later.
+          entry->stored_exception = exception;
+          
+          if(entry->stored){
+            // There is a stored then entry, but no catcher. This ususally means trouble.
+            // TODO : Detect when the last referencet to LastReturn is lost. If
+            // there are no references, and no catcher, there is no chance it could
+            // be aded later. Warn about this.
+            std::cout << "WARNING: A LateThrow cannot be caught and is ignored: " << exception->what() << std::endl;
+          }
+        }
+      }
+    }else{
+      std::cout << "ERROR: A relay may not LateThrow(...) after Return(...)ing." << std::endl; 
+    }
+    return *this;
+  }
+  const Relay& PassException(std::shared_ptr<Exception> ex) const{
+    auto it = LateReturnEntryBase::entries.find(id);
+    if(it != LateReturnEntryBase::entries.end()){
+      LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);
+      // Check if there is a catcher registered for this exception.
+      auto it2 = entry->catchers.find(typeid(*ex));
+      if(it2 != entry->catchers.end()){
+        // If so, call the cather.
+        (it2->second)(ex);
+      }else{
+        if(entry->default_catcher){
+          // Use the default catcher.
+          (entry->default_catcher)(ex);
+        }else{
+          // Otherwise store it for later.
+          entry->stored_exception = ex;
+          
+          if(entry->stored){
+            // There is a stored then entry, but no catcher. This ususally means trouble.
+            // TODO : Detect when the last referencet to LastReturn is lost. If
+            // there are no references, and no catcher, there is no chance it could
+            // be aded later. Warn about this.
+            std::cout << "WARNING: A LateThrow cannot be caught and is ignored: " << ex->what() << std::endl;
+          }
+        }
+      }
+    }else{
+      std::cout << "ERROR: A relay may not PassException(...) after Return(...)ing." << std::endl; 
     }
     return *this;
   }

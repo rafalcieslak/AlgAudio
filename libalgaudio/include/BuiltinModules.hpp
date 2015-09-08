@@ -23,8 +23,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 namespace Builtin{
-
+  
 class SubpatchEntrance;
+class SubpatchExit;
 
 class Subpatch : public Module{
 public:
@@ -38,18 +39,29 @@ public:
   // are ready, it applies their ids to the entrance. If buses are not
   // ready, the ids will be applied as soon as the buses are ready.
   void LinkToEntrance(std::shared_ptr<SubpatchEntrance>);
+  void LinkToExit(std::shared_ptr<SubpatchExit>);
   bool HasEntrance() const {return entrance != nullptr;};
+  bool HasExit() const {return exit != nullptr;};
+  
+  void LinkOutput(int output_no, int busid);
   
   // Used for ordering calculation. TODO: Move to an interface imlpemented by both subpatch and poly.
   int GetGroupID() const;
 private:
   std::shared_ptr<Canvas> internal_canvas;
   std::shared_ptr<SubpatchEntrance> entrance;
+  std::shared_ptr<SubpatchExit> exit;
 };
 class SubpatchEntrance : public Module{
 public:
   void on_init() override;
   void LinkOutput(int output_no, int busid);
+private:
+};
+class SubpatchExit : public Module{
+public:
+  LateReturn<> on_init_latereturn() override;
+  std::shared_ptr<Subpatch> subpatch;
 private:
 };
   

@@ -31,9 +31,11 @@ namespace Builtin{
 LateReturn<> Subpatch::on_init_latereturn(){
   Relay<> r;
   Sync s(5);
-  Canvas::CreateEmpty(canvas.lock()).Then([this,s](auto canvas){
-    canvas->owner_hint = shared_from_this();
-    internal_canvas = canvas;
+  auto parent = canvas.lock();
+  Canvas::CreateEmpty(parent).Then([this,s](auto c){
+    c->owner_hint = shared_from_this();
+    internal_canvas = c;
+    std::cout << "Subpatch group " << GetGroupID() << std::endl;
     s.Trigger();
   });
   std::cout << "Subpatch initting!" << std::endl;
@@ -43,28 +45,27 @@ LateReturn<> Subpatch::on_init_latereturn(){
   Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;
     if(entrance) entrance->LinkOutput(0, inlet->bus->GetID());
-    if(modulegui) modulegui->OnInletsChanged();
     s.Trigger();
   });
   Module::Inlet::Create("in2","Inlet 2",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[1] = inlet;
     if(entrance) entrance->LinkOutput(1, inlet->bus->GetID());
-    if(modulegui) modulegui->OnInletsChanged();
     s.Trigger();
   });
   Module::Inlet::Create("in3","Inlet 3",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[2] = inlet;
     if(entrance) entrance->LinkOutput(2, inlet->bus->GetID());
-    if(modulegui) modulegui->OnInletsChanged();
     s.Trigger();
   });
   Module::Inlet::Create("in4","Inlet 4",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[3] = inlet;
     if(entrance) entrance->LinkOutput(3, inlet->bus->GetID());
-    if(modulegui) modulegui->OnInletsChanged();
     s.Trigger();
   });
-  s.WhenAll([r](){r.Return();});
+  s.WhenAll([r, this](){
+    if(modulegui) modulegui->OnInletsChanged();
+    r.Return();
+  });
   return r;
 }
 
@@ -85,10 +86,13 @@ void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
   
   auto canvasxml = CanvasXML::CreateFromNode(filesave_node);
   
-  Canvas::CreateEmpty(canvas.lock()).Then([this,canvasxml](auto c){
+  auto parent = canvas.lock();
+  Canvas::CreateEmpty(parent).Then([this,canvasxml,parent](auto c){
     c->owner_hint = shared_from_this();
     internal_canvas = c;
     canvasxml->ApplyToCanvas(c);
+    // After the canvas was substituted, force recalculate order to use the new group id.
+    parent->RecalculateOrder();
   });
 }
 
@@ -116,11 +120,19 @@ void Subpatch::LinkToEntrance(std::shared_ptr<SubpatchEntrance> e){
   if(inlets[3] != nullptr) e->LinkOutput(3, inlets[3]->bus->GetID());
 }
 
+void Subpatch::LinkToExit(std::shared_ptr<SubpatchExit> e){  
+  exit = e;
+}
+
  int Subpatch::GetGroupID() const {
    return internal_canvas->GetGroup()->GetID();
  }
+ 
+ void Subpatch::LinkOutput(int output_no, int busid){
+   SCLang::SendOSC("/algaudioSC/setparam", "isi", sc_id, ("subout" + std::to_string(output_no + 1)).c_str(), busid);
+ }
 
-// ============= SubpatchEntrnace ===========
+// ============= SubpatchEntrance ===========
 
 void SubpatchEntrance::on_init(){
   std::cout << "Subpatch entrance initting!" << std::endl;
@@ -137,5 +149,56 @@ void SubpatchEntrance::on_init(){
 void SubpatchEntrance::LinkOutput(int output_no, int busid){
   SCLang::SendOSC("/algaudioSC/setparam", "isi", sc_id, ("subin" + std::to_string(output_no + 1)).c_str(), busid);
 }
+
+// ============= SubpatchExit ===========
+
+LateReturn<> SubpatchExit::on_init_latereturn(){
+  
+  Relay<> r;
+  Sync s(4);
+  
+  // Check if parent canvas is managed by a subpatch.
+  std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
+  auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
+  // If not, throw a DoNotWantToBeCreated exception.
+  if(!owner_subpatch) {r.LateThrow<ModuleDoesNotWantToBeCreatedException>("This module can only be created inside a subpatch."); return r;}
+  if(owner_subpatch->HasExit()) {r.LateThrow<ModuleDoesNotWantToBeCreatedException>("Currently it is not possible to create multiple exits inside the same subpatch."); return r;}
+  // Otherwise link to that entrance.
+  owner_subpatch->LinkToExit(std::static_pointer_cast<SubpatchExit>( shared_from_this() ));
+  subpatch = owner_subpatch;
+  
+  // Create inlets.
+  inlets.resize(4);
+  // TODO : USe global config to run w/o SC
+  bool fake = !SCLang::ready;
+  
+  Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
+    inlets[0] = inlet;
+    subpatch->LinkOutput(0, inlet->bus->GetID());
+    s.Trigger();
+  });
+  Module::Inlet::Create("in2","Inlet 2",shared_from_this(),fake).Then([this,s](auto inlet){
+    inlets[1] = inlet;
+    subpatch->LinkOutput(1, inlet->bus->GetID());
+    s.Trigger();
+  });
+  Module::Inlet::Create("in3","Inlet 3",shared_from_this(),fake).Then([this,s](auto inlet){
+    inlets[2] = inlet;
+    subpatch->LinkOutput(2, inlet->bus->GetID());
+    s.Trigger();
+  });
+  Module::Inlet::Create("in4","Inlet 4",shared_from_this(),fake).Then([this,s](auto inlet){
+    inlets[3] = inlet;
+    subpatch->LinkOutput(3, inlet->bus->GetID());
+    s.Trigger();
+  });
+  s.WhenAll([r, this](){  
+    if(modulegui) modulegui->OnInletsChanged();
+    r.Return();
+  });
+  
+  return r;
+}
+
 
 }} // namespace AlgAudio:::Builtin

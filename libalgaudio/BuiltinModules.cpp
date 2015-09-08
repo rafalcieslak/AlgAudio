@@ -25,6 +25,7 @@ namespace Builtin{
 std::shared_ptr<Module> CreateInstance(std::string id){
   if(id == "BuiltinSubpatch") return std::make_shared<Subpatch>();
   if(id == "BuiltinSubpatchEntrance") return std::make_shared<SubpatchEntrance>();
+  if(id == "BuiltinSubpatchExit") return std::make_shared<SubpatchExit>();
   return nullptr;
 }
 

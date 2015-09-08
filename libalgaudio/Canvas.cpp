@@ -42,6 +42,7 @@ LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> 
   if(SCLang::ready){
     Group::CreateNew( parentgroup ).Then([r,res](std::shared_ptr<Group> g){
       res->group = g;
+      std::cout << "New canvas group " << g->GetID() << std::endl;
       r.Return(res);
     });
   }else{
@@ -337,15 +338,14 @@ void Canvas::RecalculateOrder(){
   // Send the ordering to SC.
   lo::Message msg;
   for(const std::shared_ptr<Module> &m : ordering){
-    int id_for_ordering;
     auto subpatch = std::dynamic_pointer_cast<Builtin::Subpatch>(m);
     if(subpatch){
       // Special cas for builtin subpatch module. Ordering full node groups (subtrees)
-      id_for_ordering = subpatch->GetGroupID();
+      msg.add_int32(subpatch->GetGroupID());
+      msg.add_int32(m->sc_id);
     }else{
-      id_for_ordering = m->sc_id;
+      msg.add_int32(m->sc_id);
     }
-    msg.add_int32(id_for_ordering);
   }
   SCLang::SendOSCCustom("/algaudioSC/ordering", msg);
 

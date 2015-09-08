@@ -97,8 +97,13 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
               res->on_init_latereturn().Then([=](){
                 res->ResetControllers();
                 r.Return(res, "");
+              }).Catch<ModuleDoesNotWantToBeCreatedException>([r,res](auto ex){
+                // LateThrow catcher
+                DestroyInstance(res);
+                r.Return(nullptr, "This module does not want to be created:\n" + ex->what());
               });
             }catch(ModuleDoesNotWantToBeCreatedException ex){
+              // Normal catcher
               DestroyInstance(res);
               r.Return(nullptr, "This module does not want to be created:\n" + ex.what());
               return;
@@ -113,6 +118,9 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
     res->enabled_by_factory = true;
     res->on_init_latereturn().Then([=](){
       r.Return(res, "");
+    }).Catch<ModuleDoesNotWantToBeCreatedException>([r,res](auto ex){
+      DestroyInstance(res);
+      r.Return(nullptr, "This module does not want to be created:\n" + ex->what());
     });
   }
   return r;
