@@ -114,7 +114,7 @@ void SCLang::SendOSCCustom(const std::string& path, const lo::Message& m){
   osc->Send(path,m);
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
-  auto r = Relay<lo::Message>::Create();
+  Relay<lo::Message> r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   lo::Message m;
   osc->Send(path, [=](lo::Message msg){
@@ -123,7 +123,7 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   return r;
 }
 LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path, const lo::Message &m){
-  auto r = Relay<lo::Message>::Create();
+  Relay<lo::Message> r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path, [=](lo::Message msg){
     r.Return(msg);
@@ -141,7 +141,7 @@ void SCLang::SendOSC(const std::string &path, std::string tag, ...)
   osc->Send(path, m);
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, std::string tag, ...){
-  auto r = Relay<lo::Message>::Create();
+  Relay<lo::Message> r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;} // throw SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
@@ -166,7 +166,7 @@ void SCLang::SetOSCDebug(bool enabled){
   osc_debug = enabled;
 }
 LateReturn<> SCLang::InstallTemplate(const std::shared_ptr<ModuleTemplate> t){
-  auto r = Relay<>::Create();
+  Relay<> r;
   if(!t->has_sc_code) return r.Return();
   SendOSCWithEmptyReply("/algaudioSC/installtemplate", "ss", t->GetFullID().c_str(), t->sc_code.c_str()).Then([=](){
     installed_templates.insert(t->GetFullID());

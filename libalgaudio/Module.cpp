@@ -34,7 +34,7 @@ Bus::~Bus(){
   SCLang::SendOSC("/algaudioSC/removebus", "i", id);
 }
 LateReturn<std::shared_ptr<Bus>> Bus::CreateNew(){
-  auto r = Relay<std::shared_ptr<Bus>>::Create();
+  Relay<std::shared_ptr<Bus>> r;
   SCLang::SendOSCWithReply<int>("/algaudioSC/newbus").Then( [r](int id){
     r.Return( std::shared_ptr<Bus>(new Bus(id)) );
   });
@@ -53,14 +53,14 @@ Group::~Group(){
   SCLang::SendOSC("/algaudioSC/removegroup", "i", id);
 }
 LateReturn<std::shared_ptr<Group>> Group::CreateNew(std::shared_ptr<Group> parent){
-  auto r = Relay<std::shared_ptr<Group>>::Create();
+  Relay<std::shared_ptr<Group>> r;
   SCLang::SendOSCWithReply<int>("/algaudioSC/newgroup","i",parent? parent->GetID() : -1).Then( [r](int id){
     r.Return( std::shared_ptr<Group>(new Group(id)) );
   });
   return r;
 }
 LateReturn<std::shared_ptr<Group>> Group::CreateFake(std::shared_ptr<Group>){
-  auto r = Relay<std::shared_ptr<Group>>::Create();
+  Relay<std::shared_ptr<Group>> r;
   return r.Return( std::shared_ptr<Group>(new Group(-42)) );
 }
 
@@ -139,7 +139,7 @@ std::shared_ptr<Module::Outlet> Module::Outlet::Create(std::string id, std::stri
 }
 
 LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id, std::string name, std::shared_ptr<Module> mod, bool fake){
-  auto r = Relay<std::shared_ptr<Module::Inlet>>::Create();
+  Relay<std::shared_ptr<Module::Inlet>> r;
 
   if(fake){
     r.Return(std::shared_ptr<Module::Inlet>( new Module::Inlet(id, name, mod, Bus::CreateFake())));
@@ -189,7 +189,7 @@ void Module::Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i){
 }
 
 LateReturn<> Module::CreateIOFromTemplate(bool fake){
-  auto r = Relay<>::Create();
+  Relay<> r;
   Sync s(templ->inlets.size());
   for(auto iolettempl : templ->inlets){
     if(!fake){

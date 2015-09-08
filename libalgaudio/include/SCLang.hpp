@@ -114,7 +114,7 @@ struct is_nonempty<> : std::false_type {};
 template <typename... Q, typename... Rest>
 inline LateReturn<Q...> SCLang::SendOSCWithReply(const std::string& path, Rest... args){
   static_assert(is_nonempty<Q...>::value, "If you wish to use SendOSCWithReply with no return types, use SendOSCWithEmptyReply instead.");
-  auto r = Relay<Q...>::Create();
+  Relay<Q...> r;
   SendOSCWithLOReply(path,args...).Then([=](lo::Message msg){
     r.Return( UnpackLOMessage<Q...>(msg,0) );
   });
@@ -123,7 +123,7 @@ inline LateReturn<Q...> SCLang::SendOSCWithReply(const std::string& path, Rest..
 template <typename... Q>
 inline LateReturn<Q...> SCLang::SendOSCCustomWithReply(const std::string& path, const lo::Message &m){
   static_assert(is_nonempty<Q...>::value, "If you wish to use SendOSCWithReply with no return types, use SendOSCWithEmptyReply instead.");
-  auto r = Relay<Q...>::Create();
+  Relay<Q...> r;
   SendOSCCustomWithLOReply(path,m).Then([=](lo::Message msg){
     r.Return( UnpackLOMessage<Q...>(msg,0) );
   });
@@ -131,7 +131,7 @@ inline LateReturn<Q...> SCLang::SendOSCCustomWithReply(const std::string& path, 
 }
 template <typename... Rest>
 inline LateReturn<> SCLang::SendOSCWithEmptyReply(const std::string& path, Rest... args){
-  auto r = Relay<>::Create();
+  Relay<> r;
   SendOSCWithLOReply(path,args...).Then([=](lo::Message){
     r.Return();
   });

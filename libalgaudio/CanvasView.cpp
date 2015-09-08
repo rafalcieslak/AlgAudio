@@ -121,7 +121,7 @@ void CanvasView::ResetUI(){
 }
 
 LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
-  auto r = Relay<>::Create();
+  Relay<> r;
   
   auto current_canvas = GetCurrentCanvas();
   if(!current_canvas){

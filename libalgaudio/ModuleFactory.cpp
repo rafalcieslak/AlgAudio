@@ -32,7 +32,7 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
 }
 
 LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent){
-  auto r = Relay<std::shared_ptr<Module>, std::string>::Create();
+  Relay<std::shared_ptr<Module>, std::string> r;
   std::shared_ptr<Module> res;
   if(!templ->has_class){
     res = std::make_shared<Module>(templ);
