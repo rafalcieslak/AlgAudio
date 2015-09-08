@@ -30,7 +30,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c) : collection(c){
 
 }
 
-ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<>* node) : collection(c){
+ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : collection(c){
   xml_attribute<>* id_attr = node->first_attribute("id");
   if(!id_attr) throw ModuleParseException("", "Missing module id");
   id = id_attr->value();

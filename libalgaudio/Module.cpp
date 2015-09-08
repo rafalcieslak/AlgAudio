@@ -184,7 +184,7 @@ Module::~Module() {
   if(enabled_by_factory) std::cout << "WARNING: a module " << templ->GetFullID() << " reference is lost, but it was not destroyed by the factory." << std::endl;
 };
 
-void Module::Connect(std::shared_ptr<Module::Outlet> o, std::shared_ptr<Module::Inlet> i){
+void Module::Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i){
   o->ConnectToInlet(i);
 }
 

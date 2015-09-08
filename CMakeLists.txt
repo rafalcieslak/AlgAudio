@@ -54,6 +54,7 @@ add_subdirectory(libalgaudio)
 add_subdirectory(algaudio)
 add_subdirectory(modules)
 add_subdirectory(sc)
+add_subdirectory(doc)
 
 add_custom_target(
   package-windows
