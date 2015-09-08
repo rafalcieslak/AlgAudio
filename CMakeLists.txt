@@ -50,6 +50,8 @@ add_subdirectory(libs)
 find_package(SDL2 REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 
+find_package(Doxygen)
+
 add_subdirectory(libalgaudio)
 add_subdirectory(algaudio)
 add_subdirectory(modules)
