@@ -43,7 +43,7 @@ CanvasXML::~CanvasXML(){
 
 std::shared_ptr<CanvasXML> CanvasXML::CreateFromFile(std::string path){
   std::ifstream file(path);
-  if(!file) throw XMLFileAccessException("Unable to open file '" + path + "'");
+  if(!file) throw Exceptions::XMLFileAccess("Unable to open file '" + path + "'");
   std::stringstream ss;
   ss << file.rdbuf();
   return CreateFromString(ss.str());
@@ -63,25 +63,25 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
     
     // Get the root node
     res->root = res->doc.first_node("algaudio");
-    if(res->root == nullptr) throw XMLParseException("Root node is missing");
+    if(res->root == nullptr) throw Exceptions::XMLParse("Root node is missing");
     
     // Get version attribute
     rapidxml::xml_attribute<>* version_attr = res->root->first_attribute("version");
-    if(!version_attr) throw XMLParseException("Version information is missing");
+    if(!version_attr) throw Exceptions::XMLParse("Version information is missing");
     std::string version(version_attr->value());
     // Version check!
-    if(version != "1") throw XMLParseException("Invalid file version (" + version + ")");
+    if(version != "1") throw Exceptions::XMLParse("Invalid file version (" + version + ")");
   
   }catch(rapidxml::parse_error ex){
-    throw XMLParseException("The XML data is not valid.\nChar: " + std::to_string((int)(ex.where<char>() - res->input_buffer)) + "\n" + ex.what());
+    throw Exceptions::XMLParse("The XML data is not valid.\nChar: " + std::to_string((int)(ex.where<char>() - res->input_buffer)) + "\n" + ex.what());
   }catch(std::runtime_error ex){
-    throw XMLParseException("Failed to parse XML data.");
+    throw Exceptions::XMLParse("Failed to parse XML data.");
   }
   return res;
 }
 
 std::shared_ptr<CanvasXML> CanvasXML::CreateFromNode(rapidxml::xml_node<>* node){
-  if(node == nullptr) throw XMLParseException("Root node is missing");
+  if(node == nullptr) throw Exceptions::XMLParse("Root node is missing");
   
   auto res = std::shared_ptr<CanvasXML>( new CanvasXML() );
   res->doc.clear();
@@ -91,10 +91,10 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromNode(rapidxml::xml_node<>* node)
   
   // Get version attribute
   rapidxml::xml_attribute<>* version_attr = res->root->first_attribute("version");
-  if(!version_attr) throw XMLParseException("Version information is missing");
+  if(!version_attr) throw Exceptions::XMLParse("Version information is missing");
   std::string version(version_attr->value());
   // Version check!
-  if(version != "1") throw XMLParseException("Invalid file version (" + version + ")");
+  if(version != "1") throw Exceptions::XMLParse("Invalid file version (" + version + ")");
   
   return res;
 }
@@ -224,7 +224,7 @@ void CanvasXML::AppendDataConnection(Canvas::IOID from, Canvas::IOIDWithMode to)
 
 void CanvasXML::SaveToFile(std::string path){
   std::ofstream file(path);
-  if(!file) throw XMLFileAccessException("Unable to write to file '" + path + "'.");
+  if(!file) throw Exceptions::XMLFileAccess("Unable to write to file '" + path + "'.");
   file << doc_text << std::endl;
   file.close();
   std::cout << "File saved." << std::endl;

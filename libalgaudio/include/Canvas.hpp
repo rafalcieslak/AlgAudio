@@ -26,15 +26,17 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-struct MultipleConnectionsException : public Exception{
-  MultipleConnectionsException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct MultipleConnections : public Exception{
+  MultipleConnections(std::string t) : Exception(t) {}
 };
-struct ConnectionLoopException : public Exception{
-  ConnectionLoopException(std::string t) : Exception(t) {}
+struct ConnectionLoop : public Exception{
+  ConnectionLoop(std::string t) : Exception(t) {}
 };
-struct DoubleConnectionException : public Exception{
-  DoubleConnectionException(std::string t) : Exception(t) {}
+struct DoubleConnection : public Exception{
+  DoubleConnection(std::string t) : Exception(t) {}
 };
+} // namespace Exceptions
 
 /** A Canvas represents a collection of interconnected modules. The Canvas
  *  manages connections between them, calculates topological ordering and

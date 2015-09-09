@@ -140,8 +140,8 @@ void SubpatchEntrance::on_init(){
   std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
   auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
   // If not, throw a DoNotWantToBeCreated exception.
-  if(!owner_subpatch) throw ModuleDoesNotWantToBeCreatedException("This module can only be created inside a subpatch.");
-  if(owner_subpatch->HasEntrance()) throw ModuleDoesNotWantToBeCreatedException("Currently it is not possible to create multiple entrances inside the same subpatch.");
+  if(!owner_subpatch) throw Exceptions::ModuleDoesNotWantToBeCreated("This module can only be created inside a subpatch.");
+  if(owner_subpatch->HasEntrance()) throw Exceptions::ModuleDoesNotWantToBeCreated("Currently it is not possible to create multiple entrances inside the same subpatch.");
   // Otherwise link to that entrance.
   owner_subpatch->LinkToEntrance(std::static_pointer_cast<SubpatchEntrance>( shared_from_this() ));
 }
@@ -161,8 +161,8 @@ LateReturn<> SubpatchExit::on_init_latereturn(){
   std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
   auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
   // If not, throw a DoNotWantToBeCreated exception.
-  if(!owner_subpatch) {r.LateThrow<ModuleDoesNotWantToBeCreatedException>("This module can only be created inside a subpatch."); return r;}
-  if(owner_subpatch->HasExit()) {r.LateThrow<ModuleDoesNotWantToBeCreatedException>("Currently it is not possible to create multiple exits inside the same subpatch."); return r;}
+  if(!owner_subpatch) {r.LateThrow<Exceptions::ModuleDoesNotWantToBeCreated>("This module can only be created inside a subpatch."); return r;}
+  if(owner_subpatch->HasExit()) {r.LateThrow<Exceptions::ModuleDoesNotWantToBeCreated>("Currently it is not possible to create multiple exits inside the same subpatch."); return r;}
   // Otherwise link to that entrance.
   owner_subpatch->LinkToExit(std::static_pointer_cast<SubpatchExit>( shared_from_this() ));
   subpatch = owner_subpatch;

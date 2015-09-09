@@ -23,12 +23,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+namespace Exceptions{
 struct SDLException : public Exception{
   SDLException(std::string t);
 };
 struct SDLExceptionNoDesc : public Exception{
   SDLExceptionNoDesc(std::string t) : Exception(t) {}
 };
+} // namesace Exceptions
 
 /** A wrapper class for RAII SDL init/cleanup.
  *  All objects that require access to SDL should aquire such handle.

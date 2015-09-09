@@ -182,7 +182,7 @@ bool MainWindow::Save(std::string path){
     file_name = Utilities::GetFilename(path);
     UpdatePathLabel();
     return true;
-  }catch(XMLFileAccessException ex){
+  }catch(Exceptions::XMLFileAccess ex){
     ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
     return false;
   }
@@ -215,9 +215,9 @@ void MainWindow::Open(){
             UpdatePathLabel();
           }
         });
-      }catch(XMLFileAccessException ex){
+      }catch(Exceptions::XMLFileAccess ex){
         ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");
-      }catch(XMLParseException ex){
+      }catch(Exceptions::XMLParse ex){
         ShowErrorAlert("Failed to parse file:\n\n" + ex.what(), "Cancel");
       }
       

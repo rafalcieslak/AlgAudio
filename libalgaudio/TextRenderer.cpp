@@ -39,7 +39,7 @@ TTF_Font* TextRenderer::GetFont(FontParams fp){
 TTF_Font* TextRenderer::Preload(FontParams fp){
   std::string path = "fonts/" + fp.name + ".ttf";
   TTF_Font* f = TTF_OpenFont(path.c_str(), fp.size);
-  if(!f) throw SDLException("TTF_OpenFont failed");
+  if(!f) throw Exceptions::SDLException("TTF_OpenFont failed");
   fontbank[fp] = f;
   return f;
 }

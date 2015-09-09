@@ -154,16 +154,16 @@ Subprocess::Subprocess(std::string c){
     job = CreateJobObject (NULL,NULL);
     // Once this process is attached to a job, all new children will be too.
     if( ! AssignProcessToJobObject(job, GetCurrentProcess()) )
-      throw SubprocessException("AssignProcessToJobObject failed: " + GetLastErrorAsString());
+      throw Exceptions::Subprocess("AssignProcessToJobObject failed: " + GetLastErrorAsString());
 
     // Set the job limit so that closing the last handle to the job (which only the parent process has)
     // will kill all child process. This way no children are left if we crash or terminate.
      JOBOBJECT_EXTENDED_LIMIT_INFORMATION limits;
     if( ! QueryInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits), NULL))
-      throw SubprocessException("QueryInformationJobObject failed: " + GetLastErrorAsString());
+      throw Exceptions::Subprocess("QueryInformationJobObject failed: " + GetLastErrorAsString());
     limits.BasicLimitInformation.LimitFlags |= JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
     if( ! SetInformationJobObject(job, JobObjectExtendedLimitInformation, &limits, sizeof(limits)))
-      throw SubprocessException("SetInformationJobObject failed: " + GetLastErrorAsString());
+      throw Exceptions::Subprocess("SetInformationJobObject failed: " + GetLastErrorAsString());
   }
   // Prepare a control structure for pipe creation
   SECURITY_ATTRIBUTES saAttr;
@@ -173,16 +173,16 @@ Subprocess::Subprocess(std::string c){
 
   // Create a pipe for the child process's STDOUT.
   if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0) )
-    throw SubprocessException("CreatePipe failed: " + GetLastErrorAsString());
+    throw Exceptions::Subprocess("CreatePipe failed: " + GetLastErrorAsString());
   // Ensure the read handle to the pipe for STDOUT is not inherited.
   if ( ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0) )
-    throw SubprocessException("SetHandleInformation failed: " + GetLastErrorAsString());
+    throw Exceptions::Subprocess("SetHandleInformation failed: " + GetLastErrorAsString());
   // Create a pipe for the child process's STDIN.
   if (! CreatePipe(&g_hChildStd_IN_Rd, &g_hChildStd_IN_Wr, &saAttr, 0))
-    throw SubprocessException("CreatePipe failed: " + GetLastErrorAsString());
+    throw Exceptions::Subprocess("CreatePipe failed: " + GetLastErrorAsString());
   // Ensure the write handle to the pipe for STDIN is not inherited.
   if ( ! SetHandleInformation(g_hChildStd_IN_Wr, HANDLE_FLAG_INHERIT, 0) )
-    throw SubprocessException("SetHandleInformation failed: " + GetLastErrorAsString());
+    throw Exceptions::Subprocess("SetHandleInformation failed: " + GetLastErrorAsString());
 
   // Set up members of the PROCESS_INFORMATION structure.
   ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
@@ -213,7 +213,7 @@ Subprocess::Subprocess(std::string c){
      workdir.c_str(), // working directory
      &siStartInfo,  // STARTUPINFO pointer
      &piProcInfo);  // receives PROCESS_INFORMATION.
-  if (!res) throw SubprocessException("CreateProcess failed: " + GetLastErrorAsString());
+  if (!res) throw Exceptions::Subprocess("CreateProcess failed: " + GetLastErrorAsString());
 
  // Close handles to the child process and its primary thread.
  // Some applications might keep these handles to monitor the status

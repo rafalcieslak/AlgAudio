@@ -30,17 +30,17 @@ std::map<std::string, std::shared_ptr<LibLoader>> LibLoader::libs_by_path;
 LibLoader::LibLoader(std::string filename) : path(filename){
 #ifdef __unix__
   handle = dlopen(filename.c_str(), RTLD_NOW);
-  if(handle == NULL) throw LibLoadingException(filename, "Failed to open library");
+  if(handle == NULL) throw Exceptions::LibLoading(filename, "Failed to open library");
   create_instance_func = (create_instance_func_t*) dlsym(handle,"create_instance");
   deleter_func = (deleter_t*) dlsym(handle,"delete_instance");
 #else
   hLib = LoadLibrary(filename.c_str());
-  if(hLib == NULL) throw LibLoadingException(filename, "Failed to open library");
+  if(hLib == NULL) throw Exceptions::LibLoading(filename, "Failed to open library");
   create_instance_func = (create_instance_func_t*) GetProcAddress(hLib,"create_instance");
   deleter_func = (deleter_t*) GetProcAddress(hLib,"delete_instance");
 #endif
-  if(create_instance_func == nullptr) throw LibLoadingException(filename, "Failed to get create_instance");
-  if(deleter_func == nullptr) throw LibLoadingException(filename, "Failed to get delete_instance");
+  if(create_instance_func == nullptr) throw Exceptions::LibLoading(filename, "Failed to get create_instance");
+  if(deleter_func == nullptr) throw Exceptions::LibLoading(filename, "Failed to get delete_instance");
 }
 
 LibLoader::~LibLoader(){

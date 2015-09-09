@@ -138,11 +138,11 @@ private:
   /** The returned arguments may be stored if a relay returned before a continuation function was set with LateReturn::Then */
   std::tuple<Types...> stored_args;
   /** The collection of exception handling functions, mapped by exception type */
-  std::unordered_map<std::type_index, std::function<void(std::shared_ptr<Exception>)>> catchers;
+  std::unordered_map<std::type_index, std::function<void(std::shared_ptr<Exceptions::Exception>)>> catchers;
   /** The exception that was LateThrown before a catcher was set */
-  std::shared_ptr<Exception> stored_exception;
+  std::shared_ptr<Exceptions::Exception> stored_exception;
   /** The catcher function set with LateReturn::CatchAll, it will be called on any exception that is not present in the map of catchers */
-  std::function<void(std::shared_ptr<Exception>)> default_catcher;
+  std::function<void(std::shared_ptr<Exceptions::Exception>)> default_catcher;
   /** This flag gets set to true when any function is stored with for this LateReturn */
   bool stored = false;
 };
@@ -221,7 +221,7 @@ private:
  *  \code
  *  GetServerVersion().Then([](std::string version){
  *    std::cout << version << std::endl;
- *  }).Catch<CommunicationException>([](std::shared_ptr<Exception> ex){
+ *  }).Catch<Exceptions::Communication>([](std::shared_ptr<Exceptions::Exception> ex){
  *    std::cout << "Failed to get server version, reason: " << ex->reason << std::endl;
  *  });
  *  \endcode
@@ -269,7 +269,7 @@ public:
    *  Only one handler for each exception class may be set. Setting another overrides the previous.
    */
   template<typename Ex>
-  const LateReturn& Catch(std::function<void(std::shared_ptr<Exception>)> func) const{
+  const LateReturn& Catch(std::function<void(std::shared_ptr<Exceptions::Exception>)> func) const{
     auto it = LateReturnEntryBase::entries.find(id);
     if(it == LateReturnEntryBase::entries.end()){
       // Catch is called, but the entry has already returned. Therefore, ignore the catcher.
@@ -292,7 +292,7 @@ public:
    *  Only one default handler may be set. Setting another overrides the previous.
    */
   template<typename Ex>
-  const LateReturn& CatchAll(std::function<void(std::shared_ptr<Exception>)> func) const{
+  const LateReturn& CatchAll(std::function<void(std::shared_ptr<Exceptions::Exception>)> func) const{
     auto it = LateReturnEntryBase::entries.find(id);
     if(it == LateReturnEntryBase::entries.end()){
       // Catch is called, but the entry has already returned. Therefore, ignore the catcher.
@@ -335,7 +335,7 @@ public:
       r.PassException(entry->stored_exception);
     }else{
       // Pass all exceptions to parent relay
-      entry->default_catcher = [r](std::shared_ptr<Exception> ex){
+      entry->default_catcher = [r](std::shared_ptr<Exceptions::Exception> ex){
         r.PassException(ex);
       };
     }
@@ -463,7 +463,7 @@ public:
    *    GetServerVersion().Then([r](int v){
    *      if(v == 1) r.Return("Fluffy");
    *      if(v == 2) r.Return("Puffy");
-   *      else r.LateThrow<UnknownVersionException>("Version " + std::to_string(v) + " unrecognized.");
+   *      else r.LateThrow<Exceptions::UnknownVersion>("Version " + std::to_string(v) + " unrecognized.");
    *    });
    *  }
    *  \endcode
@@ -475,7 +475,7 @@ public:
     return *this;
   }
   /** Passes an alredy created exception to the corresponding LateReturn, so that it may catch it. */
-  const Relay& PassException(std::shared_ptr<Exception> ex) const{
+  const Relay& PassException(std::shared_ptr<Exceptions::Exception> ex) const{
     auto it = LateReturnEntryBase::entries.find(id);
     if(it != LateReturnEntryBase::entries.end()){
       LateReturnEntry<Types...>* entry = dynamic_cast<LateReturnEntry<Types...>*>(it->second);

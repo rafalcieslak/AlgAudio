@@ -56,7 +56,7 @@ void SDLFix::FixRenderer(SDL_Renderer* renderer){
   std::string renderer_name(info.name);
 
   if(renderer_name != "opengl")
-    throw UnimplementedException("Renderer '" + renderer_name + "' IS NOT supported! AlgAudio will can work with opengl only.");
+    throw Exceptions::Unimplemented("Renderer '" + renderer_name + "' IS NOT supported! AlgAudio will can work with opengl only.");
 
   // Fixes clip rect position by setting function pointer to a custom modified
   // function

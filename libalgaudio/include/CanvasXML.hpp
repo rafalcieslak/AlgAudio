@@ -26,13 +26,14 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
   
-  
-struct XMLFileAccessException : public Exception{
-  XMLFileAccessException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct XMLFileAccess : public Exception{
+  XMLFileAccess(std::string t) : Exception(t) {}
 };  
-struct XMLParseException : public Exception{
-  XMLParseException(std::string t) : Exception(t) {}
+struct XMLParse : public Exception{
+  XMLParse(std::string t) : Exception(t) {}
 };  
+} // namespace Exceptions
   
 /** An instanceable class that exports canvas state to an XML document, and
  *  vice versa. A CanvasXML maintains an XML document, which can be loaded from

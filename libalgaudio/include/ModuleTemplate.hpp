@@ -35,15 +35,17 @@ namespace AlgAudio{
 class ModuleCollection;
 class Module;
 
-struct ModuleParseException : public Exception{
-  ModuleParseException(std::string i, std::string t) : Exception(t), id(i) {};
-  ModuleParseException(std::string t) : Exception(t) {};
+namespace Exceptions{
+struct ModuleParse : public Exception{
+  ModuleParse(std::string i, std::string t) : Exception(t), id(i) {};
+  ModuleParse(std::string t) : Exception(t) {};
   virtual std::string what() override {
     if(id == "") return "While loading an unknown module: " + text;
     else return "While loading module '" + id + "': " + text;
   };
   std::string id = "";
 };
+} // namespace Exceptions
 
 /** A template for creating params. Contains all data about a param that is
  *  loaded from module description file. All ParamControlers have a link to their

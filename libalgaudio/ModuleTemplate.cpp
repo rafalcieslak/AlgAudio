@@ -32,13 +32,13 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c) : collection(c){
 
 ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : collection(c){
   xml_attribute<>* id_attr = node->first_attribute("id");
-  if(!id_attr) throw ModuleParseException("", "Missing module id");
+  if(!id_attr) throw Exceptions::ModuleParse("", "Missing module id");
   id = id_attr->value();
 
   xml_attribute<>* name_attr = node->first_attribute("name");
-  if(!name_attr) throw ModuleParseException(id, "Missing module name");
+  if(!name_attr) throw Exceptions::ModuleParse(id, "Missing module name");
   name = name_attr->value();
-  if(name == "") throw ModuleParseException(id, "Module name is empty");
+  if(name == "") throw Exceptions::ModuleParse(id, "Module name is empty");
 
   xml_node<>* sc_node = node->first_node("sc");
   if(sc_node){
@@ -51,7 +51,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
   if(class_node){
     has_class = true;
     xml_attribute<>* class_name_attr = class_node->first_attribute("name");
-    if(!class_name_attr) throw ModuleParseException(id, "Module has class node, but the class name is missing");
+    if(!class_name_attr) throw Exceptions::ModuleParse(id, "Module has class node, but the class name is missing");
     class_name = class_name_attr->value();
   }
   xml_node<>* params_node = node->first_node("params");
@@ -59,7 +59,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
     for(xml_node<>* inlet_node = params_node->first_node("inlet"); inlet_node; inlet_node = inlet_node->next_sibling("inlet")){
       IOLetTemplate t;
       xml_attribute<>* inlet_id = inlet_node->first_attribute("id");
-      if(!inlet_id) throw ModuleParseException(id, "An inlet is missing its id");
+      if(!inlet_id) throw Exceptions::ModuleParse(id, "An inlet is missing its id");
       t.id = inlet_id->value();
       xml_attribute<>* inlet_name = inlet_node->first_attribute("name");
       if(inlet_name) t.name = inlet_name->value();
@@ -69,7 +69,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
     for(xml_node<>* outlet_node = params_node->first_node("outlet"); outlet_node; outlet_node = outlet_node->next_sibling("outlet")){
       IOLetTemplate t;
       xml_attribute<>* outlet_id = outlet_node->first_attribute("id");
-      if(!outlet_id) throw ModuleParseException(id, "An outlet is missing its id");
+      if(!outlet_id) throw Exceptions::ModuleParse(id, "An outlet is missing its id");
       t.id = outlet_id->value();
       xml_attribute<>* outlet_name = outlet_node->first_attribute("name");
       if(outlet_name) t.name = outlet_name->value();
@@ -79,7 +79,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
     for(xml_node<>* param_node = params_node->first_node("param"); param_node; param_node = param_node->next_sibling("param")){
       auto p = std::make_shared<ParamTemplate>();
       xml_attribute<>* param_id = param_node->first_attribute("id");
-      if(!param_id) throw ModuleParseException(id, "An param is missing its id");
+      if(!param_id) throw Exceptions::ModuleParse(id, "An param is missing its id");
       p->id = param_id->value();
       xml_attribute<>* param_name = param_node->first_attribute("name");
       if(!param_name) p->name = "";
@@ -92,7 +92,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
         if(mode == "input") p->mode = ParamTemplate::ParamMode::Input;
         else if(mode == "output") p->mode = ParamTemplate::ParamMode::Output;
         else if(mode == "none") p->mode = ParamTemplate::ParamMode::None;
-        else throw ModuleParseException(id, "Param '" + p->id + "' has invalid mode value: " + mode);
+        else throw Exceptions::ModuleParse(id, "Param '" + p->id + "' has invalid mode value: " + mode);
       }
 
       xml_attribute<>* param_defaultmax = param_node->first_attribute("defaultmax");
@@ -115,7 +115,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
         std::string scale = param_scale->value();
         if(scale == "lin") p->scale = ParamTemplate::ParamScale::Linear;
         else if(scale == "log") p->scale = ParamTemplate::ParamScale::Logarithmic;
-        else throw ModuleParseException(id, "Param '" + p->id + "' has invalid scale value: " + scale);
+        else throw Exceptions::ModuleParse(id, "Param '" + p->id + "' has invalid scale value: " + scale);
       }
 
       xml_attribute<>* action = param_node->first_attribute("action");
@@ -129,7 +129,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
         if(val == "sc")     p->action = ParamTemplate::ParamAction::SC;
         else if(val == "custom") p->action = ParamTemplate::ParamAction::Custom;
         else if(val == "none") p->action = ParamTemplate::ParamAction::None;
-        else throw ModuleParseException(id, "Action attribute has an invalid value: " + val);
+        else throw Exceptions::ModuleParse(id, "Action attribute has an invalid value: " + val);
       }
 
 
@@ -137,9 +137,9 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
     }
     for(xml_node<>* reply_node = params_node->first_node("reply"); reply_node; reply_node = reply_node->next_sibling("reply")){
       xml_attribute<>* reply_id = reply_node->first_attribute("id");
-      if(!reply_id) throw ModuleParseException(id, "A reply is missing its id attribute");
+      if(!reply_id) throw Exceptions::ModuleParse(id, "A reply is missing its id attribute");
       xml_attribute<>* reply_param = reply_node->first_attribute("param");
-      if(!reply_param) throw ModuleParseException(id, "A reply is missing its param attribute");
+      if(!reply_param) throw Exceptions::ModuleParse(id, "A reply is missing its param attribute");
       std::string id = reply_id->value();
       std::string param = reply_param->value();
 
@@ -159,7 +159,7 @@ ModuleTemplate::ModuleTemplate(ModuleCollection& c, xml_node<char>* node) : coll
     if(gui_type_attr) guitype = gui_type_attr->value();
   }
 
-  if(!has_class && !has_sc_code) throw ModuleParseException(id, "Module must have either SC code, class name, or both.");
+  if(!has_class && !has_sc_code) throw Exceptions::ModuleParse(id, "Module must have either SC code, class name, or both.");
 
 }
 

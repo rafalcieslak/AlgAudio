@@ -149,7 +149,7 @@ void Canvas::Connect(IOID from, IOID to){
   }
 
   if(TestNewConnectionForLoop(from, to))
-    throw ConnectionLoopException("Cannot add the selected connection, adding it would close a loop.");
+    throw Exceptions::ConnectionLoop("Cannot add the selected connection, adding it would close a loop.");
 
   auto it = audio_connections.find(from);
   if(it == audio_connections.end()){
@@ -161,9 +161,9 @@ void Canvas::Connect(IOID from, IOID to){
     // Not the first connectin from this inlet.
     auto it2 = std::find(it->second.begin(), it->second.end(), to);
     if(it2 != it->second.end()) // if found
-      throw DoubleConnectionException("Cannot add the connection, it already exists!");
+      throw Exceptions::DoubleConnection("Cannot add the connection, it already exists!");
     else{
-      if(audio_connections[from].size() >= 20) throw MultipleConnectionsException("Cannot add another connection to the same outlet, maximum (20) reached.");
+      if(audio_connections[from].size() >= 20) throw Exceptions::MultipleConnections("Cannot add another connection to the same outlet, maximum (20) reached.");
       audio_connections[from].push_back(to);
     }
   }
@@ -210,7 +210,7 @@ void Canvas::ConnectData(IOID from, IOID to, DataConnectionMode m){
     // Not the first connection from this inlet.
     auto it2 = std::find(it->second.begin(), it->second.end(), IOIDWithMode{to, DataConnectionMode::Relative}); // Note that connection mode is ignored in comparison.
     if(it2 != it->second.end()) // if found
-      throw DoubleConnectionException("This connection already exists!");
+      throw Exceptions::DoubleConnection("This connection already exists!");
 
     it->second.push_back({to,m});
   }
@@ -325,7 +325,7 @@ void Canvas::RecalculateOrder(){
     // Failure. We did not traverse all modules. This can only happen
     // if the connection graph has a cycle.
     // The ordering is inconclusive.
-    throw ConnectionLoopException("");
+    throw Exceptions::ConnectionLoop("");
   }
 
 /*

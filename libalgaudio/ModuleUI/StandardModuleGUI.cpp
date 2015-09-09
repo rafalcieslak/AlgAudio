@@ -89,7 +89,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       std::string id, inlet_id, inlet_name;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
-      else throw GUIBuildException("An inlet is missing its corresponding param id");
+      else throw Exceptions::GUIBuild("An inlet is missing its corresponding param id");
 
       rapidxml::xml_attribute<>* attr_inlet = node->first_attribute("inlet");
       if(attr_inlet) inlet_id = attr_inlet->value();
@@ -111,7 +111,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       std::string id, outlet_id, outlet_name;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
-      else throw GUIBuildException("An outlet is missing its corresponding param id");
+      else throw Exceptions::GUIBuild("An outlet is missing its corresponding param id");
 
       rapidxml::xml_attribute<>* attr_outlet = node->first_attribute("outlet");
       if(attr_outlet) outlet_id = attr_outlet->value();
@@ -133,13 +133,13 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
       std::string id, param;
       rapidxml::xml_attribute<>* attr_id = node->first_attribute("id");
       if(attr_id) id = attr_id->value();
-      else throw GUIBuildException("A slider is missing its id");
+      else throw Exceptions::GUIBuild("A slider is missing its id");
       rapidxml::xml_attribute<>* attr_param = node->first_attribute("param");
       if(attr_param) param = attr_param->value();
-      else throw GUIBuildException("A slider is missing its corresponding param id");
+      else throw Exceptions::GUIBuild("A slider is missing its corresponding param id");
 
       auto p = GetModule()->GetParamControllerByID(param);
-      if(!p) throw GUIBuildException("A slider has an unexisting param id " + param);
+      if(!p) throw Exceptions::GUIBuild("A slider has an unexisting param id " + param);
       auto slider = UISlider::Create(window, p);
       slider->widget_id = UIWidget::ID(id);
       slider->param_id = param;
@@ -155,7 +155,7 @@ void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<Module
     }else if(name == "display"){
 
     }else {
-      throw GUIBuildException("Unrecognized gui element: " + name);
+      throw Exceptions::GUIBuild("Unrecognized gui element: " + name);
     }
   }
 

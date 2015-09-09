@@ -30,22 +30,24 @@ namespace AlgAudio{
 
 class LibLoader;
 
-struct CollectionParseException : public Exception{
-  CollectionParseException(std::string t) : Exception(t) {};
-  CollectionParseException(std::string i, std::string t) : Exception(t), id(i) {};
+namespace Exceptions{
+struct CollectionParse : public Exception{
+  CollectionParse(std::string t) : Exception(t) {};
+  CollectionParse(std::string i, std::string t) : Exception(t), id(i) {};
   virtual std::string what() override {
     if(id == "") return "While loading an unknown collection: " + text;
     else return "While loading collection '" + id + "': " + text;
   };
   std::string id = "";
 };
-struct CollectionLoadingException : public Exception{
-  CollectionLoadingException(std::string p, std::string t) : Exception(t), path(p) {};
+struct CollectionLoading : public Exception{
+  CollectionLoading(std::string p, std::string t) : Exception(t), path(p) {};
   virtual std::string what() override {
     return "While loading collection from '" + path + "': " + text;
   };
   std::string path;
 };
+} // namespace Exceptions
 
 class ModuleCollection{
 public:

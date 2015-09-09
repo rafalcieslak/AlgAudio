@@ -35,11 +35,13 @@ namespace AlgAudio{
 typedef void* (create_instance_func_t)(const char *);
 typedef void (deleter_t)(void*);
 
-struct LibLoadingException : public Exception{
-  LibLoadingException(std::string p, std::string t) : Exception(t), path(p) {};
+namespace Exceptions{
+struct LibLoading : public Exception{
+  LibLoading(std::string p, std::string t) : Exception(t), path(p) {};
   virtual std::string what() override {return "When loading file '" + path + "': " + text;}
   std::string path;
 };
+} // namespace Exceptions
 
 /* This class is a wrapper for dynamically loadable libraries.
  * The static part of this class opens up and loads dynamic libraries, while

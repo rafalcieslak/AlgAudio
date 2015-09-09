@@ -46,9 +46,11 @@ enum class AlertType : int{
   ERROR,
 };
 
-struct AlertableException : public Exception{
-  AlertableException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct WindowNotAlertable : public Exception{
+  WindowNotAlertable(std::string t) : Exception(t) {}
 };
+} //namespace Exceptions
 
 /* This is an interface implemented by all classes which are capable of
  * displaying an alert. For example, the MainWindow is such class.

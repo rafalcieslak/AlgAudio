@@ -101,7 +101,7 @@ void CanvasView::CreateModuleGUIs(){
           Size2D guisize = modulegui->GetRequestedSize();
           modulegui->Resize(guisize);
           
-        }catch(GUIBuildException ex){
+        }catch(Exceptions::GUIBuild ex){
           current_canvas->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
@@ -145,7 +145,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
           drag_in_progress = true;
           drag_mode = DragModeMove;
           SetNeedsRedrawing();
-        }catch(GUIBuildException ex){
+        }catch(Exceptions::GUIBuild ex){
           current_canvas->RemoveModule(m);
           window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
         }
@@ -154,7 +154,7 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
       }
       r.Return();
     });
-  }catch(ModuleInstanceCreationFailedException ex){
+  }catch(Exceptions::ModuleInstanceCreationFailed ex){
     window.lock()->ShowErrorAlert(ex.what(),"Dismiss");
   }
   return r;
@@ -508,11 +508,11 @@ void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID i
     try{
       GetCurrentCanvas()->Connect(from,to);
       FadeoutWireStart(PotentialWireMode::New);
-    }catch(MultipleConnectionsException ex){
+    }catch(Exceptions::MultipleConnections ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
-    }catch(ConnectionLoopException ex){
+    }catch(Exceptions::ConnectionLoop ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
-    }catch(DoubleConnectionException ex){
+    }catch(Exceptions::DoubleConnection ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
     }
   }else{
@@ -542,11 +542,11 @@ void CanvasView::FinalizeDataConnectingDrag(int inlet_module_id, UIWidget::ID in
     try{
       GetCurrentCanvas()->ConnectData(from,to,mode);
       FadeoutWireStart(PotentialWireMode::New);
-    }catch(MultipleConnectionsException ex){
+    }catch(Exceptions::MultipleConnections ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
-    }catch(ConnectionLoopException ex){
+    }catch(Exceptions::ConnectionLoop ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
-    }catch(DoubleConnectionException ex){
+    }catch(Exceptions::DoubleConnection ex){
       window.lock()->ShowErrorAlert(ex.what(), "Cancel connection");
     }
   }else{

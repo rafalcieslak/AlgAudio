@@ -27,20 +27,22 @@ namespace AlgAudio{
 
 int SDLHandle::reference_counter = 0;
 
+namespace Exceptions{
 SDLException::SDLException(std::string t) :
    Exception(t + ": " + SDL_GetError()) {}
+} // namespace Exceptions
 
 SDLHandle::SDLHandle(){
   if(reference_counter == 0){
     std::cout << "Starting SDL." << std::endl;
     if(SDL_Init(SDL_INIT_EVENTS) != 0)
-      throw SDLException("SDL_Init failed");
+      throw Exceptions::SDLException("SDL_Init failed");
     if(SDL_VideoInit(NULL) != 0)
-      throw SDLException("SDL_VideoInit failed");
+      throw Exceptions::SDLException("SDL_VideoInit failed");
     //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS,1);
     //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES,16);
     if(TTF_Init() != 0 )
-      throw SDLException("TTF_Init failed");
+      throw Exceptions::SDLException("TTF_Init failed");
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear"); 
   }
   reference_counter++;

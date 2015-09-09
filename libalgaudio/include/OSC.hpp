@@ -34,9 +34,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+namespace Exceptions{
 struct OSCException : public Exception{
   OSCException(std::string t) : Exception(t) {}
 };
+} // namespace Exceptions
 
 template<typename T>
 inline T UnpackLOMessage(const lo::Message& msg, unsigned int n);

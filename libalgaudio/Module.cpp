@@ -184,10 +184,6 @@ Module::~Module() {
   if(enabled_by_factory) std::cout << "WARNING: a module " << templ->GetFullID() << " reference is lost, but it was not destroyed by the factory." << std::endl;
 };
 
-void Module::Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i){
-  o->ConnectToInlet(i);
-}
-
 LateReturn<> Module::CreateIOFromTemplate(bool fake){
   Relay<> r;
   Sync s(templ->inlets.size());
@@ -263,9 +259,9 @@ std::shared_ptr<ModuleGUI> Module::BuildGUI(std::shared_ptr<Window> parent_windo
   }else if(templ->guitype == "standard auto"){
     gui = StandardModuleGUI::CreateFromTemplate(parent_window, shared_from_this());
   }else if(templ->guitype == ""){
-    throw GUIBuildException("This module has no gui defined");
+    throw Exceptions::GUIBuild("This module has no gui defined");
   }else{
-    throw GUIBuildException("Module gui type '" + templ->guitype + "' was not recognized");
+    throw Exceptions::GUIBuild("Module gui type '" + templ->guitype + "' was not recognized");
   }
   modulegui = gui;
   on_gui_build(gui);

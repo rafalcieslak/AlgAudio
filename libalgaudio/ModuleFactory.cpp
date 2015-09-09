@@ -42,14 +42,14 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
     if(templ->collection.id == "builtin"){
       // Special case for builtin modules
       res = Builtin::CreateInstance(templ->class_name);
-      if(res == nullptr) throw ModuleInstanceCreationFailedException("The corresponding class is not a builtin.", templ->GetFullID());
+      if(res == nullptr) throw Exceptions::ModuleInstanceCreationFailed("The corresponding class is not a builtin.", templ->GetFullID());
     }else if(templ->collection.defaultlib == nullptr){
       // If there is no default AA library for this collection
-      throw ModuleInstanceCreationFailedException("The collection has no .aa library defined.", templ->GetFullID());
+      throw Exceptions::ModuleInstanceCreationFailed("The collection has no .aa library defined.", templ->GetFullID());
     }else{
       res = templ->collection.defaultlib->AskForInstance(templ->class_name);
       if(res == nullptr)
-        throw ModuleInstanceCreationFailedException("The collection's .aa library did not return a '" + templ->class_name + "' class.", templ->GetFullID());
+        throw Exceptions::ModuleInstanceCreationFailed("The collection's .aa library did not return a '" + templ->class_name + "' class.", templ->GetFullID());
     }
     // Set the module template link
     res->templ = templ;
@@ -72,8 +72,8 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
           res->ResetControllers();
           r.Return(res, "");
         });
-      }catch(ModuleDoesNotWantToBeCreatedException ex){
-        throw ModuleInstanceCreationFailedException("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
+      }catch(Exceptions::ModuleDoesNotWantToBeCreated ex){
+        throw Exceptions::ModuleInstanceCreationFailed("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
       }
     }else{
       lo::Message m;
@@ -97,12 +97,12 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
               res->on_init_latereturn().Then([=](){
                 res->ResetControllers();
                 r.Return(res, "");
-              }).Catch<ModuleDoesNotWantToBeCreatedException>([r,res](auto ex){
+              }).Catch<Exceptions::ModuleDoesNotWantToBeCreated>([r,res](auto ex){
                 // LateThrow catcher
                 DestroyInstance(res);
                 r.Return(nullptr, "This module does not want to be created:\n" + ex->what());
               });
-            }catch(ModuleDoesNotWantToBeCreatedException ex){
+            }catch(Exceptions::ModuleDoesNotWantToBeCreated ex){
               // Normal catcher
               DestroyInstance(res);
               r.Return(nullptr, "This module does not want to be created:\n" + ex.what());
@@ -118,7 +118,7 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
     res->enabled_by_factory = true;
     res->on_init_latereturn().Then([=](){
       r.Return(res, "");
-    }).Catch<ModuleDoesNotWantToBeCreatedException>([r,res](auto ex){
+    }).Catch<Exceptions::ModuleDoesNotWantToBeCreated>([r,res](auto ex){
       DestroyInstance(res);
       r.Return(nullptr, "This module does not want to be created:\n" + ex->what());
     });
@@ -149,7 +149,7 @@ LateReturn<> ModuleFactory::DestroyInstance(std::shared_ptr<Module> m){
         m->enabled_by_factory = false;
         r.Return();
       });
-    }catch(SCLangException){
+    }catch(Exceptions::SCLang){
       // Failed to send osc message? If we are unable to remove the instance
       // because SC or OSC is dead, then we won't be able to clean the instance
       // anyway.

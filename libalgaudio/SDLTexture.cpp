@@ -39,7 +39,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, Size2D s)
       SDL_TEXTUREACCESS_TARGET,
       size.width, size.height
     );
-    if(!texture) throw SDLException("CreateTexture failed");
+    if(!texture) throw Exceptions::SDLException("CreateTexture failed");
     // Set blendmode to an invalid value, in such case SDL will not interfere
     // and set blendmodes according to the texture config
     SDL_SetTextureBlendMode(texture, (SDL_BlendMode)99999999);
@@ -52,7 +52,7 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   valid = true;
   auto window = parent.lock();
   texture = SDL_CreateTextureFromSurface(window->GetRenderer(), surf);
-  if(!texture) throw SDLException("CreateTexture failed");
+  if(!texture) throw Exceptions::SDLException("CreateTexture failed");
   // Set blendmode to an invalid value, in such case SDL will not interfere
   // and set blendmodes according to the texture config
   SDL_SetTextureBlendMode(texture, (SDL_BlendMode)99999999);
@@ -100,7 +100,7 @@ void SDLTexture::Resize(Size2D s){
       SDL_TEXTUREACCESS_TARGET,
       size.width, size.height
     );
-    if(!texture) throw SDLException("CreateTexture failed");
+    if(!texture) throw Exceptions::SDLException("CreateTexture failed");
     // Set blendmode to an invalid value, in such case SDL will not interfere
     // and set blendmodes according to the texture config
     SDL_SetTextureBlendMode(texture, (SDL_BlendMode)99999999);

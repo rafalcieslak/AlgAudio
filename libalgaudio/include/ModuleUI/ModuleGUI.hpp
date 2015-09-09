@@ -24,9 +24,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-struct GUIBuildException : public Exception{
-  GUIBuildException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct GUIBuild : public Exception{
+  GUIBuild(std::string t) : Exception(t) {}
 };
+} // namespace Exceptions
 
 /** Merely an interface implemented by standard box types. Module creators
  *  may wish to implement a custom version of a module GUI, by inheriting

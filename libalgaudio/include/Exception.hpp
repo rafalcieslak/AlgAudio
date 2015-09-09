@@ -23,6 +23,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
   
+namespace Exceptions{
+  
 class Exception{
 public:
   Exception(std::string t) : text(t){
@@ -38,12 +40,12 @@ public:
 protected:
   std::string text;
 };
-class UnimplementedException : public Exception{
-public:
-  UnimplementedException(std::string t) : Exception(t){}
+
+struct Unimplemented : public Exception{
+  Unimplemented(std::string t) : Exception(t){}
 };
 
-  
+} // namespace Exceptions
 } // namespcae AlgAudio
 
 #endif // EXCEPTION_HPP

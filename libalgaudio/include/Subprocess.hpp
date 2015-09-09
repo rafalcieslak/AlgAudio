@@ -28,9 +28,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-struct SubprocessException : public Exception{
-  SubprocessException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct Subprocess : public Exception{
+  Subprocess(std::string t) : Exception(t) {}
 };
+} // namespace Exceptions
 
 /* A universal class for launching and terminating subprocesses, as well as
  * communicating with them via stdio.

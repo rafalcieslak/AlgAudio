@@ -47,28 +47,28 @@ ModuleCollection::ModuleCollection(std::ifstream& file, std::string b) :
   xml_node<>* root = nullptr;
   try{
     rapidxml::file<> file_buffer(file);
-    if(file_buffer.size() < 10) throw CollectionParseException("The collection file is apparently too short");
+    if(file_buffer.size() < 10) throw Exceptions::CollectionParse("The collection file is apparently too short");
     document.parse<0>(file_buffer.data());
     root = document.first_node("collection");
-    if(!root) throw CollectionParseException("Missing `collection` node");
+    if(!root) throw Exceptions::CollectionParse("Missing `collection` node");
     xml_attribute<>* version_attr = root->first_attribute("version");
-    if(!version_attr) throw CollectionParseException("Missing version information");
+    if(!version_attr) throw Exceptions::CollectionParse("Missing version information");
     std::string version(version_attr->value());
 
     // Version check!
-    if(version != "1") throw CollectionParseException("Invalid version");
+    if(version != "1") throw Exceptions::CollectionParse("Invalid version");
 
     // Assuming version 1
     xml_attribute<>* id_attr = root->first_attribute("id");
-    if(!id_attr) throw CollectionParseException("Missing collection id");
+    if(!id_attr) throw Exceptions::CollectionParse("Missing collection id");
     id = id_attr->value();
-    if(id == "") throw CollectionParseException("Collection id is empty");
+    if(id == "") throw Exceptions::CollectionParse("Collection id is empty");
     // TODO: Testing for collection id uniqueness
 
     xml_node<>* name_node = root->first_node("name");
-    if(!name_node) throw CollectionParseException(id, "Mising collection name");
+    if(!name_node) throw Exceptions::CollectionParse(id, "Mising collection name");
     name = name_node->value();
-    if(name == "") throw CollectionParseException(id, "Collection name is empty");
+    if(name == "") throw Exceptions::CollectionParse(id, "Collection name is empty");
 
     xml_node<>* defaultlib_node = root->first_node("defaultlib");
     if(!defaultlib_node){
@@ -77,7 +77,7 @@ ModuleCollection::ModuleCollection(std::ifstream& file, std::string b) :
     }else{
       has_defaultlib = true;
       xml_attribute<>* libfile_node = defaultlib_node->first_attribute("file");
-      if(!libfile_node) throw CollectionParseException(id, "Missing file attribute in defaultlib node");
+      if(!libfile_node) throw Exceptions::CollectionParse(id, "Missing file attribute in defaultlib node");
       defaultlib_path = libfile_node->value();
     }
 
@@ -85,18 +85,18 @@ ModuleCollection::ModuleCollection(std::ifstream& file, std::string b) :
       try{
         auto templ = std::make_shared<ModuleTemplate>(*this,module_node);
         if(templates_by_id.find(templ->id) != templates_by_id.end())
-          throw CollectionParseException(id, "Collection has duplicate module ids: '" + templ->id + "'");
+          throw Exceptions::CollectionParse(id, "Collection has duplicate module ids: '" + templ->id + "'");
         templates_by_id[templ->id] = templ;
-      }catch(ModuleParseException ex){
+      }catch(Exceptions::ModuleParse ex){
         std::cerr << "Exception: " + ex.what() << std::endl;
         std::cerr << "An invalid module in collection " + id + ", ignoring." << std::endl;
       }
     }
 
   }catch(rapidxml::parse_error ex){
-    throw CollectionParseException(std::string("XML parse error: ") + ex.what());
+    throw Exceptions::CollectionParse(std::string("XML parse error: ") + ex.what());
   }catch(std::runtime_error ex){
-    throw CollectionParseException(std::string("XML file error: ") + ex.what());
+    throw Exceptions::CollectionParse(std::string("XML file error: ") + ex.what());
   }
 
   if(has_defaultlib){
@@ -136,17 +136,17 @@ std::shared_ptr<ModuleCollection> ModuleCollectionBase::InstallFile(std::string 
   std::cout << "Loading collection from file '" << filepath << "'..." << std::endl;
   std::ifstream file(filepath);
   if(!file)
-    throw CollectionLoadingException(filepath,"File does not exist or is not readable");
+    throw Exceptions::CollectionLoading(filepath,"File does not exist or is not readable");
   try{
     std::string directory = Utilities::ConvertUnipathToOSPath(filepath);
     directory = Utilities::GetDir(directory);
     auto collection = std::make_shared<ModuleCollection>(file, directory);
     if(collections_by_id.find(collection->id) != collections_by_id.end())
-      throw CollectionLoadingException(filepath, "The collection has a duplicate id");
+      throw Exceptions::CollectionLoading(filepath, "The collection has a duplicate id");
     collections_by_id[collection->id] = collection;
     return collection;
-  }catch(CollectionParseException ex){
-    throw CollectionLoadingException(filepath, "Collection file parsing failed: " + ex.what());
+  }catch(Exceptions::CollectionParse ex){
+    throw Exceptions::CollectionLoading(filepath, "Collection file parsing failed: " + ex.what());
   }
 }
 

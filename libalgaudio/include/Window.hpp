@@ -73,9 +73,9 @@ public:
 
   // Empty implementation.
   virtual LateReturn<int> ShowSimpleAlert( std::string,std::string,std::string,AlertType,Color,Color)
-  {throw AlertableException("This window is not capable of displaying alerts.");}
+  {throw Exceptions::WindowNotAlertable("This window is not capable of displaying alerts.");}
   virtual LateReturn<> ShowErrorAlert(std::string, std::string)
-  {throw  AlertableException("This window is not capable of displaying alerts.");}
+  {throw  Exceptions::WindowNotAlertable("This window is not capable of displaying alerts.");}
 protected:
   Window(std::string title, int w, int h, bool centered = true);
 private:

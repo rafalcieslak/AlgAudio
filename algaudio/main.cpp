@@ -30,7 +30,7 @@ using namespace AlgAudio;
 Relay<int> r;
 
 LateReturn<int> CheckFunc(){
-  r.LateThrow<UnimplementedException>("Blah.");
+  r.LateThrow<Exceptions::Unimplemented>("Blah.");
   return r;
 }
 
@@ -45,7 +45,7 @@ LateReturn<int> CheckFuncB(){
 void LRCatchCheck(){
   CheckFuncB().Then([](int x){
     std::cout << x << std::endl;
-  }).Catch<UnimplementedException>([](auto ex){
+  }).Catch<Exceptions::Unimplemented>([](auto ex){
     std::cout << "EXCEPTION " << ex->what() << std::endl;
   });
   r.Return(5);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]){
     // before the global cleanup.
     SDLMain::UnregisterAll();
 
-  }catch(Exception ex){
+  }catch(Exceptions::Exception ex){
     std::cout << "An unhandled exception occured: " << ex.what() << std::endl;
   }
   return 0;

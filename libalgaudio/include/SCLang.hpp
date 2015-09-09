@@ -32,9 +32,11 @@ class SCLangSubprocess;
 class ModuleTemplate;
 class SendReplyController;
 
-struct SCLangException : public Exception{
-  SCLangException(std::string t) : Exception(t) {}
+namespace Exceptions{
+struct SCLang : public Exception{
+  SCLang(std::string t) : Exception(t) {}
 };
+} // namespace Exceptions
 
 /** The static interface to a single global sclang process.
  *  Manages all interaction with the SuperCollider instance, including intepteter

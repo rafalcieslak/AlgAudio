@@ -33,12 +33,14 @@ namespace rapidxml{
 
 namespace AlgAudio{
 
-// Third pardy modules may throw this from on_init if conditions for creating
-// and instance of this module are not met, for example, if multiple instances
-// of SubpatchEntrance would exist on the same canvas.
-struct ModuleDoesNotWantToBeCreatedException : public Exception{
-  ModuleDoesNotWantToBeCreatedException(std::string t) : Exception(t){};
+namespace Exceptions{
+/** Third pardy modules may throw this from on_init if conditions for creating
+ *  and instance of this module are not met, for example, if multiple instances
+ *  of SubpatchEntrance would exist on the same canvas. */
+struct ModuleDoesNotWantToBeCreated : public Exception{
+  ModuleDoesNotWantToBeCreated(std::string t) : Exception(t){};
 };
+} // namespace Exceptions
 
 class ModuleTemplate;
 class ParamTemplate;
@@ -47,14 +49,14 @@ class ModuleGUI;
 class Window;
 class Module;
 
-/* This is a wrapper class for SC buses */
+/** This is a wrapper class for SC buses */
 class Bus{
 public:
   int GetID() const {return id;}
-  // Asks SC for a new bus id, and returns a new Bus instance wrapping that bus.
+  /**  Asks SC for a new bus id, and returns a new Bus instance wrapping that bus. */
   static LateReturn<std::shared_ptr<Bus>> CreateNew();
-  // Creates a fake Bus instance, which does not wrap anything. Useful only for
-  // testing module instances without OSC connection.
+  /** Creates a fake Bus instance, which does not wrap anything. Useful only for
+   *  testing module instances without OSC connection. */
   static std::shared_ptr<Bus> CreateFake();
   ~Bus();
 private:
@@ -62,13 +64,13 @@ private:
   int id;
 };
 
-/* This is a wrapper class for SC groups */
+/** This is a wrapper class for SC groups */
 class Group{
 public:
   int GetID() const {return id;}
-  // Asks SC for a new group id, and returns a new Group instance wrapping that group.
+  /** Asks SC for a new group id, and returns a new Group instance wrapping that group. */
   static LateReturn<std::shared_ptr<Group>> CreateNew(std::shared_ptr<Group> parent);
-  // Creates a group that has no corresponding SC instance.
+  /** Creates a group that has no corresponding SC instance. */
   static LateReturn<std::shared_ptr<Group>> CreateFake(std::shared_ptr<Group> parent);
   ~Group();
 private:
@@ -76,11 +78,11 @@ private:
   int id;
 };
 
-/* A ParamController is the representation of a Param state.
- * All ParamControllers belong to some Module, and are always build according to
- * a ParramTemplate. The internal state of a ParamController represents it's
- * current value. A ParamController's value may be Set(...), which sends
- * the value to SC, or to user-defined custom reaction routine.
+/** A ParamController is the representation of a Param state.
+ *  All ParamControllers belong to some Module, and are always build according to
+ *  a ParramTemplate. The internal state of a ParamController represents it's
+ *  current value. A ParamController's value may be Set(...), which sends
+ *  the value to SC, or to user-defined custom reaction routine.
  */
 class ParamController{
 public:
@@ -96,12 +98,12 @@ public:
   inline float GetRangeMin() const {return range_min;}
   inline float GetRangeMax() const {return range_max;}
 
-  // This signal passes two values: the absolute value of this param, and the relative fraction
-  // of the range it operates in. CAREFUL when subscribing to this signal: When a param
-  // changes quickly, subscriber will be called frequently. It is not a good idea
-  // to render any text textures in this handler. Schedule it for next Redraw.
+  /** This signal passes two values: the absolute value of this param, and the relative fraction
+   *  of the range it operates in. CAREFUL when subscribing to this signal: When a param
+   *  changes quickly, subscriber will be called frequently. It is not a good idea
+   *  to render any text textures in this handler. Schedule it for next Redraw. */
   Signal<float, float> on_set;
-  // Passing values to other controllers should be done once this controller has it value set.
+  /** Passing values to other controllers should be done once this controller has it value set. */
   Signal<float, float> after_set;
   const std::shared_ptr<ParamTemplate> templ;
 private:
@@ -111,11 +113,11 @@ private:
   std::weak_ptr<Module> module;
 };
 
-/* This class represents a single subscription to received SendReply messages
- * from SC server. A SendReplyController always belongs to a Module, and is
- * linked to one of it's Params. When the server sends a SendReply, the OSC
- * listener will call the Got() message of a corresponding SendReplyController,
- * which, in turn, sets the linked Param.
+/** This class represents a single subscription to received SendReply messages
+ *  from SC server. A SendReplyController always belongs to a Module, and is
+ *  linked to one of it's Params. When the server sends a SendReply, the OSC
+ *  listener will call the Got() message of a corresponding SendReplyController,
+ *  which, in turn, sets the linked Param.
  */
 class SendReplyController{
 public:
@@ -131,26 +133,26 @@ private:
 };
 // =================
 
-/* This is the module, the main class that represents any module instance.
- * It is intended to:
- * 1. serve as a client-side representation of a SC Synth instance
- * 2. provide an interface to be overriden by third-party module extensions.
+/** This is the module, the main class that represents any module instance.
+ *  It is intended to:
+ *  1. serve as a client-side representation of a SC Synth instance
+ *  2. provide an interface to be overriden by third-party module extensions.
  */
 class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>{
 public:
-  // You don't usually use these constructors. Create a module instance
-  // using ModuleFactory instead, this will ensure proper initialisation.
+  /** You don't usually use these constructors. Create a module instance
+   *  using ModuleFactory instead, this will ensure proper initialisation. */
   Module() {};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
   Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
   Module(const Module& other) = delete;
   virtual ~Module();
 
-  // Custom module implementations will prefer to override on_init and
-  // on_destroy, instead of creating a custom constructor/destructor. on_init
-  // is guaranteed to run when the module is ready to work - the corresponding
-  // SC instance was created etc. Similarly, on_destroy is called before the SC
-  // instance is removed, while the buses still exist etc.
+  /** Custom module implementations will prefer to override on_init and
+   *  on_destroy, instead of creating a custom constructor/destructor. on_init
+   *  is guaranteed to run when the module is ready to work - the corresponding
+   *  SC instance was created etc. Similarly, on_destroy is called before the SC
+   *  instance is removed, while the buses still exist etc. */
   virtual void on_init() {};
   virtual LateReturn<> on_init_latereturn() {
     Relay<> r;
@@ -158,35 +160,36 @@ public:
     return r.Return();
   };
   virtual void on_destroy() {};
-  // This method will be called when the module GUI is ready to be displayed.
-  // If you wish to modify the GUI but do not want to override BuildGUI with
-  // custom builder, you override on_gui_build and modify the UI from there.
+  /** This method will be called when the module GUI is ready to be displayed.
+   * If you wish to modify the GUI but do not want to override BuildGUI with
+   * custom builder, you override on_gui_build and modify the UI from there. */
   virtual void on_gui_build(std::shared_ptr<ModuleGUI>) {};
-  // This method is used if a param is defined with action="custom" attribute.
+  /** This method is used for params defined with action="custom" attribute. */
   virtual void on_param_set(std::string, float) {}
 
-  // These methods are used for storing and loading internal module state.
-  // They are mostly used when a canvas is saved, or when a module is copied
-  // to clipboard. State loading will never happen before on_init.
+  /** These methods are used for storing and loading internal module state.
+   *  They are mostly used when a canvas is saved, or when a module is copied
+   *  to clipboard. State loading will never happen before on_init. */
   virtual std::string state_store_string() const {return "";}
   virtual void state_load_string(std::string) {}
   virtual void state_store_xml(rapidxml::xml_node<char>*) const {}
   virtual void state_load_xml(rapidxml::xml_node<char>*) {}
 
-  // The template this module instance is based on.
+  /* The template this module instance is based on. */
   std::shared_ptr<ModuleTemplate> templ;
 
-  // The id of the supercollider synth instance this Module represents and
-  // manages.
+  /** The id of the supercollider synth instance this Module represents and
+   *  manages. */
   int sc_id = -1;
 
-  // This variable stores the widget position in canvas.
+  /** This variable stores the widget position in canvas. */
   Point2D position_in_canvas;
 
-  // This flag marks whether this module was initialized by ModuleFactory.
-  // When ModuleFactory destoys a module, this flag is set back to false.
-  // This way it's easy to detect whether the module was correctly created,
-  // and when it's destructed witout havning been destroyed by the factory.
+  /** This flag marks whether this module was initialized by ModuleFactory.
+   *  When ModuleFactory destoys a module, this flag is set back to false.
+   *  This way it's easy to detect whether the module was correctly created,
+   *  and when it's destructed witout havning been destroyed by the factory.
+   */
   bool enabled_by_factory = false;
 
   class Inlet; // Forward decl
@@ -222,44 +225,36 @@ public:
   private:
     Inlet(std::string i, std::string n, std::shared_ptr<Module> m, std::shared_ptr<Bus> b) : id(i), name(n), mod(*m.get()), bus(b) {}
   };
-  /*
-  void SetParam(std::string name, int value);
-  void SetParam(std::string name, double value);
-  void SetParam(std::string name, std::list<int> values);
-  */
 
-  // TODO: Move these functions to Canvas
-  static void Connect(std::shared_ptr<Outlet> o, std::shared_ptr<Inlet> i);
-  static void Connect(std::shared_ptr<Module> a, std::shared_ptr<Module> b);
-
-  // Returns a reference to the ModuleGUI that represents this particular module
-  // instance. If the GUI was not yet build, or was already deleted, this
-  // function will return nullptr.
+  /** Returns a reference to the ModuleGUI that represents this particular module
+   *  instance. If the GUI was not yet build, or was already deleted, this
+   *  function will return nullptr. */
   std::shared_ptr<ModuleGUI> GetGUI() const;
 
-  // This function is used to create a new ModuleGUI that will represent this
-  // module instance in a CanvasView. Custom modules can override this function
-  // with anything they desire, as long as it returns any ModuleGUI. It can be
-  // a custom class that derives from ModuleGUI. However, there is no
-  // necessity to override this method - the default implementation will create
-  // the GUI hierarchy according to the description from collection XML. The
-  // only argument to this function is the value of "type" attribute of xml's
-  // "gui" node.
-  // Whoever calls this function claims the ownership of the returned pointer,
-  // it will not be owned by the module instance.
+  /** This function is used to create a new ModuleGUI that will represent this
+   *  module instance in a CanvasView. Custom modules can override this function
+   *  with anything they desire, as long as it returns any ModuleGUI. It can be
+   *  a custom class that derives from ModuleGUI. However, there is no
+   *  necessity to override this method - the default implementation will create
+   *  the GUI hierarchy according to the description from collection XML. The
+   *  only argument to this function is the value of "type" attribute of xml's
+   *  "gui" node.
+   *  Whoever calls this function claims the ownership of the returned pointer,
+   *  it will not be owned by the module instance.
+   */
   virtual std::shared_ptr<ModuleGUI> BuildGUI(std::shared_ptr<Window> parent_window);
 
   void DropGUI() {modulegui.reset();}
   
-  // Creates and allocates Inlets and Outlets for this instance, according to
-  // the data in template info.
+  /** Creates and allocates Inlets and Outlets for this instance, according to
+   *  the data in template info. */
   LateReturn<> CreateIOFromTemplate(bool fake = false);
   std::vector<std::shared_ptr<Inlet>> inlets;
   std::vector<std::shared_ptr<Outlet>> outlets;
 
   void PrepareParamControllers();
 
-  // Sets all controllers to default values
+  /** Sets all controllers to default values */
   void ResetControllers();
 
   // TODO: Make this a map?
@@ -267,14 +262,15 @@ public:
 
   std::vector<std::shared_ptr<SendReplyController>> reply_controllers;
 
-  // Returns a ParamControler by given ID.
+  /** Returns a ParamControler by given ID. */
   std::shared_ptr<ParamController> GetParamControllerByID(std::string) const;
 
-  // Returns inlets and outlets by their ID.
+  /** Returns inlets by their ID. */
   std::shared_ptr<Inlet >  GetInletByID(std::string id) const;
+  /** Returns outlets by their ID. */
   std::shared_ptr<Outlet> GetOutletByID(std::string id) const;
 
-  // The canvas this module belongs to.
+  /** The canvas this module belongs to. */
   std::weak_ptr<Canvas> canvas;
   
 protected:
