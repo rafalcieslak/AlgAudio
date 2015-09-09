@@ -36,39 +36,68 @@ struct SCLangException : public Exception{
   SCLangException(std::string t) : Exception(t) {}
 };
 
-/* The static interface to a single global sclang process.
- * Manages all interaction with the SuperCollider instance, including intepteter
- * starting and halting, server configuration and booting, OSC messaging.
+/** The static interface to a single global sclang process.
+ *  Manages all interaction with the SuperCollider instance, including intepteter
+ *  starting and halting, server configuration and booting, OSC messaging.
  */
 class SCLang{
   SCLang() = delete; // static class
 public:
-  // Interpreter state controls.
+  /** Launches SuperCollider. Starts the interpreter, prepares connection, boots
+   *  the server etc.
+   *  \param command The command to start the process. Usually a path to sclang binary.
+   *  \param supernova Whether to use Supernova server instad of SCSynth.*/
   static void Start(std::string command, bool supernova = false);
+  /** Reboots SuperCollider. */
   static void Restart(std::string command);
+  /** Stops SuperCollider, closing the interpreter and stopping the subprocess. */
   static void Stop();
+  /** Returns true iff SuperCollider was started and is ready to work. */
   static bool IsRunning() { return subprocess != nullptr; }
-  // These function will process any subprocess or OSC input. They shall be
-  // called only by the main thread. The main thread is notified about
-  // awaiting input by an SDL_UserEvent send to the main queue. When
-  // corresponding event is taken from the queue, the
+  /** This function will process any subprocess output. It shall be
+   *  called only by the main thread. The main thread is notified about
+   *  awaiting data by an SDL_UserEvent send to the main queue. It then calls
+   *  this method, which in turn triggers all signals and callbacks that
+   *  waited for sclang subprocess output. */
   static void PollSubprocess();
+  /** This function will process any incoming OSC data. It shall be
+   *  called only by the main thread. The main thread is notified about
+   *  awaiting data by an SDL_UserEvent send to the main queue. It then calls
+   *  this method, which in turn triggers all signals and callbacks that
+   *  waited for OSC events. */
   static void PollOSC();
+  /** Happens once for each line of sclang subprocess stdout. */
   static Signal<std::string> on_line_received;
-  // Arg: bool: success, string: message
+  /** Happens when Start completes. Carries bool marking whether the start
+   *  was sucessful, if not, the string contains an error message. */
   static Signal<bool, std::string> on_start_completed;
-  // Arg: bool: success
+  /** Happens when the SC server started. Carries bool marking whether the
+   *  start was successful. */
   static Signal<bool> on_server_started;
+  /** Happens multiple times during start process. Each time it carries a number
+   *  which increases during the start procedure (this is intended for
+   *  progressbars), and a string with current status message, */
   static Signal<int,std::string> on_start_progress;
-  static void SendInstruction(std::string);
+  /** Passes a text instruction to sclang subprocess via its stdin.
+   *  \param instr The instruction to send. */
+  static void SendInstruction(std::string instr);
+  /** Performs SC synth template (SynthDef) installation on the server. */
   static LateReturn<> InstallTemplate(const std::shared_ptr<ModuleTemplate> templ);
-  static bool WasInstalled(const std::string&);
+  /** Returns true iff the template was already installed in the server.
+   *  \param id The template id. */
+  static bool WasInstalled(const std::string& id);
+  /** Writes the list of all templates that were installed to stdout. */
   static void DebugQueryInstalled();
+  /** Asks SuperCollider to s.QueryAllNodes. sclang subprocess will then print
+   *  out a graph of active synths and groups hierarchy - useful for debugging.
+   *  Observe on_line_received for result. */
   static void QueryAllNodes();
 
+  /** Happens whenever sclang receives some MIDI event. */
   static Signal<MidiMessage> on_midi_message_received;
 
-  // Various functions and type templates for OSC communication.
+  ///@{
+  /** Various functions and type templates for OSC communication. */
   static void SetOSCDebug(bool enabled);
   static void SendOSC(const std::string& path);
   static void SendOSC(const std::string& path, std::string tag, ...);
@@ -84,16 +113,22 @@ public:
   // when Q = {}.
   template <typename... Rest>
   inline static LateReturn<> SendOSCWithEmptyReply(const std::string& path, Rest... args);
+  ///@}
 
-  // Returns the new reply id the catcher will use. Afterwards it is logical
-  // to set the SC Synth arg to that returned value, so that it will start
-  // sending replies with the right id.
+  /** Returns the new reply id the catcher will use. Afterwards one should
+   *  set the SC Synth's arg to that returned value, so that it will start
+   *  sending replies with the right id. */
   static int RegisterSendReply(int synth_id, std::weak_ptr<SendReplyController>);
+  /** Unregisters a sendreply catcher that was previously created with
+   *  RegisterSendReply(). */
   static void UnregisterSendReply(int synth_id, int reply_id);
 
-  // Controls SuperCollider server.
+  /** Boots the supercollider server. */
   static void BootServer(bool supernova = false);
+  /** Quits the supercollider server. */
   static void StopServer();
+  
+  /** True if the supercollider subprocess is ready to work. */
   static bool ready;
 private:
   static std::unique_ptr<SCLangSubprocess> subprocess;

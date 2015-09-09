@@ -45,9 +45,9 @@ struct ModuleParseException : public Exception{
   std::string id = "";
 };
 
-/* A template for creating params. Contains all data about a param that is
- * loaded from module description file. All ParamControlers have a link to their
- * corresponding template.
+/** A template for creating params. Contains all data about a param that is
+ *  loaded from module description file. All ParamControlers have a link to their
+ *  corresponding template.
  */
 class ParamTemplate{
 public:
@@ -81,11 +81,11 @@ public:
   std::string name;
 };
 
-/* All modules are build according to a template. If multiple instances
- * of the same module type are present, they will share a single instance
- * of ModuleTemplate.
- * ModuleTemplate contains all data about a module that are loaded from the
- * module description file. The fields are self-explainatory.
+/** All modules are build according to a template. If multiple instances
+ *  of the same module type are present, they will share a single instance
+ *  of ModuleTemplate.
+ *  ModuleTemplate contains all data about a module that are loaded from the
+ *  module description file. The fields are self-explainatory.
  */
 class ModuleTemplate{
 public:

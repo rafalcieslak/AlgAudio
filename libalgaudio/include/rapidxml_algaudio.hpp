@@ -23,9 +23,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace rapidxml{
 
-// Similar to rapidxml::memory_pool, but copies names and values, and therefore
-// the result of copying is usable even when the original document no longer
-// exists.
+/** Similar to rapidxml::memory_pool, but copies names and values, and therefore
+ *  the result of copying is usable even when the original document no longer
+ *  exists. */
 template<typename Ch>
 void clone_node_copying(const xml_node<Ch> *source, xml_node<Ch> *dest, xml_document<>* target_doc)
 {

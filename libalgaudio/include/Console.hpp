@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/** A window that displays all sclang subprocess output. */
 class Console : public Window{
 public:
  static std::shared_ptr<Console> Create();

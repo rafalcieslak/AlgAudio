@@ -29,7 +29,7 @@ namespace AlgAudio{
 
 class Window;
 
-// A wrapper class for operations on an SDL_Texture
+/** A wrapper class for operations on an SDL_Texture */
 class SDLTexture{
 public:
   SDLTexture(std::weak_ptr<Window> parent_window, Size2D size);

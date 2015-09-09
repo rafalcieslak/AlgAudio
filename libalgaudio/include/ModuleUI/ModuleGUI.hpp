@@ -28,45 +28,56 @@ struct GUIBuildException : public Exception{
   GUIBuildException(std::string t) : Exception(t) {}
 };
 
-// Merely an interface implemented by standard box types. Module creators
-// may wish to implement a custom version of a module GUI, by inheriting
-// from this class and writing a custom Module::BuildGUI.
+/** Merely an interface implemented by standard box types. Module creators
+ *  may wish to implement a custom version of a module GUI, by inheriting
+ *  from this class and writing a custom Module::BuildGUI.
+ *
+ *  Each Module has zero or one corresponding ModuleGUI. ModuleGUIs are drawn by
+ *  the CanvasView.
+ */
 class ModuleGUI : public UIWidget{
 public:
-  // The position of this module on the parent CanvasView.
+  /** The position of this module on the parent CanvasView. */
   Point2D& position() { return module.lock()->position_in_canvas; }
   
-  // When set to true, the module shall draw itself in it's "highlighted"
-  // variant.
+  /** Gets the corresponding module instance */
+  std::shared_ptr<Module> GetModule(){ return module.lock(); }
+  
+  /** When set to true, the module shall draw itself in it's "highlighted"
+   *  variant. */
   virtual void SetHighlight(bool) = 0;
 
-  // These methods are used by the CanvasView to query where it should draw
-  // connection wire endings.
-  // Arguments: WidgetIDs
-  // virtual Point2D WhereIsInlet(UIWidget::ID inlet) = 0;
-  // virtual Point2D WhereIsOutlet(UIWidget::ID outlet) = 0;
-  // Arguments: iolet IDs
+  ///@{
+  /** These methods are used by the CanvasView to query where it should draw
+   *  connection wire endings. The only parameter is iolet ID. The ModuleGUI
+   *  implementation should return the coordinates where the connector is
+   *  drawn. */
   virtual Point2D WhereIsInlet(std::string inlet) = 0;
   virtual Point2D WhereIsOutlet(std::string outlet) = 0;
   virtual Point2D WhereIsParamInlet(std::string inlet) = 0;
   virtual Point2D WhereIsParamRelativeOutlet(std::string inlet) = 0;
   virtual Point2D WhereIsParamAbsoluteOutlet(std::string inlet) = 0;
+  ///@}
 
-  // This method shall translate an inlet/outlet widget id to the corresponding
-  // param id.
+  /** This method shall translate an inlet/outlet widget id to the corresponding
+   *  param id. */
   virtual std::string GetIoletParamID(UIWidget::ID) const = 0;
-  // Sets the link to module instance
-  std::shared_ptr<Module> GetModule(){ return module.lock(); }
 
-  // CanvasView uses this function to notify the ModuleGUI that a slider is
-  // being dragged. This way the drag can continue outside the ModuleGUI.
-  // Argument: The slider widget id (as returned by WhatIsHere)
+  /** CanvasView uses this function to notify the ModuleGUI that a slider is
+   *  being dragged. This way the drag can continue outside the ModuleGUI.
+   *  The only arguments is the slider widget id (as returned by WhatIsHere).
+   *  Usually, the ModuleGUI will pass this event to the right slider widget. */
   virtual void SliderDragStart(UIWidget::ID){}
-  // This method is called by CanvasView for each step of a slider drag.
-  // Note that offset values may be outside moduleGUI, or even negative.
+  /** This method is called by CanvasView for each step of a slider drag.
+   *  Note that offset values may be outside moduleGUI, or even negative.
+   *  Usually, the ModuleGUI will pass this event to the right slider widget. */
   virtual void SliderDragStep(UIWidget::ID, Point2D_<float>){}
+  /** This method is called by CanvasView when a slider drag has ended.
+   *  Usually, the ModuleGUI will pass this event to the right slider widget. */
   virtual void SliderDragEnd(UIWidget::ID){}
 
+  /** A Module may call this method sometimes to notify its GUI that the set of
+   *  inlets has changed, and the ModuleGUI should take appropriate changes. */
   virtual void OnInletsChanged() {};
 
   enum class WhatIsHereType{
@@ -80,14 +91,14 @@ public:
   };
   struct WhatIsHere{
     WhatIsHereType type;
-    // The id of the widget
+    /** The id of the widget */
     UIWidget::ID widget_id;
-    // The id of the param/inlet/outlet corresponding to this widget
+    /** The id of the param/inlet/outlet corresponding to this widget */
     std::string param_id;
   };
-  // This function is used by the CanvasView to ask the module GUI what kind of
-  // element is located at a given point. This way the CanvasView can handle
-  // connections etc. and ModuleGUI does not have to bother about them.
+  /** This function is used by the CanvasView to ask the module GUI what kind of
+   *  element is located at a given point. This way the CanvasView can handle
+   *  connections etc. and ModuleGUI does not have to bother about them. */
   virtual WhatIsHere GetWhatIsHere(Point2D) const = 0;
 
 protected:

@@ -73,19 +73,3 @@ add_custom_command(
 	TARGET libalgaudio POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/libalgaudio${CMAKE_SHARED_LIBRARY_SUFFIX}" "${CMAKE_BINARY_DIR}/"
 )
-
-
-add_custom_target(sdk_hpp
-	${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/include" "${CMAKE_BINARY_DIR}/SDK/include"
-)
-if(DOXYGEN_FOUND)
-	add_custom_target(SDK
-		${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/doc" "${CMAKE_BINARY_DIR}/SDK/doc"
-		DEPENDS doc sdk_hpp
-	)
-else(DOXYGEN_FOUND)
-	add_custom_target(SDK
-		${CMAKE_COMMAND} -E echo "SDK generated without docs, because doxygen was not found."
-		DEPENDS doc sdk_hpp
-	)
-endif(DOXYGEN_FOUND)
