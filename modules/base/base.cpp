@@ -19,6 +19,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Module.hpp"
 #include <cstring>
 #include <iostream>
+#include <algorithm>
 #include "SCLang.hpp"
 #include "Timer.hpp"
 
@@ -73,7 +74,6 @@ public:
 class Seq8 : public AlgAudio::Module{
 public:
   int i = 7;
-  float fill = 0.8;
   void on_init(){
     step();
   }
@@ -81,6 +81,8 @@ public:
     i = (i+1)%8;
     int note = GetParamControllerByID("note" + std::to_string(i+1))->Get();
     float period = GetParamControllerByID("period")->Get();
+    float fill = GetParamControllerByID("fill")->Get();
+    fill = std::max(0.0f,std::min(1.0f,fill));
     GetParamControllerByID("freq")->Set( AlgAudio::Utilities::mtof(note) );
     GetParamControllerByID("gate")->Set(1.0f);
     timerhandles += AlgAudio::Timer::Schedule(period, [this](){
