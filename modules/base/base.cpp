@@ -17,9 +17,10 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Module.hpp"
-#include "SCLang.hpp"
 #include <cstring>
 #include <iostream>
+#include "SCLang.hpp"
+#include "Timer.hpp"
 
 class MIDICtrl : public AlgAudio::Module{
 public:
@@ -69,6 +70,29 @@ public:
     }
 };
 
+class Seq8 : public AlgAudio::Module{
+public:
+  int i = 7;
+  float fill = 0.8;
+  void on_init(){
+    step();
+  }
+  void step(){
+    i = (i+1)%8;
+    int note = GetParamControllerByID("note" + std::to_string(i+1))->Get();
+    float period = GetParamControllerByID("period")->Get();
+    GetParamControllerByID("freq")->Set( AlgAudio::Utilities::mtof(note) );
+    GetParamControllerByID("gate")->Set(1.0f);
+    AlgAudio::Timer::Schedule(period, [this](){
+      step();
+    });
+    AlgAudio::Timer::Schedule(period * fill, [this](){
+      GetParamControllerByID("gate")->Set(0.0f);
+    });
+  }
+  
+};
+
 extern "C"{
 void delete_instance(void* obj){
   delete reinterpret_cast<AlgAudio::Module*>(obj);
@@ -77,6 +101,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"MIDICtrl")==0) return new MIDICtrl();
   if(strcmp(name,"MIDINote")==0) return new MIDINote();
   if(strcmp(name,"DataLin")==0) return new DataLin();
+  if(strcmp(name,"Seq8")==0) return new Seq8();
   return nullptr;
 }
 

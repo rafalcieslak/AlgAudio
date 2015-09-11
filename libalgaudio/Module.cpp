@@ -226,6 +226,7 @@ void Module::PrepareParamControllers(){
     auto replycontroller = SendReplyController::Create(shared_from_this(), reply_pair.first, c);
     reply_controllers.push_back(replycontroller);
   }
+  ResetControllers();
 }
 void Module::ResetControllers(){
   for(auto controller : param_controllers)

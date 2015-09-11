@@ -334,4 +334,24 @@ Out.ar(out, In.ar(in1) * In.ar(in2));
     <gui type="standard auto"/>
   </module>
 
+  <module id="seq8" name="Seq8">
+    <class name="Seq8"/>
+    <params>
+      <param id="note1" name="Note 1" defaultmin="48" defaultmax="78" step="1" defaultval="60" action="none"/>
+      <param id="note2" name="Note 2" defaultmin="48" defaultmax="78" step="1" defaultval="62" action="none"/>
+      <param id="note3" name="Note 3" defaultmin="48" defaultmax="78" step="1" defaultval="64" action="none"/>
+      <param id="note4" name="Note 4" defaultmin="48" defaultmax="78" step="1" defaultval="65" action="none"/>
+      <param id="note5" name="Note 5" defaultmin="48" defaultmax="78" step="1" defaultval="64" action="none"/>
+      <param id="note6" name="Note 6" defaultmin="48" defaultmax="78" step="1" defaultval="62" action="none"/>
+      <param id="note7" name="Note 7" defaultmin="48" defaultmax="78" step="1" defaultval="69" action="none"/>
+      <param id="note8" name="Note 8" defaultmin="48" defaultmax="78" step="1" defaultval="67" action="none"/>
+      <param id="freq" name="Frequency" mode="output" defaultmin="20" defaultmax="1000"/>
+      <param id="gate" name="Gate" mode="output"/>
+      <param id="period" name="Period" defaultmin="0.1" defaultmax="2.0" defaultval="0.2" scale="log" action="none"/>
+      <param id="fill" name="Fill" defaultmin="0.0" defaultmax="1.0" defaultval="0.2" scale="log" action="none"/>
+    </params>
+    <description> An 8-step sequencer. </description>
+    <gui type="standard auto"/>
+  </module>
+
 </collection>
