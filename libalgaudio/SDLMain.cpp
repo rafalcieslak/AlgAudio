@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <SDL2/SDL.h>
 #include <iostream>
 #include "SCLang.hpp"
+#include "Timer.hpp"
 
 namespace AlgAudio{
 
@@ -81,6 +82,8 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
     }else if(ev.user.code == NOTIFY_OSC){
       ev_flag_notify_osc_already_pushed.clear();
       SCLang::PollOSC();
+    }else if(ev.user.code == NOTIFY_TIMER){
+      Timer::Trigger(ev.user.data1);
     }
     return;
   }
