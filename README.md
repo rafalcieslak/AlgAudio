@@ -10,6 +10,8 @@ For developer documentation, browse the [wiki](https://github.com/rafalcieslak/a
 
 Module specification draft is available in `./doc/modules.md` ([see it here](https://github.com/rafalcieslak/AlgAudio/blob/master/doc/modules.md)).
 
+The API documentation can be built with `make doc`, ([or browsed online](http://cielak.org/algaudio/doc)).
+
 # Building and running
 
 ## On Linux
