@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "MainWindow.hpp"
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
+#include "Version.hpp"
 
 using namespace AlgAudio;
 
@@ -56,6 +57,8 @@ int main(int argc, char *argv[]){
   (void)argv;
   
   //LRCatchCheck(); return 0;
+
+  std::cout << "Algaudio " << ALGAUDIO_VERSION << " starting." << std::endl;
 
   try{
     Theme::Init();

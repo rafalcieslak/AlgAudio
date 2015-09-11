@@ -26,6 +26,8 @@ file(GLOB LIBALGAUDIO_SOURCES
 )
 file(GLOB LIBALGAUDIO_INCLUDES ./include/*.hpp)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/Version.hpp.in ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.hpp @ONLY)
+	
 include_directories(
 	"./include"
 	"${CMAKE_SOURCE_DIR}/libs"

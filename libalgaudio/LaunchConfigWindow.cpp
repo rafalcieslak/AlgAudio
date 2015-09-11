@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Canvas.hpp"
 #include "MainWindow.hpp"
 #include "SDLMain.hpp"
+#include "Version.hpp"
 
 namespace AlgAudio{
 
@@ -39,8 +40,9 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 
 void LaunchConfigWindow::init(){
   marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
-  startbutton = UIButton::Create(shared_from_this(),"Start AlgAudio");
+  startbutton = UIButton::Create(shared_from_this(),"Start!");
   testbutton = UIButton::Create(shared_from_this(),"Test UI");
+  aboutbutton = UIButton::Create(shared_from_this(),"About");
   testbutton->SetVisible(false);
   quitbutton = UIButton::Create(shared_from_this(),"Quit App");
   titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
@@ -50,24 +52,47 @@ void LaunchConfigWindow::init(){
   supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
   debugchkbox = UICheckbox::Create(shared_from_this(),"Enable debug tools");
   mainvbox = UIVBox::Create(shared_from_this());
+  configbox = UIVBox::Create(shared_from_this());
   buttonhbox = UIHBox::Create(shared_from_this());
   progressbar = UIProgressBar::Create(shared_from_this());
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
+  layered = UILayered::Create(shared_from_this());
+  about_box = UIVBox::Create(shared_from_this());
+  about_box->SetVisible(false);
+  about_text = UILabel::Create(shared_from_this(),
+    "Copyright (C) 2015 CeTA - Audiovisual Technology Center\n"
+    "Copyright (C) 2015 Rafal Cieslak\n"
+    "\n"
+    "Released on the terms of the GNU Lesser General Public\n"
+    "License version 3. See LICENCE file for details, or go to:\n"
+    "      https://www.gnu.org/licenses/lgpl.txt"
+    ,12);
+  about_text->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
+  about_version = UILabel::Create(shared_from_this(), ALGAUDIO_VERSION, 16);
+  about_version->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
+  about_separator = UISeparator::Create(shared_from_this());
+  about_separator->SetCustomSize(Size2D(0,30));
 
-  //mainvbox->SetPadding(10);
   Insert(marginbox);
   marginbox->Insert(mainvbox);
-  mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(configlabel, UIBox::PackMode::WIDE);
-  mainvbox->Insert(oscchkbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(debugchkbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
-  mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
-  buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
-  buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
-  buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
+   mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
+    mainvbox->Insert(layered, UIBox::PackMode::WIDE);
+     layered->Insert(configbox);
+      configbox->Insert(configlabel, UIBox::PackMode::WIDE);
+      configbox->Insert(oscchkbox, UIBox::PackMode::TIGHT);
+      configbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
+      configbox->Insert(debugchkbox, UIBox::PackMode::TIGHT);
+    layered->Insert(about_box);
+      about_box->Insert(about_version, UIBox::PackMode::TIGHT);
+      about_box->Insert(about_separator, UIBox::PackMode::TIGHT);
+      about_box->Insert(about_text, UIBox::PackMode::WIDE);
+   mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
+    buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(aboutbutton, UIHBox::PackMode::WIDE);
+    buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
+   mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
+   mainvbox->Insert(statustext, UIBox::PackMode::TIGHT);
 
   startbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-positive"));
   quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
@@ -75,25 +100,26 @@ void LaunchConfigWindow::init(){
   subscriptions += startbutton->on_clicked.Subscribe([this](){
     if(!SCLang::IsRunning()){
       SCLang::Start(sclang_path, supernovachkbox->GetActive());
-      startbutton->SetText("Stop SCLang");
+      startbutton->SetText("Stop");
     }else{
       SCLang::Stop();
       progressbar->SetAmount(0.0);
       statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
-      startbutton->SetText("Start AlgAudio");
+      startbutton->SetText("Start!");
     }
     statustext->SetTextColor(Theme::Get("text-generic"));
     statustext->SetBold(false);
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
-    std::cout << "Progress " << n << std::endl;
     progressbar->SetAmount(n/10.0);
     statustext->SetText(msg);
   });
 
   subscriptions += testbutton->on_clicked.Subscribe([this](){
-    std::cout << "COMPLETE" << std::endl;
     on_complete.Happen();
+  });
+  subscriptions += aboutbutton->on_clicked.Subscribe([this](){
+    ToggleAbout();
   });
 
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
@@ -111,10 +137,12 @@ void LaunchConfigWindow::init(){
       SDLMain::RegisterWindow(console);
       oscchkbox->SetVisible(true);
       testbutton->SetVisible(true);
+      aboutbutton->SetVisible(false);
     }else{
       SDLMain::UnregisterWindow(console);
       oscchkbox->SetVisible(false);
       testbutton->SetVisible(false);
+      aboutbutton->SetVisible(true);
       console = nullptr;
     }
   });
@@ -134,6 +162,31 @@ std::shared_ptr<LaunchConfigWindow> LaunchConfigWindow::Create(){
   auto res = std::shared_ptr<LaunchConfigWindow>( new LaunchConfigWindow());
   res->init();
   return res;
+}
+
+void LaunchConfigWindow::ToggleAbout(){
+  about_displayed = !about_displayed;
+  if(about_displayed){
+    quitbutton->SetNotDrawn(true);
+    startbutton->SetNotDrawn(true);
+    progressbar->SetNotDrawn(true);
+    statustext->SetNotDrawn(true);
+    
+    configbox->SetVisible(false);
+    about_box->SetVisible(true);
+    
+    aboutbutton->SetText("Back");
+  }else{
+    quitbutton->SetNotDrawn(false);
+    startbutton->SetNotDrawn(false);
+    progressbar->SetNotDrawn(false);
+    statustext->SetNotDrawn(false);
+    
+    configbox->SetVisible(true);
+    about_box->SetVisible(false);
+    
+    aboutbutton->SetText("About");
+  }
 }
 
 } // namespace AlgAudio
