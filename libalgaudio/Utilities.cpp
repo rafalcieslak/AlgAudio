@@ -272,4 +272,8 @@ void KeyData::InitKeymap(){
 }
 
 
+float Utilities::mtof(float m){
+  return 440.0f * exp2((m - 69.0f)/12.0f);
+}
+
 } // namespace AlgAudio

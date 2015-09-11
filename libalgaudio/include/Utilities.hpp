@@ -259,6 +259,10 @@ public:
   static std::string TrimAllLines(std::string);
   /** Returns a float formatted to a string in a way that uses only a few digits at each magnitude level. */
   static std::string PrettyFloat(float val);
+  
+  // Other
+  /** Converts a midi node to the corresponding frequency. */
+  static float mtof(float m);
 };
 
 } // namespace AlgAudio

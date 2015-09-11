@@ -48,7 +48,7 @@ public:
 
     subscriptions += AlgAudio::SCLang::on_midi_message_received.Subscribe([this](AlgAudio::MidiMessage m){
       if(m.type == AlgAudio::MidiMessage::Type::NoteOn){
-        note->Set( mtof(m.number) );
+        note->Set( AlgAudio::Utilities::mtof(m.number) );
         velocity->Set( m.velocity );
         notecount++;
         gate->Set(notecount);
@@ -57,9 +57,6 @@ public:
         gate->Set(notecount);
       }
     });
-  }
-  float mtof(float m) const{
-    return 440.0f * exp2((m - 69.0f)/12.0f);
   }
 };
 

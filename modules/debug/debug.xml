@@ -121,5 +121,16 @@ Out.ar(outbus, In.ar(portalbus));
     </sc>
     <gui type="standard auto"/>
   </module>
+  
+  <module id="simpleseq" name="Simple sequence">
+    <class name="SimpleSeq"/>
+    <params>
+      <param id="period" name="Period" defaultmin="0.1" defaultmax="2.0" defaultval="0.2" scale="log" action="none"/>
+      <param id="freq" name="Frequency" mode="output" defaultmin="20" defaultmax="1000"/>
+      <param id="gate" name="Gate" mode="output"/>
+    </params>
+    <description> A simple non-editable sequencer. </description>
+    <gui type="standard auto"/>
+  </module>
 
 </collection>

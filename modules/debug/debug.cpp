@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Theme.hpp"
 #include "SDLMain.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
+#include "Timer.hpp"
 
 // The custom class NEVER takes ownership of the instances
 class HelloWorld : public AlgAudio::Module{
@@ -87,6 +88,32 @@ public:
     if(!slider) std::cout << "Oops, our child widget was not found?" << std::endl;
     else slider->SetName("Custom name");
   }
+};
+
+// -------- SIMPLE SEQ ------------
+
+class SimpleSeq : public AlgAudio::Module{
+public:
+  int i = 7;
+  int seq[8] = {60, 62, 64, 65, 64, 62, 69, 67};
+  float fill = 0.8;
+  void on_init(){
+    step();
+  }
+  void step(){
+    i = (i+1)%8;
+    int note = seq[i];
+    float period = GetParamControllerByID("period")->Get();
+    GetParamControllerByID("freq")->Set( AlgAudio::Utilities::mtof(note) );
+    GetParamControllerByID("gate")->Set(1.0f);
+    AlgAudio::Timer::Schedule(period, [this](){
+      step();
+    });
+    AlgAudio::Timer::Schedule(period * fill, [this](){
+      GetParamControllerByID("gate")->Set(0.0f);
+    });
+  }
+  
 };
 
 // --------  PORTALS --------------
@@ -170,6 +197,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"Console")==0) return new Console();
   if(strcmp(name,"GUIDemo")==0) return new GUIDemo();
   if(strcmp(name,"PortalBase")==0) return new PortalBase();
+  if(strcmp(name,"SimpleSeq")==0) return new SimpleSeq();
   else return nullptr;
 }
 } // extern C
