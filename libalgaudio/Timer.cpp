@@ -23,7 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
   
-std::map<int, std::function<void()>> Timer::awaiting_callbacks;
+std::map<int, std::function<void()>> awaiting_callbacks;
 int Timer::counter = 0;
 
 static void send_event(void* param){
@@ -45,10 +45,11 @@ static unsigned int timer_callback_repeat(unsigned int interval, void* param){
   return interval;
 }
 */
-void Timer::Schedule(float seconds, std::function<void()> f){
+TimerHandle Timer::Schedule(float seconds, std::function<void()> f){
   int* id = new int(counter++);
   awaiting_callbacks[*id] = f;
   SDL_AddTimer(seconds*1000.0f, timer_callback_once, id);
+  return TimerHandle(*id);
 }
 
 void Timer::Trigger(void* param){
@@ -56,12 +57,31 @@ void Timer::Trigger(void* param){
   delete (int*)param;
   auto it = awaiting_callbacks.find(id);
   if(it == awaiting_callbacks.end()){
-    std::cout << "ERROR: Triggered an unregistered timer callback " << id << "." << std::endl;
+    // Apparently the callback has been realeased.
     return;
   }
   std::function<void()> f = it->second;
   awaiting_callbacks.erase(it);
   f();
+}
+
+// ====== HANDLE ======
+
+void TimerHandle::Release(){
+  auto it = awaiting_callbacks.find(id);
+  if(it == awaiting_callbacks.end()){
+    // It was already released!
+    return;
+  }
+  awaiting_callbacks.erase(it);
+}
+
+TimerHandle::TimerHandle(TimerHandle&& other) : id(std::move(other.id)){
+  
+}
+TimerHandle& TimerHandle::operator=(TimerHandle&& other){
+  std::swap(id,other.id);
+  return *this;
 }
 
 } // namespace AlgAudio

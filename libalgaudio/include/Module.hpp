@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Signal.hpp"
 #include "Utilities.hpp"
 #include "LateReturn.hpp"
+#include "Timer.hpp"
 
 // Forward declaration to strip rapidxml header dependecncy
 namespace rapidxml{
@@ -138,7 +139,7 @@ private:
  *  1. serve as a client-side representation of a SC Synth instance
  *  2. provide an interface to be overriden by third-party module extensions.
  */
-class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>{
+class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>, public virtual TimerHandleManager{
 public:
   /** You don't usually use these constructors. Create a module instance
    *  using ModuleFactory instead, this will ensure proper initialisation. */

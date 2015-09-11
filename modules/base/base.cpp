@@ -83,10 +83,10 @@ public:
     float period = GetParamControllerByID("period")->Get();
     GetParamControllerByID("freq")->Set( AlgAudio::Utilities::mtof(note) );
     GetParamControllerByID("gate")->Set(1.0f);
-    AlgAudio::Timer::Schedule(period, [this](){
+    timerhandles += AlgAudio::Timer::Schedule(period, [this](){
       step();
     });
-    AlgAudio::Timer::Schedule(period * fill, [this](){
+    timerhandles += AlgAudio::Timer::Schedule(period * fill, [this](){
       GetParamControllerByID("gate")->Set(0.0f);
     });
   }
