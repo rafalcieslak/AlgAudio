@@ -29,37 +29,47 @@ union SDL_Event;
 namespace AlgAudio{
 
 /** The static interface implementing the main loop, event processing and window
- * rendering.
+ *  rendering.
  */
 class SDLMain{
 private:
   SDLMain() = delete; // static class
-  enum CustomEventCodes{
-    NOTIFY_SUBPROCESS,
-    NOTIFY_OSC
-  };
 public:
-  // Must be caled before event queue is used.
+  /** Init() must be caled before any other calls to this class members. */
   static void Init();
+  /** Stops the main loop. */
   static void Quit();
-  // Loop is not re-entrant!
-  // Also, it will block for at least until Quit is called.
+  /** This function enters the main loop, which keeps procesing events and
+   *  triggering their routines. Note that it's not reentrant.
+   *  \warning This is a blocking call. This function will not return until
+   *  Quit() is called.
+   */
   static void Loop();
+  /** Executes a single step of the main loop. This call is not blocking. */
   static void Step();
-  // A registered window is managed and rendered as SDLMain sees fit.
-  // This is handy it you wish to create a window and forget about it,
-  // as SDLMain will then sustain the ownership of the window, and it will keep
-  // redrawing it when needed.
-  // However, if you wish to redraw a window on your own, you should not
-  // register it.
+  /** A registered window is managed and rendered as SDLMain sees fit.
+   *  This is handy it you wish to create a window and forget about it,
+   *  as SDLMain will then sustain the ownership of the window, and it will keep
+   *  redrawing it when needed.
+   *  However, if you wish to redraw a window on your own, you should not
+   *  register it.
+   */
   static void RegisterWindow(std::shared_ptr<Window>);
+  /** Unregisters a window. It will no longer be managed by SDLMain, you will
+   *  have to render it on your own, and manually process its events. 
+   *  \see RegisterWindow */
   static void UnregisterWindow(std::shared_ptr<Window>);
+  /** Unregisters all registered windows. \see UnregisterWindow */
   static void UnregisterAll();
+  /** Returns the number of currently registered windows. */
   static unsigned int GetWindowNum() {return registered_windows.size();}
 
-  // Hook your code to this signal if you wish to perform animations.
-  // The float argument is the time delta (in seconds) from the time where
-  // the last frame was drawn.
+  /** Hook your code to this signal if you wish to perform animations.
+   *  This signal will be triggered every time a fram is drawn, just before
+   *  rendering happens.
+   *  The float argument is the time delta (in seconds) from the time where
+   *  the last frame was drawn. 
+   */
   static Signal<float> on_before_frame;
 
   // These two funcitions are used by i/o threads to notify the main loop that
@@ -73,6 +83,12 @@ public:
   static void SetTextInput(bool);
 
   static std::atomic_bool running;
+  
+  enum CustomEventCodes{
+    NOTIFY_SUBPROCESS,
+    NOTIFY_OSC,
+    NOTIFY_TIMER,
+  };
 private:
   static std::map<unsigned int, std::shared_ptr<Window>> registered_windows;
   static void ProcessEvent(const SDL_Event&);

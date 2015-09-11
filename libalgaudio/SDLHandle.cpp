@@ -35,7 +35,7 @@ SDLException::SDLException(std::string t) :
 SDLHandle::SDLHandle(){
   if(reference_counter == 0){
     std::cout << "Starting SDL." << std::endl;
-    if(SDL_Init(SDL_INIT_EVENTS) != 0)
+    if(SDL_Init(SDL_INIT_EVENTS | SDL_INIT_TIMER) != 0)
       throw Exceptions::SDLException("SDL_Init failed");
     if(SDL_VideoInit(NULL) != 0)
       throw Exceptions::SDLException("SDL_VideoInit failed");
