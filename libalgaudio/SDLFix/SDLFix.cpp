@@ -67,6 +67,10 @@ void SDLFix::CorrectBlendMode(SDL_Renderer* renderer){
   GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
   data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
   data->glEnable(GL_BLEND);
+  data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  data->glEnable(GL_BLEND);
+  data->glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+  data->glEnable(GL_BLEND);
   data->glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 }
 
@@ -101,14 +105,24 @@ void SDLFix::RendererMakeCurrent(SDL_Renderer* renderer){
 }
 
 void SDLFix::PremultiplySurface32RGBA(SDL_Surface* surf){
+  //if(surf->format->format != SDL_PIXELFORMAT_RGBA8888){
+  //  std::cout << "Error: PremultiplySurface32RGBA does not support pixel formats other than RGBA8888 (" << surf->format->format << " vs " << SDL_PIXELFORMAT_RGBA8888 << ")" << std::endl;
+  //  return;
+  //}
   SDL_LockSurface(surf);
   unsigned char* pixels = (unsigned char*)surf->pixels;
   for(int p = 0; p < surf->w * surf->h; p++){
     pixels[4*p+0] = ((unsigned int)pixels[4*p+0])*((unsigned int)pixels[4*p+3])/255;
     pixels[4*p+1] = ((unsigned int)pixels[4*p+1])*((unsigned int)pixels[4*p+3])/255;
     pixels[4*p+2] = ((unsigned int)pixels[4*p+2])*((unsigned int)pixels[4*p+3])/255;
+    //if(pixels[4*p+0] != pixels[4*p+1]) std::cout << "ASDSADSADSA" << std::endl;
   }
   SDL_UnlockSurface(surf);
+}
+
+void SDLFix::MarkApiTrace(SDL_Renderer* renderer, int no){
+  GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
+  data->glScissor(no,no,no,no);
 }
 
 } // namespace AlgAudio

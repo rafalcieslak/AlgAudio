@@ -29,33 +29,37 @@ typedef struct { // This struct is not exposed by SDL API, but we need it.
 
 namespace AlgAudio{
 
+/** This class provides sevaral fixes and workarounds for flaws within SDL. */
 class SDLFix{
 public:
-  // Mutliplies all pixel colors in a surface by alpha.
+  /** Mutliplies all pixel colors in a surface by alpha. */
   static void PremultiplySurface32RGBA(SDL_Surface* surf);
-  // This function substitutes several method pointers inside the renderer,
-  // so that fixed (or modified) versions of several rendering functions are
-  // used whenever SDL calls any of these methods on the renderer.
-  // It also checks whether the renderer is opengl.
-  // Generally, call this function on any fresh created renderer.
+  /** This function substitutes several method pointers inside the renderer,
+   *  so that fixed (or modified) versions of several rendering functions are
+   *  used whenever SDL calls any of these methods on the renderer.
+   *  It also checks whether the renderer is opengl.
+   *  Generally, call this function on any fresh created renderer. */
   static void FixRenderer(SDL_Renderer* renderer);
-  // This function corrects the renderers internal blendmode state. The internal
-  // formulas SDL uses are wrong, incorrect, ugly, and do not support
-  // premultiplied alpha. Call this function on your renderer after calling
-  // SetBlendMode(BLENDMODE_BLEND), and make sure your textures use an invalid
-  // blendmode, otherwise SDL will reset
+  /** This function corrects the renderers internal blendmode state. The internal
+   *  formulas SDL uses are wrong, incorrect, ugly, and do not support
+   *  premultiplied alpha. Call this function on your renderer after calling
+   *  SetBlendMode(BLENDMODE_BLEND), and make sure your textures use an invalid
+   *  blendmode, otherwise SDL will reset */
   static void CorrectBlendMode(SDL_Renderer* renderer);
-  // Similar to SDL_RenderDrawLines, but acccepts SDL_FPoints instead of SDL_Points.
+  /** Similar to SDL_RenderDrawLines, but acccepts SDL_FPoints instead of SDL_Points. */
   static void RenderDrawLines(SDL_Renderer* renderer, const SDL_FPoint* points, int count);
-  // Calls glEnable( GL_LINE_SMOOTH ).
+  /** Calls glEnable( GL_LINE_SMOOTH ). */
   static void RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled);
-  // Some SDL calls forget to make renderer's contex current, for example internal
-  // SDL_RenderSetCLipRect suffers from this problem. This function is a helpful
-  // workaround, it forces SDL to call GL_ActivateRenderer(renderer) and nothing
-  // else.
+  /** Some SDL calls forget to make renderer's contex current, for example internal
+   *  SDL_RenderSetCLipRect suffers from this problem. This function is a helpful
+   *  workaround, it forces SDL to call GL_ActivateRenderer(renderer) and nothing
+   *  else. */
   static void RendererMakeCurrent(SDL_Renderer* renderer);
-  // Sets GL line width.
+  /** Sets GL line width. */
   static void RenderSetLineWidth(SDL_Renderer* renderer, float w);
+  /*  Does some pointless GL calls to set a visible mark in gl api trace with
+   *  the provided number. */
+  static void MarkApiTrace(SDL_Renderer* renderer, int no);
 private:
   SDLFix() = delete;
 };

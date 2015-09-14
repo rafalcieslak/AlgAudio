@@ -105,18 +105,20 @@ void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, Point2D p){
   SDLFix::CorrectBlendMode(renderer);
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
 }
-void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c, Point2D p){
+void DrawContext::DrawText(std::shared_ptr<SDLTextTexture> texture, Color c , Point2D p){
   p = Transform(p);
   //std::cout << "Drawing texture " << texture << "(" << texture->texture << ") at " << x+x_ << " " << y+y_ << std::endl;
   if(!texture->valid) return; // Silently skip null textures.
   const Size2D texture_size = texture->GetSize();
   SDL_Rect source{0, 0, texture_size.width, texture_size.height};
   SDL_Rect dest{x + p.x, y + p.y, int(texture_size.width * TotalScale()), int(texture_size.height * TotalScale())};
-  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
   SDLFix::CorrectBlendMode(renderer);
   SDL_SetTextureColorMod(texture->texture, c.r, c.g, c.b);
   SDL_RenderCopy(renderer, texture->texture, &source, &dest);
   SDL_SetTextureColorMod(texture->texture, 255,255,255);
+  SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+  SDLFix::CorrectBlendMode(renderer);
 }
 
 void DrawContext::DrawRect(int x, int y, int w, int h){
