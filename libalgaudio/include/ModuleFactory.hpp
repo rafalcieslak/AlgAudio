@@ -30,7 +30,6 @@ namespace AlgAudio{
 namespace Exceptions{
 struct ModuleInstanceCreationFailed : public Exception{
   ModuleInstanceCreationFailed(std::string t, std::string id_) : Exception(t), id(id_) {};
-  virtual std::string what() override {return "Failed to create module instance '" + id + "': " + text;}
   std::string id;
 };
 } // namespace Exceptions
@@ -42,10 +41,20 @@ private:
   ModuleFactory() = delete; // static class
   static std::set<std::shared_ptr<Module>> instances;
 public:
-  // TODO: Use Latereturn Catch
-  // These methods latereturn two values - a pointer to new module, which is nullptr on failure, and an error message string, which is empty on success.
-  static LateReturn<std::shared_ptr<Module>, std::string> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
-  static LateReturn<std::shared_ptr<Module>, std::string> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);
+  /** Creates, initializes and installs a new module instance. This is the
+   *  correct way to create new module instances. In case of problems, this
+   *  method may latethrow Exceptions::ModuleInstanceCreationFailed. The
+   *  returned pointer is never null, and always points to a valud module.
+   *  \param templ The module template to use when creating a new instance.
+   *  \param parent The parent canvas where this new instance shall be installed. */
+  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
+    /** Creates, initializes and installs a new module instance. This is the
+     *  correct way to create new module instances. In case of problems, this
+     *  method may latethrow Exceptions::ModuleInstanceCreationFailed. The
+     *  returned pointer is never null, and always points to a valud module.
+     *  \param id The module template id to use when creating a new instance. 
+     *  \param parent The parent canvas where this new instance shall be installed. */
+  static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);
   static LateReturn<> DestroyInstance(std::shared_ptr<Module>);
   static std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string);
 };

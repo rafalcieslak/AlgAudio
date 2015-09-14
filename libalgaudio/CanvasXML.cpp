@@ -365,53 +365,51 @@ LateReturn<> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::x
   auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
   if(!templptr) parseerror("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
 
-  ModuleFactory::CreateNewInstance(templptr, c).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m, std::string error) -> void{
-    if(m){
-      c->modules.emplace(m);
-      saveids_to_modules.insert(std::make_pair(saveid,m));
-      m->canvas = c;
+  ModuleFactory::CreateNewInstance(templptr, c).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m) -> void{
+    c->modules.emplace(m);
+    saveids_to_modules.insert(std::make_pair(saveid,m));
+    m->canvas = c;
 
-      // Parse param data.
-      for(rapidxml::xml_node<>* param_node = module_node->first_node("param"); param_node; param_node = param_node->next_sibling("param") ){
-        rapidxml::xml_attribute<>* id_attr  = param_node->first_attribute("id");
-        rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
-        if(!id_attr) parseerrornr("A param node is missing id attribute. saveid = " + std::to_string(saveid));
-        if(!val_attr) parseerrornr("A param node is missing value attribute. saveid = " + std::to_string(saveid));
-        std::string paramid = id_attr->value();
-        float value = std::stof(val_attr->value());
+    // Parse param data.
+    for(rapidxml::xml_node<>* param_node = module_node->first_node("param"); param_node; param_node = param_node->next_sibling("param") ){
+      rapidxml::xml_attribute<>* id_attr  = param_node->first_attribute("id");
+      rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
+      if(!id_attr) parseerrornr("A param node is missing id attribute. saveid = " + std::to_string(saveid));
+      if(!val_attr) parseerrornr("A param node is missing value attribute. saveid = " + std::to_string(saveid));
+      std::string paramid = id_attr->value();
+      float value = std::stof(val_attr->value());
 
-        auto pc = m->GetParamControllerByID(paramid);
-        if(!pc) parseerrornr("A param node has invalid id attribute: " + paramid);
+      auto pc = m->GetParamControllerByID(paramid);
+      if(!pc) parseerrornr("A param node has invalid id attribute: " + paramid);
 
-        pc->Set(value);
-      }
-
-      // Read GUI data.
-      rapidxml::xml_node<>* guinode = module_node->first_node("gui");
-      if(guinode){
-        rapidxml::xml_attribute<>* x_attr = guinode->first_attribute("x");
-        rapidxml::xml_attribute<>* y_attr = guinode->first_attribute("y");
-        if(x_attr && y_attr){
-          // Set modulegui position in canvas
-          m->position_in_canvas = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
-        }
-      }
-      
-      // Read custom data.
-      rapidxml::xml_node<>* customstringnode = module_node->first_node("customstring");
-      if(customstringnode){
-        // Pass the value to the module.
-        m->state_load_string(customstringnode->value());
-      }
-      rapidxml::xml_node<>* customxmlnode = module_node->first_node("customxml");
-      if(customxmlnode){
-        // Pass the subtree to the module.
-        m->state_load_xml(customxmlnode);
-      }
-      r.Return();
-    }else{
-      parseerrornr("Failed to create module instance: " + error);
+      pc->Set(value);
     }
+
+    // Read GUI data.
+    rapidxml::xml_node<>* guinode = module_node->first_node("gui");
+    if(guinode){
+      rapidxml::xml_attribute<>* x_attr = guinode->first_attribute("x");
+      rapidxml::xml_attribute<>* y_attr = guinode->first_attribute("y");
+      if(x_attr && y_attr){
+        // Set modulegui position in canvas
+        m->position_in_canvas = Point2D( std::stoi(x_attr->value()), std::stoi(y_attr->value()));
+      }
+    }
+    
+    // Read custom data.
+    rapidxml::xml_node<>* customstringnode = module_node->first_node("customstring");
+    if(customstringnode){
+      // Pass the value to the module.
+      m->state_load_string(customstringnode->value());
+    }
+    rapidxml::xml_node<>* customxmlnode = module_node->first_node("customxml");
+    if(customxmlnode){
+      // Pass the subtree to the module.
+      m->state_load_xml(customxmlnode);
+    }
+    r.Return();
+  }).Catch<Exceptions::ModuleInstanceCreationFailed>([r](auto ex){
+    parseerrornr("Failed to create module instance: " + ex->what());
   });
   return r;
 }

@@ -56,15 +56,13 @@ LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> 
   return r;
 }
 
-LateReturn<std::shared_ptr<Module>, std::string> Canvas::CreateModule(std::string id){
-  Relay<std::shared_ptr<Module>, std::string> r;
-  ModuleFactory::CreateNewInstance(id, shared_from_this()).Then([this,r](std::shared_ptr<Module> m, std::string error){
-    if(m){
-      modules.emplace(m);
-      m->canvas = shared_from_this();
-    }
-    r.Return(m, error);
-  });
+LateReturn<std::shared_ptr<Module>> Canvas::CreateModule(std::string id){
+  Relay<std::shared_ptr<Module>> r;
+  ModuleFactory::CreateNewInstance(id, shared_from_this()).Then([this,r](std::shared_ptr<Module> m){
+    modules.emplace(m);
+    m->canvas = shared_from_this();
+    r.Return(m);
+  }).Catch(r);
   return r;
 }
 

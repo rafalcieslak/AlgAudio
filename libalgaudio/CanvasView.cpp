@@ -129,34 +129,28 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
     return r;
   }
   
-  try{
-    current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m, std::string error){
-      if(m){ // Do not create the GUI if module instance creation failed.
-        try{
-          auto modulegui = m->BuildGUI(window.lock());
-          Size2D guisize = modulegui->GetRequestedSize();
-          modulegui->position() = pos - guisize/2;
-          modulegui->parent = shared_from_this();
-          modulegui->Resize(guisize);
-          module_guis.push_back(modulegui);
-          ClearSelection();
-          selection.push_back({modulegui, (guisize/2).ToPoint()});
-          modulegui->SetHighlight(true);
-          drag_in_progress = true;
-          drag_mode = DragModeMove;
-          SetNeedsRedrawing();
-        }catch(Exceptions::GUIBuild ex){
-          current_canvas->RemoveModule(m);
-          window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
-        }
-      }else{
-        window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + error,"Dismiss");
-      }
-      r.Return();
-    });
-  }catch(Exceptions::ModuleInstanceCreationFailed ex){
-    window.lock()->ShowErrorAlert(ex.what(),"Dismiss");
-  }
+  current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m){
+    try{
+      auto modulegui = m->BuildGUI(window.lock());
+      Size2D guisize = modulegui->GetRequestedSize();
+      modulegui->position() = pos - guisize/2;
+      modulegui->parent = shared_from_this();
+      modulegui->Resize(guisize);
+      module_guis.push_back(modulegui);
+      ClearSelection();
+      selection.push_back({modulegui, (guisize/2).ToPoint()});
+      modulegui->SetHighlight(true);
+      drag_in_progress = true;
+      drag_mode = DragModeMove;
+      SetNeedsRedrawing();
+    }catch(Exceptions::GUIBuild ex){
+      current_canvas->RemoveModule(m);
+      window.lock()->ShowErrorAlert("Failed to create module GUI.\n\n" + ex.what(),"Dismiss");
+    }
+    r.Return();
+  }).Catch<Exceptions::ModuleInstanceCreationFailed>([this](auto ex){
+    window.lock()->ShowErrorAlert("Failed to create module instance: " + ex->what(),"Dismiss");
+  });
   return r;
 }
 void CanvasView::CustomDraw(DrawContext& c){

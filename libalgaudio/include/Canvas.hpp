@@ -67,7 +67,7 @@ public:
    *
    *  This is the proper way of adding new modules.
    */
-  LateReturn<std::shared_ptr<Module>, std::string> CreateModule(std::string id);
+  LateReturn<std::shared_ptr<Module>> CreateModule(std::string id);
   /** Removes a particular module instance from the Canvas. */
   void RemoveModule(std::shared_ptr<Module>);
 
