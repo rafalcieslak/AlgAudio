@@ -50,6 +50,8 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromFile(std::string path){
 }
 
 std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
+  Utilities::LocaleDecPoint ldp;
+  
   auto res = std::shared_ptr<CanvasXML>( new CanvasXML() );
   res->doc_text = string;
   res->doc.clear();
@@ -81,6 +83,8 @@ std::shared_ptr<CanvasXML> CanvasXML::CreateFromString(std::string string){
 }
 
 std::shared_ptr<CanvasXML> CanvasXML::CreateFromNode(rapidxml::xml_node<>* node){
+  Utilities::LocaleDecPoint ldp;
+  
   if(node == nullptr) throw Exceptions::XMLParse("Root node is missing");
   
   auto res = std::shared_ptr<CanvasXML>( new CanvasXML() );
@@ -145,6 +149,8 @@ void CanvasXML::UpdateStringFromDoc(){
 }
 
 void CanvasXML::AppendModule(std::shared_ptr<Module> m){
+  Utilities::LocaleDecPoint ldp;
+  
   rapidxml::xml_node<>* modulenode = doc.allocate_node(rapidxml::node_type::node_element, "module");
   root->append_node(modulenode);
   
@@ -187,6 +193,8 @@ void CanvasXML::AppendModule(std::shared_ptr<Module> m){
   UpdateStringFromDoc();
 }
 void CanvasXML::AppendAudioConnection(Canvas::IOID from, Canvas::IOID to){
+  Utilities::LocaleDecPoint ldp;
+  
   rapidxml::xml_node<>* connnode = doc.allocate_node(rapidxml::node_type::node_element, "audioconn");
   auto it1 = modules_to_saveids.find(from.module); auto it2 = modules_to_saveids.find(to.module);
   if(it1 == modules_to_saveids.end() || it2 == modules_to_saveids.end()){
@@ -202,6 +210,8 @@ void CanvasXML::AppendAudioConnection(Canvas::IOID from, Canvas::IOID to){
   UpdateStringFromDoc();
 }
 void CanvasXML::AppendDataConnection(Canvas::IOID from, Canvas::IOIDWithMode to){
+  Utilities::LocaleDecPoint ldp;
+  
   rapidxml::xml_node<>* connnode = doc.allocate_node(rapidxml::node_type::node_element, "dataconn");
   auto it1 = modules_to_saveids.find(from.module); auto it2 = modules_to_saveids.find(to.ioid.module);
   if(it1 == modules_to_saveids.end() || it2 == modules_to_saveids.end()){
@@ -244,6 +254,8 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::CreateNewCanvas(std::shared_ptr<C
 
 
 LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Canvas> c){
+  Utilities::LocaleDecPoint ldp;
+  
   // Traverse all nodes, add their state to canvas.
   Relay<std::shared_ptr<Canvas>> r;
   
@@ -343,6 +355,8 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
 }
 
 LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node){
+  Utilities::LocaleDecPoint ldp;
+  
   Relay<std::string> r;
   rapidxml::xml_attribute<>* saveid_attr = module_node->first_attribute("saveid");
   if(!saveid_attr) return r.Return("A module has missing fileid.");
@@ -375,12 +389,15 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
         }
         std::string paramid = id_attr->value();
         float value = std::stof(val_attr->value());
+        std::cout << "param: " << paramid << " " << val_attr->value() << std::endl;
 
         auto pc = m->GetParamControllerByID(paramid);
         if(!pc){
           r.Return("A param node has invalid id attribute: " + paramid);
           return;
         }
+        
+        std::cout << "Setting" << std::endl;
 
         pc->Set(value);
       }

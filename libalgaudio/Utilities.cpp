@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <clocale>
 #ifdef __unix__
   #include <unistd.h>
 #else
@@ -36,6 +37,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio {
 
 static std::unordered_map<SDL_Keycode, std::pair<std::string, KeyData::KeyType>> keymap;
+std::locale user_locale; // When constructed on global init, will get and store system locale
 
 #ifdef __unix__
   const char Utilities::OSDirSeparator = '/';
@@ -274,6 +276,13 @@ void KeyData::InitKeymap(){
 
 float Utilities::mtof(float m){
   return 440.0f * exp2((m - 69.0f)/12.0f);
+}
+
+void Utilities::NumericLocaleSetUniversal(){
+  std::setlocale(LC_NUMERIC,"en_US");
+}
+void Utilities::NumericLocaleRestoreUserCustom(){
+  std::locale::global(user_locale);
 }
 
 } // namespace AlgAudio

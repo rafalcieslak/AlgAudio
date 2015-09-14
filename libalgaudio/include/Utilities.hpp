@@ -263,6 +263,16 @@ public:
   // Other
   /** Converts a midi node to the corresponding frequency. */
   static float mtof(float m);
+  
+  /** Sets the numeric locale to universal "C" */
+  static void NumericLocaleSetUniversal();
+  /** Restores locale settings to user defined. */
+  static void NumericLocaleRestoreUserCustom();
+  /** RAII-style locale decimal point changer. */
+  struct LocaleDecPoint{
+    LocaleDecPoint() {NumericLocaleSetUniversal();}
+    ~LocaleDecPoint() {NumericLocaleRestoreUserCustom();}
+  };
 };
 
 } // namespace AlgAudio
