@@ -82,16 +82,22 @@ public:
 
   std::weak_ptr<UIWidget> parent;
 
-  // TODO: enum display modes
-  ///@{
-  /** Sets widget display mode. An invisible widget takes up zero space, and is
-   *  never drawn. A notdrawn widget takes up as much space as it normally would,
-   *  but is empty and never drawn. */
-  void SetVisible(bool);
-  bool IsVisible() const {return visible;}
-  void SetNotDrawn(bool);
-  bool IsNotDrawn() const {return notdrawn;}
-  ///@}
+  enum class DisplayMode{
+    Visible, /**< A Visible widget is drawn just normally. */
+    EmptySpace, /**< An EmptySpace widget is not drawn, but it takes as much space as it would normally take. */
+    Invisible, /**< An Invisible widget is not drawn, and it takes zero area. */
+  };
+  /** Sets widget display mode. \see DisplayModes */
+  void SetDisplayMode(DisplayMode display_mode);
+  /** Returns true if the contents of the widget are supposed to be drawn, i.e.
+   *  whether display mode is 'visible'. When implementing a custom widget,
+   *  do do not need to test for being drawn in CustomDraw, if a widget is not
+   *  supposed to be drawn, CustomDraw will never be called. */
+  inline bool IsDrawn() const {return display_mode == DisplayMode::Visible;}
+  /** Returns true if this widget has zero area, and this it will not take any space. */
+  inline bool HasZeroArea() const {return GetRequestedSize().IsEmpty(); }
+  /** Returns true if this widget is marked as invisible. */
+  inline bool IsInvisible() const {return display_mode == DisplayMode::Invisible; }
 
   /**The requested size depends on both minimal size and custom size.
      The minimal size is set by the particular widget implementation. For
@@ -102,7 +108,13 @@ public:
      The requested size is a dimention-wise maximum of minimal and custom sizes.
      Except for serval cases, a widget shall never be drawn smaller than its
      requested size. */
-  Size2D GetRequestedSize() const;
+  inline Size2D GetRequestedSize() const {
+    if(display_mode == DisplayMode::Invisible) return Size2D(0,0);
+    return Size2D(
+        std::max(minimal_size.width,  custom_size.width ),
+        std::max(minimal_size.height, custom_size.height)
+      );
+  }
   /**The current size is the actual size this widget takes on screen. This is
      exactly the dimensions of the DrawContext from the last time this widget
      was drawn. Note that before a widget is drawn for the first time, this
@@ -225,9 +237,7 @@ private:
   // This flag is used to track incorrect usage of SetMinimalSize()
   bool in_custom_resize = false;
 
-  // TODO: Merge these two flags into a single enum
-  bool visible = true;
-  bool notdrawn = false;
+  DisplayMode display_mode = DisplayMode::Visible;
 
   std::shared_ptr<SDLTexture> cache_texture;
   void RedrawToCache(Size2D size);

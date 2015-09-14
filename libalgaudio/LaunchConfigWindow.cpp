@@ -44,12 +44,12 @@ void LaunchConfigWindow::init(){
   startbutton = UIButton::Create(shared_from_this(),"Start!");
   testbutton = UIButton::Create(shared_from_this(),"Test UI");
   aboutbutton = UIButton::Create(shared_from_this(),"About");
-  testbutton->SetVisible(false);
+  testbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   quitbutton = UIButton::Create(shared_from_this(),"Quit App");
   titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
   configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
   oscchkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
-  oscchkbox->SetVisible(false);
+  oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
   debugchkbox = UICheckbox::Create(shared_from_this(),"Enable debug tools");
   mainvbox = UIVBox::Create(shared_from_this());
@@ -59,7 +59,7 @@ void LaunchConfigWindow::init(){
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
   layered = UILayered::Create(shared_from_this());
   about_box = UIVBox::Create(shared_from_this());
-  about_box->SetVisible(false);
+  about_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   about_text = UILabel::Create(shared_from_this(),
     "Copyright (C) 2015 CeTA - Audiovisual Technology Center\n"
     "Copyright (C) 2015 Rafal Cieslak\n"
@@ -138,14 +138,14 @@ void LaunchConfigWindow::init(){
         debugchkbox->SetActive(false); // This will also unregister the window.
       });
       SDLMain::RegisterWindow(console);
-      oscchkbox->SetVisible(true);
-      testbutton->SetVisible(true);
-      aboutbutton->SetVisible(false);
+      oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Visible);
+      testbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
+      aboutbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     }else{
       SDLMain::UnregisterWindow(console);
-      oscchkbox->SetVisible(false);
-      testbutton->SetVisible(false);
-      aboutbutton->SetVisible(true);
+      oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Invisible);
+      testbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
+      aboutbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
       console = nullptr;
     }
   });
@@ -170,23 +170,23 @@ std::shared_ptr<LaunchConfigWindow> LaunchConfigWindow::Create(){
 void LaunchConfigWindow::ToggleAbout(){
   about_displayed = !about_displayed;
   if(about_displayed){
-    quitbutton->SetNotDrawn(true);
-    startbutton->SetNotDrawn(true);
-    progressbar->SetNotDrawn(true);
-    statustext->SetNotDrawn(true);
+    quitbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+    startbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+    progressbar->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+    statustext->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
     
-    configbox->SetVisible(false);
-    about_box->SetVisible(true);
+    configbox->SetDisplayMode(UIWidget::DisplayMode::Invisible);
+    about_box->SetDisplayMode(UIWidget::DisplayMode::Visible);
     
     aboutbutton->SetText("Back");
   }else{
-    quitbutton->SetNotDrawn(false);
-    startbutton->SetNotDrawn(false);
-    progressbar->SetNotDrawn(false);
-    statustext->SetNotDrawn(false);
+    quitbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    startbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    progressbar->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    statustext->SetDisplayMode(UIWidget::DisplayMode::Visible);
     
-    configbox->SetVisible(true);
-    about_box->SetVisible(false);
+    configbox->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    about_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     
     aboutbutton->SetText("About");
   }

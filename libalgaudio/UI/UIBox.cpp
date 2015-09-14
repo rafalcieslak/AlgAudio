@@ -94,7 +94,7 @@ void UIBox::RecalculateChildSizes(unsigned int available){
   int left = available;
   unsigned int loose_children = 0;
   for(unsigned int n = 0; n < children.size(); n++){
-    if(children[n].child->IsVisible() == false){
+    if(children[n].child->IsInvisible()){
       // Invisible children are given exactly 0 space, regardless of their pack
       // mode
       children[n].size = 0;
@@ -110,7 +110,7 @@ void UIBox::RecalculateChildSizes(unsigned int available){
   // Finally, split the space that is left more or less equally among the other
   // children.
   for(unsigned int n = 0; n < children.size(); n++){
-    if(children[n].child->IsVisible() == false){
+    if(children[n].child->IsInvisible()){
       // ...
     }else if(children[n].mode == PackMode::TIGHT){
       // ...

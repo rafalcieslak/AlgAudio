@@ -29,7 +29,7 @@ std::shared_ptr<ModuleSelector> ModuleSelector::Create(std::weak_ptr<Window> w){
   return m;
 }
 void ModuleSelector::init(){
-  SetVisible(false);
+  SetDisplayMode(UIWidget::DisplayMode::Invisible);
   drawersbox = UIHBox::Create(window);
   drawersbox->SetPadding(2);
   drawerlvl1 = UIAnimDrawer::Create(window, Direction_LEFT);
@@ -52,7 +52,7 @@ void ModuleSelector::init(){
   lvl1_box->Insert(lvl1_separator, PackMode::WIDE);
   lvl2_box->Insert(lvl2_separator, PackMode::WIDE);
   description_box = UIMarginBox::Create(window,20,0,0,20);
-  description_box->SetVisible(false);
+  description_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   description_label = UILabel::Create(window,"To add a new module, select a collection from the list on the left.\nThen click a module name to add it.\n\nPoint a module to see its description.");
   description_label->SetAlignment(HorizAlignment_LEFT, VertAlignment_TOP);
   description_box->Insert(description_label);
@@ -127,9 +127,9 @@ void ModuleSelector::Expose(){
   exposed = true;
   lvl1_selection = "";
   listlvl1->SetHighlight("");
-  SetVisible(true);
+  SetDisplayMode(UIWidget::DisplayMode::Visible);
   lvl1_anim_end_wait = drawerlvl1->on_show_complete.Subscribe([this](){
-    description_box->SetVisible(true);
+    description_box->SetDisplayMode(UIWidget::DisplayMode::Visible);
   });
   lvl2_anim_end_wait.Release();
   drawerlvl1->StartShow(0.15);
@@ -137,10 +137,10 @@ void ModuleSelector::Expose(){
 }
 void ModuleSelector::Hide(){
   exposed = false;
-  description_box->SetVisible(false);
+  description_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   lvl2_anim_end_wait = drawerlvl2->on_hide_complete.Subscribe([this](){
     this->lvl1_anim_end_wait = drawerlvl1->on_hide_complete.Subscribe([this](){
-      SetVisible(false);
+      SetDisplayMode(UIWidget::DisplayMode::Invisible);
     });
     drawerlvl1->StartHide(0.08);
   });

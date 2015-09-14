@@ -25,38 +25,39 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 void UIWidget::Draw(DrawContext& c){
-  if(visible){
-    const Size2D drawsize = c.Size();
-    if(drawsize.IsEmpty()){
-      needs_redrawing = false;
-      return;
-    }
-    if(drawsize != current_size){
-      std::cout << "WARNING: Implicitly calling Resize, because the draw "
-      "context size " << drawsize.ToString() << " is incoherent with widget "
-      "stored size " << current_size.ToString() << "!" << std::endl;
-      //throw Exception("");
-      Resize(drawsize);
-    }
-    if(needs_redrawing){
-      //std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
-      c.Push(cache_texture, drawsize.width, drawsize.height);
-      if(notdrawn){
-        c.Clear();
-      }else{
-        c.Clear(clear_color);
-        CustomDraw(c);
-        c.SetColor(overlay_color);
-        c.Fill();
-      }
-      c.Pop();
-    }else{
-      //std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;
-    }
-    c.DrawTexture(cache_texture);
-    current_size = drawsize;
+  if(display_mode == DisplayMode::Invisible) return;
+
+  const Size2D drawsize = c.Size();
+  if(drawsize.IsEmpty()){
     needs_redrawing = false;
+    return;
   }
+  if(drawsize != current_size){
+    std::cout << "WARNING: Implicitly calling Resize, because the draw "
+    "context size " << drawsize.ToString() << " is incoherent with widget "
+    "stored size " << current_size.ToString() << "!" << std::endl;
+    //throw Exception("");
+    Resize(drawsize);
+  }
+  if(needs_redrawing){
+    //std::cout << "Needs redrawing. " << cache_texture->GetSize().ToString() << std::endl;
+    c.Push(cache_texture, drawsize.width, drawsize.height);
+    if(IsDrawn()){
+      c.Clear(clear_color);
+      CustomDraw(c);
+      c.SetColor(overlay_color);
+      c.Fill();
+    }else{
+      c.Clear();
+    }
+    c.Pop();
+  }else{
+    //std::cout << "No need to redraw. " << cache_texture->GetSize().ToString() << std::endl;
+  }
+  c.DrawTexture(cache_texture);
+  current_size = drawsize;
+  needs_redrawing = false;
+
 }
 
 void UIWidget::Resize(Size2D s){
@@ -73,7 +74,6 @@ void UIWidget::Resize(Size2D s){
 
 void UIWidget::SetNeedsRedrawing(){
   if(needs_redrawing) return;
-  if(!visible) return;
   needs_redrawing = true;
   auto p = parent.lock();
   auto w = window.lock();
@@ -81,18 +81,13 @@ void UIWidget::SetNeedsRedrawing(){
   else if(w) w->SetNeedsRedrawing();
 }
 
-void UIWidget::SetVisible(bool v){
-  if(v == visible) return;
-  visible = v;
-  if(v) SetNeedsRedrawing();
+void UIWidget::SetDisplayMode(DisplayMode m){
+  if(m == display_mode) return;
+  display_mode = m;
+  if(display_mode != DisplayMode::Invisible)
+    SetNeedsRedrawing();
   auto p = parent.lock();
   if(p) p->OnChildVisibilityChanged();
-}
-
-void UIWidget::SetNotDrawn(bool v){
-  if(v == notdrawn) return;
-  notdrawn = v;
-  SetNeedsRedrawing();
 }
 
 void UIWidget::SetMinimalSize(Size2D s){
@@ -112,13 +107,6 @@ void UIWidget::SetCustomSize(Size2D s){
   custom_size = s;
   auto p = parent.lock();
   if(p) p->OnChildRequestedSizeChanged();
-}
-Size2D UIWidget::GetRequestedSize() const{
-  if(!visible) return Size2D(0,0);
-  return Size2D(
-      std::max(minimal_size.width,  custom_size.width ),
-      std::max(minimal_size.height, custom_size.height)
-    );
 }
 
 Point2D UIWidget::GetPosInParent(std::shared_ptr<UIWidget> ancestor){

@@ -43,8 +43,7 @@ void UILayered::CustomDraw(DrawContext& c){
   // No need to adjust context size etc.
   // Just draw them all stacked each on another.
   for(auto& child : children)
-    if(child->IsVisible())
-      child->Draw(c);
+    child->Draw(c);
 }
 void UILayered::CustomResize(Size2D size){
   for(auto& child : children){
@@ -71,7 +70,7 @@ void UILayered::RecalculateSize(){
 
 std::shared_ptr<UIWidget> UILayered::GetTopChild() const{
   for(auto it = children.rbegin(); it != children.rend(); it++)
-    if((*it)->IsVisible()) return *it;
+    if((*it)->IsDrawn()) return *it;
   return nullptr;
 }
 

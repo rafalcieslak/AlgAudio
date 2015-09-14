@@ -52,8 +52,7 @@ void UIPosition::OnChildRequestedSizeChanged(){
   SetMinimalSize(s);
 }
 void UIPosition::OnChildVisibilityChanged(){
-  if(child->IsVisible()) SetMinimalSize(child->GetRequestedSize());
-  else SetMinimalSize(Size2D(0,0));
+  SetMinimalSize(child->GetRequestedSize()); 
 }
 
 bool UIPosition::CustomMousePress(bool down, MouseButton b,Point2D p){

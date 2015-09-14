@@ -57,7 +57,7 @@ void MainWindow::init(){
   canvaspathback->SetBorder(false);
   canvaspathback->SetInnerMargin(1);
   canvaspathback->SetFontSize(12);
-  canvaspathback->SetNotDrawn(true);
+  canvaspathback->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
   canvasbox = UIVBox::Create(shared_from_this());
   canvaspathbox = UIHBox::Create(shared_from_this());
 
@@ -126,7 +126,7 @@ void MainWindow::init(){
   layered_alert->Insert(centered_alert);
   //centered_alert->Insert(alert);
   centered_alert->SetBackColor(Color(0,0,0,150));
-  centered_alert->SetVisible(false);
+  centered_alert->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   Insert(layered_alert);
 
   subscriptions += selector->on_complete.Subscribe([this](std::string id){
@@ -282,10 +282,10 @@ LateReturn<int> MainWindow::ShowSimpleAlert(std::string message, std::string but
                      UIAlert::ButtonData(button2_text, ButtonID::CUSTOM2, button2_color)});
   alert->SetType(type);
   centered_alert->RemoveChild();
-  centered_alert->SetVisible(true);
+  centered_alert->SetDisplayMode(UIWidget::DisplayMode::Visible);
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
-    centered_alert->SetVisible(false);
+    centered_alert->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     alert = nullptr; // loose reference
     if(id == ButtonID::CUSTOM1) r.Return(0);
     if(id == ButtonID::CUSTOM2) r.Return(1);
@@ -299,10 +299,10 @@ LateReturn<> MainWindow::ShowErrorAlert(std::string message, std::string button_
   alert->SetButtons({UIAlert::ButtonData(button_text, ButtonID::OK, Theme::Get("bg-button-neutral"))});
   alert->SetType(AlertType::ERROR);
   centered_alert->RemoveChild();
-  centered_alert->SetVisible(true);
+  centered_alert->SetDisplayMode(UIWidget::DisplayMode::Visible);
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
-    centered_alert->SetVisible(false);
+    centered_alert->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     // Cannot remove the child at this point. This is because the button_pressed signal
     // is called by a chain of CustomMousePresses. One of them is the UICentered,
     // and it calls code from it's child. If we remove ALL references to the child,
@@ -326,10 +326,10 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
   alert->SetType(AlertType::WARNING);
   
   centered_alert->RemoveChild();
-  centered_alert->SetVisible(true);
+  centered_alert->SetDisplayMode(UIWidget::DisplayMode::Visible);
   centered_alert->Insert(alert);
   sub_alert_reply = alert->on_button_pressed.Subscribe([this,r](ButtonID id){
-    centered_alert->SetVisible(false);
+    centered_alert->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     // centered_alert->RemoveChild(); // See ShowErrorAlert
     alert = nullptr; // loose reference
     if(id == ButtonID::CANCEL) r.Return(SaveAlertReply::Cancel);
@@ -342,8 +342,8 @@ LateReturn<MainWindow::SaveAlertReply> MainWindow::ShowDoYouWantToSaveAlert(){
 
 void MainWindow::UpdatePathLabel(){
   auto vs = canvasview->GetCanvasStackPath();
-  if(vs.size() <= 1) canvaspathback->SetNotDrawn(true);
-  else               canvaspathback->SetNotDrawn(false);
+  if(vs.size() <= 1) canvaspathback->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+  else               canvaspathback->SetDisplayMode(UIWidget::DisplayMode::Visible);
   std::string path = Utilities::JoinString(vs," -> ");
   canvaspathlabel->SetText("   Currently editting: " + path);
 }
