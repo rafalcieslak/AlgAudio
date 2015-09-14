@@ -247,22 +247,21 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::CreateNewCanvas(std::shared_ptr<C
   Relay<std::shared_ptr<Canvas>> r;
   // Captturing a shared pointer to self to extend lifetime.
   Canvas::CreateEmpty(parent).Then([me = shared_from_this(),r](std::shared_ptr<Canvas> res){
-    me->ApplyToCanvas(res).ThenReturn(r);
+    me->ApplyToCanvas(res).ThenReturn(r).Catch(r);
   });
   return r;
 }
 
+
+// Helper macro for exitting with an error.  
+#define parseerror(x) {r.LateThrow<Exceptions::XMLParse>(x); return r;}
+#define parseerrornr(x) {r.LateThrow<Exceptions::XMLParse>(x); return;}
 
 LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Canvas> c){
   Utilities::LocaleDecPoint ldp;
   
   // Traverse all nodes, add their state to canvas.
   Relay<std::shared_ptr<Canvas>> r;
-  
-  last_createcanvas_error = "";
-
-// Helper macro for exitting with an error.  
-#define parseerror(x) {last_createcanvas_error = (x); r.Return(nullptr); return;}
 
   // Assuming version 1
   
@@ -275,10 +274,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
   Sync s(module_count);
   std::shared_ptr<std::string> msg = std::make_shared<std::string>("");
   for(rapidxml::xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
-      AddModuleFromNode(c, module_node).Then([s,msg](std::string errormsg){
-        if(errormsg != "" && *msg == "") *msg = errormsg;
-        s.Trigger();
-      });
+      AddModuleFromNode(c, module_node).ThenSync(s).Catch(r);
       
   // Capturing me as shared_ptr to extend lifetime
   s.WhenAll([this,me = shared_from_this(),r,c,msg](){
@@ -354,20 +350,20 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
   return r;
 }
 
-LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node){
+LateReturn<> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node){
   Utilities::LocaleDecPoint ldp;
   
-  Relay<std::string> r;
+  Relay<> r;
   rapidxml::xml_attribute<>* saveid_attr = module_node->first_attribute("saveid");
-  if(!saveid_attr) return r.Return("A module has missing fileid.");
+  if(!saveid_attr) parseerror("A module has missing fileid.");
   int saveid = std::stoi(saveid_attr->value());
-  if(saveid <= 0) return r.Return("A module has invalid fileid.");
+  if(saveid <= 0) parseerror("A module has invalid fileid.");
   rapidxml::xml_attribute<>* template_attr = module_node->first_attribute("template");
-  if(!template_attr) return r.Return("A module has missing template.");
+  if(!template_attr) parseerror("A module has missing template.");
   std::string template_id = template_attr->value();
 
   auto templptr = ModuleCollectionBase::GetTemplateByID(template_id);
-  if(!templptr) return r.Return("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
+  if(!templptr) parseerror("Missing template: " + template_id + ". This may happen if you lack\none of module collections that were used to create the save file.");
 
   ModuleFactory::CreateNewInstance(templptr, c).Then([this,c,r,saveid,module_node](std::shared_ptr<Module> m, std::string error) -> void{
     if(m){
@@ -379,25 +375,13 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
       for(rapidxml::xml_node<>* param_node = module_node->first_node("param"); param_node; param_node = param_node->next_sibling("param") ){
         rapidxml::xml_attribute<>* id_attr  = param_node->first_attribute("id");
         rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
-        if(!id_attr){
-          r.Return("A param node is missing id attribute. saveid = " + std::to_string(saveid));
-          return;
-        }
-        if(!val_attr){
-          r.Return("A param node is missing value attribute. saveid = " + std::to_string(saveid));
-          return;
-        }
+        if(!id_attr) parseerrornr("A param node is missing id attribute. saveid = " + std::to_string(saveid));
+        if(!val_attr) parseerrornr("A param node is missing value attribute. saveid = " + std::to_string(saveid));
         std::string paramid = id_attr->value();
         float value = std::stof(val_attr->value());
-        std::cout << "param: " << paramid << " " << val_attr->value() << std::endl;
 
         auto pc = m->GetParamControllerByID(paramid);
-        if(!pc){
-          r.Return("A param node has invalid id attribute: " + paramid);
-          return;
-        }
-        
-        std::cout << "Setting" << std::endl;
+        if(!pc) parseerrornr("A param node has invalid id attribute: " + paramid);
 
         pc->Set(value);
       }
@@ -424,9 +408,9 @@ LateReturn<std::string> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, 
         // Pass the subtree to the module.
         m->state_load_xml(customxmlnode);
       }
-      r.Return("");
+      r.Return();
     }else{
-      r.Return("Failed to create module instance: " + error);
+      parseerrornr("Failed to create module instance: " + error);
     }
   });
   return r;

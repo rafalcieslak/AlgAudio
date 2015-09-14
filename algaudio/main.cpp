@@ -29,7 +29,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 using namespace AlgAudio;
 
 Relay<int> r;
-
+/*
 LateReturn<int> CheckFunc(){
   r.LateThrow<Exceptions::Unimplemented>("Blah.");
   return r;
@@ -51,7 +51,7 @@ void LRCatchCheck(){
   });
   r.Return(5);
 };
-
+*/
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;

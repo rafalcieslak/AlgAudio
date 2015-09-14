@@ -205,15 +205,13 @@ void MainWindow::Open(){
       try{
         auto canvasxml = CanvasXML::CreateFromFile(path);
         canvasxml->CreateNewCanvas(nullptr).Then( [this,path,canvasxml](std::shared_ptr<Canvas> c){
-          if(!c){
-            ShowErrorAlert("Failed to create a new canvas from file:\n\n" + canvasxml->GetLastError(), "Cancel");
-          }else{
-            std::cout << "File opened sucessfuly." << std::endl;
-            this->current_file_path = path;
-            this->file_name = Utilities::GetFilename(path);
-            canvasview->SwitchTopLevelCanvas(c, file_name);
-            UpdatePathLabel();
-          }
+          std::cout << "File opened sucessfuly." << std::endl;
+          this->current_file_path = path;
+          this->file_name = Utilities::GetFilename(path);
+          canvasview->SwitchTopLevelCanvas(c, file_name);
+          UpdatePathLabel();
+        }).Catch<Exceptions::XMLParse>([this](auto ex){
+          this->ShowErrorAlert("Failed to parse file:\n\n" + ex->what(), "Cancel");
         });
       }catch(Exceptions::XMLFileAccess ex){
         ShowErrorAlert("Failed to access file:\n\n" + ex.what(), "Cancel");

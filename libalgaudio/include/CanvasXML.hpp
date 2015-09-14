@@ -81,22 +81,17 @@ public:
   
   /** Applies the data in stored document to a given Canvas, creating new
    *  modules, setting params, adding connections etc. On success, latereturns
-   *  the same canvas pointer. Otherwise it returns a null pointer, and stores
-   *  an error message to be read using GetLastError.
+   *  the same canvas pointer. Never returns a nullptr. May latethrow
+   *  Exceptions::XMLParse.
    *  \warning ApplyToCanvas() is strictly NOT late-reentrant! (it shall not be
    *  invoked again before the previous call latereturns). */
   LateReturn<std::shared_ptr<Canvas>> ApplyToCanvas(std::shared_ptr<Canvas> c);
   
-  /** Creates a new canvas basing on the stored document.
+  /** Creates a new canvas basing on the stored document. Never returns a
+   *  nullptr. May latethrow Exceptions::XMLParse.
    *  \warning CreateNewCanvas() is strictly NOT late-reentrant! (it shall not
    *  be invoked again before the previous call latereturns) */
   LateReturn<std::shared_ptr<Canvas>> CreateNewCanvas(std::shared_ptr<Canvas> parent);
-  
-  /** Since CreateNewCanvas() is a lateReturn, it cannot throw exceptions.
-   *  Thus if it fails, it returns a nullptr, and the error cause can be
-   *  fetched using GetLastError(); */
-  // TODO: Bullshit. Of course it can throw exceptions! Refactor CreateNewCanvas() to LateThrow exceptions.
-  std::string GetLastError(){ return last_createcanvas_error;}
   
   ~CanvasXML();
 private:
@@ -117,18 +112,14 @@ private:
   void AppendAudioConnection(Canvas::IOID from, Canvas::IOID to);
   void AppendDataConnection(Canvas::IOID from, Canvas::IOIDWithMode to);
   
-  /** Helper for creating canvas from document. Returns error message, or empty  string on success. */
-  // TODO: Refactor AddModuleFromNode to LateThrow exceptions.
-  LateReturn<std::string> AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node);
+  /** Helper for creating canvas from document. May latethrow Exceptions::XMLParse in case of problems. */
+  LateReturn<> AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::xml_node<>* module_node);
   
   /** Exports the contents of the doc to doc_text. */
   void UpdateStringFromDoc();
   /** Set this flag to true if you are going to call Append* multiple times, to
    * avoid unnvecessary exports to doc_text after each append. */
   bool block_string_updates = false;
-  
-  /** The stored error. \see GetLastError */
-  std::string last_createcanvas_error;
 };
   
 } // namespace AlgAudio
