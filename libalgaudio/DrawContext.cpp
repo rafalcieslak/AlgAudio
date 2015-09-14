@@ -228,4 +228,8 @@ bool DrawContext::HasZeroArea(){
   return false;
 }
 
+void DrawContext::MarkApiTrace(int no){
+    SDLFix::MarkApiTrace(renderer, no);
+}
+
 } // namespace AlgAudio

@@ -137,6 +137,9 @@ public:
    *  rendering is completed. */
   void Restore();
   
+  /*  Does some pointless GL calls to set a visible mark in gl api trace with
+   *  the provided number. */
+  void MarkApiTrace(int no);
 private:
   // Current DrawContext state.
   int width, height;
