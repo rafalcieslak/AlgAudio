@@ -1,5 +1,7 @@
 include(ExternalProject)
 
+## ----- LIBLO -----
+
 # Liblo has a nasty minot bug, that is very unlikely to be fixed soon. It causes
 # applications which include lo_cpp to have problems with multiple definitions
 # imported from that header file. Therefore, instead of using the system
@@ -35,7 +37,7 @@ else()
   )
 endif()
 
-
+## ----- NATIVE FILE DIALOG -----
 ExternalProject_Add(
   nativefiledialog
   PREFIX nativefiledialog
@@ -48,6 +50,8 @@ ExternalProject_Add(
   BUILD_IN_SOURCE 1
   BUILD_COMMAND cd src && scons debug=0
   INSTALL_COMMAND
+    mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/install/include/ &&
+    mkdir -p ${CMAKE_CURRENT_BINARY_DIR}/install/lib/ &&
     cp ${CMAKE_CURRENT_BINARY_DIR}/nativefiledialog/src/nativefiledialog/src/include/nfd.h ${CMAKE_CURRENT_BINARY_DIR}/install/include/. &&
     cp ${CMAKE_CURRENT_BINARY_DIR}/nativefiledialog/src/nativefiledialog/src/libnfd.a ${CMAKE_CURRENT_BINARY_DIR}/install/lib/.
   INSTALL_DIR ${CMAKE_CURRENT_BINARY_DIR}/install
