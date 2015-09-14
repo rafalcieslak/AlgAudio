@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "BuiltinModules.hpp"
 #include "LibLoader.hpp"
 #include "Canvas.hpp"
+#include "Config.hpp"
 
 namespace AlgAudio{
 
@@ -59,12 +60,10 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
   
   // Create SC instance
   if(templ->has_sc_code){
-    if(!SCLang::ready){
-      std::cout << "WARNING: Cannot create a new instance of " << templ->GetFullID() << ", the server is not yet ready." << std::endl;
-      // TODO: Do not return an unlinked module reference! This is a temporary
-      // trick which allows to quickly test GUI without starting the SC server.
-      // Happen a global error signal instead.
-      res->CreateIOFromTemplate(true); // Create fake io
+    if(Config::do_not_use_sc){
+      
+      // Create fake io
+      res->CreateIOFromTemplate(true);
       res->PrepareParamControllers();
       res->enabled_by_factory = true;
       try{
@@ -75,7 +74,11 @@ LateReturn<std::shared_ptr<Module>, std::string> ModuleFactory::CreateNewInstanc
       }catch(Exceptions::ModuleDoesNotWantToBeCreated ex){
         throw Exceptions::ModuleInstanceCreationFailed("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
       }
+      
     }else{
+      if(!SCLang::ready){
+        throw Exceptions::ModuleInstanceCreationFailed("WARNING: Cannot create a new instance of " + templ->GetFullID() + ", the server is not yet ready.", templ->GetFullID());
+      }
       lo::Message m;
       // Use the full ID to identify SynthDef.
       m.add_string(templ->GetFullID());

@@ -28,6 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleCollection.hpp"
 #include "Module.hpp"
 #include "OSC.hpp"
+#include "Config.hpp"
 
 namespace AlgAudio{
 
@@ -106,15 +107,18 @@ void SCLang::SendInstruction(std::string i){
   if(subprocess) subprocess->SendInstruction(i);
 }
 void SCLang::SendOSC(const std::string& path){
+  if(Config::do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path);
 }
 void SCLang::SendOSCCustom(const std::string& path, const lo::Message& m){
+  if(Config::do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path,m);
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   Relay<lo::Message> r;
+  if(Config::do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   lo::Message m;
   osc->Send(path, [=](lo::Message msg){
@@ -124,6 +128,7 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
 }
 LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path, const lo::Message &m){
   Relay<lo::Message> r;
+  if(Config::do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path, [=](lo::Message msg){
     r.Return(msg);
@@ -132,6 +137,7 @@ LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path
 }
 void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 {
+  if(Config::do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
@@ -142,6 +148,7 @@ void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, std::string tag, ...){
   Relay<lo::Message> r;
+  if(Config::do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;} // throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);

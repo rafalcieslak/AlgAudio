@@ -277,10 +277,10 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       AddModuleFromNode(c, module_node).ThenSync(s).Catch(r);
       
   // Capturing me as shared_ptr to extend lifetime
-  s.WhenAll([this,me = shared_from_this(),r,c,msg](){
+  s.WhenAll([this,me = shared_from_this(),r,c,msg]()->void{
     
     if(*msg != "") // An error occured with at least one of the modules
-      parseerror(*msg);
+      parseerrornr(*msg);
     
     
     std::cout << "Modules parsed, now connections." << std::endl;
@@ -294,7 +294,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       rapidxml::xml_attribute<>* fromioletid_attr = audioconn_node->first_attribute("fromioletid");
       rapidxml::xml_attribute<>*   toioletid_attr = audioconn_node->first_attribute(  "toioletid");
       if(!fromioletid_attr || !toioletid_attr || !fromsaveid_attr || !tosaveid_attr)
-        parseerror("Audioconn node is missing one of its attributes");
+        parseerrornr("Audioconn node is missing one of its attributes");
       int fromsaveid = std::stoi(fromsaveid_attr->value());
       int tosaveid = std::stoi(tosaveid_attr->value());
       std::string fromioletid = fromioletid_attr->value();
@@ -302,7 +302,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       auto from_it = saveids_to_modules.find(fromsaveid);
       auto   to_it = saveids_to_modules.find(  tosaveid);
       if(from_it == saveids_to_modules.end() || to_it == saveids_to_modules.end())
-        parseerror("Audioconn has invalid from/to save id");
+        parseerrornr("Audioconn has invalid from/to save id");
       std::shared_ptr<Module> from = from_it->second;
       std::shared_ptr<Module>   to =   to_it->second;
 
@@ -319,7 +319,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       rapidxml::xml_attribute<>*   toparamid_attr = dataconn_node->first_attribute(  "toparamid");
       rapidxml::xml_attribute<>*        mode_attr = dataconn_node->first_attribute(       "mode");
       if(!fromparamid_attr || !toparamid_attr || !fromsaveid_attr || !tosaveid_attr || !mode_attr)
-        parseerror("Dataconn node is missing one of its attributes");
+        parseerrornr("Dataconn node is missing one of its attributes");
       int fromsaveid = std::stoi(fromsaveid_attr->value());
       int tosaveid = std::stoi(tosaveid_attr->value());
       std::string fromparamid = fromparamid_attr->value();
@@ -327,7 +327,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       auto from_it = saveids_to_modules.find(fromsaveid);
       auto   to_it = saveids_to_modules.find(  tosaveid);
       if(from_it == saveids_to_modules.end() || to_it == saveids_to_modules.end())
-        parseerror("Dataconn has invalid from/to save id");
+        parseerrornr("Dataconn has invalid from/to save id");
       std::shared_ptr<Module> from = from_it->second;
       std::shared_ptr<Module>   to =   to_it->second;
       std::string mode = mode_attr->value();
@@ -337,7 +337,7 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
       }else if(mode == "relative"){
         connmode = Canvas::DataConnectionMode::Relative;
       }else{
-        parseerror("Dataconn has invalid mode value");
+        parseerrornr("Dataconn has invalid mode value");
       }
 
       c->ConnectData({from, fromparamid},{to, toparamid},connmode);

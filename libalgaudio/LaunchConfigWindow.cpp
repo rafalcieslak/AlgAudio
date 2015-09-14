@@ -23,6 +23,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "MainWindow.hpp"
 #include "SDLMain.hpp"
 #include "Version.hpp"
+#include "Config.hpp"
 
 namespace AlgAudio{
 
@@ -116,6 +117,8 @@ void LaunchConfigWindow::init(){
   });
 
   subscriptions += testbutton->on_clicked.Subscribe([this](){
+    // Disable SC usage through the app. All inlets will be fake, etc.
+    Config::do_not_use_sc = true;
     on_complete.Happen();
   });
   subscriptions += aboutbutton->on_clicked.Subscribe([this](){

@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "CanvasView.hpp"
 #include "CanvasXML.hpp"
 #include "SCLang.hpp"
+#include "Config.hpp"
 
 namespace AlgAudio{
 namespace Builtin{
@@ -40,8 +41,8 @@ LateReturn<> Subpatch::on_init_latereturn(){
   });
   std::cout << "Subpatch initting!" << std::endl;
   inlets.resize(4);
-  // TODO : USe global config to run w/o SC
-  bool fake = !SCLang::ready;
+  
+  bool fake = Config::do_not_use_sc;
   Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;
     if(entrance) entrance->LinkOutput(0, inlet->bus->GetID());
@@ -169,8 +170,8 @@ LateReturn<> SubpatchExit::on_init_latereturn(){
   
   // Create inlets.
   inlets.resize(4);
-  // TODO : USe global config to run w/o SC
-  bool fake = !SCLang::ready;
+  
+  bool fake = Config::do_not_use_sc;
   
   Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;

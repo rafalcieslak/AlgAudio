@@ -24,6 +24,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleFactory.hpp"
 #include "ModuleCollection.hpp"
 #include "SCLang.hpp"
+#include "Config.hpp"
 #include "BuiltinModules.hpp"
 
 namespace AlgAudio{
@@ -37,9 +38,8 @@ LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> 
   auto res = std::shared_ptr<Canvas>( new Canvas() );
   res->parent = parent;
   auto parentgroup = (parent)? parent->GetGroup() : nullptr;
-  // TODO: Instead of checking whether the server is ready, check global config
-  // if we are running detached from SC.
-  if(SCLang::ready){
+  
+  if( ! Config::do_not_use_sc){
     Group::CreateNew( parentgroup ).Then([r,res](std::shared_ptr<Group> g){
       res->group = g;
       std::cout << "New canvas group " << g->GetID() << std::endl;
