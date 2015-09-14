@@ -33,9 +33,9 @@ LateReturn<> Subpatch::on_init_latereturn(){
   Sync s(5);
   auto parent = canvas.lock();
   Canvas::CreateEmpty(parent).Then([this,s](auto c){
-    c->owner_hint = shared_from_this();
+    c->owner_hint = this->shared_from_this();
     internal_canvas = c;
-    std::cout << "Subpatch group " << GetGroupID() << std::endl;
+    std::cout << "Subpatch group " << this->GetGroupID() << std::endl;
     s.Trigger();
   });
   std::cout << "Subpatch initting!" << std::endl;
@@ -88,7 +88,7 @@ void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
   
   auto parent = canvas.lock();
   Canvas::CreateEmpty(parent).Then([this,canvasxml,parent](auto c){
-    c->owner_hint = shared_from_this();
+    c->owner_hint = this->shared_from_this();
     internal_canvas = c;
     canvasxml->ApplyToCanvas(c);
     // After the canvas was substituted, force recalculate order to use the new group id.
