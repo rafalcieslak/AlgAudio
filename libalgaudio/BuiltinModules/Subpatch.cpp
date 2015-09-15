@@ -33,13 +33,7 @@ LateReturn<> Subpatch::on_init_latereturn(){
   Relay<> r;
   Sync s(5);
   auto parent = canvas.lock();
-  Canvas::CreateEmpty(parent).Then([this,s](auto c){
-    c->owner_hint = this->shared_from_this();
-    internal_canvas = c;
-    std::cout << "Subpatch group " << this->GetGroupID() << std::endl;
-    s.Trigger();
-  });
-  std::cout << "Subpatch initting!" << std::endl;
+  
   inlets.resize(4);
   
   bool fake = Config::do_not_use_sc;
@@ -67,11 +61,27 @@ LateReturn<> Subpatch::on_init_latereturn(){
     if(modulegui) modulegui->OnInletsChanged();
     r.Return();
   });
+  
+  Canvas::CreateEmpty(parent).Then([this,s](auto c){
+    c->owner_hint = this->shared_from_this();
+    internal_canvas = c;
+    Sync s2(2);
+    c->CreateModule("builtin/subentry").Then([this,s2](auto module){
+      module->position_in_canvas = Point2D(0,-300);
+      s2.Trigger();
+    });
+    c->CreateModule("builtin/subexit").Then([this,s2](auto module){
+      module->position_in_canvas = Point2D(0,300);
+      s2.Trigger();
+    });
+    s2.WhenAll([s](){s.Trigger();});
+  });
+  
   return r;
 }
 
 void Subpatch::on_destroy(){
-  std::cout << "Subpatch destroy" << std::endl;
+  
 }
 
 void Subpatch::state_store_xml(rapidxml::xml_node<char>* node) const {
@@ -81,7 +91,6 @@ void Subpatch::state_store_xml(rapidxml::xml_node<char>* node) const {
   canvasxml->CloneToAnotherXMLTree(filesave_node, node->document());
 }
 void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
-  std::cout << "Subpatch load XML" << std::endl;
   auto filesave_node = node->first_node("algaudio");
   if(!filesave_node) return; // ??? No save node? Apparently custom save data has no subpatch information, so ignore it.
   
@@ -103,7 +112,6 @@ void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
   paramsbox->Insert(button, UIBox::PackMode::TIGHT);
   
   subscriptions += button->on_clicked.Subscribe([this](){
-    std::cout << "Edit clicked." << std::endl;
     auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui->parent.lock());
     if(!canvasview){
       std::cout << "Whoops, failed to get a reference to a canvasview, unable to switch displayed canvas." << std::endl;
@@ -136,7 +144,6 @@ void Subpatch::LinkToExit(std::shared_ptr<SubpatchExit> e){
 // ============= SubpatchEntrance ===========
 
 void SubpatchEntrance::on_init(){
-  std::cout << "Subpatch entrance initting!" << std::endl;
   // Check if parent canvas is managed by a subpatch.
   std::shared_ptr<Module> owner = canvas.lock()->owner_hint;
   auto owner_subpatch = std::dynamic_pointer_cast<Subpatch>(owner);
