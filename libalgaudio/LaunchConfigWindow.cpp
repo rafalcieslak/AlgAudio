@@ -29,10 +29,8 @@ namespace AlgAudio{
 
 #ifdef __unix__
   static const std::string sclang_path = "/usr/bin/sclang";
-  static const std::string scsynth_path = "/usr/bin/scsynth";
 #else
   static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
-  static const std::string scsynth_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\scsynth.exe";
 #endif
 
 
@@ -40,6 +38,8 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 }
 
 void LaunchConfigWindow::init(){
+  Utilities::FindSCLang();
+  
   marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
   startbutton = UIButton::Create(shared_from_this(),"Start!");
   testbutton = UIButton::Create(shared_from_this(),"Test UI");

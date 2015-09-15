@@ -237,6 +237,11 @@ public:
   static std::string ConvertUnipathToOSPath(const std::string& unipath);
   /** Replaces all platform native path separators to '/'. */
   static std::string ConvertOSpathToUniPath(const std::string& ospath);
+  /** Searches for SuperCollider interpreter executable in the system. That
+   *  includes searching in windows registry, $PATH, and a list of common
+   *  locations.
+   *  \returns The path to sclang.exe binary, or an empty string on failure. */
+  static std::string FindSCLang();
   
   /** Pushes the string to sytem clipboard. */
   static void CopyToClipboard(std::string);

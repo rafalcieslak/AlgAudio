@@ -26,8 +26,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 #include <unordered_map>
 #include <clocale>
+#include <codecvt>
 #ifdef __unix__
   #include <unistd.h>
+  #include <cstdlib>
 #else
   #include <windows.h>
 #endif
@@ -283,6 +285,66 @@ void Utilities::NumericLocaleSetUniversal(){
 }
 void Utilities::NumericLocaleRestoreUserCustom(){
   std::locale::global(user_locale);
+}
+
+std::string Utilities::FindSCLang(){
+#ifndef __unix__
+  std::string sclang_binary = "sclang.exe";
+#else
+  std::string sclang_binary = "sclang";
+#endif
+
+#ifndef __unix__
+  // Check windows registry
+  HKEY hKey;
+  LONG lRes = RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\SuperCollider\\3.6.6", 0, KEY_READ, &hKey);
+  if(lRes == ERROR_SUCCESS){
+    WCHAR szBuffer[1024];
+    DWORD dwBufferSize = sizeof(szBuffer);
+    ULONG nError = RegQueryValueExW(hKey, L"", 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+    if(nError == ERROR_SUCCESS){
+      std::wstring w = szBuffer;
+      
+      typedef std::codecvt_utf8<wchar_t> convert_typeX;
+      std::wstring_convert<convert_typeX, wchar_t> converterX;
+
+      std::string path = converterX.to_bytes(w);
+      
+      path = path + OSDirSeparator + sclang_binary;
+    
+      if(GetFileExists(path)){
+        std::cout << "Found possible path! " << path << std::endl;
+        return path;
+      }
+    }
+  }
+#endif
+
+  std::vector<std::string> env_path;
+  
+#ifndef __unix__
+  char buffer[8000];
+  DWORD result = GetEnvironmentVariable("PATH",buffer,sizeof(buffer));
+  if(result != 0){
+    env_path = Utilities::SplitString(buffer,";");
+  }
+#else 
+  char* p = getenv("PATH");
+  if(p){
+    env_path = Utilities::SplitString(buffer,":");
+  }
+#endif
+
+  for(std::string& dir : env_path){
+    std::string path = dir + OSDirSeparator + sclang_binary;
+    if(GetFileExists(path)){
+      std::cout << "Found possible path! " << path << std::endl;
+      return path;
+    }
+  }
+
+  std::cout << "SCLang not found!" << std::endl;
+  return "";
 }
 
 } // namespace AlgAudio
