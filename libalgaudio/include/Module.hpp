@@ -141,11 +141,14 @@ private:
  */
 class Module : public DynamicallyLoadableClass, public virtual SubscriptionsManager, public std::enable_shared_from_this<Module>, public virtual TimerHandleManager{
 public:
-  /** You don't usually use these constructors. Create a module instance
+  ///@{
+  /** You don't usually this constructor. Create a module instance
    *  using ModuleFactory instead, this will ensure proper initialisation. */
   Module() {};
   Module(void (*deleter)(void*)) : DynamicallyLoadableClass(deleter) {};
   Module(std::shared_ptr<ModuleTemplate> t) : templ(t) {};
+  ///@}
+  /** No copy constructing. */
   Module(const Module& other) = delete;
   virtual ~Module();
 

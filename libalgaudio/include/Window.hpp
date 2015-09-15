@@ -33,21 +33,33 @@ namespace AlgAudio{
 
 class UIWidget;
 
+/** This class represents a drawable on-screen window. */
 class Window : public virtual SubscriptionsManager, public IAlertable, public std::enable_shared_from_this<Window>{
 private:
   SDLHandle h;
 public:
+  /** Creates a new native window.
+   *  \param title The window title to use.
+   *  \param w Initial window width.
+   *  \param h Initial window height.
+   *  \param centered If true, window will be placed on the center of the screen.
+   *        Otherwise, the initial window position is undefined. */
   static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300, bool centered = true);
   ~Window();
 
-  // explicitly forbid copying windows
+  /** Explicitly forbids copying windows. */
   Window(const Window&) = delete;
   Window& operator=(const Window&) = delete;
 
+  /** Starts the render chain of this window, by asking the child widget to
+   *  render itself on this window. */
   void Render();
 
+  /** Places a child widget onto the window. This should be the topmost widget
+   *  in a hierarchy. */
   void Insert(std::shared_ptr<UIWidget> child);
 
+  /** Marks the window as dirty. It will be redrawn when it has a chance/ */
   void SetNeedsRedrawing();
 
   virtual void ProcessCloseEvent();
@@ -66,9 +78,13 @@ public:
 
   Signal<> on_close;
 
+  /** Returns a unique window identifier, as defined by SDL. */
   unsigned int GetID() const {return id;}
+  /** Returns current window size. */
   Size2D GetSize() const;
+  /** Returns a pointer the the SDL_Renderer associated with this window. */
   SDL_Renderer* GetRenderer() const {return renderer;}
+  /** Returns a pointer to the underlying SDL_Window. */
   SDL_Window* GetWindow() const {return window;}
 
   // Empty implementation.

@@ -51,10 +51,10 @@ private:
   Size2D size;
 };
 
-// A speciallized texture type. Text textures are cached in 100% white, and
-// modulated to desired color when rendering onto another texture. This is
-// because alpha blend cache misbehaves when rendering onto an empty cache
-// textures, leading to artefacts on letter edges.
+/** A speciallized texture type. Text textures are cached in 100% white, and
+ *  modulated to desired color when rendering onto another texture. This is
+ *  because alpha blend cache misbehaves when rendering onto an empty cache
+ *  textures, leading to artefacts on letter edges. */
 class SDLTextTexture : public SDLTexture{
 public:
   SDLTextTexture(std::weak_ptr<Window> parent_window, SDL_Surface* s) :

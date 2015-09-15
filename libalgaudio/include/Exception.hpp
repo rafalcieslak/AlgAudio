@@ -24,7 +24,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
   
 namespace Exceptions{
-  
+
+/** The base class for all exceptions in AlgAudio */
 class Exception{
 public:
   Exception(std::string t) : text(t){
@@ -41,6 +42,8 @@ protected:
   std::string text;
 };
 
+/** This exception is usually used as a temporary measure to mark feaures that
+ *  need urgent completion. */
 struct Unimplemented : public Exception{
   Unimplemented(std::string t) : Exception(t){}
 };

@@ -36,6 +36,8 @@ struct ModuleInstanceCreationFailed : public Exception{
 
 class Canvas;
 
+/** This class contains procedures for correct creation and destruction of
+ *  Module instances. */
 class ModuleFactory{
 private:
   ModuleFactory() = delete; // static class
@@ -44,14 +46,14 @@ public:
   /** Creates, initializes and installs a new module instance. This is the
    *  correct way to create new module instances. In case of problems, this
    *  method may latethrow Exceptions::ModuleInstanceCreationFailed. The
-   *  returned pointer is never null, and always points to a valud module.
+   *  returned pointer is never null, and always points to a valid module.
    *  \param templ The module template to use when creating a new instance.
    *  \param parent The parent canvas where this new instance shall be installed. */
   static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::shared_ptr<ModuleTemplate> templ, std::shared_ptr<Canvas> parent);
     /** Creates, initializes and installs a new module instance. This is the
      *  correct way to create new module instances. In case of problems, this
      *  method may latethrow Exceptions::ModuleInstanceCreationFailed. The
-     *  returned pointer is never null, and always points to a valud module.
+     *  returned pointer is never null, and always points to a valid module.
      *  \param id The module template id to use when creating a new instance. 
      *  \param parent The parent canvas where this new instance shall be installed. */
   static LateReturn<std::shared_ptr<Module>> CreateNewInstance(std::string id, std::shared_ptr<Canvas> parent);

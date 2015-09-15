@@ -29,15 +29,19 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/** A UI element that displays all available modules grouped by collections,
+ *  lets the user navigate through hierarchy, and select one of them. */
 class ModuleSelector : public UIHBox{
 public:
   static std::shared_ptr<ModuleSelector> Create(std::weak_ptr<Window> parent_window);
-  // Argument: selected template full ID, or empty string if none.
-  // The event happens both when user selects a module, or when resigns by
-  // clicking outside the menu.
+  /** Subscriver param: selected template full ID, or empty string if none.
+   *  The event happens both when user selects a module, or when resigns by
+   *  clicking outside the menu. */
   Signal<std::string> on_complete;
   void Populate() {PopulateLvl1();}
+  /** Shows the menu with an animation. */
   void Expose();
+  /** Hides the menu with an animation. */
   void Hide();
   bool IsExposed() {return exposed; }
 private:

@@ -49,23 +49,23 @@ struct LibLoading : public Exception{
  */
 class LibLoader{
 public:
-  // Calls create_instance asking for a new module instance of a given class name.
+  /** Calls create_instance asking for a new module instance of a given class name. */
   std::shared_ptr<Module> AskForInstance(std::string);
-  // Returns the deleter function from the shared library.
+  /** Returns the deleter function from the shared library. */
   deleter_t* GetDeleter() {return deleter_func;}
-  // Loads (or returns an existing instance, if cached) of a library from the
-  // provided path.
+  /** Loads (or returns an existing instance, if cached) of a library from the
+   *  provided path. */
   static std::shared_ptr<LibLoader> GetByPath(std::string path);
 
   ~LibLoader();
 private:
   LibLoader(std::string);
-  // This method loads a new library into cache.
+  /** This method loads a new library into cache. */
   static std::shared_ptr<LibLoader> Preload(std::string path);
-  // The path to maintained library.
+  /** The path to maintained library. */
   const std::string path;
 
-  // Pointers to the create and delete functions as loaded from the dynamic library.
+  /** Pointers to the create and delete functions as loaded from the dynamic library. */
   create_instance_func_t* create_instance_func = nullptr;
   deleter_t* deleter_func = nullptr;
 

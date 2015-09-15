@@ -57,7 +57,7 @@ struct WindowNotAlertable : public Exception{
  */
 class IAlertable {
 public:
-  // Returns 0 if the first button was clicked, 1, if the second.
+  /** Returns 0 if the first button was clicked, 1, if the second. */
   virtual LateReturn<int> ShowSimpleAlert(
     std::string message,
     std::string button1_text,

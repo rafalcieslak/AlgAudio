@@ -28,25 +28,37 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/** A wrapper for Subprocess, specialised in managing sclang{,.exe}. In
+ *  particular, it can recognize comamnd prompt at SC output, pass events
+ *  to main loop, and trigger some signals. */
 class SCLangSubprocess{
 public:
+  /** Prepares to launch sclang with the given command. The process will not be
+   *  started in the constructor. \see Start*/
   SCLangSubprocess(std::string command);
   ~SCLangSubprocess();
-  // The thread cannot be started in the constructor.
-  // See https://rafalcieslak.wordpress.com/2014/05/16/c11-stdthreads-managed-by-a-designated-class/
-  // for details.
+  /** Starts the managed sclang process and the subprocess I/O thread. \warning
+   *  The thread cannot be started in the constructor.
+   *  See https://rafalcieslak.wordpress.com/2014/05/16/c11-stdthreads-managed-by-a-designated-class/
+   *  for details. */
   void Start();
+  /** Stops sclang process. */
   void Stop();
 
-  // The I/O thread may not do any UI calls. They are all left for the main
-  // thread. The main thread should run the following method from time to time,
-  // it fires all signals that should. This way all subscribers are run by the
-  // main thread.
+  /** The I/O thread may not do any UI calls. They are all left for the main
+   *  thread. The main thread should run the following method from time to time,
+   *  it fires all signals that should. This way all subscribers are run by the
+   *  main thread. */
   void TriggerSignals();
 
   Signal<std::string> on_any_line_received;
   Signal<> on_started;
+  
+  /** Sends an instruction to sclang subprocess (using its stdio). */
   void SendInstruction(std::string);
+  /** Sends an instruction to sclang subprocess (using its stdio) and triggers
+   *  the reply_action with the string that sclang outputted after sending that
+   *  command and before the next prompt.*/
   void SendInstruction(std::string instruction, std::function<void(std::string)> reply_action);
 private:
   std::atomic<bool> started, run;

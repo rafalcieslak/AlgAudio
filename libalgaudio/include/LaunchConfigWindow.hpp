@@ -40,12 +40,13 @@ namespace AlgAudio{
 class LaunchConfigWindow : public Window{
 public:
   static std::shared_ptr<LaunchConfigWindow> Create();
-  // This signal happens when the configuration and server starting has
-  // been completed. It's time then to open the main window, probably.
+  /** This signal happens when the configuration and server starting has
+   *  been completed. It's probably the time to open the main window. */
   Signal<> on_complete;
 private:
   LaunchConfigWindow();
   void init();
+  /** Switches back and forth between configuration display and about dialog. */
   void ToggleAbout();
   bool about_displayed = false;
 

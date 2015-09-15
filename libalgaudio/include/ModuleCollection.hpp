@@ -49,10 +49,15 @@ struct CollectionLoading : public Exception{
 };
 } // namespace Exceptions
 
+/** A module collection represents a set of module templates from as single
+ *  module description file. */
 class ModuleCollection{
 public:
   ModuleCollection(std::ifstream& file, std::string basedir);
   LateReturn<> InstallAllTemplatesIntoSC();
+  /** \param id The requested module template id.
+   *  \returns a shared_ptr to template with the requested id, or a nullptr
+   *  if no match is found. */
   std::shared_ptr<ModuleTemplate> GetTemplateByID(std::string id);
   std::map<std::string, std::shared_ptr<ModuleTemplate>> templates_by_id;
   std::string id;
@@ -63,6 +68,9 @@ public:
   std::shared_ptr<LibLoader> defaultlib;
 };
 
+/** ModuleCollectionBase is a set of ModuleCollections. Usually it gathers all
+ *  collections loaded from all module description files. \see ModuleCollection,
+ *  Module */
 class ModuleCollectionBase{
 private:
   ModuleCollectionBase() = delete; // static class

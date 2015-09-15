@@ -59,16 +59,20 @@ public:
   void ProcessCloseEvent() override;
   void ProcessKeyboardEvent(KeyData data) override;
   
-  // Returns true on successful save 
+  ///@{
+  /** Returns true on a successful save. */
   bool SaveAs();
   bool Save();
   bool Save(std::string path);
+  ///@}
   
-  // This helper method asks the user to save the file, potentially saves it,
-  // and afterwards invokes a function.
+  /** This helper method asks the user to save the file, potentially saves it, 
+   *  and afterwards invokes a function. */
   void AskToSaveBeforeCalling(std::function<void()> f);
   
+  /** Displays the open dialog and loads the selected file, if any. */
   void Open();
+  /** Asks the user to save their work, and clears the canvas. */
   void New();
 private:
   MainWindow();
