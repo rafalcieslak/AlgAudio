@@ -33,6 +33,7 @@ include_directories(
 	"${CMAKE_SOURCE_DIR}/libs"
 	${SDL2_INCLUDE_DIR}
 	${SDL2_TTF_INCLUDE_DIR}
+  ${PORTAUDIO_INCLUDE_DIRS} # This is empty on non-windows
 )
 
 # Suppress warnings from included headers
@@ -64,6 +65,7 @@ target_link_libraries(
 	${LIBLO_LIBRARY}
 	${NFD_LIBRARY}
 	freetype
+  ${PORTAUDIO_LIBRARIES} # This is empty on non-windows
 	${EXTRA_SYS_LIBS}
 )
 # The following command will clear transitive dependencies of libalgaudio.

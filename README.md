@@ -16,7 +16,7 @@ The API documentation can be built with `make doc`, ([or browsed online](http://
 
 ## On Linux
 
-To build, you will need CMake 3.0 or newer, SDL2 and SDL2-ttf, as well as freetype development headers. Run:
+To build AlgAudio on Linux, you will need CMake 3.0 or newer, scons, git and development headers for SDL2, SDL2-ttf and freetype. Run:
 
 	mkdir build
 	cd build
@@ -41,6 +41,7 @@ From MSYS2 shell, use `pacman` to install following packages (choose an architec
 	mingw/SDL2_ttf
 	mingw/cmake
 	mingw/freetype
+	mingw/portaudio
 	make
 	automake
 	patch

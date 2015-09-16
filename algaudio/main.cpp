@@ -57,6 +57,8 @@ int main(int argc, char *argv[]){
   (void)argv;
   
   //LRCatchCheck(); return 0;
+  auto list = Utilities::GetAudioDeviceNames();
+  for(auto s : list) std::cout << s << std::endl;
 
   std::cout << "Algaudio " << ALGAUDIO_VERSION << " starting." << std::endl;
 

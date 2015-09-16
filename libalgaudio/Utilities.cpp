@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <sstream>
 #include <iomanip>
 #include <unordered_map>
+#include <set>
 #include <clocale>
 #include <codecvt>
 #ifdef __unix__
@@ -32,6 +33,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
   #include <cstdlib>
 #else
   #include <windows.h>
+  #include "portaudio.h"
 #endif
 
 // #define SILLY_GDB
@@ -291,7 +293,8 @@ void Utilities::NumericLocaleRestoreUserCustom(){
   std::locale::global(user_locale);
 }
 
-std::string Utilities::FindSCLang(){
+std::string Utilities::FindSCLang()
+{
 #ifndef __unix__
   std::string sclang_binary = "sclang.exe";
 #else
@@ -349,6 +352,30 @@ std::string Utilities::FindSCLang(){
 
   std::cout << "SCLang not found!" << std::endl;
   return "";
+}
+
+
+std::vector<std::string> Utilities::GetAudioDeviceNames()
+{
+  std::vector<std::string> list;
+#ifndef __UNIX__
+  std::set<std::string> set;
+  PaError result = Pa_Initialize();
+  if(result != paNoError) return list;
+  PaDeviceIndex numDevices = Pa_GetDeviceCount();
+  
+  for(int i=0; i<numDevices; i++){
+  	const PaDeviceInfo* pdi = Pa_GetDeviceInfo( i );
+    const PaHostApiInfo* apiInfo = Pa_GetHostApiInfo(pdi->hostApi);
+    set.insert(apiInfo->name);
+    std::cout << apiInfo->name << " : " << pdi->name << std::endl;
+  }
+  
+  for(auto& s : set) list.emplace_back(s);
+  
+  Pa_Terminate();
+#endif
+  return list;
 }
 
 } // namespace AlgAudio

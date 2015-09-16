@@ -280,6 +280,13 @@ public:
     LocaleDecPoint() {NumericLocaleSetUniversal();}
     ~LocaleDecPoint() {NumericLocaleRestoreUserCustom();}
   };
+  /** Queries what audio devices are available on this system. These should be
+   *  the same as SuperCollider reports, but SuperCollider has a bug that makes
+   *  it impossible to ask it for audio devices - so we need to gather the
+   *  devices on our own. On Linux, there is no choice in devices, thus the
+   *  returned list will be empty. On windows, this will be a list of all device
+   *  names as reported by PortAudio (which is what SuperCollider does). */
+   static std::vector<std::string> GetAudioDeviceNames();
 };
 
 } // namespace AlgAudio
