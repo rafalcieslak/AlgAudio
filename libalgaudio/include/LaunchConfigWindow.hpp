@@ -31,6 +31,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UITextEntry.hpp"
 #include "UI/UILayered.hpp"
 #include "UI/UISeparator.hpp"
+#include "UI/UIPathSelector.hpp"
 
 namespace AlgAudio{
 
@@ -50,29 +51,33 @@ private:
   void ToggleAbout();
   bool about_displayed = false;
 
-  std::shared_ptr<UIMarginBox> marginbox;
-  std::shared_ptr<UIButton> startbutton;
-  std::shared_ptr<UIButton> testbutton;
-  std::shared_ptr<UIButton> aboutbutton;
-  std::shared_ptr<UIButton> quitbutton;
-  std::shared_ptr<UILabel> titlelabel;
-  std::shared_ptr<UILabel> configlabel;
-  std::shared_ptr<UICheckbox> oscchkbox;
-  std::shared_ptr<UICheckbox> supernovachkbox;
-  std::shared_ptr<UICheckbox> debugchkbox;
+std::shared_ptr<UIMarginBox> marginbox;
   std::shared_ptr<UIVBox> mainvbox;
-  std::shared_ptr<UIVBox> configbox;
-  std::shared_ptr<UIHBox> buttonhbox;
-  std::shared_ptr<UIProgressBar> progressbar;
-  std::shared_ptr<UILabel> statustext;
+    std::shared_ptr<UILabel> titlelabel;
+    std::shared_ptr<UILabel> version_label;
+    std::shared_ptr<UISeparator> config_separator;
+    std::shared_ptr<UILayered> layered;
+      std::shared_ptr<UIVBox> about_box;
+        std::shared_ptr<UILabel> about_text;
+      std::shared_ptr<UIVBox> configbox;
+        std::shared_ptr<UILabel> path_label;
+        std::shared_ptr<UIPathSelector> sclang_path_selector;
+        std::shared_ptr<UILabel> configlabel;
+        std::shared_ptr<UICheckbox> debugchkbox;
+        std::shared_ptr<UICheckbox> supernovachkbox;
+        std::shared_ptr<UICheckbox> oscchkbox;
+    std::shared_ptr<UIHBox> buttonhbox;
+      std::shared_ptr<UIButton> quitbutton;
+      std::shared_ptr<UIButton> testbutton;
+      std::shared_ptr<UIButton> aboutbutton;
+      std::shared_ptr<UIButton> startbutton;
+    std::shared_ptr<UIProgressBar> progressbar;
+    std::shared_ptr<UILabel> statustext;
   
-  std::shared_ptr<UILayered> layered;
-  std::shared_ptr<UIVBox> about_box;
-  std::shared_ptr<UILabel> about_text;
-  std::shared_ptr<UISeparator> about_separator;
-  std::shared_ptr<UILabel> about_version;
 
   std::shared_ptr<Console> console;
+  
+  bool start_in_progress = false;
 };
 
 } //namespace AlgAudio

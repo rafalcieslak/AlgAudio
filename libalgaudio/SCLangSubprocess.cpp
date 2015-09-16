@@ -33,10 +33,11 @@ SCLangSubprocess::SCLangSubprocess(std::string cmd) : command(cmd)
 
 SCLangSubprocess::~SCLangSubprocess(){
   Stop();
-  the_thread.join();
+  if(started) the_thread.join();
 }
 
 void SCLangSubprocess::Start(){
+  subprocess = std::make_unique<Subprocess>(command);
   the_thread = std::thread(&SCLangSubprocess::ThreadMain, this);
   run = true;
 }
@@ -45,7 +46,6 @@ void SCLangSubprocess::Stop(){
 }
 
 void SCLangSubprocess::ThreadMain(){
-  subprocess = std::make_unique<Subprocess>(command);
   WaitForPrompt();
   started = true;
   while(run) Step();

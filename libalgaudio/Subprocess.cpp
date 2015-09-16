@@ -78,12 +78,12 @@ Subprocess::Subprocess(std::string c){
     // Disable stdio buffering
     setvbuf(stdout,NULL,_IONBF,0);
     setvbuf(stdin,NULL,_IONBF,0);
+    
+    #error TODO: React on execve errors!!! http://stackoverflow.com/questions/1584956/how-to-handle-execvp-errors-after-fork
 		// swap image
 		execve(args[0], args, environ);
-    // execve never returns.
-    // Well, it does, in case of unrecoverable trouble when swapping image.
-    // But in such case it's not like we could react on such error in any
-    // resonable way, so let's just:
+    
+    
     perror("Starting subprocess failed: execve failed");
     exit(1);
   }else{

@@ -158,6 +158,10 @@ static inline std::string& trim(std::string& s) {
   return ltrim(rtrim(s));
 }
 
+std::string Utilities::Trim(std::string s){
+  return trim(s);
+}
+
 std::string Utilities::TrimAllLines(std::string s){
   std::vector<std::string> lines = SplitString(s, "\n");
   for(auto& line : lines)

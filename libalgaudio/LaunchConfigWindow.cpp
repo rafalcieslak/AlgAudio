@@ -38,9 +38,7 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
 }
 
 void LaunchConfigWindow::init(){
-  Utilities::FindSCLang();
-  
-  marginbox = UIMarginBox::Create(shared_from_this(),10,10,10,10);
+  marginbox = UIMarginBox::Create(shared_from_this(),10,10,2,10);
   startbutton = UIButton::Create(shared_from_this(),"Start!");
   testbutton = UIButton::Create(shared_from_this(),"Test UI");
   aboutbutton = UIButton::Create(shared_from_this(),"About");
@@ -57,6 +55,7 @@ void LaunchConfigWindow::init(){
   buttonhbox = UIHBox::Create(shared_from_this());
   progressbar = UIProgressBar::Create(shared_from_this());
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
+  statustext->SetCustomSize(Size2D(0,32));
   layered = UILayered::Create(shared_from_this());
   about_box = UIVBox::Create(shared_from_this());
   about_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
@@ -69,23 +68,32 @@ void LaunchConfigWindow::init(){
     "      https://www.gnu.org/licenses/lgpl.txt"
     ,12);
   about_text->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
-  about_version = UILabel::Create(shared_from_this(), ALGAUDIO_VERSION, 16);
-  about_version->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
-  about_separator = UISeparator::Create(shared_from_this());
-  about_separator->SetCustomSize(Size2D(0,30));
+  version_label = UILabel::Create(shared_from_this(), ALGAUDIO_VERSION, 16);
+  version_label->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
+  config_separator = UISeparator::Create(shared_from_this());
+  config_separator->SetCustomSize(Size2D(0,20));
+  std::string default_sclang_path = Utilities::FindSCLang();
+  sclang_path_selector = UIPathSelector::Create(shared_from_this(), default_sclang_path);
+#ifdef __UNIX__
+  path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang binary", 14);
+#else
+  path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang.exe", 14);
+#endif
 
   Insert(marginbox);
   marginbox->Insert(mainvbox);
    mainvbox->Insert(titlelabel, UIBox::PackMode::TIGHT);
-   mainvbox->Insert(about_version, UIBox::PackMode::TIGHT);
+   mainvbox->Insert(version_label, UIBox::PackMode::TIGHT);
+   mainvbox->Insert(config_separator, UIBox::PackMode::TIGHT);
    mainvbox->Insert(layered, UIBox::PackMode::WIDE);
     layered->Insert(configbox);
+     configbox->Insert(path_label, UIBox::PackMode::TIGHT);
+     configbox->Insert(sclang_path_selector, UIBox::PackMode::TIGHT);
      configbox->Insert(configlabel, UIBox::PackMode::WIDE);
      configbox->Insert(oscchkbox, UIBox::PackMode::TIGHT);
      configbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
      configbox->Insert(debugchkbox, UIBox::PackMode::TIGHT);
     layered->Insert(about_box);
-      about_box->Insert(about_separator, UIBox::PackMode::TIGHT);
       about_box->Insert(about_text, UIBox::PackMode::WIDE);
    mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
@@ -99,20 +107,21 @@ void LaunchConfigWindow::init(){
   quitbutton->SetColors(Theme::Get("text-button"), Theme::Get("bg-button-negative"));
 
   subscriptions += startbutton->on_clicked.Subscribe([this](){
-    if(!SCLang::IsRunning()){
-      SCLang::Start(sclang_path, supernovachkbox->GetActive());
-      startbutton->SetText("Stop");
-    }else{
-      SCLang::Stop();
-      progressbar->SetAmount(0.0);
-      statustext->SetText("AlgAudio (C) CeTA 2015, released on GNU LGPL 3");
-      startbutton->SetText("Start!");
-    }
+    
     statustext->SetTextColor(Theme::Get("text-generic"));
     statustext->SetBold(false);
+    
+    if(!start_in_progress){
+      startbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+      start_in_progress = true;
+      SCLang::Start(sclang_path_selector->GetPath(), supernovachkbox->GetActive());
+    }else{
+      // ??? Should not happen.
+    }
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
     progressbar->SetAmount(n/10.0);
+    statustext->SetAlignment(HorizAlignment_CENTERED,VertAlignment_TOP);
     statustext->SetText(msg);
   });
 
@@ -153,10 +162,13 @@ void LaunchConfigWindow::init(){
     if(success){
       on_complete.Happen();
     }else{
+      start_in_progress = false;
       statustext->SetText(message);
       statustext->SetBold(true);
       statustext->SetTextColor(Theme::Get("text-error"));
+      statustext->SetAlignment(HorizAlignment_LEFT,VertAlignment_TOP);
       progressbar->SetAmount(0);
+      startbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
     }
   });
 }
@@ -181,7 +193,7 @@ void LaunchConfigWindow::ToggleAbout(){
     aboutbutton->SetText("Back");
   }else{
     quitbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
-    startbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    startbutton->SetDisplayMode(start_in_progress ? UIWidget::DisplayMode::EmptySpace : UIWidget::DisplayMode::Visible);
     progressbar->SetDisplayMode(UIWidget::DisplayMode::Visible);
     statustext->SetDisplayMode(UIWidget::DisplayMode::Visible);
     

@@ -23,47 +23,62 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UITextEntry::UITextEntry(std::shared_ptr<Window> w) : UIWidget(w) {
-  SetMinimalSize(Size2D(30,18));
+UITextEntry::UITextEntry(std::weak_ptr<Window> w, std::string t) : UIWidget(w), text(t) {
 }
 
-std::shared_ptr<UITextEntry> UITextEntry::Create(std::shared_ptr<Window> parent_window){
-  return std::shared_ptr<UITextEntry>(new UITextEntry(parent_window));
+std::shared_ptr<UITextEntry> UITextEntry::Create(std::weak_ptr<Window> parent_window, std::string t){
+  auto res = std::shared_ptr<UITextEntry>(new UITextEntry(parent_window, t));
+  res->Init();
+  return res;
+}
+
+void UITextEntry::Init(){
+  SetMinimalSize(Size2D(30, fontsize + 2));
+  UpdateText();
 }
 
 void UITextEntry::CustomDraw(DrawContext& c){
   Color bg_color = Theme::Get("textentry-bg");
   if(GetIsFocused()) bg_color = bg_color.Lighter(0.1);
   c.SetColor(bg_color);
-  int w = c.Size().width;
-  int h = c.Size().height;
-  c.DrawRect(0,0,w,h);
+  c.DrawRect(Rect(Point2D(0,0), c.Size()));
 
-  c.DrawText(text_texture, Theme::Get("textentry-text"), Point2D(1,0));
+  c.DrawText(text_texture, Theme::Get("textentry-text"), Point2D( c.Size().height/2 - text_texture->GetSize().height/2 + 1 ,0));
 }
 
 void UITextEntry::SetText(std::string t){
   text = t;
-  text_texture = TextRenderer::Render(window, FontParams("Molengo-Regular",14), text);
+  UpdateText();
 }
 
 void UITextEntry::OnKeyboard(KeyData k){
   if(k.pressed == false) return; // Ignore key up events
   if(k.type == KeyData::KeyType::Text){
     text += k.symbol;
-    text_texture = TextRenderer::Render(window, FontParams("Molengo-Regular",14), text);
-    SetNeedsRedrawing();
+    on_edited.Happen();
+    UpdateText();
   }else if(k.type == KeyData::KeyType::Backspace){
     if(text.length() >= 1){
       text.pop_back();
-      text_texture = TextRenderer::Render(window, FontParams("Molengo-Regular",14), text);
-      SetNeedsRedrawing();
+      on_edited.Happen();
+      UpdateText();
     }
   }
 }
 
 void UITextEntry::OnFocusChanged(){
   SDLMain::SetTextInput( GetIsFocused() );
+  SetNeedsRedrawing();
+}
+
+void UITextEntry::SetFontSize(int size){
+  fontsize = size;
+  SetMinimalSize(Size2D(30, fontsize + 2));
+  UpdateText();
+}
+
+void UITextEntry::UpdateText(){
+  text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), text);
   SetNeedsRedrawing();
 }
 

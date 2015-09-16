@@ -136,6 +136,7 @@ void Window::ProcessResizeEvent(){
 }
 
 void Window::ProcessMouseButtonEvent(bool d, MouseButton b, Point2D p){
+  std::cout << (d?"down":"up") << " " << p.ToString() << std::endl;
   last_mouse_pos = p;
   if(child)
     child->OnMousePress(d,b,p);

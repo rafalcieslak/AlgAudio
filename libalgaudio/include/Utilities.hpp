@@ -260,6 +260,8 @@ public:
   static std::string JoinString(std::vector<std::string> str, std::string c);
   /** This function replaces all ocurences of string from to string to in string str.*/
   static void Replace(std::string& str, const std::string& from, const std::string& to);
+  /** Returns a string trimmed from heading and tailing whitespaces. */
+  static std::string Trim(std::string);
   /** Returns a string trimmed from heading and tailing whitespaces on each line. */
   static std::string TrimAllLines(std::string);
   /** Returns a float formatted to a string in a way that uses only a few digits at each magnitude level. */

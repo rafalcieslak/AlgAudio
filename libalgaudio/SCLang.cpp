@@ -47,13 +47,25 @@ std::map<std::pair<int,int>, std::weak_ptr<SendReplyController>> SCLang::sendrep
 int SCLang::sendreply_id = 0;
 
 void SCLang::Start(std::string command, bool supernova){
-  if(subprocess) return;
+  if(ready) return;
+  
+  if(!Utilities::GetFileExists(command)){
+    on_start_completed.Happen(false,"Invalid path to sclang");
+    return;
+  }
   subprocess = std::make_unique<SCLangSubprocess>(command);
   subprocess->on_any_line_received.SubscribeForever([&](std::string l){
     on_line_received.Happen(l);
   });
+  
   on_start_progress.Happen(1,"Starting SCLang...");
-  subprocess->Start();
+  try{
+    subprocess->Start();
+  }catch(Exceptions::Subprocess ex){
+    on_start_completed.Happen(false,"Failed to start sclang subprocess:\n" + Utilities::Trim(ex.what()));
+    return;
+  }
+  
   subprocess->on_started.SubscribeOnce([supernova](){
     // The SC dir should be in current directory.
     SetOSCDebug(osc_debug);

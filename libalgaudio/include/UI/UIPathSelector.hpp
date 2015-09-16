@@ -1,5 +1,5 @@
-#ifndef UITEXTENTRY_HPP
-#define UITEXTENTRY_HPP
+#ifndef UIPATHSELECTOR_HPP
+#define UIPATHSELECTOR_HPP
 /*
 This file is part of AlgAudio.
 
@@ -18,32 +18,30 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "UIWidget.hpp"
-#include "Window.hpp"
+#include "UIBox.hpp"
 
 namespace AlgAudio{
 
-class UITextEntry : public UIWidget{
+class UIHBox;
+class UITextEntry;
+class UIButton;
+
+class UIPathSelector : public UIHBox{
 public:
-  static std::shared_ptr<UITextEntry> Create(std::weak_ptr<Window> parent_window, std::string text = "");
-  virtual void CustomDraw(DrawContext& c) override;
-  Signal<> on_complete; // Triggered when the Return key is pressed while entering text.
-  Signal<> on_edited; // Triggered when user does any change to the text.
-  void SetText(std::string text);
-  void SetFontSize(int size);
-  std::string GetText() const {return text;}
-  virtual void OnFocusChanged() override;
-  virtual void OnKeyboard(KeyData) override;
+  static std::shared_ptr<UIPathSelector> Create(std::weak_ptr<Window> parent_window, std::string path = "");
+  Signal<std::string> on_selected;
+  void SetPath(std::string);
+  void OpenDialog();
+  std::string GetPath() const {return path;}
 private:
-  UITextEntry(std::weak_ptr<Window>, std::string t = "");
+  UIPathSelector(std::weak_ptr<Window> parent_window, std::string path = "");
   void Init();
-  void UpdateText();
-  std::string text;
-  std::shared_ptr<SDLTextTexture> text_texture;
-  int fontsize = 12;
+  std::string path;
+  std::shared_ptr<UIButton> child_button;
+  std::shared_ptr<UITextEntry> child_entry;
 };
 
 } // namespace AlgAudio
 
-#endif // UITEXTENTRY_HPP
+#endif // UIPATHSELECTOR_HPP
