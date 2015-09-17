@@ -353,5 +353,48 @@ Out.ar(out, In.ar(in1) * In.ar(in2));
     <description> An 8-step sequencer. </description>
     <gui type="standard auto"/>
   </module>
+  
+  <module id="phaser1" name="Phaser">
+    <params>
+      <inlet id="inbus" name="Input"/>
+      <outlet id="outbus" name="Output"/>
+      <param id="freq" name="Frequency" defaultmin="0.1" defaultmax="1" defaultval="0.5" scale="log"/>
+      <param id="level" name="Dry/Wet" defaultmin="-1" defaultmax="1" defaultval="1"/>
+    </params>
+    <description> An effect similar to guitar phaser. </description>
+    <sc>
+arg inbus, outbus, level, freq;
+var orig = In.ar(inbus);
+var eff = orig + AllpassL.ar(orig, 4, SinOsc.ar(freq, 0, 0.005, 0.005), 0);
+var mix = XFade2.ar(orig, eff, level);
+Out.ar(outbus,mix);
+    </sc>
+    <gui type="standard auto"/>
+  </module>
+  
+  <module id="chorus1" name="Chorus">
+    <params>
+      <inlet id="inbus" name="Input"/>
+      <outlet id="outbus" name="Output"/>
+      <param id="speed" name="Delay time" defaultmin="0.00" defaultmax="0.15" defaultval="0.02"/>
+      <param id="level" name="Dry/Wet" defaultmin="-1" defaultmax="1" defaultval="1"/>
+    </params>
+    <description> An simple chorus effect. </description>
+    <sc>
+arg inbus, outbus, level, predelay=0.08, speed=0.02, depth=0.1, ph_diff=0.5;
+var numDelays = 12, mix;
+var orig = In.ar(inbus) ;
+var in =  orig * numDelays.reciprocal;
+var modulators = Array.fill(numDelays, {
+  arg i;
+  LFPar.kr(speed * rrand(0.94, 1.06), ph_diff * i, depth, predelay);
+}); 
+var sig = DelayC.ar(in, 0.5, modulators);  
+sig = sig.sum;
+mix = XFade2.ar(orig, sig, level);
+Out.ar(outbus,mix);
+    </sc>
+    <gui type="standard auto"/>
+  </module>
 
 </collection>
