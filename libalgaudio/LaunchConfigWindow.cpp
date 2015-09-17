@@ -27,14 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-#ifdef __unix__
-  static const std::string sclang_path = "/usr/bin/sclang";
-#else
-  static const std::string sclang_path = "C:\\Program Files (x86)\\SuperCollider-3.6.6\\sclang.exe";
-#endif
-
-
-LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",280,400){
+LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",290,425){
 }
 
 void LaunchConfigWindow::init(){
