@@ -25,6 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDLMain.hpp"
 #include "SCLang.hpp"
 #include "Version.hpp"
+#include "Config.hpp"
 
 using namespace AlgAudio;
 
@@ -63,6 +64,9 @@ int main(int argc, char *argv[]){
   try{
     Theme::Init();
     SDLMain::Init();
+    
+    // Explicitly load default config.
+    Config::Global() = Config::Default();
 
     // TODO: Load modules later, with SC start.
     ModuleCollectionBase::InstallDir("modules");

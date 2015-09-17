@@ -19,9 +19,29 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <string>
+#include <memory>
+
+namespace AlgAudio{
+
 class Config{
 public:
-	static bool do_not_use_sc;
+	bool do_not_use_sc;
+	bool supernova;
+	std::string path_to_sclang;
+	
+	Config(const Config& other) = default;
+	
+	static Config& Global();
+	static Config Default();
+	
+	// TODO: Store/load to/from file
+	
+private:
+	Config() {};
+	static std::unique_ptr<Config> global;
 };
+
+} // namespace AlgAudio
 
 #endif // CONFIG_HPP

@@ -46,8 +46,10 @@ std::unique_ptr<OSC> SCLang::osc;
 std::map<std::pair<int,int>, std::weak_ptr<SendReplyController>> SCLang::sendreply_map;
 int SCLang::sendreply_id = 0;
 
-void SCLang::Start(std::string command, bool supernova){
+void SCLang::Start(){
   if(ready) return;
+  
+  std::string command = Config::Global().path_to_sclang;
   
   if(!Utilities::GetFileExists(command)){
     on_start_completed.Happen(false,"Invalid path to sclang");
@@ -66,7 +68,7 @@ void SCLang::Start(std::string command, bool supernova){
     return;
   }
   
-  subprocess->on_started.SubscribeOnce([supernova](){
+  subprocess->on_started.SubscribeOnce([](){
     // The SC dir should be in current directory.
     SetOSCDebug(osc_debug);
     on_start_progress.Happen(3,"Loading scripts...");
@@ -79,16 +81,16 @@ void SCLang::Start(std::string command, bool supernova){
     }
     SendInstruction("(\"" + main_script + "\").loadPaths;");
 
-    subprocess->SendInstruction("NetAddr.localAddr.port.postln;", [&,supernova](std::string port){
+    subprocess->SendInstruction("NetAddr.localAddr.port.postln;", [&](std::string port){
       port = Utilities::SplitString(port,"\n")[1];
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
       osc = std::make_unique<OSC>("localhost", port);
       osc->AddMethodHandler("/algaudio/midiin", ProcessMIDIInput);
       osc->AddMethodHandler("/algaudio/sendreply", [](lo::Message msg){SendReplyCatcher(msg.argv()[0]->i32, msg.argv()[1]->i32, msg.argv()[2]->f); });
-      SendOSCWithEmptyReply("/algaudioSC/hello").Then([supernova](){
+      SendOSCWithEmptyReply("/algaudioSC/hello").Then([](){
         on_start_progress.Happen(5,"Booting server...");
-        BootServer(supernova);
+        BootServer();
         on_server_started.SubscribeOnce([&](bool success){
           if(success){
             ready = true;
@@ -106,9 +108,9 @@ void SCLang::Start(std::string command, bool supernova){
     }); // sendinstruction port
   }); // subprocess started
 }
-void SCLang::Restart(std::string command){
+void SCLang::Restart(){
   Stop();
-  Start(command);
+  Start();
 }
 void SCLang::Stop(){
   ready = false;
@@ -119,18 +121,18 @@ void SCLang::SendInstruction(std::string i){
   if(subprocess) subprocess->SendInstruction(i);
 }
 void SCLang::SendOSC(const std::string& path){
-  if(Config::do_not_use_sc) return;
+  if(Config::Global().do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path);
 }
 void SCLang::SendOSCCustom(const std::string& path, const lo::Message& m){
-  if(Config::do_not_use_sc) return;
+  if(Config::Global().do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path,m);
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
   Relay<lo::Message> r;
-  if(Config::do_not_use_sc) return r;
+  if(Config::Global().do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   lo::Message m;
   osc->Send(path, [=](lo::Message msg){
@@ -140,7 +142,7 @@ LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string& path){
 }
 LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path, const lo::Message &m){
   Relay<lo::Message> r;
-  if(Config::do_not_use_sc) return r;
+  if(Config::Global().do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   osc->Send(path, [=](lo::Message msg){
     r.Return(msg);
@@ -149,7 +151,7 @@ LateReturn<lo::Message> SCLang::SendOSCCustomWithLOReply(const std::string& path
 }
 void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 {
-  if(Config::do_not_use_sc) return;
+  if(Config::Global().do_not_use_sc) return;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return;}// throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
@@ -160,7 +162,7 @@ void SCLang::SendOSC(const std::string &path, std::string tag, ...)
 }
 LateReturn<lo::Message> SCLang::SendOSCWithLOReply(const std::string &path, std::string tag, ...){
   Relay<lo::Message> r;
-  if(Config::do_not_use_sc) return r;
+  if(Config::Global().do_not_use_sc) return r;
   if(!osc) {std::cout << "WARNING: Failed to send OSC message to server, OSC not ready" << std::endl; return r;} // throw Exceptions::SCLangException("Failed to send OSC message to server, OSC not yet ready");
   va_list q;
   va_start(q, tag);
@@ -201,13 +203,17 @@ bool SCLang::WasInstalled(const std::string& s){
 void SCLang::QueryAllNodes(){
   SendOSC("/algaudioSC/allnodes");
 }
-void SCLang::BootServer(bool supernova){
+void SCLang::BootServer(){
   // TODO: Device selection
-  SendInstruction("s.options.device = \"ASIO\"");
-  // TODO: Server options
-  if(supernova) SendInstruction("Server.supernova;");
+  // SendInstruction("s.options.device = \"ASIO\"");
+
+#ifdef __unix__
+  // Do not attempt to use supernova on Windows.
+  if(Config::Global().supernova) SendInstruction("Server.supernova;");
   else SendInstruction("Server.scsynth;");
-  SendOSCWithReply<int>("/algaudioSC/boothelper", "si", "ASIO", (supernova)?1:0).Then([&](int status){
+#endif
+
+  SendOSCWithReply<int>("/algaudioSC/boothelper").Then([&](int status){
     if(status){
       on_server_started.Happen(true);
     }else{

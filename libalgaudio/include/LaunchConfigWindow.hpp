@@ -47,6 +47,8 @@ public:
 private:
   LaunchConfigWindow();
   void init();
+  /** Stores configuration from UI to the global Config */
+  void ApplyConfig();
   /** Switches back and forth between configuration display and about dialog. */
   void ToggleAbout();
   bool about_displayed = false;

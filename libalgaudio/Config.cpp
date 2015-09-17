@@ -18,5 +18,26 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Config.hpp"
+#include "Utilities.hpp"
 
-bool Config::do_not_use_sc = false;
+namespace AlgAudio{
+
+std::unique_ptr<Config> Config::global;
+
+Config& Config::Global(){
+  if(!global){
+    global = std::make_unique<Config>(Default());
+  }
+  
+  return *global;
+}
+
+Config Config::Default(){
+  Config c;
+  c.do_not_use_sc = false;
+  c.supernova = false;
+  c.path_to_sclang = Utilities::FindSCLang();
+  return c;
+}
+
+} // namespace AlgAudio

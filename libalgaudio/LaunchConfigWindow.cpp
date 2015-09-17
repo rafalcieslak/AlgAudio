@@ -65,8 +65,7 @@ void LaunchConfigWindow::init(){
   version_label->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
   config_separator = UISeparator::Create(shared_from_this());
   config_separator->SetCustomSize(Size2D(0,20));
-  std::string default_sclang_path = Utilities::FindSCLang();
-  sclang_path_selector = UIPathSelector::Create(shared_from_this(), default_sclang_path);
+  sclang_path_selector = UIPathSelector::Create(shared_from_this(), Config::Global().path_to_sclang);
 #ifdef __UNIX__
   path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang binary", 14);
 #else
@@ -101,16 +100,16 @@ void LaunchConfigWindow::init(){
 
   subscriptions += startbutton->on_clicked.Subscribe([this](){
     
+    ApplyConfig();
+    
     statustext->SetTextColor(Theme::Get("text-generic"));
     statustext->SetBold(false);
+    statustext->SetText("Starting...");
+    // Hide the start button
+    startbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+    start_in_progress = true;
     
-    if(!start_in_progress){
-      startbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
-      start_in_progress = true;
-      SCLang::Start(sclang_path_selector->GetPath(), supernovachkbox->GetActive());
-    }else{
-      // ??? Should not happen.
-    }
+    SCLang::Start();
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
     progressbar->SetAmount(n/10.0);
@@ -119,8 +118,9 @@ void LaunchConfigWindow::init(){
   });
 
   subscriptions += testbutton->on_clicked.Subscribe([this](){
+    ApplyConfig();
     // Disable SC usage through the app. All inlets will be fake, etc.
-    Config::do_not_use_sc = true;
+    Config::Global().do_not_use_sc = true;
     on_complete.Happen();
   });
   subscriptions += aboutbutton->on_clicked.Subscribe([this](){
@@ -195,6 +195,12 @@ void LaunchConfigWindow::ToggleAbout(){
     
     aboutbutton->SetText("About");
   }
+}
+
+void LaunchConfigWindow::ApplyConfig(){
+  Config& c = Config::Global();
+  c.path_to_sclang = sclang_path_selector->GetPath();
+  c.supernova = supernovachkbox->GetActive();
 }
 
 } // namespace AlgAudio

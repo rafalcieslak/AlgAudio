@@ -39,7 +39,7 @@ LateReturn<std::shared_ptr<Canvas>> Canvas::CreateEmpty(std::shared_ptr<Canvas> 
   res->parent = parent;
   auto parentgroup = (parent)? parent->GetGroup() : nullptr;
   
-  if( ! Config::do_not_use_sc){
+  if( ! Config::Global().do_not_use_sc){
     Group::CreateNew( parentgroup ).Then([r,res](std::shared_ptr<Group> g){
       res->group = g;
       std::cout << "New canvas group " << g->GetID() << std::endl;

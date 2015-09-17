@@ -46,12 +46,10 @@ class SCLang{
   SCLang() = delete; // static class
 public:
   /** Launches SuperCollider. Starts the interpreter, prepares connection, boots
-   *  the server etc.
-   *  \param command The command to start the process. Usually a path to sclang binary.
-   *  \param supernova Whether to use Supernova server instad of SCSynth.*/
-  static void Start(std::string command, bool supernova = false);
+   *  the server etc. Uses the configuration from global config. \see Config */
+  static void Start();
   /** Reboots SuperCollider. */
-  static void Restart(std::string command);
+  static void Restart();
   /** Stops SuperCollider, closing the interpreter and stopping the subprocess. */
   static void Stop();
   /** Returns true iff SuperCollider was started and is ready to work. */
@@ -125,8 +123,8 @@ public:
    *  RegisterSendReply(). */
   static void UnregisterSendReply(int synth_id, int reply_id);
 
-  /** Boots the supercollider server. */
-  static void BootServer(bool supernova = false);
+  /** Boots the supercollider server. Uses global configuration. \see Config*/
+  static void BootServer();
   /** Quits the supercollider server. */
   static void StopServer();
   
