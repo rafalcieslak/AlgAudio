@@ -101,10 +101,19 @@ void Canvas::RemoveModule(std::shared_ptr<Module> m){
   for(auto param : m->templ->params){
     std::string paramid = param->id;
     auto it = data_connections.find(IOID{m, paramid});
-    if(it != data_connections.end())
+    if(it != data_connections.end()){
+      // There is a connection from that param output.
+      
+      // Remove the subscription
+      auto it2 = data_connections_subscriptions.find(it->first);
+      if(it2 == data_connections_subscriptions.end()){
+        std::cout << "WARNING: Unable to remove data_connections subscriptions, as none was found!" << std::endl;
+      }else data_connections_subscriptions.erase(it2);
+      // Erase the connection
       data_connections.erase(it);
+    }
   }
-  // Fianlly, remove all data connections that end at this module.
+  // Finally, remove all data connections that end at this module.
   for(auto param : m->templ->params){
     std::string paramid = param->id;
     for(auto it = data_connections.begin(); it != data_connections.end(); /*--*/){
@@ -234,7 +243,7 @@ void Canvas::DisconnectData(IOID from, IOID to){
 void Canvas::PassData(IOID source, float value, float relative){
   auto it = data_connections.find(source);
   if(it == data_connections.end()){
-    std::cout << "WARNING: Pasing data from source, which has no connections anymore..." << std::endl;
+    std::cout << "WARNING: Passing data from source, which has no connections anymore..." << std::endl;
     return;
   }
   auto list = it->second;

@@ -181,6 +181,7 @@ void Module::Outlet::SendConnections(){
 
 
 Module::~Module() {
+  std::cout << "Deleted module " << templ->GetFullID() << std::endl;
   if(enabled_by_factory) std::cout << "WARNING: a module " << templ->GetFullID() << " reference is lost, but it was not destroyed by the factory." << std::endl;
 };
 

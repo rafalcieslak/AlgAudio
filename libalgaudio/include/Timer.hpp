@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <functional>
 #include <map>
 #include <list>
+#include <iostream>
 
 namespace AlgAudio{
 
@@ -71,7 +72,7 @@ class TimerHandleList{
 public:
   TimerHandleList(const TimerHandleList& other) = delete;
   std::list<TimerHandle> list;
-  void ReleaseAll() { 
+  void ReleaseAll() {
     for(auto& th : list) th.Release();
     list.clear();
   }
