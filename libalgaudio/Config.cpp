@@ -39,6 +39,7 @@ Config Config::Default(){
   c.path_to_sclang = Utilities::FindSCLang();
   c.debug = false;
   c.debug_osc = false;
+  c.scsynth_audio_driver_name = ""; // default audio driver
   return c;
 }
 

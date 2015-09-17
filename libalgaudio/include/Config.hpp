@@ -31,6 +31,7 @@ public:
 	bool debug;
 	bool debug_osc;
 	std::string path_to_sclang;
+	std::string scsynth_audio_driver_name;
 	
 	Config(const Config& other) = default;
 	

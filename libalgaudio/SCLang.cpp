@@ -204,8 +204,9 @@ void SCLang::QueryAllNodes(){
   SendOSC("/algaudioSC/allnodes");
 }
 void SCLang::BootServer(){
-  // TODO: Device selection
-  // SendInstruction("s.options.device = \"ASIO\"");
+  
+  if(Config::Global().scsynth_audio_driver_name != "")
+      SendInstruction("s.options.device = \"" + Config::Global().scsynth_audio_driver_name + "\"");
 
 #ifdef __unix__
   // Do not attempt to use supernova on Windows.

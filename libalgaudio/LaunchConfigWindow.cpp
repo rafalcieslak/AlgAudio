@@ -47,7 +47,13 @@ void LaunchConfigWindow::init(){
   chk_advconfig = UICheckbox::Create(shared_from_this(),"Advanced configuration");
   mainvbox = UIVBox::Create(shared_from_this());
   configbox = UIVBox::Create(shared_from_this());
-  config_adv = UIHBox::Create(shared_from_this());
+  configbox->SetPadding(4);
+  config_adv = UIVBox::Create(shared_from_this());
+  config_adv->SetPadding(2);
+  config_adv_driver_box = UIHBox::Create(shared_from_this());
+  config_adv_driver_label = UILabel::Create(shared_from_this(),"SC audio device name: ",12);
+  config_adv_driver_entry = UITextEntry::Create(shared_from_this());
+  config_adv_chbox = UIHBox::Create(shared_from_this());
   config_adv->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
   config_advA = UIVBox::Create(shared_from_this());
   config_advB = UIVBox::Create(shared_from_this());
@@ -89,12 +95,16 @@ void LaunchConfigWindow::init(){
      configbox->Insert(sclang_path_selector, UIBox::PackMode::TIGHT);
      configbox->Insert(configlabel, UIBox::PackMode::WIDE);
      configbox->Insert(config_adv, UIBox::PackMode::TIGHT);
-       config_adv->Insert(config_advA, UIBox::PackMode::WIDE);
-         config_advA->Insert(chk_supernova, UIBox::PackMode::TIGHT);
-         config_advA->Insert(chk_nosclang, UIBox::PackMode::TIGHT);
-       config_adv->Insert(config_advB, UIBox::PackMode::WIDE);
-         config_advB->Insert(chk_debug, UIBox::PackMode::TIGHT);
-         config_advB->Insert(chk_oscdebug, UIBox::PackMode::TIGHT);
+       config_adv->Insert(config_adv_driver_box, UIBox::PackMode::TIGHT);
+         config_adv_driver_box->Insert(config_adv_driver_label, UIBox::PackMode::TIGHT);
+         config_adv_driver_box->Insert(config_adv_driver_entry, UIBox::PackMode::WIDE);
+       config_adv->Insert(config_adv_chbox, UIBox::PackMode::TIGHT);
+         config_adv_chbox->Insert(config_advA, UIBox::PackMode::WIDE);
+           config_advA->Insert(chk_supernova, UIBox::PackMode::TIGHT);
+           config_advA->Insert(chk_nosclang, UIBox::PackMode::TIGHT);
+         config_adv_chbox->Insert(config_advB, UIBox::PackMode::WIDE);
+           config_advB->Insert(chk_debug, UIBox::PackMode::TIGHT);
+           config_advB->Insert(chk_oscdebug, UIBox::PackMode::TIGHT);
      configbox->Insert(chk_advconfig, UIBox::PackMode::TIGHT);
     layered->Insert(about_box);
       about_box->Insert(about_text, UIBox::PackMode::WIDE);
@@ -213,6 +223,7 @@ void LaunchConfigWindow::ApplyToGlobalConfig(){
   c.use_sc = ! chk_nosclang->GetActive();
   c.debug = chk_debug->GetActive();
   c.debug_osc = chk_oscdebug->GetActive();
+  c.scsynth_audio_driver_name = config_adv_driver_entry->GetText();
 }
 
 } // namespace AlgAudio
