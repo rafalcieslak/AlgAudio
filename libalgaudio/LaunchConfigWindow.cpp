@@ -31,40 +31,55 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",290,425){
 }
 
 void LaunchConfigWindow::init(){
-  marginbox = UIMarginBox::Create(shared_from_this(),10,10,2,10);
-  startbutton = UIButton::Create(shared_from_this(),"Start!");
-  aboutbutton = UIButton::Create(shared_from_this(),"About");
-  quitbutton = UIButton::Create(shared_from_this(),"Quit App");
-  titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
-  configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
-  chk_oscdebug = UICheckbox::Create(shared_from_this(),"OSC debugging");
-  chk_supernova = UICheckbox::Create(shared_from_this(),"Supernova");
+  std::weak_ptr<Window> w = shared_from_this();
+  marginbox = UIMarginBox::Create(w,10,10,2,10);
+  startbutton = UIButton::Create(w,"Start!");
+  aboutbutton = UIButton::Create(w,"About");
+  quitbutton = UIButton::Create(w,"Quit App");
+  titlelabel = UILabel::Create(w,"AlgAudio",52);
+  chk_oscdebug = UICheckbox::Create(w,"OSC debugging");
+  chk_supernova = UICheckbox::Create(w,"Supernova");
 #ifndef __unix__
   chk_supernova->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
 #endif
-  chk_debug = UICheckbox::Create(shared_from_this(),"Debug tools");
-  chk_nosclang = UICheckbox::Create(shared_from_this(),"Disable SC");
-  chk_advconfig = UICheckbox::Create(shared_from_this(),"Advanced configuration");
-  mainvbox = UIVBox::Create(shared_from_this());
-  configbox = UIVBox::Create(shared_from_this());
+  chk_debug = UICheckbox::Create(w,"Debug tools");
+  chk_nosclang = UICheckbox::Create(w,"Disable SC");
+  chk_advconfig = UICheckbox::Create(w,"Advanced configuration");
+  mainvbox = UIVBox::Create(w);
+  configbox = UIVBox::Create(w);
   configbox->SetPadding(4);
-  config_adv = UIVBox::Create(shared_from_this());
+  config_sep = UISeparator::Create(w);
+  config_sep->SetCustomSize(Size2D(0,10));
+  config_widesep = UISeparator::Create(w);
+  config_audio = UIHBox::Create(w);
+  config_audio->SetPadding(2);
+  config_audioA = UIVBox::Create(w);
+  config_audioA->SetPadding(2);
+  config_audioB = UIVBox::Create(w);
+  config_audioB->SetPadding(2);
+  config_inchannels  = UISpinEntry::Create(w, "In channels:", 2);
+  config_outchannels = UISpinEntry::Create(w, "Out channels:", 2);
+  config_samplerate = UISpinEntry::Create(w, "Sample rate:", 44100);
+  config_blocksize = UISpinEntry::Create(w, "Block size:", 64);
+  config_adv = UIVBox::Create(w);
   config_adv->SetPadding(2);
-  config_adv_driver_box = UIHBox::Create(shared_from_this());
-  config_adv_driver_label = UILabel::Create(shared_from_this(),"SC audio device name: ",12);
-  config_adv_driver_entry = UITextEntry::Create(shared_from_this());
-  config_adv_chbox = UIHBox::Create(shared_from_this());
+  config_adv_driver_box = UIHBox::Create(w);
+  config_adv_driver_label = UILabel::Create(w,"SC audio device name: ",12);
+  config_adv_driver_entry = UITextEntry::Create(w);
+  config_adv_chbox = UIHBox::Create(w);
   config_adv->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
-  config_advA = UIVBox::Create(shared_from_this());
-  config_advB = UIVBox::Create(shared_from_this());
-  buttonhbox = UIHBox::Create(shared_from_this());
-  progressbar = UIProgressBar::Create(shared_from_this());
-  statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
+  config_advA = UIVBox::Create(w);
+  config_advA->SetPadding(2);
+  config_advB = UIVBox::Create(w);
+  config_advB->SetPadding(2);
+  buttonhbox = UIHBox::Create(w);
+  progressbar = UIProgressBar::Create(w);
+  statustext = UILabel::Create(w,"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
   statustext->SetCustomSize(Size2D(0,32));
-  layered = UILayered::Create(shared_from_this());
-  about_box = UIVBox::Create(shared_from_this());
+  layered = UILayered::Create(w);
+  about_box = UIVBox::Create(w);
   about_box->SetDisplayMode(UIWidget::DisplayMode::Invisible);
-  about_text = UILabel::Create(shared_from_this(),
+  about_text = UILabel::Create(w,
     "Copyright (C) 2015 CeTA - Audiovisual Technology Center\n"
     "Copyright (C) 2015 Rafal Cieslak\n"
     "\n"
@@ -73,15 +88,15 @@ void LaunchConfigWindow::init(){
     "      https://www.gnu.org/licenses/lgpl.txt"
     ,12);
   about_text->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
-  version_label = UILabel::Create(shared_from_this(), ALGAUDIO_VERSION, 16);
+  version_label = UILabel::Create(w, ALGAUDIO_VERSION, 16);
   version_label->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
-  config_separator = UISeparator::Create(shared_from_this());
+  config_separator = UISeparator::Create(w);
   config_separator->SetCustomSize(Size2D(0,20));
-  sclang_path_selector = UIPathSelector::Create(shared_from_this(), Config::Global().path_to_sclang);
+  sclang_path_selector = UIPathSelector::Create(w, Config::Global().path_to_sclang);
 #ifdef __unix__
-  path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang binary", 14);
+  path_label = UILabel::Create(w, "Path to SuperCollider's sclang binary", 14);
 #else
-  path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang.exe", 14);
+  path_label = UILabel::Create(w, "Path to SuperCollider's sclang.exe", 14);
 #endif
 
   Insert(marginbox);
@@ -93,7 +108,15 @@ void LaunchConfigWindow::init(){
     layered->Insert(configbox);
      configbox->Insert(path_label, UIBox::PackMode::TIGHT);
      configbox->Insert(sclang_path_selector, UIBox::PackMode::TIGHT);
-     configbox->Insert(configlabel, UIBox::PackMode::WIDE);
+     configbox->Insert(config_sep, UIBox::PackMode::TIGHT);
+     configbox->Insert(config_audio, UIBox::PackMode::TIGHT);
+       config_audio->Insert(config_audioA, UIBox::PackMode::WIDE);
+         config_audioA->Insert(config_inchannels, UIBox::PackMode::TIGHT);
+         config_audioA->Insert(config_samplerate, UIBox::PackMode::TIGHT);
+       config_audio->Insert(config_audioB, UIBox::PackMode::WIDE);
+         config_audioB->Insert(config_outchannels, UIBox::PackMode::TIGHT);
+         config_audioB->Insert(config_blocksize  , UIBox::PackMode::TIGHT);
+     configbox->Insert(config_widesep, UIBox::PackMode::WIDE);
      configbox->Insert(config_adv, UIBox::PackMode::TIGHT);
        config_adv->Insert(config_adv_driver_box, UIBox::PackMode::TIGHT);
          config_adv_driver_box->Insert(config_adv_driver_label, UIBox::PackMode::TIGHT);

@@ -20,7 +20,6 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "UIWidget.hpp"
-#include "Window.hpp"
 
 namespace AlgAudio{
 

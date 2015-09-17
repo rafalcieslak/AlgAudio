@@ -31,6 +31,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UITextEntry.hpp"
 #include "UI/UILayered.hpp"
 #include "UI/UISeparator.hpp"
+#include "UI/UISpinEntry.hpp"
 #include "UI/UIPathSelector.hpp"
 
 namespace AlgAudio{
@@ -64,7 +65,15 @@ std::shared_ptr<UIMarginBox> marginbox;
       std::shared_ptr<UIVBox> configbox;
         std::shared_ptr<UILabel> path_label;
         std::shared_ptr<UIPathSelector> sclang_path_selector;
-        std::shared_ptr<UILabel> configlabel;
+        std::shared_ptr<UISeparator> config_sep;
+        std::shared_ptr<UIHBox> config_audio;
+          std::shared_ptr<UIVBox> config_audioA;
+            std::shared_ptr<UISpinEntry> config_inchannels;
+            std::shared_ptr<UISpinEntry> config_samplerate;
+          std::shared_ptr<UIVBox> config_audioB;
+            std::shared_ptr<UISpinEntry> config_outchannels;
+            std::shared_ptr<UISpinEntry> config_blocksize;
+        std::shared_ptr<UISeparator> config_widesep;
         std::shared_ptr<UIVBox> config_adv;
           std::shared_ptr<UIHBox> config_adv_driver_box;
             std::shared_ptr<UILabel> config_adv_driver_label;
