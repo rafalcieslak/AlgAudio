@@ -27,7 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",290,425){
+LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",290,425,true,false){
 }
 
 void LaunchConfigWindow::init(){

@@ -26,11 +26,11 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-Window::Window(std::string t, int w, int h, bool centered) :
+Window::Window(std::string t, int w, int h, bool centered, bool resizable) :
   title(t), width(w), height(h)
 {
   //std::cout << "Creating a new window" << std::endl;
-  window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
+  window = SDL_CreateWindow(title.c_str(), (centered)?SDL_WINDOWPOS_CENTERED:40, (centered)?SDL_WINDOWPOS_CENTERED:40, width, height, (resizable?SDL_WINDOW_RESIZABLE:0) | SDL_WINDOW_OPENGL);
   if(!window) throw Exceptions::SDLException("Unable to create a window");
   context = SDL_GL_CreateContext(window);
   int n = SDL_GetNumRenderDrivers();
@@ -54,8 +54,8 @@ Window::Window(std::string t, int w, int h, bool centered) :
   id = SDL_GetWindowID(window);
 }
 
-std::shared_ptr<Window> Window::Create(std::string title, int w, int h, bool centered){
-  std::shared_ptr<Window> res(new Window(title,w,h,centered));
+std::shared_ptr<Window> Window::Create(std::string title, int w, int h, bool centered, bool resizable){
+  std::shared_ptr<Window> res(new Window(title,w,h,centered,resizable));
   return res;
 }
 

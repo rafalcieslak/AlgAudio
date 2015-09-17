@@ -44,7 +44,7 @@ public:
    *  \param h Initial window height.
    *  \param centered If true, window will be placed on the center of the screen.
    *        Otherwise, the initial window position is undefined. */
-  static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300, bool centered = true);
+  static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300, bool centered = true, bool resizable = true);
   ~Window();
 
   /** Explicitly forbids copying windows. */
@@ -93,7 +93,7 @@ public:
   virtual LateReturn<> ShowErrorAlert(std::string, std::string)
   {throw  Exceptions::WindowNotAlertable("This window is not capable of displaying alerts.");}
 protected:
-  Window(std::string title, int w, int h, bool centered = true);
+  Window(std::string title, int w, int h, bool centered = true, bool resizable = true);
 private:
   std::string title;
   int width;
