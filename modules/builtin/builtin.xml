@@ -1,6 +1,9 @@
 <collection version="1" id="builtin">
   <name>Builtin modules</name>
   
+  <!-- Builtin modules have their code embedded within libAlgAudio. The only
+  point of this file is to provide easily editable metadata for builtin modules. -->
+  
   <module id="pipe" name="Pipe">
     <params>
       <inlet id="inbus" name="in"/>

@@ -24,17 +24,39 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
+/** This class provides configuration settings for AlgAudio. This includes 
+ *  supercollider's audio settings. The static member Global() returns a
+ *  reference to an instance of this class which shall be used when accessing
+ *  configuration. */
 class Config{
 public:
+	/** This flag marks whether we use supercollider or not. Usually supercollider
+	 *  is in use, but the user can manually specify not to use it. In such case,
+	 *  no audio processing will happen. This may be, however, useful, when, for
+	 *  example, testing UI. */
 	bool use_sc;
+	/** If set to true, supernova will be launched instead of scsynth. This setting
+	 *  has no effect on Windows, which does not support supernova. */
 	bool supernova;
+	/** False by default. If set to true, various debuggin features will be enabled,
+	 *  including sc console window. */
 	bool debug;
+	/** False by default. If set to true, will enable OSCFunc.trace in sclang. */
 	bool debug_osc;
+	/** The path to sclang binary executable file. */
 	std::string path_to_sclang;
+	/** The name of driver device to be used by scsynth for audio I/O. If set to
+	 *  an empty string, scsynth will use the default device. */
 	std::string scsynth_audio_driver_name;
 	
 	Config(const Config& other) = default;
 	
+	/** Reuturns a reference to the global Config instance. Usually, you will
+	 *  access configuration properties this way:
+	 *  \code
+	 *    ... = Config::Global().path_to_sclang;
+	 *  \endcode */
+	// TODO: return a const reference, and create a separate method that returns non-const for writing to config.
 	static Config& Global();
 	static Config Default();
 	
