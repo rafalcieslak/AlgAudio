@@ -42,7 +42,7 @@ void UICheckbox::Init(){
   child_box = UIHBox::Create(window);
   child_box->parent = shared_from_this();
   child_button = UIButton::Create(window," ");
-  child_label = UILabel::Create(window,text,12);
+  child_label = UILabel::Create(window,text,14);
   child_box->Insert(child_button, UIBox::PackMode::TIGHT);
   child_box->Insert(child_label, UIBox::PackMode::TIGHT);
 
