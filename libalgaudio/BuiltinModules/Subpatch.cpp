@@ -36,7 +36,7 @@ LateReturn<> Subpatch::on_init_latereturn(){
   
   inlets.resize(4);
   
-  bool fake = Config::Global().do_not_use_sc;
+  bool fake = ! Config::Global().use_sc;
   Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;
     if(entrance) entrance->LinkOutput(0, inlet->bus->GetID());
@@ -178,7 +178,7 @@ LateReturn<> SubpatchExit::on_init_latereturn(){
   // Create inlets.
   inlets.resize(4);
   
-  bool fake = Config::Global().do_not_use_sc;
+  bool fake = ! Config::Global().use_sc;
   
   Module::Inlet::Create("in1","Inlet 1",shared_from_this(),fake).Then([this,s](auto inlet){
     inlets[0] = inlet;

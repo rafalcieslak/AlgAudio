@@ -66,7 +66,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
   
   // Create SC instance
   if(templ->has_sc_code){
-    if(Config::Global().do_not_use_sc){
+    if(!Config::Global().use_sc){
       
       // Create fake io
       res->CreateIOFromTemplate(true);

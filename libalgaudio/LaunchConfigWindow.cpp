@@ -33,18 +33,24 @@ LaunchConfigWindow::LaunchConfigWindow() : Window("AlgAudio config",290,425){
 void LaunchConfigWindow::init(){
   marginbox = UIMarginBox::Create(shared_from_this(),10,10,2,10);
   startbutton = UIButton::Create(shared_from_this(),"Start!");
-  testbutton = UIButton::Create(shared_from_this(),"Test UI");
   aboutbutton = UIButton::Create(shared_from_this(),"About");
-  testbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
   quitbutton = UIButton::Create(shared_from_this(),"Quit App");
   titlelabel = UILabel::Create(shared_from_this(),"AlgAudio",52);
   configlabel = UILabel::Create(shared_from_this(),"This place is left for config.");
-  oscchkbox = UICheckbox::Create(shared_from_this(),"Enable OSC debugging");
-  oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Invisible);
-  supernovachkbox = UICheckbox::Create(shared_from_this(),"Enable Supernova mode");
-  debugchkbox = UICheckbox::Create(shared_from_this(),"Enable debug tools");
+  chk_oscdebug = UICheckbox::Create(shared_from_this(),"OSC debugging");
+  chk_supernova = UICheckbox::Create(shared_from_this(),"Supernova");
+#ifndef __unix__
+  chk_supernova->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+#endif
+  chk_debug = UICheckbox::Create(shared_from_this(),"Debug tools");
+  chk_nosclang = UICheckbox::Create(shared_from_this(),"Disable SC");
+  chk_advconfig = UICheckbox::Create(shared_from_this(),"Advanced configuration");
   mainvbox = UIVBox::Create(shared_from_this());
   configbox = UIVBox::Create(shared_from_this());
+  config_adv = UIHBox::Create(shared_from_this());
+  config_adv->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+  config_advA = UIVBox::Create(shared_from_this());
+  config_advB = UIVBox::Create(shared_from_this());
   buttonhbox = UIHBox::Create(shared_from_this());
   progressbar = UIProgressBar::Create(shared_from_this());
   statustext = UILabel::Create(shared_from_this(),"AlgAudio (C) CeTA 2015, released on GNU LGPL 3",12);
@@ -66,7 +72,7 @@ void LaunchConfigWindow::init(){
   config_separator = UISeparator::Create(shared_from_this());
   config_separator->SetCustomSize(Size2D(0,20));
   sclang_path_selector = UIPathSelector::Create(shared_from_this(), Config::Global().path_to_sclang);
-#ifdef __UNIX__
+#ifdef __unix__
   path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang binary", 14);
 #else
   path_label = UILabel::Create(shared_from_this(), "Path to SuperCollider's sclang.exe", 14);
@@ -82,14 +88,18 @@ void LaunchConfigWindow::init(){
      configbox->Insert(path_label, UIBox::PackMode::TIGHT);
      configbox->Insert(sclang_path_selector, UIBox::PackMode::TIGHT);
      configbox->Insert(configlabel, UIBox::PackMode::WIDE);
-     configbox->Insert(oscchkbox, UIBox::PackMode::TIGHT);
-     configbox->Insert(supernovachkbox, UIBox::PackMode::TIGHT);
-     configbox->Insert(debugchkbox, UIBox::PackMode::TIGHT);
+     configbox->Insert(config_adv, UIBox::PackMode::TIGHT);
+       config_adv->Insert(config_advA, UIBox::PackMode::WIDE);
+         config_advA->Insert(chk_supernova, UIBox::PackMode::TIGHT);
+         config_advA->Insert(chk_nosclang, UIBox::PackMode::TIGHT);
+       config_adv->Insert(config_advB, UIBox::PackMode::WIDE);
+         config_advB->Insert(chk_debug, UIBox::PackMode::TIGHT);
+         config_advB->Insert(chk_oscdebug, UIBox::PackMode::TIGHT);
+     configbox->Insert(chk_advconfig, UIBox::PackMode::TIGHT);
     layered->Insert(about_box);
       about_box->Insert(about_text, UIBox::PackMode::WIDE);
    mainvbox->Insert(buttonhbox, UIBox::PackMode::TIGHT);
     buttonhbox->Insert(quitbutton, UIHBox::PackMode::WIDE);
-    buttonhbox->Insert(testbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(aboutbutton, UIHBox::PackMode::WIDE);
     buttonhbox->Insert(startbutton, UIHBox::PackMode::WIDE);
    mainvbox->Insert(progressbar, UIBox::PackMode::TIGHT);
@@ -100,28 +110,26 @@ void LaunchConfigWindow::init(){
 
   subscriptions += startbutton->on_clicked.Subscribe([this](){
     
-    ApplyConfig();
+    ApplyToGlobalConfig();
     
     statustext->SetTextColor(Theme::Get("text-generic"));
     statustext->SetBold(false);
     statustext->SetText("Starting...");
     // Hide the start button
     startbutton->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
-    start_in_progress = true;
     
-    SCLang::Start();
+    if(Config::Global().use_sc){
+      start_in_progress = true;
+      SCLang::Start();
+    }else{
+      on_complete.Happen();
+    }
+    
   });
   subscriptions += SCLang::on_start_progress.Subscribe([this](int n, std::string msg){
     progressbar->SetAmount(n/10.0);
     statustext->SetAlignment(HorizAlignment_CENTERED,VertAlignment_TOP);
     statustext->SetText(msg);
-  });
-
-  subscriptions += testbutton->on_clicked.Subscribe([this](){
-    ApplyConfig();
-    // Disable SC usage through the app. All inlets will be fake, etc.
-    Config::Global().do_not_use_sc = true;
-    on_complete.Happen();
   });
   subscriptions += aboutbutton->on_clicked.Subscribe([this](){
     ToggleAbout();
@@ -130,25 +138,26 @@ void LaunchConfigWindow::init(){
   subscriptions += quitbutton->on_clicked.Subscribe([this](){
     on_close.Happen();
   });
-  subscriptions += oscchkbox->on_toggled.Subscribe([](bool state){
+  subscriptions += chk_oscdebug->on_toggled.Subscribe([](bool state){
     SCLang::SetOSCDebug(state);
   });
-  subscriptions += debugchkbox->on_toggled.Subscribe([this](bool enabled){
+  subscriptions += chk_debug->on_toggled.Subscribe([this](bool enabled){
     if(enabled){
       console = Console::Create();
       subscriptions += console->on_close.Subscribe([this](){
-        debugchkbox->SetActive(false); // This will also unregister the window.
+        chk_debug->SetActive(false); // This will also unregister the window.
       });
       SDLMain::RegisterWindow(console);
-      oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Visible);
-      testbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
-      aboutbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
     }else{
       SDLMain::UnregisterWindow(console);
-      oscchkbox->SetDisplayMode(UIWidget::DisplayMode::Invisible);
-      testbutton->SetDisplayMode(UIWidget::DisplayMode::Invisible);
-      aboutbutton->SetDisplayMode(UIWidget::DisplayMode::Visible);
       console = nullptr;
+    }
+  });
+  subscriptions += chk_advconfig->on_toggled.Subscribe([this](bool enabled){
+    if(enabled){
+      config_adv->SetDisplayMode(UIWidget::DisplayMode::Visible);
+    }else{
+      config_adv->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
     }
   });
   subscriptions += SCLang::on_start_completed.Subscribe([this](bool success, std::string message){
@@ -197,10 +206,13 @@ void LaunchConfigWindow::ToggleAbout(){
   }
 }
 
-void LaunchConfigWindow::ApplyConfig(){
+void LaunchConfigWindow::ApplyToGlobalConfig(){
   Config& c = Config::Global();
   c.path_to_sclang = sclang_path_selector->GetPath();
-  c.supernova = supernovachkbox->GetActive();
+  c.supernova = chk_supernova->GetActive();
+  c.use_sc = ! chk_nosclang->GetActive();
+  c.debug = chk_debug->GetActive();
+  c.debug_osc = chk_oscdebug->GetActive();
 }
 
 } // namespace AlgAudio

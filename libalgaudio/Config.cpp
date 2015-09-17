@@ -34,9 +34,11 @@ Config& Config::Global(){
 
 Config Config::Default(){
   Config c;
-  c.do_not_use_sc = false;
+  c.use_sc = true;
   c.supernova = false;
   c.path_to_sclang = Utilities::FindSCLang();
+  c.debug = false;
+  c.debug_osc = false;
   return c;
 }
 

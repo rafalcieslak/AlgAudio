@@ -48,7 +48,7 @@ private:
   LaunchConfigWindow();
   void init();
   /** Stores configuration from UI to the global Config */
-  void ApplyConfig();
+  void ApplyToGlobalConfig();
   /** Switches back and forth between configuration display and about dialog. */
   void ToggleAbout();
   bool about_displayed = false;
@@ -65,9 +65,14 @@ std::shared_ptr<UIMarginBox> marginbox;
         std::shared_ptr<UILabel> path_label;
         std::shared_ptr<UIPathSelector> sclang_path_selector;
         std::shared_ptr<UILabel> configlabel;
-        std::shared_ptr<UICheckbox> debugchkbox;
-        std::shared_ptr<UICheckbox> supernovachkbox;
-        std::shared_ptr<UICheckbox> oscchkbox;
+        std::shared_ptr<UIHBox> config_adv;
+          std::shared_ptr<UIVBox> config_advA;
+            std::shared_ptr<UICheckbox> chk_supernova;
+            std::shared_ptr<UICheckbox> chk_nosclang;
+          std::shared_ptr<UIVBox> config_advB;
+            std::shared_ptr<UICheckbox> chk_debug;
+            std::shared_ptr<UICheckbox> chk_oscdebug;
+        std::shared_ptr<UICheckbox> chk_advconfig;
     std::shared_ptr<UIHBox> buttonhbox;
       std::shared_ptr<UIButton> quitbutton;
       std::shared_ptr<UIButton> testbutton;

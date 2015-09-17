@@ -26,8 +26,10 @@ namespace AlgAudio{
 
 class Config{
 public:
-	bool do_not_use_sc;
+	bool use_sc;
 	bool supernova;
+	bool debug;
+	bool debug_osc;
 	std::string path_to_sclang;
 	
 	Config(const Config& other) = default;
