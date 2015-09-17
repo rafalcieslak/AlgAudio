@@ -249,6 +249,10 @@ void LaunchConfigWindow::ApplyToGlobalConfig(){
   c.debug = chk_debug->GetActive();
   c.debug_osc = chk_oscdebug->GetActive();
   c.scsynth_audio_driver_name = config_adv_driver_entry->GetText();
+  c.input_channels = config_inchannels->GetValue();
+  c.output_channels = config_outchannels->GetValue();
+  c.sample_rate = config_samplerate->GetValue();
+  c.block_size = config_blocksize->GetValue();
 }
 
 } // namespace AlgAudio

@@ -70,6 +70,7 @@ void OSC::AddMethodHandler(std::string path, std::function<void(lo::Message)> f)
 
 OSC::~OSC(){
   server->stop();
+  server.reset();
 }
 
 void OSC::Send(std::string a){

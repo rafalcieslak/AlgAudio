@@ -95,6 +95,7 @@ void SCLang::Start(){
       port = Utilities::SplitString(port,"\n")[1];
       std::cout << "SCLang is using port " << port << std::endl;
       on_start_progress.Happen(4,"Starting OSC...");
+      osc.reset(); // Resetting the pointer BEFORE creating new. Otherwise, the new OSC server would fail to start because the speficied port would be already in use.
       osc = std::make_unique<OSC>("localhost", port);
       osc->AddMethodHandler("/algaudio/midiin", ProcessMIDIInput);
       osc->AddMethodHandler("/algaudio/sendreply", [](lo::Message msg){SendReplyCatcher(msg.argv()[0]->i32, msg.argv()[1]->i32, msg.argv()[2]->f); });
@@ -214,17 +215,16 @@ void SCLang::QueryAllNodes(){
   SendOSC("/algaudioSC/allnodes");
 }
 void SCLang::BootServer(){
-  
-  if(Config::Global().scsynth_audio_driver_name != "")
-      SendInstruction("s.options.device = \"" + Config::Global().scsynth_audio_driver_name + "\"");
 
-#ifdef __unix__
-  // Do not attempt to use supernova on Windows.
-  if(Config::Global().supernova) SendInstruction("Server.supernova;");
-  else SendInstruction("Server.scsynth;");
-#endif
-
-  SendOSCWithReply<int>("/algaudioSC/boothelper").Then([&](int status){
+  const Config& c = Config::Global();
+  SendOSCWithReply<int>("/algaudioSC/boothelper", "siiiii",
+    c.scsynth_audio_driver_name,
+    (c.supernova)?1:0,
+    c.sample_rate,
+    c.block_size,
+    c.input_channels,
+    c.output_channels
+  ).Then([&](int status){
     if(status){
       on_server_started.Happen(true);
     }else{

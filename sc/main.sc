@@ -88,16 +88,30 @@ OSCdef.new( 'installtemplate', {
 ).postln;
 
 // A helper method for notifying the app if starting the server succeeded.
+/* Params:
+ *  1. (string) Audio driver device name. 
+ *  2. (int interpreted as bool 0-1) Use supernova?
+ *  3. (int) Sample rate
+ *  4. (int) Block size
+ *  5. (int) Input channels
+ *  6. (int) Output channels
+ */
 OSCdef.new( 'boothelper', {
 		arg msg;
-		/*s.options.device = msg[1].asString;
+		s.options.device = msg[1].asString;
 		if((msg[2].asInt == 1),{
 			"Server will start in Supernova mode".postln;
 			Server.supernova;
 		},{
 			"Server will start in SCSynth mode".postln;
 			Server.scsynth;
-		});*/
+		});
+		
+		s.options.sampleRate = msg[3].asInt;
+		s.options.blockSize = msg[4].asInt;
+		s.options.numInputBusChannels = msg[5].asInt;
+		s.options.numOutputBusChannels = msg[6].asInt;
+		
 		s.waitForBoot({
 			~addr.sendMsg("/algaudio/reply", 1, msg[msg.size-1]);
 		}, 35, {

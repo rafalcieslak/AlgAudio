@@ -41,6 +41,10 @@ Config Config::Default(){
   c.debug = false;
   c.debug_osc = false;
   c.scsynth_audio_driver_name = ""; // default audio driver
+  c.sample_rate = 44100;
+  c.input_channels = 2;
+  c.output_channels = 2;
+  c.block_size = 64;
   return c;
 }
 

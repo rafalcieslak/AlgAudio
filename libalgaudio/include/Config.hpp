@@ -49,6 +49,12 @@ public:
 	 *  an empty string, scsynth will use the default device. */
 	std::string scsynth_audio_driver_name;
 	
+	int  input_channels;
+	int output_channels;
+	
+	int sample_rate;
+	int block_size;
+	
 	Config(const Config& other) = default;
 	
 	/** Reuturns a reference to the global Config instance. Usually, you will
