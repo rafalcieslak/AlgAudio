@@ -116,7 +116,6 @@ void LaunchConfigWindow::init(){
        config_audio->Insert(config_audioB, UIBox::PackMode::WIDE);
          config_audioB->Insert(config_outchannels, UIBox::PackMode::TIGHT);
          config_audioB->Insert(config_blocksize  , UIBox::PackMode::TIGHT);
-     configbox->Insert(config_widesep, UIBox::PackMode::WIDE);
      configbox->Insert(config_adv, UIBox::PackMode::TIGHT);
        config_adv->Insert(config_adv_driver_box, UIBox::PackMode::TIGHT);
          config_adv_driver_box->Insert(config_adv_driver_label, UIBox::PackMode::TIGHT);
@@ -128,6 +127,7 @@ void LaunchConfigWindow::init(){
          config_adv_chbox->Insert(config_advB, UIBox::PackMode::WIDE);
            config_advB->Insert(chk_debug, UIBox::PackMode::TIGHT);
            config_advB->Insert(chk_oscdebug, UIBox::PackMode::TIGHT);
+     configbox->Insert(config_widesep, UIBox::PackMode::WIDE);
      configbox->Insert(chk_advconfig, UIBox::PackMode::TIGHT);
     layered->Insert(about_box);
       about_box->Insert(about_text, UIBox::PackMode::WIDE);

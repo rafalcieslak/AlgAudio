@@ -23,7 +23,19 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "UI/UIContainer.hpp"
 
 namespace AlgAudio{
-
+  
+UIWidget::UIWidget(std::weak_ptr<Window> parent_window)
+  : window(parent_window)
+{
+  cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(0,0));
+  on_display_mode_changed.SubscribeForever([this](){
+    if(display_mode != DisplayMode::Invisible)
+      SetNeedsRedrawing();
+    auto p = parent.lock();
+    if(p) p->OnChildVisibilityChanged();
+  });
+}
+    
 void UIWidget::Draw(DrawContext& c){
   if(display_mode == DisplayMode::Invisible) return;
 
@@ -57,7 +69,7 @@ void UIWidget::Draw(DrawContext& c){
   c.DrawTexture(cache_texture);
   current_size = drawsize;
   needs_redrawing = false;
-
+  
 }
 
 void UIWidget::Resize(Size2D s){
@@ -79,15 +91,6 @@ void UIWidget::SetNeedsRedrawing(){
   auto w = window.lock();
   if(p) p->SetNeedsRedrawing();
   else if(w) w->SetNeedsRedrawing();
-}
-
-void UIWidget::SetDisplayMode(DisplayMode m){
-  if(m == display_mode) return;
-  display_mode = m;
-  if(display_mode != DisplayMode::Invisible)
-    SetNeedsRedrawing();
-  auto p = parent.lock();
-  if(p) p->OnChildVisibilityChanged();
 }
 
 void UIWidget::SetMinimalSize(Size2D s){

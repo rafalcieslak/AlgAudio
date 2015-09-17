@@ -59,10 +59,7 @@ class Window;
 */
 class UIWidget : public UIMouseEventsBase, public virtual SubscriptionsManager, public std::enable_shared_from_this<UIWidget>{
 protected:
-  UIWidget(std::weak_ptr<Window> parent_window)
-    : window(parent_window) {
-      cache_texture = std::make_shared<SDLTexture>(parent_window, Size2D(0,0));
-    };
+  UIWidget(std::weak_ptr<Window> parent_window);
 public:
 
   virtual ~UIWidget() {}
@@ -81,24 +78,10 @@ public:
   void TriggerFakeResize() { CustomResize(current_size); }
 
   std::weak_ptr<UIWidget> parent;
-
-  enum class DisplayMode{
-    Visible, /**< A Visible widget is drawn just normally. */
-    EmptySpace, /**< An EmptySpace widget is not drawn, but it takes as much space as it would normally take. */
-    Invisible, /**< An Invisible widget is not drawn, and it takes zero area. */
-  };
-  /** Sets widget display mode. \see DisplayModes */
-  void SetDisplayMode(DisplayMode display_mode);
-  /** Returns true if the contents of the widget are supposed to be drawn, i.e.
-   *  whether display mode is 'visible'. When implementing a custom widget,
-   *  do do not need to test for being drawn in CustomDraw, if a widget is not
-   *  supposed to be drawn, CustomDraw will never be called. */
-  inline bool IsDrawn() const {return display_mode == DisplayMode::Visible;}
+  
   /** Returns true if this widget has zero area, and this it will not take any space. */
   inline bool HasZeroArea() const {return GetRequestedSize().IsEmpty(); }
-  /** Returns true if this widget is marked as invisible. */
-  inline bool IsInvisible() const {return display_mode == DisplayMode::Invisible; }
-
+  
   /**The requested size depends on both minimal size and custom size.
      The minimal size is set by the particular widget implementation. For
      example, a Box container will set it's minimal size just large enough
@@ -236,8 +219,6 @@ private:
 
   // This flag is used to track incorrect usage of SetMinimalSize()
   bool in_custom_resize = false;
-
-  DisplayMode display_mode = DisplayMode::Visible;
 
   std::shared_ptr<SDLTexture> cache_texture;
   void RedrawToCache(Size2D size);

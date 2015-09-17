@@ -22,8 +22,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 namespace AlgAudio{
 
 bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
+  
+  // Ignore all mouse clicks it the widget is hidden in any way.
+  if(display_mode != DisplayMode::Visible) return false;
+  
   // Prolong instance lifetime in case this widget would get destroyed as a
-  // result of a subscriber
+  // result of a subscribers' action
   std::shared_ptr<UIWidget> ptr;
   auto widg = dynamic_cast<UIWidget*>(this);
   if(widg) ptr = widg->shared_from_this();

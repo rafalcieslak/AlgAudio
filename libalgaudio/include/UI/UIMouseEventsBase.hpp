@@ -19,10 +19,11 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "Utilities.hpp"
+#include "UI/UIVisibilityBase.hpp"
 
 namespace AlgAudio{
 
-class UIMouseEventsBase{
+class UIMouseEventsBase : public UIVisibilityBase{
 public:
   Signal<> on_clicked;
   Signal<bool> on_pointed;
