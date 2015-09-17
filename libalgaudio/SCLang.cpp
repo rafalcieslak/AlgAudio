@@ -51,8 +51,18 @@ void SCLang::Start(){
   
   std::string command = Config::Global().path_to_sclang;
   
+#ifndef __unix__
+  std::string sclang_binary = "sclang.exe";
+#else
+  std::string sclang_binary = "sclang";
+#endif
+  if(Utilities::GetFilename(command) != sclang_binary){
+    on_start_completed.Happen(false,"Invalid path to sclang: Selected file is not " + sclang_binary);
+    return;
+  }
+  
   if(!Utilities::GetFileExists(command)){
-    on_start_completed.Happen(false,"Invalid path to sclang");
+    on_start_completed.Happen(false,"Invalid path to sclang: File does not exist");
     return;
   }
   subprocess = std::make_unique<SCLangSubprocess>(command);
