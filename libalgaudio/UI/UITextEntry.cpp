@@ -43,7 +43,7 @@ void UITextEntry::CustomDraw(DrawContext& c){
   c.SetColor(bg_color);
   c.DrawRect(Rect(Point2D(0,0), c.Size()));
 
-  c.DrawText(text_texture, Theme::Get("textentry-text"), Point2D( c.Size().height/2 - text_texture->GetSize().height/2 + 1 ,0));
+  c.DrawText(text_texture, Theme::Get( (text!="") ? "textentry-text" : "textentry-default"), Point2D( c.Size().height/2 - text_texture->GetSize().height/2 + 1 ,0));
 }
 
 void UITextEntry::SetText(std::string t){
@@ -78,7 +78,7 @@ void UITextEntry::SetFontSize(int size){
 }
 
 void UITextEntry::UpdateText(){
-  text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), text);
+  text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), (text!="") ? text : default_text);
   SetNeedsRedrawing();
 }
 

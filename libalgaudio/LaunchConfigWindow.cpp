@@ -67,6 +67,7 @@ void LaunchConfigWindow::init(){
   config_adv_driver_label = UILabel::Create(w,"SC audio device name: ",14);
   config_adv_driver_entry = UITextEntry::Create(w);
   config_adv_driver_entry->SetFontSize(14);
+  config_adv_driver_entry->SetDefaultText("(Default device)");
   config_adv_chbox = UIHBox::Create(w);
   config_adv->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
   config_advA = UIVBox::Create(w);

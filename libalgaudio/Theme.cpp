@@ -72,6 +72,7 @@ void Theme::Init(){
 
   thememap["textentry-bg"] = Color(0x52607cff);
   thememap["textentry-text"] = Color(0x212227ff);
+  thememap["textentry-default"] = Color(0x3a404fff);
 }
 
 const Color& Theme::Get(const std::string& id){

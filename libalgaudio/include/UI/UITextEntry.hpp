@@ -32,6 +32,12 @@ public:
   void SetText(std::string text);
   void SetFontSize(int size);
   std::string GetText() const {return text;}
+  /** The default text is displayed when the typed in text is empty. Useful
+   *  for setting up a placeholder message, or example value. */
+  void SetDefaultText(std::string d) {
+    default_text = d;
+    if(text == "") UpdateText();
+  }
   virtual void OnFocusChanged() override;
   virtual void OnKeyboard(KeyData) override;
 private:
@@ -39,6 +45,7 @@ private:
   void Init();
   void UpdateText();
   std::string text;
+  std::string default_text = "";
   std::shared_ptr<SDLTextTexture> text_texture;
   int fontsize = 12;
 };
