@@ -56,8 +56,8 @@ public:
 	 *  \code
 	 *    ... = Config::Global().path_to_sclang;
 	 *  \endcode */
-	// TODO: return a const reference, and create a separate method that returns non-const for writing to config.
-	static Config& Global();
+	static const Config& Global();
+	static Config& GlobalWriteable();
 	static Config Default();
 	
 	// TODO: Store/load to/from file

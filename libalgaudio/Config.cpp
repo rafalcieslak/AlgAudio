@@ -24,11 +24,12 @@ namespace AlgAudio{
 
 std::unique_ptr<Config> Config::global;
 
-Config& Config::Global(){
-  if(!global){
-    global = std::make_unique<Config>(Default());
-  }
-  
+const Config& Config::Global(){
+  if(!global) global = std::make_unique<Config>(Default());
+  return *global;
+}
+Config& Config::GlobalWriteable(){
+  if(!global) global = std::make_unique<Config>(Default());
   return *global;
 }
 

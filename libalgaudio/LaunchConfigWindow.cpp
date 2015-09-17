@@ -217,7 +217,7 @@ void LaunchConfigWindow::ToggleAbout(){
 }
 
 void LaunchConfigWindow::ApplyToGlobalConfig(){
-  Config& c = Config::Global();
+  Config& c = Config::GlobalWriteable();
   c.path_to_sclang = sclang_path_selector->GetPath();
   c.supernova = chk_supernova->GetActive();
   c.use_sc = ! chk_nosclang->GetActive();
