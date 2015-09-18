@@ -133,8 +133,9 @@ void UIAnimDrawer::OnChildVisibilityChanged(){
 
 // TODO: Animated pointing over moving elements?
 bool UIAnimDrawer::CustomMousePress(bool down, MouseButton b,Point2D pos){
-  if(!child || phase < 0.999) return false;
-  return child->OnMousePress(down,b,pos);
+  if(!child || phase < 0.999) return true;
+  child->OnMousePress(down,b,pos);
+  return false;
 }
 void UIAnimDrawer::CustomMouseMotion(Point2D p1,Point2D p2){
   if(!child || phase < 0.999) return;

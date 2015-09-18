@@ -24,7 +24,7 @@ namespace AlgAudio{
 bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
   
   // Ignore all mouse clicks it the widget is hidden in any way.
-  if(display_mode != DisplayMode::Visible) return false;
+  if(display_mode != DisplayMode::Visible) return true;
   
   // Prolong instance lifetime in case this widget would get destroyed as a
   // result of a subscribers' action
@@ -32,21 +32,23 @@ bool UIMouseEventsBase::OnMousePress(bool down, MouseButton b,Point2D p){
   auto widg = dynamic_cast<UIWidget*>(this);
   if(widg) ptr = widg->shared_from_this();
   
-  bool result = CustomMousePress(down,b,p);
-  (void)result;
-  //if(result) return true; // The custom handler captured the event
+  bool reachedBottom = CustomMousePress(down,b,p);
+  
+  //if(reachedBottom) std::cout << "BOTTOM" << std::endl;
+  
   // In other case, execute our own code
   if(down == true && b == MouseButton::Left){
     pressed = true;
-    if(focusable) RequestFocus();
-    return on_pressed.Happen(true);
+    if(focusable && reachedBottom){
+      RequestFocus();
+    }
+    on_pressed.Happen(true);
   }else if(down == false && b == MouseButton::Left && pressed == true){
     pressed = false;
-    result = on_pressed.Happen(false);
-    //if(result) return true;
-    return on_clicked.Happen();
+    on_pressed.Happen(false);
+    on_clicked.Happen();
   }
-  return false;
+  return reachedBottom;
 }
 
 void UIMouseEventsBase::OnMouseEnter(Point2D p){

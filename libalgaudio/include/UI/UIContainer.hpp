@@ -22,10 +22,8 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-// This file contains interfaces for
-
-// This is an interface for widgets which act as a container for a single child,
-// like UICentered or UIMarginBox
+/** This is an interface for widgets which act as a container for a single child,
+ *  like UICentered or UIMarginBox. */
 class UIContainerSingle : public UIWidget{
 public:
   virtual void Insert(std::shared_ptr<UIWidget>) = 0;
@@ -34,14 +32,28 @@ public:
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override {return child?child->FindChild(id):nullptr;}
 protected:
   UIContainerSingle(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
-  virtual void OnChildFocusRequested(std::shared_ptr<UIWidget>) override { RequestFocus(); }
-  virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget>) override {return true;} // My only child is always the special one.
-  virtual void OnKeyboard(KeyData k) override { if(child) child->OnKeyboard(k);}
+  virtual void OnChildFocusRequested(std::shared_ptr<UIWidget>) override { 
+    child->OnFocusChanged(true);
+    child_is_focused = true;
+    UIWidget::RequestFocus();
+  }
+  virtual void RequestFocus() override{
+    if(child) child->OnFocusChanged(false);
+    child_is_focused = false;
+    UIWidget::RequestFocus();
+  }
+  virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget>) override {
+    return child_is_focused;
+  }
+  virtual void OnKeyboard(KeyData k) override { 
+    if(child && child_is_focused) child->OnKeyboard(k);
+  }
   std::shared_ptr<UIWidget> child;
+  bool child_is_focused = false;
 };
 
-// This is an interface for widgets which act as a container for multiple
-// children, like UIBox or UILayered
+/** This is an interface for widgets which act as a container for multiple
+ *  children, like UIBox or UILayered. */
 class UIContainerMultiple : public UIWidget{
 public:
   // Not forcing on an Insert method, as some widgets may require extra arguments
@@ -51,21 +63,34 @@ public:
   virtual void Clear() = 0;
 protected:
   UIContainerMultiple(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
-  // Not forcing how the child list looks like, some widgets may wish to store
+  // Not forcing what the child list looks like, some widgets may wish to store
   // some extra data wich each child.
   //std::list<std::shared_ptr<UIWidget>> child;
 
   virtual void OnChildFocusRequested(std::shared_ptr<UIWidget> w) override {
-    auto old_focused_child = focused_child;
-    focused_child = w;
-    if(old_focused_child) old_focused_child->OnFocusChanged();
-    RequestFocus();
+    if(w != focused_child){
+      auto old_focused_child = focused_child;
+      focused_child = w;
+      if(old_focused_child && old_focused_child != w) old_focused_child->OnFocusChanged(false);
+      focused_child->OnFocusChanged(true);
+    }
+    if(! GetIsFocused()){
+      UIWidget::RequestFocus();
+    }
+  }
+  virtual void RequestFocus() override{
+    if(focused_child) focused_child->OnFocusChanged(false);
+    focused_child = nullptr;
+    UIWidget::RequestFocus();
   }
   virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget> w) override {
     return (w == focused_child) && GetIsFocused();
   }
   virtual void OnKeyboard(KeyData k) override{
     if(focused_child) focused_child->OnKeyboard(k);
+  }
+  virtual void OnFocusChanged(bool has_focus) override{
+    if(focused_child) focused_child->OnFocusChanged(has_focus);
   }
   std::shared_ptr<UIWidget> focused_child = nullptr;
 };

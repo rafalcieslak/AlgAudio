@@ -57,8 +57,10 @@ void UIPosition::OnChildVisibilityChanged(){
 
 bool UIPosition::CustomMousePress(bool down, MouseButton b,Point2D p){
   if(!child) return false;
-  if(IsInside(p))
-    return child->OnMousePress(down,b,p - position);
+  if(IsInside(p)){
+    child->OnMousePress(down,b,p - position);
+    return true;
+  }
   return false;
 }
 

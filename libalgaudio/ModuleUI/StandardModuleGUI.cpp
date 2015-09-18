@@ -304,9 +304,8 @@ Point2D StandardModuleGUI::IOConn::GetRectPos() const{
 bool StandardModuleGUI::IOConn::CustomMousePress(bool down, MouseButton b,Point2D pos){
   if(b == MouseButton::Left && pos.IsInside(GetRectPos(),GetRectSize())){
     on_press.Happen(down);
-    return true;
   }
-  return false;
+  return true;
 }
 
 void StandardModuleGUI::IOConn::CustomMouseEnter(Point2D pos){

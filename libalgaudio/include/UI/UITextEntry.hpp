@@ -43,7 +43,7 @@ public:
   /** Sets the maximum allowed length of enterred text. Set to -1 to disable
    *  limit. By default there is no limit. */
   void SetMaxLength(int l);
-  virtual void OnFocusChanged() override;
+  virtual void OnFocusChanged(bool) override;
   virtual void OnKeyboard(KeyData) override;
 private:
   UITextEntry(std::weak_ptr<Window>, std::string t = "");

@@ -154,11 +154,10 @@ public:
 
   /** This method is called by the widget when it wishes to grab focus, for example
    *  a text entry field should call this method when it's clicked. */
-  void RequestFocus() override;
-  /** This method is called when the widget focus state has changed. It is not clear
-   *  if the child actually has focus now, or not. When implementing a custom
-   *  override, you may use GetIsFocused() to check for current focus state. */
-  virtual void OnFocusChanged() {}
+  virtual void RequestFocus() override;
+  /** This method is called when the widget focus state has changed. The only
+   *  param states whether this widget has now the focus*/
+  virtual void OnFocusChanged(bool) {}
   
   std::shared_ptr<Window> GetWindow() {return window.lock();}
 protected:
@@ -205,9 +204,9 @@ protected:
 
   /** This method checks whether this widget currently has focus. If it does,
    *  this method returns true. If it lies on the focus path (e.g. is a box whose
-   *  child as grabbed focus), it also returns true. This should be always true
+   *  child has grabbed focus), it also returns true. This should be always true
    *  for a top-level widget. In any other case, false is returned.
-  */
+   */
   bool GetIsFocused() const;
 
 private:

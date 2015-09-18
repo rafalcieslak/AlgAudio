@@ -327,6 +327,8 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   Point2D pos = PositionAbsToRel(pos_abs);
   //std::cout << pos_abs.ToString() << " " << pos.ToString() << std::endl;
   
+  bool passed_event = false;
+  
   int id = InWhich(pos);
   Point2D offset;
 
@@ -369,6 +371,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
           // So when the slider is clicked with shift held down, we don't want
           // it to jump to the pointed position.
           module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+          passed_event = true;
         }
         mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
         mouse_down_elem_widgetid = whatishere.widget_id;
@@ -387,6 +390,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
         mouse_down_elem_paramid = whatishere.param_id;
       }else if(whatishere.type == ModuleGUI::WhatIsHereType::Nothing){
         bool captured = module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+        passed_event = true;
         if(!captured) mouse_down_mode = ModeModuleBody;
         else mouse_down_mode = ModeCaptured;
       }else{
@@ -466,6 +470,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
     }else{
       // No drag in progress.
       if(id >= 0) module_guis[id]->OnMousePress(false, MouseButton::Left, offset);
+      passed_event = true;
     }
   }else if(down == true && b == MouseButton::Middle){
     mmb_down = true;
@@ -481,7 +486,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
   }else if(b == MouseButton::WheelDown){
     DecreaseZoom();
   }
-  return true;
+  return !passed_event;
 }
 
 void CanvasView::FinalizeAudioConnectingDrag(int inlet_module_id, UIWidget::ID inlet_widget_id, int outlet_module_id, UIWidget::ID outlet_widget_id){

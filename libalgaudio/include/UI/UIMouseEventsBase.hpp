@@ -35,7 +35,10 @@ public:
   void OnMouseEnter(Point2D);
   void OnMouseLeave(Point2D);
   void OnMouseMotion(Point2D,Point2D);
-  virtual bool CustomMousePress(bool,MouseButton,Point2D) {return false;}
+  /** This call is supposed to return TRUE iff it's the end of the click chain,
+   * i.e. the event was NOT passed to another widget. It must return FALSE if
+  *  the event was passed to any child widget. */
+  virtual bool CustomMousePress(bool,MouseButton,Point2D) {return true;}
   virtual void CustomMouseEnter(Point2D) {}
   virtual void CustomMouseLeave(Point2D) {}
   virtual void CustomMouseMotion(Point2D,Point2D) {}

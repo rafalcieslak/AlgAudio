@@ -180,9 +180,8 @@ bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){
     float x = pos.x - GetBodyStart();
     float q = x / GetBodyWidth();
     controller.lock()->SetRelative(q);
-    return true;
   }
-  return false;
+  return true;
 }
 
 void UISlider::CustomMouseMotion(Point2D, Point2D pos2){

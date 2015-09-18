@@ -139,7 +139,6 @@ void UIWidget::RequestFocus(){
   auto p = parent.lock();
   if(!p) return;
   p->OnChildFocusRequested(shared_from_this());
-  OnFocusChanged();
 }
 
 bool UIWidget::GetIsFocused() const{

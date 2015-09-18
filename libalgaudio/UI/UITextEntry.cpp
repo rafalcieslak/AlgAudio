@@ -75,8 +75,8 @@ void UITextEntry::OnKeyboard(KeyData k){
   }
 }
 
-void UITextEntry::OnFocusChanged(){
-  if(GetIsFocused()){
+void UITextEntry::OnFocusChanged(bool has_focus){
+  if(has_focus){
     SDLMain::SetTextInput(true);
     was_edited_since_received_focus = false;
   }else{
