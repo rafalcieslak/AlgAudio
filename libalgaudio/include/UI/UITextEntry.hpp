@@ -27,8 +27,8 @@ class UITextEntry : public UIWidget{
 public:
   static std::shared_ptr<UITextEntry> Create(std::weak_ptr<Window> parent_window, std::string text = "");
   virtual void CustomDraw(DrawContext& c) override;
-  Signal<> on_complete; // Triggered when the Return key is pressed while entering text.
-  Signal<> on_edited; // Triggered when user does any change to the text.
+  Signal<> on_edit_complete; /**< Triggered when the Return key is pressed while entering text, or when focus is lost after user edited text. */
+  Signal<> on_edited; /**< Triggered when user does any change to the text. */
   void SetText(std::string text);
   void SetFontSize(int size);
   std::string GetText() const {return text;}
@@ -40,6 +40,9 @@ public:
   }
   /** If set to true, all non-digit keystrokes will be ignored. */
   void SetDigitsOnly(bool d) {digits_only = d;}
+  /** Sets the maximum allowed length of enterred text. Set to -1 to disable
+   *  limit. By default there is no limit. */
+  void SetMaxLength(int l);
   virtual void OnFocusChanged() override;
   virtual void OnKeyboard(KeyData) override;
 private:
@@ -51,6 +54,9 @@ private:
   std::shared_ptr<SDLTextTexture> text_texture;
   int fontsize = 12;
   bool digits_only = false;
+  int max_length = -1;
+  
+  bool was_edited_since_received_focus = false;
 };
 
 } // namespace AlgAudio

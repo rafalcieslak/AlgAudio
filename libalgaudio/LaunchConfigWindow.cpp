@@ -57,10 +57,10 @@ void LaunchConfigWindow::init(){
   config_audioA->SetPadding(2);
   config_audioB = UIVBox::Create(w);
   config_audioB->SetPadding(2);
-  config_inchannels  = UISpinEntry::Create(w, "In channels:", 2);
-  config_outchannels = UISpinEntry::Create(w, "Out channels:", 2);
-  config_samplerate = UISpinEntry::Create(w, "Sample rate:", 44100);
-  config_blocksize = UISpinEntry::Create(w, "Block size:", 64);
+  config_inchannels  = UISpinEntry::Create(w, "In channels:", 2, 0, 64);
+  config_outchannels = UISpinEntry::Create(w, "Out channels:", 2, 0, 64);
+  config_samplerate = UISpinEntry::Create(w, "Sample rate:", 48000, 8000, 300000);
+  config_blocksize = UISpinEntry::Create(w, "Block size:", 64, 1, 65536);
   config_adv = UIVBox::Create(w);
   config_adv->SetPadding(2);
   config_adv_driver_box = UIHBox::Create(w);

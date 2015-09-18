@@ -30,13 +30,24 @@ class UILabel;
 
 class UISpinEntry : public UIHBox{
 public:
-  static std::shared_ptr<UISpinEntry> Create(std::weak_ptr<Window> parent_window, std::string name = "", int value = 0);
+  static std::shared_ptr<UISpinEntry> Create(std::weak_ptr<Window> parent_window, std::string name = "", int value = 0, int start = 0, int end = 10);
   Signal<> on_changed;
   void SetValue(int v);
   int GetValue() const;
+  /** Sets the range of values this UISpinEntry accepts. By default, it's from 0
+   *  to 10. It is expected that end is grater than start.*/
+  void SetRange(int start, int end);
 private:
   UISpinEntry(std::weak_ptr<Window>);
   void Init(std::string name = "", int value = 0);
+  
+  int range_min = 0;
+  int range_max = 10;
+  
+  /** Checks if inputted value is in range, sets to 0 when text is empty etc. */
+  void FinalizeEdit();
+  
+  int value = 0; // The stored number
   
   std::shared_ptr<UISeparator> child_sep;
   std::shared_ptr<UILabel> child_label;

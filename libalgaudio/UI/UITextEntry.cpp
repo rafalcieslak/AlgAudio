@@ -33,7 +33,7 @@ std::shared_ptr<UITextEntry> UITextEntry::Create(std::weak_ptr<Window> parent_wi
 }
 
 void UITextEntry::Init(){
-  SetMinimalSize(Size2D(30, fontsize + 2));
+  SetMinimalSize(Size2D(10, fontsize + 2));
   UpdateText();
 }
 
@@ -48,6 +48,7 @@ void UITextEntry::CustomDraw(DrawContext& c){
 
 void UITextEntry::SetText(std::string t){
   text = t;
+  if(max_length != -1) text = text.substr(0,max_length);
   UpdateText();
 }
 
@@ -56,32 +57,54 @@ void UITextEntry::OnKeyboard(KeyData k){
   if( (k.type == KeyData::KeyType::Text && digits_only == false) ||
        k.type == KeyData::KeyType::Digit
      ) {
-    text += k.symbol;
-    on_edited.Happen();
-    UpdateText();
+    if(max_length == -1 || text.length() < (unsigned int)max_length){
+      text += k.symbol;
+      on_edited.Happen();
+      was_edited_since_received_focus = true;
+      UpdateText();
+    }
   }else if(k.type == KeyData::KeyType::Backspace){
     if(text.length() >= 1){
       text.pop_back();
       on_edited.Happen();
+      was_edited_since_received_focus = true;
       UpdateText();
     }
+  }else if(k.type == KeyData::KeyType::Return){
+    on_edit_complete.Happen();
   }
 }
 
 void UITextEntry::OnFocusChanged(){
-  SDLMain::SetTextInput( GetIsFocused() );
+  if(GetIsFocused()){
+    SDLMain::SetTextInput(true);
+    was_edited_since_received_focus = false;
+  }else{
+    SDLMain::SetTextInput(false);
+    if(was_edited_since_received_focus){
+      on_edit_complete.Happen();
+    }
+  }
   SetNeedsRedrawing();
 }
 
 void UITextEntry::SetFontSize(int size){
   fontsize = size;
-  SetMinimalSize(Size2D(30, fontsize + 2));
+  SetMinimalSize(Size2D(10, fontsize + 2));
   UpdateText();
 }
 
 void UITextEntry::UpdateText(){
   text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), (text!="") ? text : default_text);
   SetNeedsRedrawing();
+}
+
+void UITextEntry::SetMaxLength(int l){
+  max_length = l;
+  if(max_length != -1){
+    text = text.substr(0,max_length);
+    UpdateText();
+  }
 }
 
 } // namespace AlgAudio
