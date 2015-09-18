@@ -53,7 +53,9 @@ void UITextEntry::SetText(std::string t){
 
 void UITextEntry::OnKeyboard(KeyData k){
   if(k.pressed == false) return; // Ignore key up events
-  if(k.type == KeyData::KeyType::Text){
+  if( (k.type == KeyData::KeyType::Text && digits_only == false) ||
+       k.type == KeyData::KeyType::Digit
+     ) {
     text += k.symbol;
     on_edited.Happen();
     UpdateText();

@@ -38,6 +38,8 @@ public:
     default_text = d;
     if(text == "") UpdateText();
   }
+  /** If set to true, all non-digit keystrokes will be ignored. */
+  void SetDigitsOnly(bool d) {digits_only = d;}
   virtual void OnFocusChanged() override;
   virtual void OnKeyboard(KeyData) override;
 private:
@@ -48,6 +50,7 @@ private:
   std::string default_text = "";
   std::shared_ptr<SDLTextTexture> text_texture;
   int fontsize = 12;
+  bool digits_only = false;
 };
 
 } // namespace AlgAudio

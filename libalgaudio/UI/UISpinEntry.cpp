@@ -35,6 +35,7 @@ void UISpinEntry::Init(std::string name, int value){
   child_entry->SetText( std::to_string(value) );
   child_entry->SetCustomSize(Size2D(40,0));
   child_entry->SetFontSize(16);
+  child_entry->SetDigitsOnly(true);
   child_box_buttons = UIVBox::Create(window);
   child_box_buttons->SetPadding(2);
   child_button_up = UIButton::Create(window, "    /\\    ");
