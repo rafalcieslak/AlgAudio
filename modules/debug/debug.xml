@@ -132,5 +132,16 @@ Out.ar(outbus, In.ar(portalbus));
     <description> A simple non-editable sequencer. </description>
     <gui type="standard auto"/>
   </module>
+  
+  <module id="qtest" name="Quad test">
+    <description> Test for quad output. </description>
+    <sc>
+Out.ar(0,SinOsc.ar(100,0,1));
+Out.ar(1,SinOsc.ar(200,0,1));
+Out.ar(2,SinOsc.ar(300,0,1));
+Out.ar(3,SinOsc.ar(400,0,1));
+    </sc>
+    <gui type="standard auto"/>
+  </module>
 
 </collection>

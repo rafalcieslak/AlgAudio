@@ -217,8 +217,9 @@ void SCLang::QueryAllNodes(){
 void SCLang::BootServer(){
 
   const Config& c = Config::Global();
+  std::cout << " WILL USE " << c.scsynth_audio_driver_name << std::endl;
   SendOSCWithReply<int>("/algaudioSC/boothelper", "siiiii",
-    c.scsynth_audio_driver_name,
+    c.scsynth_audio_driver_name.c_str(),
     (c.supernova)?1:0,
     c.sample_rate,
     c.block_size,
