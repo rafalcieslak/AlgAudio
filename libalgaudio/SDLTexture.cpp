@@ -58,9 +58,10 @@ SDLTexture::SDLTexture(std::weak_ptr<Window> w, SDL_Surface* surf)
   SDL_SetTextureBlendMode(texture, (SDL_BlendMode)99999999);
   size.width = surf->w;
   size.height = surf->h;
+  
 }
 
-
+/*
 SDLTexture::SDLTexture(SDLTexture&& other) :
   handle(std::move(other.handle)),
   texture(std::move(other.texture)),
@@ -69,19 +70,24 @@ SDLTexture::SDLTexture(SDLTexture&& other) :
   size(std::move(other.size))
 {
   other.valid = false;
+  std::cout << "Texture " << texture << " move-constructed." << std::endl;
 }
+
 SDLTexture& SDLTexture::operator=(SDLTexture&& other){
   handle = std::move(other.handle);
   texture = std::move(other.texture);
   valid = std::move(other.valid);
   parent = std::move(other.parent);
   size = std::move(other.size);
+  other.valid = false;
+  std::cout << "Texture " << texture << " moved." << std::endl;
   return *this;
 }
-
+*/
 SDLTexture::~SDLTexture(){
-  //std::cout << "Destroying a texture" << texture << std::endl;
-  if(valid) SDL_DestroyTexture(texture);
+  if(valid && parent.lock()){
+    SDL_DestroyTexture(texture);
+  }
 }
 
 void SDLTexture::Resize(Size2D s){

@@ -35,8 +35,8 @@ public:
   SDLTexture(std::weak_ptr<Window> parent_window, Size2D size);
   SDLTexture(std::weak_ptr<Window> parent_window, SDL_Surface*);
   ~SDLTexture();
-  SDLTexture(SDLTexture&& other);
-  SDLTexture& operator=(SDLTexture&& other);
+  //SDLTexture(SDLTexture&& other);
+  //SDLTexture& operator=(SDLTexture&& other);
   SDLTexture(const SDLTexture& other) = delete; // No copyconstructing
   SDLTexture& operator=(const SDLTexture& other) = delete; // No copying
   void Resize(Size2D size);
