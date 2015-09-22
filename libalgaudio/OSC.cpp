@@ -24,12 +24,15 @@ namespace AlgAudio{
 
 int OSC::msg_id = 0;
 
+#define PROTO LO_UDP
+
 OSC::OSC(std::string address, std::string port) : addr(""){
-  server = std::make_unique<lo::ServerThread>(2542);
+  //TODO: Search for an available port in a larger range (100 ports?)
+  server = std::make_unique<lo::ServerThread>(2542, PROTO, nullptr);
   if(!server->is_valid()){
-    server = std::make_unique<lo::ServerThread>(2543);
+    server = std::make_unique<lo::ServerThread>(2543, PROTO, nullptr);
     if(!server->is_valid()){
-      server = std::make_unique<lo::ServerThread>(2544);
+      server = std::make_unique<lo::ServerThread>(2544, PROTO, nullptr);
       if(!server->is_valid()){
         throw Exceptions::OSCException("OSC server failed to bind to a socket");
       }
@@ -54,7 +57,7 @@ OSC::OSC(std::string address, std::string port) : addr(""){
 
   // The constructor for lo::Address is messed up. Creating an lo_address
   // manually and binding it to lo::Address fixes the issue.
-  lo_address a = lo_address_new(address.c_str(), port.c_str());
+  lo_address a = lo_address_new_with_proto(PROTO, address.c_str(), port.c_str());
   addr = lo::Address(a,true);
 }
 
