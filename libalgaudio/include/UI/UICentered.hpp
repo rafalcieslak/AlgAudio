@@ -39,7 +39,6 @@ public:
 private:
   UICentered(std::weak_ptr<Window> parent_window);
   inline bool IsInside(Point2D) const;
-  std::shared_ptr<UIWidget> child;
   Point2D current_child_pos;
   Size2D current_child_size;
 };
