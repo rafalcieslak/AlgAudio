@@ -78,6 +78,7 @@ LateReturn<std::shared_ptr<Module>> ModuleFactory::CreateNewInstance(std::shared
           r.Return(res);
         });
       }catch(Exceptions::ModuleDoesNotWantToBeCreated ex){
+        DestroyInstance(res);
         r.LateThrow<Exceptions::ModuleInstanceCreationFailed>("This module does not want to be created:\n" + ex.what(), templ->GetFullID());
         return r;
       }
