@@ -113,6 +113,13 @@ public:
    *  the graph of interconnections, and sends the result to SC so that it can
    *  reorder synths. */
   void RecalculateOrder();
+  /** If set to true, no synth reordering will happen from now on. When set to
+   *  false, synths will be topologically reordered immediatelly, and then after
+   *  each new connection. This is useful if you are performing a lot of new
+   *  connections at once, for example when loading a save file, and wish to
+   *  avoid unnecesary order calculations after each of them.
+   *  \see RecalculateOrder */
+  void BlockReordering(bool enable);
   
   /*The list of all audio connections "from-to", in the format of one-to-many. */
   std::map<IOID, std::list<IOID>> audio_connections;
@@ -162,6 +169,8 @@ private:
   /** The function that provides the reaction on param value changes,
    *  effectively realizing data connections. */
   void PassData(IOID source, float value, float relative);
+  /** \see BlockReordering */
+  bool do_not_recalculate_ordering;
 };
 
 } // namespace AlgAudio

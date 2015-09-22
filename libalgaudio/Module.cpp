@@ -153,30 +153,37 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
   return r;
 }
 
-void Module::Outlet::ConnectToInlet(std::shared_ptr<Module::Inlet> i){
+int x = 0;
+LateReturn<> Module::Outlet::ConnectToInlet(std::shared_ptr<Module::Inlet> i){
   buses.push_back(i->bus);
-  SendConnections();
+  //std::cout << "outlet " << mod.sc_id << "/" << id << " connecting to bus " << i->bus->GetID() << " AT " << ++x << std::endl;
+  return SendConnections();
 }
-void Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
+LateReturn<> Module::Outlet::DetachFromInlet(std::shared_ptr<Module::Inlet> i){
   auto b = i->bus;
   buses.remove_if([b](std::weak_ptr<Bus> p){
     std::shared_ptr<Bus> a = p.lock();
     if(a) return a == b;
     return false;
   });
-  SendConnections();
+  return SendConnections();
 }
-void Module::Outlet::DetachFromAll(){
+LateReturn<> Module::Outlet::DetachFromAll(){
   buses.clear();
-  SendConnections();
+  return SendConnections();
 }
-void Module::Outlet::SendConnections(){
+LateReturn<> Module::Outlet::SendConnections(){
+  Relay<> r;
   lo::Message m;
   m.add_int32(mod.sc_id);
   m.add_string(id);
+  m.add_string(std::to_string(x));
   for(auto& b : buses) m.add_int32(b.lock()->GetID());
-  if(buses.size() == 0) m.add_int32(-1);
-  SCLang::SendOSCCustom("/algaudioSC/connectoutlet", m);
+  SCLang::SendOSCCustomWithReply<int>("/algaudioSC/connectoutlet", m).Then([r](int i){
+    if(i == 1) // success!
+      r.Return();
+  });
+  return r;
 }
 
 

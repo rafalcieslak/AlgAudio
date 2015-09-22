@@ -179,7 +179,8 @@ void Canvas::Connect(IOID from, IOID to){
   outlet->ConnectToInlet(inlet);
 
   // Correct SC synth order.
-  RecalculateOrder();
+  if(!do_not_recalculate_ordering)
+    RecalculateOrder();
 }
 
 void Canvas::Disconnect(IOID from, IOID to){
@@ -356,6 +357,13 @@ void Canvas::RecalculateOrder(){
   }
   SCLang::SendOSCCustom("/algaudioSC/ordering", msg);
 
+}
+
+void Canvas::BlockReordering(bool enable){
+  do_not_recalculate_ordering = enable;
+  if(!do_not_recalculate_ordering){
+    RecalculateOrder();
+  }
 }
 
 bool Canvas::TestNewConnectionForLoop(IOID from, IOID to){

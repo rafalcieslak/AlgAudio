@@ -272,20 +272,17 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
     module_count++;
 
   Sync s(module_count);
-  std::shared_ptr<std::string> msg = std::make_shared<std::string>("");
   for(rapidxml::xml_node<>* module_node = root->first_node("module"); module_node; module_node = module_node->next_sibling("module"))
       AddModuleFromNode(c, module_node).ThenSync(s).Catch(r);
       
   // Capturing me as shared_ptr to extend lifetime
-  s.WhenAll([this,me = shared_from_this(),r,c,msg]()->void{
-    
-    if(*msg != "") // An error occured with at least one of the modules
-      parseerrornr(*msg);
-    
+  s.WhenAll([this,me = shared_from_this(),r,c]()->void{
     
     std::cout << "Modules parsed, now connections." << std::endl;
 
     // Next, parse audio connections.
+    c->BlockReordering(true);
+    
     for(rapidxml::xml_node<>* audioconn_node = root->first_node("audioconn"); audioconn_node; audioconn_node = audioconn_node->next_sibling("audioconn")){
       std::cout << "Parsing audio connection." << std::endl;
       
@@ -308,6 +305,8 @@ LateReturn<std::shared_ptr<Canvas>> CanvasXML::ApplyToCanvas(std::shared_ptr<Can
 
       c->Connect({from, fromioletid},{to, toioletid});
     }
+    
+    c->BlockReordering(false);
     
     // Then, parse data connections.
     for(rapidxml::xml_node<>* dataconn_node = root->first_node("dataconn"); dataconn_node; dataconn_node = dataconn_node->next_sibling("dataconn")){

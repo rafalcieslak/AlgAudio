@@ -206,15 +206,15 @@ public:
     Module& mod;
     // The outlet is not the owner of the buses.
     std::list<std::weak_ptr<Bus>> buses;
-    void ConnectToInlet(std::shared_ptr<Inlet> i);
-    void DetachFromInlet(std::shared_ptr<Inlet> i);
-    void DetachFromAll();
+    LateReturn<> ConnectToInlet(std::shared_ptr<Inlet> i);
+    LateReturn<> DetachFromInlet(std::shared_ptr<Inlet> i);
+    LateReturn<> DetachFromAll();
     static std::shared_ptr<Outlet> Create(std::string id, std::string name, std::shared_ptr<Module> mod);
     ~Outlet(){
       std::cout << "Outlet freed" << std::endl;
     }
   private:
-    void SendConnections();
+    LateReturn<> SendConnections();
     Outlet(std::string i, std::string n, std::shared_ptr<Module> m) : id(i), name(n), mod(*m.get()) {}
   };
   class Inlet{

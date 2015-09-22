@@ -255,12 +255,13 @@ OSCdef.new( 'setparamlist', {
 OSCdef.new( 'connectoutlet', {
 		arg msg;
 		var synthid = msg[1];
-		var targets = msg[3..(msg.size-2)];
-		var target = msg[3];
+		var connid = msg[3];
+		var targets = msg[4..(msg.size-2)];
+		var target = msg[4];
 		var outlet = msg[2].asString;
 		var count = targets.size;
 		var fork, bus, forkpair;
-		("Connecting outlet " ++ synthid.asString ++ "/" ++ msg[2].asString ++ " to bus " ++ targets.asString ++ " count " ++ count).postln;
+		(connid.asString ++ " -- Connecting outlet " ++ synthid.asString ++ "/" ++ msg[2].asString ++ " to bus " ++ targets.asString ++ " count " ++ count).postln;
 		// Free the fork synth and bus, if they exists.
 		forkpair = ~minstances[synthid][2][outlet];
 		if((forkpair.notNil),{
@@ -288,6 +289,9 @@ OSCdef.new( 'connectoutlet', {
 				("ERROR: Failed to connect, count is over maximum allowed (20)").postln;
 			});
 		});
+		
+		~addr.sendMsg("/algaudio/reply", 1, msg[msg.size-1]);
+		
 	}, '/algaudioSC/connectoutlet'
 ).postln;
 
