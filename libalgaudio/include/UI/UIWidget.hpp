@@ -166,7 +166,7 @@ public:
    *  an only instance to be verbose, witout noise from other instances. */
   bool debug_this_widget = false;
 protected:
-  Size2D current_size;
+  Size2D current_size = Size2D(0,0);
   /** Calling this method marks the widget's (as well as its ancestor's) render
    *  cache as invalid, causing it to be redrawn with the next frame using
    *  CustomDraw. It is NOT inefficient to call this method multiple times in a

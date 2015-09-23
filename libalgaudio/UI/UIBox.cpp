@@ -84,11 +84,11 @@ std::shared_ptr<UIWidget> UIBox::CustomFindChild(ID id) const{
   return nullptr;
 }
 
-void UIBox::RecalculateChildSizes(unsigned int available){
+void UIBox::RecalculateChildSizes(int available){
   // Begin by removing the space taken up by padding.
   available -= padding*(children.size() - 1);
 
-  if(available == 0){
+  if(available <= 0){
     for(unsigned int n = 0; n < children.size(); n++)
       children[n].size = 0;
     return;
@@ -108,12 +108,16 @@ void UIBox::RecalculateChildSizes(unsigned int available){
       // Invisible children are given exactly 0 space, regardless of their pack
       // mode
       children[n].size = 0;
-    }else if(children[n].mode == PackMode::TIGHT){
-      unsigned int q = DirectionalDimension(children[n].child->GetRequestedSize());
-      children[n].size = q;
-      left  -= q;
     }else{
-      wide_children++;
+      if(children[n].mode == PackMode::TIGHT){
+        unsigned int q = DirectionalDimension(children[n].child->GetRequestedSize());
+        children[n].size = q;
+        left  -= q;
+      }else if(children[n].mode == PackMode::WIDE){
+        wide_children++;
+      }else{
+        std::cout << "Box's children has unknown pack mode!" << std::endl;
+      }
     }
   }
   if(left  < 0) left  = 0; // Sigh.
@@ -165,6 +169,14 @@ void UIBox::RecalculateChildSizes(unsigned int available){
     } // for each child
     
   } // if there are any loose children
+  
+  /*
+  for(unsigned int n = 0; n < children.size(); n++){
+    if(children[n].size < 0 || children[n].size > 10000){
+      std::cout << "INVALID SIZE" << std::endl;
+    }
+  }
+  */
 }
 
 Size2D UIBox::GetChildSize(unsigned int n) const{

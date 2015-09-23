@@ -54,7 +54,7 @@ private:
   unsigned int padding = 0;
   Size2D GetChildSize(unsigned int n) const;
   void TriggerChildResizes();
-  void RecalculateChildSizes(unsigned int available_space);
+  void RecalculateChildSizes(int available_space);
   Point2D GetChildLocation(unsigned int n) const;
   unsigned int GetTotalSize() const;
   unsigned int GetChildMaxContra() const;
