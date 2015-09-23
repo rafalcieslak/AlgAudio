@@ -51,6 +51,9 @@ private:
     int pipe_child_stdout_fd[2];
     int pipe_child_stdin_fd[2];
     int pid;
+    // This pipe is used to notify parent proces about execve success or
+    // failure. See http://stackoverflow.com/questions/1584956/how-to-handle-execvp-errors-after-fork
+    int pipe_child_exec_status[2];
   #else
     PROCESS_INFORMATION piProcInfo;
     HANDLE g_hChildStd_IN_Rd = NULL;

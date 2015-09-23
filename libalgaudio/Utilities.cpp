@@ -26,12 +26,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 #include <unordered_map>
 #include <clocale>
-#include <codecvt>
 #ifdef __unix__
   #include <unistd.h>
   #include <cstdlib>
 #else
   #include <windows.h>
+  #include <codecvt>
 #endif
 
 // #define SILLY_GDB
@@ -335,12 +335,14 @@ std::string Utilities::FindSCLang(){
 #else 
   char* p = getenv("PATH");
   if(p){
-    env_path = Utilities::SplitString(buffer,":");
+    env_path = Utilities::SplitString(p,":");
   }
 #endif
+  std::cout << "path " << p << std::endl;
 
   for(std::string& dir : env_path){
     std::string path = dir + OSDirSeparator + sclang_binary;
+    std::cout << "Trying " << path << std::endl;
     if(GetFileExists(path)){
       std::cout << "Found possible path! " << path << std::endl;
       return path;
