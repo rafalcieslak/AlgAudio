@@ -44,9 +44,11 @@ std::locale user_locale; // When constructed on global init, will get and store 
 #ifdef __unix__
   const char Utilities::OSDirSeparator = '/';
   const std::string Utilities::OSLibSuffix = ".so";
+  const std::string Utilities::OSSCLangBinName = "sclang";
 #else
   const char Utilities::OSDirSeparator = '\\';
   const std::string Utilities::OSLibSuffix = ".dll";
+  const std::string Utilities::OSSCLangBinName = "sclang.exe";
 #endif
 
 void Utilities::Wait(int ms){

@@ -197,7 +197,7 @@ protected:
    *  Argument: the child that is requesting focus. */
   virtual void OnChildFocusRequested(std::shared_ptr<UIWidget>) {}
   /** This method is called by a child when it has to ask the parent whether it
-   *  is the focused child. This is necessary for performing GetIsFocused() test.
+   *  is the focused child. This is necessary for performing IsFocused() test.
    *  Containers should override this method.
    */
   virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget>) {return false;}
@@ -207,8 +207,13 @@ protected:
    *  child has grabbed focus), it also returns true. This should be always true
    *  for a top-level widget. In any other case, false is returned.
    */
-  bool GetIsFocused() const;
+  bool IsFocused() const;
 
+  /** If a children has no parent, this can mean two things: either it was not
+   *  yet placed in the hierarchy tree, or it's meant to be the root widget,
+   *  whose parent is the window. This method returns true iff this is a root
+   *  widget attached to a window. */
+  bool IsRoot() const;
 private:
   Color clear_color = Color(0,0,0,0);
   Color overlay_color = Color(0,0,0,0);

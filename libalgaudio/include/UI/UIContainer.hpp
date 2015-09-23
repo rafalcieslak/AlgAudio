@@ -86,7 +86,7 @@ protected:
     UIWidget::RequestFocus();
   }
   virtual bool OnChildFocusTested(std::shared_ptr<const UIWidget> w) override {
-    return (w == focused_child) && GetIsFocused();
+    return (w == focused_child) && IsFocused();
   }
   virtual void OnKeyboard(KeyData k) override{
     if(focused_child) focused_child->OnKeyboard(k);

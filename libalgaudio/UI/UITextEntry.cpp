@@ -39,11 +39,19 @@ void UITextEntry::Init(){
 
 void UITextEntry::CustomDraw(DrawContext& c){
   Color bg_color = Theme::Get("textentry-bg");
-  if(GetIsFocused()) bg_color = bg_color.Lighter(0.1);
+  bool focused = IsFocused();
+  if(focused) bg_color = bg_color.Lighter(0.1);
   c.SetColor(bg_color);
   c.DrawRect(Rect(Point2D(0,0), c.Size()));
 
-  c.DrawText(text_texture, Theme::Get( (text!="") ? "textentry-text" : "textentry-default"), Point2D( c.Size().height/2 - text_texture->GetSize().height/2 + 1 ,0));
+  c.DrawText(text_texture, Theme::Get( (text!="" || focused) ? "textentry-text" : "textentry-default"), Point2D( c.Size().height/2.0f - text_texture->GetSize().height/2.0f + 1.0f ,0));
+  
+  if(focused){
+    c.SetColor(Theme::Get("textentry-default"));
+    c.DrawLine(Point2D(text_texture->GetSize().width + 2, 2),
+               Point2D(text_texture->GetSize().width + 2, c.Size().height - 2)
+              );
+  }
 }
 
 void UITextEntry::SetText(std::string t){
@@ -87,6 +95,7 @@ void UITextEntry::OnFocusChanged(bool has_focus){
       on_edit_complete.Happen();
     }
   }
+  if(text == "") UpdateText();
   SetNeedsRedrawing();
 }
 
@@ -97,7 +106,7 @@ void UITextEntry::SetFontSize(int size){
 }
 
 void UITextEntry::UpdateText(){
-  text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), (text!="") ? text : default_text);
+  text_texture = TextRenderer::Render(window, FontParams("Dosis-Regular", fontsize), (text!="" || IsFocused()) ? text : default_text);
   SetNeedsRedrawing();
 }
 

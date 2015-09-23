@@ -33,6 +33,8 @@ public:
   Signal<std::string> on_selected;
   void SetPath(std::string);
   void OpenDialog();
+  /** Sets the default text of the child entry. */
+  void SetName(std::string);
   std::string GetPath() const {return path;}
 private:
   UIPathSelector(std::weak_ptr<Window> parent_window, std::string path = "");

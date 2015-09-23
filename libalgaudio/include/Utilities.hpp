@@ -233,6 +233,8 @@ public:
   /** The platform-specific shared library file extension.
    *  This is '.dll' on Windows, and '.so' on Linux. */
   static const std::string OSLibSuffix;
+  /** Platform specific sclang binary name (sclang or sclang.exe) */
+  static const std::string OSSCLangBinName;
   /** Replaces all '/' path separators to platform native separators. */
   static std::string ConvertUnipathToOSPath(const std::string& unipath);
   /** Replaces all platform native path separators to '/'. */

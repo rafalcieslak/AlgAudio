@@ -92,6 +92,9 @@ public:
   {throw Exceptions::WindowNotAlertable("This window is not capable of displaying alerts.");}
   virtual LateReturn<> ShowErrorAlert(std::string, std::string)
   {throw  Exceptions::WindowNotAlertable("This window is not capable of displaying alerts.");}
+  
+  /** Returns the widget that is in the root of this window's widget hierarchy. */
+  std::shared_ptr<UIWidget> GetRoot() const {return child;}
 protected:
   Window(std::string title, int w, int h, bool centered = true, bool resizable = true);
 private:

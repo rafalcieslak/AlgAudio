@@ -35,15 +35,15 @@ void LaunchConfigWindow::init(){
   marginbox = UIMarginBox::Create(w,10,10,2,10);
   startbutton = UIButton::Create(w,"Start!");
   aboutbutton = UIButton::Create(w,"About");
-  quitbutton = UIButton::Create(w,"Quit App");
+  quitbutton = UIButton::Create(w,"Quit");
   titlelabel = UILabel::Create(w,"AlgAudio",52);
-  chk_oscdebug = UICheckbox::Create(w,"OSC debugging");
+  chk_oscdebug = UICheckbox::Create(w,"Debug OSC");
+  chk_debug = UICheckbox::Create(w,"Debug tools");
+  chk_nosclang = UICheckbox::Create(w,"Disable SC");
   chk_supernova = UICheckbox::Create(w,"Supernova");
 #ifndef __unix__
   chk_supernova->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
 #endif
-  chk_debug = UICheckbox::Create(w,"Debug tools");
-  chk_nosclang = UICheckbox::Create(w,"Disable SC");
   chk_advconfig = UICheckbox::Create(w,"Advanced configuration");
   mainvbox = UIVBox::Create(w);
   configbox = UIVBox::Create(w);
@@ -98,11 +98,8 @@ void LaunchConfigWindow::init(){
   config_separator = UISeparator::Create(w);
   config_separator->SetCustomSize(Size2D(0,20));
   sclang_path_selector = UIPathSelector::Create(w, Config::Global().path_to_sclang);
-#ifdef __unix__
-  path_label = UILabel::Create(w, "Path to SuperCollider's sclang binary", 14);
-#else
-  path_label = UILabel::Create(w, "Path to SuperCollider's sclang.exe", 14);
-#endif
+  sclang_path_selector->SetName("Select the location of '" + Utilities::OSSCLangBinName + "' file");
+  path_label = UILabel::Create(w, "Path to SuperCollider's binary '" + Utilities::OSSCLangBinName + "'", 14);
 
   Insert(marginbox);
   marginbox->Insert(mainvbox);

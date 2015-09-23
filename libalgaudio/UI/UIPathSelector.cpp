@@ -66,5 +66,9 @@ void UIPathSelector::OpenDialog(){
     free(outPath);
   }
 }
+
+void UIPathSelector::SetName(std::string t){
+  child_entry->SetDefaultText(t);
+}
   
 } // namespace AlgAudio

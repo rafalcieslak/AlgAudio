@@ -141,10 +141,17 @@ void UIWidget::RequestFocus(){
   p->OnChildFocusRequested(shared_from_this());
 }
 
-bool UIWidget::GetIsFocused() const{
+bool UIWidget::IsFocused() const{
   auto p = parent.lock();
-  if(!p) return true;
+  if(!p) return IsRoot(); // Root widgets are always focused, but parentless widgets never.
   return p->OnChildFocusTested(shared_from_this());
+}
+
+
+bool UIWidget::IsRoot() const{
+  auto w = window.lock();
+  if(!w) return false;
+  return w->GetRoot() == shared_from_this();
 }
 
 } // namespace AlgAudio

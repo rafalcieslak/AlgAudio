@@ -51,13 +51,8 @@ void SCLang::Start(){
   
   std::string command = Config::Global().path_to_sclang;
   
-#ifndef __unix__
-  std::string sclang_binary = "sclang.exe";
-#else
-  std::string sclang_binary = "sclang";
-#endif
-  if(Utilities::GetFilename(command) != sclang_binary){
-    on_start_completed.Happen(false,"Invalid path to sclang: Selected file is not " + sclang_binary);
+  if(Utilities::GetFilename(command) != Utilities::OSSCLangBinName){
+    on_start_completed.Happen(false,"Invalid path to sclang: Selected file is not '" + Utilities::OSSCLangBinName + "'");
     return;
   }
   
