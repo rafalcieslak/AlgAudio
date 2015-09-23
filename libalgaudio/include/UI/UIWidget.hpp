@@ -160,6 +160,11 @@ public:
   virtual void OnFocusChanged(bool) {}
   
   std::shared_ptr<Window> GetWindow() {return window.lock();}
+  
+  /** Some widgets output verbose information to stdout when this flag is
+   *  set. This is useful for debugging new widgets, this way one can select
+   *  an only instance to be verbose, witout noise from other instances. */
+  bool debug_this_widget = false;
 protected:
   Size2D current_size;
   /** Calling this method marks the widget's (as well as its ancestor's) render
