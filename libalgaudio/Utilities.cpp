@@ -26,12 +26,12 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <iomanip>
 #include <unordered_map>
 #include <clocale>
-#include <codecvt>
 #ifdef __unix__
   #include <unistd.h>
   #include <cstdlib>
 #else
   #include <windows.h>
+  #include <codecvt>
 #endif
 
 // #define SILLY_GDB
@@ -326,8 +326,8 @@ std::string Utilities::FindSCLang(){
 
   std::vector<std::string> env_path;
   
-#ifndef __unix__
   char buffer[8000];
+#ifndef __unix__
   DWORD result = GetEnvironmentVariable("PATH",buffer,sizeof(buffer));
   if(result != 0){
     env_path = Utilities::SplitString(buffer,";");
