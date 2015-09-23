@@ -66,15 +66,32 @@ LateReturn<std::shared_ptr<Group>> Group::CreateFake(std::shared_ptr<Group>){
 
 // ========== ParamController ==========
 
-ParamController::ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t)
-  : id(t->id), templ(t), range_min(t->default_min), range_max(t->default_max), module(m){
+bool ParamController::inside_set_chain = false;
+std::unordered_set<ParamController*> ParamController::already_set;
 
+ParamController::ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t)
+  : id(t->id), templ(t), range_min(t->default_min), range_max(t->default_max), module(m)
+{
 }
-std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParamTemplate> templ){
+std::shared_ptr<ParamController> ParamController::Create(std::shared_ptr<Module> m, std::shared_ptr<ParamTemplate> templ)
+{
   return std::shared_ptr<ParamController>(new ParamController(m,templ));
 }
 
 void ParamController::Set(float value){
+  
+  bool this_is_set_chain_root = false;
+  if(!inside_set_chain){
+    // Apparently this is the beggining of a set-chain.
+    inside_set_chain = true;
+    this_is_set_chain_root = true;
+    already_set.insert(this);
+  }else{
+    if(already_set.find(this) != already_set.end()) // If already set...
+      return; // IGNORE this Set() to avoid passing  parameter data in a loop!
+    already_set.insert(this);
+  }
+  
   if(templ->step > 0.0f){
     value = round(value/templ->step)*templ->step;
   }
@@ -94,6 +111,12 @@ void ParamController::Set(float value){
     }
   }
   after_set.Happen(value, relative);
+  
+  if(this_is_set_chain_root){
+    // Cleanup
+    already_set.clear();
+    inside_set_chain = false;
+  }
 }
 
 void ParamController::SetRelative(float q){

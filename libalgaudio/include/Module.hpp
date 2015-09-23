@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <memory>
 #include <vector>
+#include <unordered_set>
 #include "DynamicallyLoadableClass.hpp"
 #include "Signal.hpp"
 #include "Utilities.hpp"
@@ -112,6 +113,18 @@ private:
   float current_val = 0.0;
   float range_min = 0.0, range_max = 1.0;
   std::weak_ptr<Module> module;
+  
+  /** These structures prevent stack overflows when setting one param results
+   *  in setting another. This might lead to loops, and thus setting same
+   *  params endlessly. To prevent this, whenever any param is set, it sets
+   *  inside_set_chain flag, and stores its address in already_set set. If the
+   *  action of any handlers to on_set or after_set results in setting som other
+   *  param, it will add itself to the set. If at any point of such chain the 
+   *  same param would be set again, it will find itself in already_set, and
+   *  will ignore new value.
+   */
+  static bool inside_set_chain;
+  static std::unordered_set<ParamController*> already_set;
 };
 
 /** This class represents a single subscription to received SendReply messages
