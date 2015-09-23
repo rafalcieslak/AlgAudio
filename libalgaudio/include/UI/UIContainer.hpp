@@ -68,13 +68,15 @@ protected:
   //std::list<std::shared_ptr<UIWidget>> child;
 
   virtual void OnChildFocusRequested(std::shared_ptr<UIWidget> w) override {
+    auto old_focused_child = focused_child;
+    
     if(w != focused_child){
-      auto old_focused_child = focused_child;
+      focused_child = nullptr;
+        UIWidget::RequestFocus();
       focused_child = w;
       if(old_focused_child && old_focused_child != w) old_focused_child->OnFocusChanged(false);
       focused_child->OnFocusChanged(true);
-    }
-    if(! GetIsFocused()){
+    }else{
       UIWidget::RequestFocus();
     }
   }
