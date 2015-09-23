@@ -126,6 +126,8 @@ void SDLMain::ProcessEvent(const SDL_Event& ev){
     window->ProcessKeyboardEvent( KeyData(ev.key) );
   }else if(ev.type == SDL_TEXTINPUT){
     window->ProcessKeyboardEvent( KeyData(ev.text.text) );
+  }else{
+    std::cout << "Other event" << std::endl;
   }
 }
 
