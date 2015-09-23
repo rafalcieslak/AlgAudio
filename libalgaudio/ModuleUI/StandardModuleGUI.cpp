@@ -55,6 +55,7 @@ void StandardModuleGUI::CommonInit(){
   main_box->Insert(inlets_box, UIBox::PackMode::TIGHT);
   main_box->Insert(caption, UIBox::PackMode::TIGHT);
   main_box->Insert(params_box, UIBox::PackMode::TIGHT);
+  //params_box->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
   main_box->Insert(outlets_box, UIBox::PackMode::TIGHT);
   main_margin->Insert(main_box);
   main_margin->parent = shared_from_this();

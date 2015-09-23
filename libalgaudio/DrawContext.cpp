@@ -43,6 +43,8 @@ void DrawContext::DrawLine(Point2D from, Point2D to, bool smooth){
     SDLFix::RenderSetLineSmoothing(renderer, false);
   }
   SDL_RenderDrawLine(renderer, x+from.x, y+from.y, x+to.x, y+to.y);
+  
+  SDLFix::RenderSetLineWidth(renderer, 1.0f * TotalScale());
 }
 
 SDL_FPoint PointToSDL(Point2D_<float> p){
@@ -51,7 +53,7 @@ SDL_FPoint PointToSDL(Point2D_<float> p){
 
 void DrawContext::DrawCubicBezier(Point2D p1, Point2D p2, Point2D p3, Point2D p4, float width, unsigned int segments){
   // TODO :: De casteljeu
-
+  
   p1 = Transform(p1);
   p2 = Transform(p2);
   p3 = Transform(p3);
@@ -91,7 +93,7 @@ void DrawContext::DrawLineEx(float x1, float y1, float x2, float y2, float width
   points[1].x = x2; points[1].y = y2;
   SDLFix::RenderSetLineWidth(renderer, width * TotalScale());
   SDLFix::RenderDrawLines(renderer, points, 2);
-  SDLFix::RenderSetLineWidth(renderer, 1.0f * TotalScale());
+  //SDLFix::RenderSetLineWidth(renderer, 1.0f * TotalScale());
 }
 
 void DrawContext::DrawTexture(std::shared_ptr<SDLTexture> texture, Point2D p){

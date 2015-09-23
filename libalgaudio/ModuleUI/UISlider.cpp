@@ -123,7 +123,7 @@ void UISlider::CustomDraw(DrawContext& c){
     else c.SetColor(Theme::Get("slider-connector-absolute"));
     c.DrawRect(w-24,0,12,h);
   }
-
+  
   if(point_mode != PointMode::Center && !dragged){
     // NOT pointed on center
 
@@ -154,14 +154,8 @@ void UISlider::CustomDraw(DrawContext& c){
 
       c.SetColor(Theme::Get("slider-marker"));
       c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
-
-      c.Restore(); // Fix the context, because textrendered did tinker with it.
       c.DrawText(value_texture_big, Color(0,0,0), Point2D(w/2 - value_texture_big->GetSize().width/2, 0));
-
-      c.Restore(); // Fix the context, because textrendered did tinker with it.
       c.DrawText(range_max_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3));
-
-      c.Restore(); // Fix the context, because textrendered did tinker with it.
       c.DrawText(range_min_texture, Color(0,0,0), Point2D(GetBodyStart() + 1 ,3));
     }
 
@@ -172,7 +166,6 @@ void UISlider::CustomDraw(DrawContext& c){
   if(mode == Mode::Slider) c.DrawLine(12,0,12,h);
   c.DrawLine(w-13,0,w-13,h);
   if(mode == Mode::Display) c.DrawLine(w-25,0,w-25,h);
-
 }
 
 bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){

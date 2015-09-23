@@ -88,10 +88,8 @@ void SDLFix::RenderSetLineSmoothing(SDL_Renderer* renderer, bool enabled){
   GL_RenderData *data = (GL_RenderData*) renderer->driverdata;
   if(enabled){
     data->glEnable(GL_LINE_SMOOTH);
-    data->glLineWidth(2.0);
   }else{
     data->glDisable(GL_LINE_SMOOTH);
-    data->glLineWidth(1.0);
   }
 }
 
