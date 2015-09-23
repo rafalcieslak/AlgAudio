@@ -326,8 +326,8 @@ std::string Utilities::FindSCLang(){
 
   std::vector<std::string> env_path;
   
-  char buffer[8000];
 #ifndef __unix__
+  char buffer[8000];
   DWORD result = GetEnvironmentVariable("PATH",buffer,sizeof(buffer));
   if(result != 0){
     env_path = Utilities::SplitString(buffer,";");
@@ -335,12 +335,14 @@ std::string Utilities::FindSCLang(){
 #else 
   char* p = getenv("PATH");
   if(p){
-    env_path = Utilities::SplitString(buffer,":");
+    env_path = Utilities::SplitString(p,":");
   }
 #endif
+  std::cout << "path " << p << std::endl;
 
   for(std::string& dir : env_path){
     std::string path = dir + OSDirSeparator + sclang_binary;
+    std::cout << "Trying " << path << std::endl;
     if(GetFileExists(path)){
       std::cout << "Found possible path! " << path << std::endl;
       return path;
