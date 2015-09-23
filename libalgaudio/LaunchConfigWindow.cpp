@@ -64,6 +64,9 @@ void LaunchConfigWindow::init(){
   config_adv = UIVBox::Create(w);
   config_adv->SetPadding(2);
   config_adv_driver_box = UIHBox::Create(w);
+#ifdef __unix__
+  config_adv_driver_box->SetDisplayMode(UIWidget::DisplayMode::EmptySpace);
+#endif
   config_adv_driver_label = UILabel::Create(w,"SC audio device name: ",14);
   config_adv_driver_entry = UITextEntry::Create(w);
   config_adv_driver_entry->SetFontSize(14);
