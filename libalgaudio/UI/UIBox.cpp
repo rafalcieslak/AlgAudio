@@ -88,6 +88,10 @@ void UIBox::RecalculateChildSizes(unsigned int available){
   // Begin by removing the space taken up by padding.
   available -= padding*(children.size() - 1);
 
+  // Mark all children as unprocessed.
+  for(unsigned int n = 0; n < children.size(); n++)
+    children[n].size = -1;
+
   // Then, each tightly packed child has to be given exactly as much space as
   // the requested. Also count the space left, as well as the number of loosely
   // packed children.
@@ -107,24 +111,49 @@ void UIBox::RecalculateChildSizes(unsigned int available){
     }
   }
   if(left  < 0) left  = 0; // Sigh.
-  // Finally, split the space that is left more or less equally among the other
-  // children.
-  for(unsigned int n = 0; n < children.size(); n++){
-    if(children[n].child->IsInvisible()){
-      // ...
-    }else if(children[n].mode == PackMode::TIGHT){
-      // ...
-    }else{
-      // The trick is to decrease left space gradually instead of
-      // assigining left /n space to each child, thanks to it the box
-      // will fit perfectly even if the size is not divisable by the number
-      // of children
-      unsigned int q = left  / loose_children;
-      loose_children--;
-      left  -= q;
-      children[n].size = q;
+  
+  if(loose_children > 0){
+    int space_per_child = left / loose_children;
+    bool found;
+    while(true){
+      // For each child ...
+      for(unsigned int n = 0; n < children.size(); n++){
+        // ... that has not yet any size ...
+        if(children[n].child->IsInvisible() && children[n].size == -1){
+          auto request = DirectionalDimension(children[n].child->GetRequestedSize());
+          // .. if it requires more space than would be given when space is split equally ...
+          if( request > space_per_child ){
+            // ... give it as much space as it wishes.
+            children[n].size = request;
+            left -= request;
+            loose_children--;
+            if(loose_children == 0) break; // Shortcut exit, plus avoids division by zero.
+            space_per_child = left / loose_children;
+            found = true;
+          }
+        }
+      }
+      // Continue to the next step only when no corrections need to be done.
+      if(!found) break;
+      found = false;
     }
-  }
+    
+    // Finally, split the space that is left more or less equally among the other
+    // children.
+    for(unsigned int n = 0; n < children.size(); n++){
+      if(children[n].size == -1 && children[n].mode == PackMode::WIDE){
+        // The trick is to decrease left space gradually instead of
+        // assigining left /n space to each child, thanks to it the box
+        // will fit perfectly even if the size is not divisible by the number
+        // of children
+        unsigned int q = left  / loose_children;
+        loose_children--;
+        left  -= q;
+        children[n].size = q;
+      }
+    } // for each child
+    
+  } // if there are any loose children
 }
 
 Size2D UIBox::GetChildSize(unsigned int n) const{
