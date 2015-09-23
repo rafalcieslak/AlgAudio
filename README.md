@@ -16,7 +16,7 @@ The API documentation can be built with `make doc`, ([or browsed online](http://
 
 ## On Linux
 
-To build, you will need CMake 3.0 or newer, scons, git, and development headers for SDL2 2.0.3 and SDL2-ttf, and freetype. Run:
+To build, you will need CMake 3.0 or newer, scons, git, and development headers for SDL2 2.0.3 and SDL2-ttf, and freetype. If you wish to build documentation, you will also need doxygen. Run:
 
 	mkdir build
 	cd build
