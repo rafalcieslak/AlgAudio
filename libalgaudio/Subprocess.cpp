@@ -51,11 +51,22 @@ namespace AlgAudio {
 /* ================= UNIX implementation ================= */
 Subprocess::Subprocess(std::string c){
   // TODO: change working directory
+  
+  // Create execve status pipe
+  pipe(pipe_child_exec_status);
+  // Make the write end of the status pipe automatically close when execve
+  // is successful
+  fcntl(pipe_child_exec_status[1], F_SETFD, fcntl(pipe_child_exec_status[1], F_GETFD) | FD_CLOEXEC);
+  
   pipe(pipe_child_stdin_fd);
   pipe(pipe_child_stdout_fd);
   int p = fork();
   if(p == 0){
     // child process
+    
+    // Close the read end of the status pipe
+    close(pipe_child_exec_status[0]);
+    
     // Spit command into arguments
 		char command[1024];
 		strncpy(command,c.c_str(),c.length());
@@ -78,16 +89,22 @@ Subprocess::Subprocess(std::string c){
     // Disable stdio buffering
     setvbuf(stdout,NULL,_IONBF,0);
     setvbuf(stdin,NULL,_IONBF,0);
-    
-    #error TODO: React on execve errors!!! http://stackoverflow.com/questions/1584956/how-to-handle-execvp-errors-after-fork
+  
 		// swap image
 		execve(args[0], args, environ);
     
+    // execve never returns, unless execution failed. In such case, errno is
+    // set accordingly. We'll write the errno value to the pipe, so that the
+    // parent can read it.
+    write(pipe_child_exec_status[1], &errno, sizeof(errno));
     
-    perror("Starting subprocess failed: execve failed");
-    exit(1);
+    _exit(0);
+    
   }else{
     // parent process
+
+    // Close the write-end of the execve status pipe
+    close(pipe_child_exec_status[1]);
 
     // Set the read-end of stdout pipe to non-blocking mode
     int flags = fcntl(pipe_child_stdout_fd[0], F_GETFL);
@@ -96,11 +113,24 @@ Subprocess::Subprocess(std::string c){
     flags = fcntl(pipe_child_stdin_fd[1], F_GETFL);
     fcntl(pipe_child_stdin_fd[1], F_SETFL, flags | O_NONBLOCK);
 
+
+    int count, err;
+    while(1){
+      count = read(pipe_child_exec_status[0], &err, sizeof(errno));
+      if(count == 0){
+        // Apparently the pipe end was closed, which means execve was successful
+        // (The pipe has FD_CLOEXEC flag set).
+        break;
+      }
+      if(count > 0){
+        // Oh, we got the errno value from child.
+        throw Exceptions::Subprocess("execve failed: " + std::string(strerror(err)));
+      }
+      usleep(10000); // 10ms before next read.
+    }
+    
     // store pid
     pid = p;
-
-    // TODO: Wait for the child to swap image (by pid), and if it fails,
-    // throw an exception
   }
 }
 
