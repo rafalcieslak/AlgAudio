@@ -2,6 +2,8 @@
 
 AlgAudio is an audio processing framework, designed to be easy to learn and use at live performances.
 
+![screenshot](http://i.imgur.com/JQU8xWD.png)
+
 Copyright (C) 2015 CeTA - Audiovisual Technology Center
 
 Algaudio is released under the terms of the GNU Lesser General Public License version 3, see COPYING and COPYING.LESSER for details.
