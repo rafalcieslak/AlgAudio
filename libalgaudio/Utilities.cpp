@@ -338,11 +338,9 @@ std::string Utilities::FindSCLang(){
     env_path = Utilities::SplitString(p,":");
   }
 #endif
-  std::cout << "path " << p << std::endl;
 
   for(std::string& dir : env_path){
     std::string path = dir + OSDirSeparator + sclang_binary;
-    std::cout << "Trying " << path << std::endl;
     if(GetFileExists(path)){
       std::cout << "Found possible path! " << path << std::endl;
       return path;
