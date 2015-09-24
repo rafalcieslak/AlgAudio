@@ -110,6 +110,7 @@ LateReturn<> Module::Outlet::SendConnections(){
   m.add_string(id);
   m.add_string(std::to_string(x));
   for(auto& b : buses) m.add_int32(b.lock()->GetID());
+  if(buses.size() == 0) m.add_int32(-1);
   SCLang::SendOSCCustomWithReply<int>("/algaudioSC/connectoutlet", m).Then([r](int i){
     if(i == 1) // success!
       r.Return();
