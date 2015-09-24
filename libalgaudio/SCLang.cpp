@@ -27,6 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleTemplate.hpp"
 #include "ModuleCollection.hpp"
 #include "Module.hpp"
+#include "ParamController.hpp"
 #include "OSC.hpp"
 #include "Config.hpp"
 

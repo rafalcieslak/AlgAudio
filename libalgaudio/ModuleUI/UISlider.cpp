@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "ModuleTemplate.hpp"
 #include "Theme.hpp"
 #include "TextRenderer.hpp"
+#include "ParamController.hpp"
 
 namespace AlgAudio{
 

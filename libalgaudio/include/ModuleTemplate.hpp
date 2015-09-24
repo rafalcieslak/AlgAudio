@@ -48,7 +48,7 @@ struct ModuleParse : public Exception{
 } // namespace Exceptions
 
 /** A template for creating params. Contains all data about a param that is
- *  loaded from module description file. All ParamControlers have a link to their
+ *  loaded from module description file. All ParamControllers have a link to their
  *  corresponding template.
  */
 class ParamTemplate{

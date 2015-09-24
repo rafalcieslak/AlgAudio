@@ -26,6 +26,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "SCLang.hpp"
 #include "Config.hpp"
 #include "BuiltinModules.hpp"
+#include "ParamController.hpp"
 
 namespace AlgAudio{
 

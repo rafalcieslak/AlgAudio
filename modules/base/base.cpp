@@ -22,6 +22,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 #include "SCLang.hpp"
 #include "Timer.hpp"
+#include "ParamController.hpp"
 
 class MIDICtrl : public AlgAudio::Module{
 public:
