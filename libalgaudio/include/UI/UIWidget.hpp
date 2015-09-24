@@ -30,6 +30,11 @@ namespace AlgAudio{
 
 class Window;
 
+class UIFocusable{
+public:
+  virtual void RequestFocus() = 0;
+};
+
 /** Widgets are drawable, interactive parts of the user interface. This is the
  *  base class for many many interface elements, such as buttons, labels,
  *  sliders, etc. 

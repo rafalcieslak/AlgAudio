@@ -19,12 +19,14 @@ You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "UI/UIWidget.hpp"
+#include "UI/UIBox.hpp"
+#include "UI/UITextEntry.hpp"
 
 namespace AlgAudio{
 
 class ParamController;
 
-class UISlider : public UIWidget{
+class UISlider : public UIContainerSingle{
 public:
   static std::shared_ptr<UISlider> Create(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> controller);
   void CustomDraw(DrawContext& c) override;
@@ -32,6 +34,9 @@ public:
   virtual void CustomMouseMotion(Point2D pos1,Point2D pos2) override;
   virtual void CustomMouseEnter(Point2D pos) override;
   virtual void CustomMouseLeave(Point2D pos) override;
+  virtual void OnFocusChanged(bool has_focus) override;
+  virtual void CustomResize(Size2D size) override;
+  virtual Point2D GetChildPos() const override {return GetBodyRect().a;}
   Rect GetInputRect() const;
   Rect GetAbsoluteOutputRect() const;
   Rect GetRelativeOutputRect() const;
@@ -81,6 +86,14 @@ private:
   inline int GetBodyStart() const{ return (mode == Mode::Slider)?   12 : 0  ;}
   inline int GetBodyEnd()   const{ return (mode == Mode::Slider)? (current_size.width - 12) : (current_size.width - 25) ;}
   inline int GetBodyWidth() const{ return current_size.width - 25;}
+  
+  bool editted = false;
+  std::shared_ptr<UIHBox> edit_box;
+  std::shared_ptr<UITextEntry> edit_entry_min;
+  std::shared_ptr<UITextEntry> edit_entry_val;
+  std::shared_ptr<UITextEntry> edit_entry_max;
+  /** This is toggled, among others, by right clicking the slider. */
+  void SetEditMode(bool enabled);
 };
 
 

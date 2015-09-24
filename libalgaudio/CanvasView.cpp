@@ -27,7 +27,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-CanvasView::CanvasView(std::shared_ptr<Window> parent) : UIWidget(parent){
+CanvasView::CanvasView(std::shared_ptr<Window> parent) : UIContainerMultiple(parent){
 }
 
 std::shared_ptr<CanvasView> CanvasView::CreateEmpty(std::shared_ptr<Window> parent){
@@ -84,7 +84,7 @@ void CanvasView::CreateModuleGUIs(){
   for(auto& m : current_canvas->modules){
       auto modulegui = m->GetGUI();
       // If the module already has a gui, but it does not recognize us as a parent
-      if(modulegui && modulegui->parent.lock() != shared_from_this()){
+      if(modulegui && modulegui->Widget()->parent.lock() != shared_from_this()){
         // Get rid of the gui.
         m->DropGUI();
         modulegui = nullptr;
@@ -96,10 +96,10 @@ void CanvasView::CreateModuleGUIs(){
         try{
           modulegui = m->BuildGUI(window.lock());
           // Mark us as the modulegui parent
-          modulegui->parent = shared_from_this();
+          modulegui->Widget()->parent = shared_from_this();
           // Resize the gui
-          Size2D guisize = modulegui->GetRequestedSize();
-          modulegui->Resize(guisize);
+          Size2D guisize = modulegui->Widget()->GetRequestedSize();
+          modulegui->Widget()->Resize(guisize);
           
         }catch(Exceptions::GUIBuild ex){
           current_canvas->RemoveModule(m);
@@ -132,10 +132,10 @@ LateReturn<> CanvasView::AddModule(std::string id, Point2D pos){
   current_canvas->CreateModule(id).Then([this,r,pos,current_canvas](std::shared_ptr<Module> m){
     try{
       auto modulegui = m->BuildGUI(window.lock());
-      Size2D guisize = modulegui->GetRequestedSize();
+      Size2D guisize = modulegui->Widget()->GetRequestedSize();
       modulegui->position() = pos - guisize/2;
-      modulegui->parent = shared_from_this();
-      modulegui->Resize(guisize);
+      modulegui->Widget()->parent = shared_from_this();
+      modulegui->Widget()->Resize(guisize);
       module_guis.push_back(modulegui);
       ClearSelection();
       selection.push_back({modulegui, (guisize/2).ToPoint()});
@@ -167,8 +167,8 @@ void CanvasView::CustomDraw(DrawContext& c){
   
   // For each modulegui, draw the modulegui.
   for(auto& modulegui : module_guis){
-    c.Push(modulegui->position(), modulegui->GetRequestedSize());
-    modulegui->Draw(c);
+    c.Push(modulegui->position(), modulegui->Widget()->GetRequestedSize());
+    modulegui->Widget()->Draw(c);
     c.Pop();
   }
   // Then draw all the audio connections...
@@ -310,7 +310,7 @@ int CanvasView::CurveStrengthFuncB(Point2D a, Point2D b){
 
 int CanvasView::InWhich(Point2D relative_pos){
   for(int i = module_guis.size() - 1; i >= 0; i--){
-    if(relative_pos.IsInside(module_guis[i]->position(), module_guis[i]->GetRequestedSize()) )
+    if(relative_pos.IsInside(module_guis[i]->position(), module_guis[i]->Widget()->GetRequestedSize()) )
       return i;
   }
   return -1;
@@ -370,7 +370,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
           // Holding shift starts relative slider drag.
           // So when the slider is clicked with shift held down, we don't want
           // it to jump to the pointed position.
-          module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+          module_guis[id]->Widget()->OnMousePress(true, MouseButton::Left, offset);
           passed_event = true;
         }
         mouse_down_mode = ModeSlider; // The slider is not a part of the main module body.
@@ -389,7 +389,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
         mouse_down_elem_widgetid = whatishere.widget_id;
         mouse_down_elem_paramid = whatishere.param_id;
       }else if(whatishere.type == ModuleGUI::WhatIsHereType::Nothing){
-        bool captured = module_guis[id]->OnMousePress(true, MouseButton::Left, offset);
+        bool captured = module_guis[id]->Widget()->OnMousePress(true, MouseButton::Left, offset);
         passed_event = true;
         if(!captured) mouse_down_mode = ModeModuleBody;
         else mouse_down_mode = ModeCaptured;
@@ -459,7 +459,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
         ClearSelection();
         Rect bb = {drag_position, mouse_down_position};
         for(auto mgui : module_guis){
-          Rect r = {mgui->position(),  mgui->GetCurrentSize()};
+          Rect r = {mgui->position(),  mgui->Widget()->GetCurrentSize()};
           if(r.IsFullyInside(bb))
             AddToSelection(mgui);
         }
@@ -469,7 +469,7 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
       SetNeedsRedrawing();
     }else{
       // No drag in progress.
-      if(id >= 0) module_guis[id]->OnMousePress(false, MouseButton::Left, offset);
+      if(id >= 0) module_guis[id]->Widget()->OnMousePress(false, MouseButton::Left, offset);
       passed_event = true;
     }
   }else if(down == true && b == MouseButton::Middle){
@@ -485,6 +485,12 @@ bool CanvasView::CustomMousePress(bool down,MouseButton b,Point2D pos_abs){
     IncreaseZoom();
   }else if(b == MouseButton::WheelDown){
     DecreaseZoom();
+  }else if(b == MouseButton::Right){
+    if(id >=0 ){
+      // Pass the event to a module gui
+      module_guis[id]->Widget()->OnMousePress(down, b, offset);
+      passed_event = true;
+    }
   }
   return !passed_event;
 }
@@ -577,7 +583,7 @@ void CanvasView::CustomMouseEnter(Point2D pos_abs){
   Point2D pos = PositionAbsToRel(pos_abs);
   int id = InWhich(pos);
   if(id != -1){
-    module_guis[id]->OnMouseEnter(pos);
+    module_guis[id]->Widget()->OnMouseEnter(pos);
   }
 }
 void CanvasView::CustomMouseLeave(Point2D pos_abs){
@@ -586,7 +592,7 @@ void CanvasView::CustomMouseLeave(Point2D pos_abs){
   if(drag_in_progress) StopDrag();
   int id = InWhich(pos);
   if(id != -1){
-    module_guis[id]->OnMouseLeave(pos);
+    module_guis[id]->Widget()->OnMouseLeave(pos);
   }
 }
 void CanvasView::CustomMouseMotion(Point2D from_abs,Point2D to_abs){
@@ -759,10 +765,10 @@ void CanvasView::MouseMotionOverCanvasPlane(Point2D from, Point2D to){
   if(id1 != -1) offset1 = from - module_guis[id1]->position();
   if(id2 != -1) offset2 = to   - module_guis[id2]->position();
   if(id1 != id2){
-    if(id1 != -1) module_guis[id1]->OnMouseLeave(offset1);
-    if(id2 != -1) module_guis[id2]->OnMouseEnter(offset2);
+    if(id1 != -1) module_guis[id1]->Widget()->OnMouseLeave(offset1);
+    if(id2 != -1) module_guis[id2]->Widget()->OnMouseEnter(offset2);
   }else if(id1 == id2 && id1 != -1){
-    module_guis[id1]->OnMouseMotion(offset1,offset2);
+    module_guis[id1]->Widget()->OnMouseMotion(offset1,offset2);
   }
 }
 
@@ -785,7 +791,8 @@ void CanvasView::OnKeyboard(KeyData k){
   }
   
   if(k.type == KeyData::KeyType::Escape && k.IsTrig()) ExitCanvas();
-  // TODO: pass events to children
+  
+  UIContainerMultiple::OnKeyboard(k);
 }
 
 void CanvasView::StopDrag(){
@@ -838,8 +845,8 @@ void CanvasView::CenterView(){
     for(auto mgui : module_guis){
         int l = mgui->position().x;
         int t = mgui->position().y;
-        int r = l + mgui->GetRequestedSize().width;
-        int b = t + mgui->GetRequestedSize().height;
+        int r = l + mgui->Widget()->GetRequestedSize().width;
+        int b = t + mgui->Widget()->GetRequestedSize().height;
         if(l < minx) minx = l;
         if(t < miny) miny = t;
         if(r > maxx) maxx = r;
@@ -891,6 +898,12 @@ void CanvasView::SetZoom(float level){
   
   SetNeedsRedrawing();
   std::cout << "Zoom: " << view_zoom << std::endl;
+}
+
+Point2D CanvasView::GetChildPos(std::shared_ptr<UIWidget> w) const{
+  auto modulegui = std::dynamic_pointer_cast<ModuleGUI>(w);
+  if(!modulegui) return Point2D(0,0);
+  return modulegui->GetModule()->position_in_canvas;
 }
 
 } // namespace AlgAudio

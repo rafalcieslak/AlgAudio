@@ -65,6 +65,8 @@ void StandardModuleGUI::CommonInit(){
   outlets_box->SetCustomSize(Size2D(0,4));
 
   SetHighlight(false); // Preps colors.
+  
+  child = main_margin; // for UIContainerSingle base
 }
 
 void StandardModuleGUI::LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ){

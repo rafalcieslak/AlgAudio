@@ -201,7 +201,13 @@ std::string Utilities::PrettyFloat(float val){
   }
   int precision = std::max(0, 3 - s);
   ss << std::setprecision(precision) << std::fixed << val;
-  return ss.str();
+  std::string q = ss.str();
+  // Strip tailing zeroes
+  if(q.find('.') != std::string::npos)
+    q.erase(std::find_if(q.rbegin(), q.rend(), [](char c){return c != '0';}).base(), q.end());
+  // Remove tailing decimal separator
+  if(q.back() == '.') q.pop_back();
+  return q;
 }
 
 KeyData::KeyData(const SDL_KeyboardEvent& k){

@@ -20,7 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <queue>
-#include "UI/UIWidget.hpp"
+#include "UI/UIContainer.hpp"
 #include "ModuleUI/ModuleGUI.hpp"
 #include "Canvas.hpp"
 #include "Alertable.hpp"
@@ -34,7 +34,7 @@ namespace AlgAudio{
  *  also process mouse events, clicks and drags. By reacting on user input it
  *  asks the underlying Canvas instance to connect/disconnect modules, etc.
  */
-class CanvasView : public UIWidget{
+class CanvasView : public UIContainerMultiple{
 public:
   /** Creates a new empty instance of this widget. */
   static std::shared_ptr<CanvasView> CreateEmpty(std::shared_ptr<Window> parent);
@@ -45,6 +45,8 @@ public:
   virtual void CustomMouseLeave(Point2D);
   virtual void OnKeyboard(KeyData);
 
+  virtual void Clear() override {}
+  virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const override;
   
   /** This routine is called on mouse movement over the widget. See also MouseMotionOverCanvasPlane. */
   virtual void CustomMouseMotion(Point2D from_abs,Point2D to_abs) override;
@@ -225,7 +227,7 @@ private:
   float fadeout_phase;
 
   // Flags remebering held keys.
-  bool shift_held, ctrl_held, alt_held;
+  bool shift_held = false, ctrl_held = false, alt_held = false;
   
   /** A global offset for drawing all contents. This allows canvas view panning. */
   Point2D view_position = Point2D(0,0);

@@ -52,7 +52,7 @@ public:
   }
   // This demonstrates how you can modify the automatically built module GUI
   virtual void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) {
-    gui->SetCustomSize(AlgAudio::Size2D(100,100));
+    gui->Widget()->SetCustomSize(AlgAudio::Size2D(100,100));
   };
   std::shared_ptr<AlgAudio::Window> my_window;
 };
@@ -85,7 +85,7 @@ public:
     controller->Set(val*5);
   }
   void on_gui_build(std::shared_ptr<AlgAudio::ModuleGUI> gui) override{
-    auto slider = std::dynamic_pointer_cast<AlgAudio::UISlider>( gui->FindChild(AlgAudio::UIWidget::ID("gainslider")) );
+    auto slider = std::dynamic_pointer_cast<AlgAudio::UISlider>( gui->Widget()->FindChild(AlgAudio::UIWidget::ID("gainslider")) );
     if(!slider) std::cout << "Oops, our child widget was not found?" << std::endl;
     else slider->SetName("Custom name");
   }

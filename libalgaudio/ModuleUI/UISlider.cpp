@@ -25,7 +25,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> c) : UIWidget(parent_window), controller(c) {
+UISlider::UISlider(std::weak_ptr<Window> parent_window, std::shared_ptr<ParamController> c) : UIContainerSingle(parent_window), controller(c) {
   SetMinimalSize(Size2D(130,20));
 }
 
@@ -49,6 +49,19 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
     text_textures_invalid = true;
     SetNeedsRedrawing();
   });
+  
+  edit_box = UIHBox::Create(window);
+  edit_box->SetPadding(2);
+  edit_entry_min = UITextEntry::Create(window);
+  edit_entry_val = UITextEntry::Create(window);
+  edit_entry_max = UITextEntry::Create(window);
+  
+  edit_box->parent = shared_from_this();
+  edit_box->Insert(edit_entry_min, UIBox::PackMode::WIDE);
+  edit_box->Insert(edit_entry_val, UIBox::PackMode::WIDE);
+  edit_box->Insert(edit_entry_max, UIBox::PackMode::WIDE);
+  
+  child = edit_box;
 }
 
 void UISlider::SetName(std::string name){
@@ -63,6 +76,11 @@ void UISlider::SetRangeMin(float x){
 void UISlider::SetRangeMax(float x){
   current_range_max = x;
   text_textures_invalid = true;
+}
+
+void UISlider::CustomResize(Size2D size){
+  current_size = size; // Setting size prematurely to correctly calculate body rect
+  edit_box->Resize(GetBodyRect().Size());
 }
 
 Rect UISlider::GetInputRect() const{
@@ -125,41 +143,48 @@ void UISlider::CustomDraw(DrawContext& c){
     c.DrawRect(w-24,0,12,h);
   }
   
-  if(point_mode != PointMode::Center && !dragged){
-    // NOT pointed on center
+  
+  // Drawing body
+  if(!editted){
+    if(point_mode != PointMode::Center && !dragged){
+      // NOT pointed on center
 
-    // Slider name
-    c.DrawText(name_texture, Color(0,0,0), Point2D((mode == Mode::Display)?1:13,3));
+      // Slider name
+      c.DrawText(name_texture, Color(0,0,0), Point2D((mode == Mode::Display)?1:13,3));
 
-    auto contr = controller.lock();
-    if(contr){
-      float p = contr->GetRelative();
-      float pos = std::max(0.0f, std::min(p, 1.0f));
-      float x = GetBodyStart() + pos*(GetBodyWidth());
+      auto contr = controller.lock();
+      if(contr){
+        float p = contr->GetRelative();
+        float pos = std::max(0.0f, std::min(p, 1.0f));
+        float x = GetBodyStart() + pos*(GetBodyWidth());
 
-      c.SetColor(Theme::Get("slider-marker"));
-      c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
+        c.SetColor(Theme::Get("slider-marker"));
+        c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
 
-      c.Restore(); // Fix the context, because textrendered did tinker with it.
-      c.DrawText(value_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - value_texture->GetSize().width ,3));
+        c.Restore(); // Fix the context, because textrendered did tinker with it.
+        c.DrawText(value_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - value_texture->GetSize().width ,3));
+      }
+
+    }else{
+      // POINTED at center
+
+      auto contr = controller.lock();
+      if(contr){
+        float p = contr->GetRelative();
+        float pos = std::max(0.0f, std::min(p, 1.0f));
+        float x = GetBodyStart() + pos*(GetBodyWidth());
+
+        c.SetColor(Theme::Get("slider-marker"));
+        c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
+        c.DrawText(value_texture_big, Color(0,0,0), Point2D(w/2 - value_texture_big->GetSize().width/2, 0));
+        c.DrawText(range_max_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3));
+        c.DrawText(range_min_texture, Color(0,0,0), Point2D(GetBodyStart() + 1 ,3));
+      }
     }
-
-  }else{
-    // POINTED at center
-
-    auto contr = controller.lock();
-    if(contr){
-      float p = contr->GetRelative();
-      float pos = std::max(0.0f, std::min(p, 1.0f));
-      float x = GetBodyStart() + pos*(GetBodyWidth());
-
-      c.SetColor(Theme::Get("slider-marker"));
-      c.DrawLineEx(x, 0.0f, x, (float)h, 3.0);
-      c.DrawText(value_texture_big, Color(0,0,0), Point2D(w/2 - value_texture_big->GetSize().width/2, 0));
-      c.DrawText(range_max_texture, Color(0,0,0), Point2D(GetBodyEnd() - 1 - range_max_texture->GetSize().width ,3));
-      c.DrawText(range_min_texture, Color(0,0,0), Point2D(GetBodyStart() + 1 ,3));
-    }
-
+  }else{ // editted == true
+    c.Push(GetBodyRect());
+    edit_box->Draw(c);
+    c.Pop();
   }
   c.SetColor(Theme::Get("slider-border"));
   c.DrawRectBorder(Rect(Point2D(0,0),Size2D(w-1,h-1)));
@@ -170,10 +195,17 @@ void UISlider::CustomDraw(DrawContext& c){
 }
 
 bool UISlider::CustomMousePress(bool down, MouseButton b,Point2D pos){
-  if(pos.IsInside(GetBodyRect()) && down && b == MouseButton::Left && mode == Mode::Slider){
-    float x = pos.x - GetBodyStart();
-    float q = x / GetBodyWidth();
-    controller.lock()->SetRelative(q);
+  if(pos.IsInside(GetBodyRect()) && down && b == MouseButton::Right){
+    SetEditMode(!editted);
+  }else{
+    if(editted){
+      edit_box->OnMousePress(down,b,pos - GetBodyRect().a);
+      return false;
+    }else if(pos.IsInside(GetBodyRect()) && down && b == MouseButton::Left && mode == Mode::Slider && !editted){
+      float x = pos.x - GetBodyStart();
+      float q = x / GetBodyWidth();
+      controller.lock()->SetRelative(q);
+    }
   }
   return true;
 }
@@ -217,13 +249,21 @@ void UISlider::CustomMouseLeave(Point2D){
   SetNeedsRedrawing();
 }
 
+void UISlider::OnFocusChanged(bool has_focus){
+  if(!has_focus){
+    edit_box->OnFocusChanged(false);
+    SetEditMode(false);
+  }
+}
+
 void UISlider::DragStart(){
+  if(editted) return;
   dragged = true;
   drag_start_q = controller.lock()->GetRelative();
   SetNeedsRedrawing();
 }
 void UISlider::DragStep(Point2D_<float> offset){
-  if(mode == Mode::Display) return;
+  if(mode == Mode::Display || !dragged) return;
 
   float dq = (offset.x)/((float)GetBodyWidth());
   float q = std::max(0.0f, std::min(1.0f, drag_start_q + dq));
@@ -231,6 +271,21 @@ void UISlider::DragStep(Point2D_<float> offset){
 }
 void UISlider::DragEnd(){
   dragged = false;
+  SetNeedsRedrawing();
+}
+
+void UISlider::SetEditMode(bool e){
+  editted = e;
+  if(editted){
+    std::cout << "Start slider edit" << std::endl;
+    edit_entry_min->SetText(Utilities::PrettyFloat(current_range_min));
+    edit_entry_val->SetText(Utilities::PrettyFloat(current_value));
+    edit_entry_max->SetText(Utilities::PrettyFloat(current_range_max));
+    
+    edit_entry_val->RequestFocus();
+  }else{
+    std::cout << "End slider edit" << std::endl;
+  }
   SetNeedsRedrawing();
 }
 

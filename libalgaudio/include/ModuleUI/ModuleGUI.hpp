@@ -18,9 +18,9 @@ GNU Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public License
 along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "UI/UIWidget.hpp"
 #include "Module.hpp"
 #include "Canvas.hpp"
+#include "UI/UIWidget.hpp"
 
 namespace AlgAudio{
 
@@ -37,10 +37,20 @@ struct GUIBuild : public Exception{
  *  Each Module has zero or one corresponding ModuleGUI. ModuleGUIs are drawn by
  *  the CanvasView.
  */
-class ModuleGUI : public UIWidget{
+class ModuleGUI{
 public:
   /** The position of this module on the parent CanvasView. */
   Point2D& position() { return module.lock()->position_in_canvas; }
+  
+  /** Returns the widget representing this module. Cannot return nullptr.
+   *  Must be implemented by all ModuleGUI specialisations.
+   *  ModuleGUI is just an interface defining a set of methods. It cannot
+   *  inherit from UIWidget, as that would mess up inheritance completely.
+   *  Tuhs, to access the underlyin widget use this method.
+   *  Custom implementations, like StandardModuleGUI, return a pointer to
+   *  itself, because StandardModuleGUI inherts from both ModuleGUI and
+   *  UIWidget.*/
+  virtual std::shared_ptr<UIWidget> Widget() = 0;
   
   /** Gets the corresponding module instance */
   std::shared_ptr<Module> GetModule(){ return module.lock(); }
@@ -104,7 +114,7 @@ public:
   virtual WhatIsHere GetWhatIsHere(Point2D) const = 0;
 
 protected:
-  ModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : UIWidget(w), module(mod){}
+  ModuleGUI(std::shared_ptr<Module> mod) : module(mod){}
   // A link to the module instance this GUI represents.
   std::weak_ptr<Module> module;
 };

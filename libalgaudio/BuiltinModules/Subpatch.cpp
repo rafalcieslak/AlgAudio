@@ -107,12 +107,12 @@ void Subpatch::state_load_xml(rapidxml::xml_node<char>* node){
 }
 
 void Subpatch::on_gui_build(std::shared_ptr<ModuleGUI> gui){
-  auto paramsbox = std::dynamic_pointer_cast<UIVBox>( gui->FindChild(UIWidget::ID("paramsbox")) );
-  auto button = UIButton::Create(gui->GetWindow(), "Edit...");
+  auto paramsbox = std::dynamic_pointer_cast<UIVBox>( gui->Widget()->FindChild(UIWidget::ID("paramsbox")) );
+  auto button = UIButton::Create(gui->Widget()->GetWindow(), "Edit...");
   paramsbox->Insert(button, UIBox::PackMode::TIGHT);
   
   subscriptions += button->on_clicked.Subscribe([this](){
-    auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui->parent.lock());
+    auto canvasview = std::dynamic_pointer_cast<CanvasView>(modulegui->Widget()->parent.lock());
     if(!canvasview){
       std::cout << "Whoops, failed to get a reference to a canvasview, unable to switch displayed canvas." << std::endl;
       return;

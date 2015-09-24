@@ -28,7 +28,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace AlgAudio{
 
-class StandardModuleGUI : public ModuleGUI{
+class StandardModuleGUI : public ModuleGUI, public UIContainerSingle{
 public:
   static std::shared_ptr<StandardModuleGUI> CreateFromXML(std::shared_ptr<Window> w, std::string xml_data, std::shared_ptr<Module> mod);
   static std::shared_ptr<StandardModuleGUI> CreateFromTemplate(std::shared_ptr<Window> w, std::shared_ptr<Module> mod);
@@ -53,8 +53,14 @@ public:
   virtual std::string GetIoletParamID(UIWidget::ID) const override;
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override{ return main_margin->FindChild(id);}
   virtual void OnInletsChanged();
+  virtual Point2D GetChildPos() const {return Point2D(0,0);}
+  
+  virtual inline std::shared_ptr<UIWidget> Widget() override{
+    return shared_from_this();
+  };
+  
 protected:
-  StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(w, mod){}
+  StandardModuleGUI(std::shared_ptr<Window> w, std::shared_ptr<Module> mod) : ModuleGUI(mod), UIContainerSingle(w){}
 private:
   void LoadFromXML(std::string xml_data, std::shared_ptr<ModuleTemplate> templ);
   void LoadFromTemplate(std::shared_ptr<ModuleTemplate> templ);

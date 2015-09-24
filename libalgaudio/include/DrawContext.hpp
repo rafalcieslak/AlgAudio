@@ -109,9 +109,12 @@ public:
   /** Returns if the context is currently empty in size. In such case no draw operation will have any effect. */
   bool HasZeroArea();
 
+  ///@{
   /** Pushes the context stact one level down, changing the relative offset
    * and size. Useful for drawing children widgets. */
   void Push(Point2D p, Size2D s);
+  inline void Push(Rect r) { Push(r.a, r.Size()); }
+  ///@}
   /** Pushes the context stack one level down, changing the target texture.
    *  To change the texture to the window associated with the internal renderer,
    *  pass nullptr as the texture. This method is useful for switching targets

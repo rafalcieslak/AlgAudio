@@ -62,11 +62,23 @@ void UITextEntry::SetText(std::string t){
 
 void UITextEntry::OnKeyboard(KeyData k){
   if(k.pressed == false) return; // Ignore key up events
-  if( (k.type == KeyData::KeyType::Text && digits_only == false) ||
-       k.type == KeyData::KeyType::Digit
-     ) {
+  if( k.type == KeyData::KeyType::Text ){
+    if(digits_only){
+      if(std::isdigit(k.symbol[0])){
+        // okay.
+      }else if(k.symbol[0] == '-'){
+        // TODO: only allowed as the first character
+      }else if(k.symbol[0] == '.'){
+        // TODO: only allowed once
+      }else{
+        // disallowed character
+        return;
+      }
+    }
+    
     if(max_length == -1 || text.length() < (unsigned int)max_length){
       text += k.symbol;
+      std::cout << text << std::endl;
       on_edited.Happen();
       was_edited_since_received_focus = true;
       UpdateText();

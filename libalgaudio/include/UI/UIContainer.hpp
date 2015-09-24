@@ -26,12 +26,10 @@ namespace AlgAudio{
  *  like UICentered or UIMarginBox. */
 class UIContainerSingle : public UIWidget{
 public:
-  virtual void Insert(std::shared_ptr<UIWidget>) = 0;
+  virtual void Insert(std::shared_ptr<UIWidget>) {};
   virtual Point2D GetChildPos() const = 0;
-  virtual void RemoveChild() = 0;
+  virtual void RemoveChild() {};
   virtual std::shared_ptr<UIWidget> CustomFindChild(ID id) const override {return child?child->FindChild(id):nullptr;}
-protected:
-  UIContainerSingle(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
   virtual void OnChildFocusRequested(std::shared_ptr<UIWidget>) override { 
     child->OnFocusChanged(true);
     child_is_focused = true;
@@ -48,6 +46,11 @@ protected:
   virtual void OnKeyboard(KeyData k) override { 
     if(child && child_is_focused) child->OnKeyboard(k);
   }
+  virtual void OnFocusChanged(bool has_focus) override{
+    if(child) child->OnFocusChanged(has_focus && child_is_focused);
+  }
+protected:
+  UIContainerSingle(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
   std::shared_ptr<UIWidget> child;
   bool child_is_focused = false;
 };
@@ -61,12 +64,7 @@ public:
   // virtual void Insert(std::shared_ptr<UIWidget>) = 0;
   virtual Point2D GetChildPos(std::shared_ptr<UIWidget>) const = 0;
   virtual void Clear() = 0;
-protected:
-  UIContainerMultiple(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
-  // Not forcing what the child list looks like, some widgets may wish to store
-  // some extra data wich each child.
-  //std::list<std::shared_ptr<UIWidget>> child;
-
+  
   virtual void OnChildFocusRequested(std::shared_ptr<UIWidget> w) override {
     auto old_focused_child = focused_child;
     
@@ -94,6 +92,12 @@ protected:
   virtual void OnFocusChanged(bool has_focus) override{
     if(focused_child) focused_child->OnFocusChanged(has_focus);
   }
+protected:
+  UIContainerMultiple(std::weak_ptr<Window> parent_window) : UIWidget(parent_window) {}
+  // Not forcing what the child list looks like, some widgets may wish to store
+  // some extra data wich each child.
+  //std::list<std::shared_ptr<UIWidget>> child;
+
   std::shared_ptr<UIWidget> focused_child = nullptr;
 };
 
