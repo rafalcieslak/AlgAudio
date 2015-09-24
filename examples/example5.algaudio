@@ -1,0 +1,34 @@
+<algaudio version="1">
+	<module saveid="1" template="base/saw">
+		<param id="freq" value="363.619781" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="0.780952" min="0.000000" max="1.000000"/>
+		<gui x="-181" y="-87"/>
+	</module>
+	<module saveid="2" template="base/saw">
+		<param id="freq" value="181.809891" min="20.000000" max="2500.000000"/>
+		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
+		<gui x="-329" y="-87"/>
+	</module>
+	<module saveid="3" template="base/saw">
+		<param id="freq" value="727.239563" min="80.000000" max="10000.000000"/>
+		<param id="amp" value="0.542857" min="0.000000" max="1.000000"/>
+		<gui x="-37" y="-87"/>
+	</module>
+	<module saveid="4" template="base/stereoout">
+		<param id="db" value="85.000000" min="0.000000" max="100.000000"/>
+		<param id="measure" value="70.797729" min="0.000000" max="100.000000"/>
+		<gui x="-187" y="144"/>
+	</module>
+	<module saveid="5" template="base/exrev1">
+		<gui x="-164" y="63"/>
+	</module>
+	<audioconn frommodule="1" tomodule="5" fromioletid="outbus" toioletid="inbus2"/>
+	<audioconn frommodule="2" tomodule="5" fromioletid="outbus" toioletid="inbus1"/>
+	<audioconn frommodule="3" tomodule="5" fromioletid="outbus" toioletid="inbus1"/>
+	<audioconn frommodule="5" tomodule="4" fromioletid="outbus1" toioletid="inbus1"/>
+	<audioconn frommodule="5" tomodule="4" fromioletid="outbus2" toioletid="inbus2"/>
+	<dataconn frommodule="1" tomodule="3" fromparamid="freq" toparamid="freq" mode="relative"/>
+	<dataconn frommodule="2" tomodule="1" fromparamid="freq" toparamid="freq" mode="relative"/>
+</algaudio>
+
+
