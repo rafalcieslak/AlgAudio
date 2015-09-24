@@ -164,6 +164,8 @@ void CanvasXML::AppendModule(std::shared_ptr<Module> m){
     rapidxml::xml_node<>* pcnode = doc.allocate_node(rapidxml::node_type::node_element, "param");
     pcnode->append_attribute( doc.allocate_attribute("id", allocs(pc->id) ));
     pcnode->append_attribute( doc.allocate_attribute("value", alloc2s( pc->Get() )));
+    pcnode->append_attribute( doc.allocate_attribute("min", alloc2s( pc->GetRangeMin() )));
+    pcnode->append_attribute( doc.allocate_attribute("max", alloc2s( pc->GetRangeMax() )));
     modulenode->append_node(pcnode);
   }
   // Gui data
@@ -376,12 +378,19 @@ LateReturn<> CanvasXML::AddModuleFromNode(std::shared_ptr<Canvas> c, rapidxml::x
       rapidxml::xml_attribute<>* val_attr = param_node->first_attribute("value");
       if(!id_attr) parseerrornr("A param node is missing id attribute. saveid = " + std::to_string(saveid));
       if(!val_attr) parseerrornr("A param node is missing value attribute. saveid = " + std::to_string(saveid));
+      
+      rapidxml::xml_attribute<>* min_attr = param_node->first_attribute("min");
+      rapidxml::xml_attribute<>* max_attr = param_node->first_attribute("max");
+      
       std::string paramid = id_attr->value();
       float value = std::stof(val_attr->value());
 
       auto pc = m->GetParamControllerByID(paramid);
       if(!pc) parseerrornr("A param node has invalid id attribute: " + paramid);
-
+      
+      if(min_attr) pc->SetRangeMin( std::stof(min_attr->value()) );
+      if(max_attr) pc->SetRangeMax( std::stof(max_attr->value()) );
+      
       pc->Set(value);
     }
 
