@@ -321,7 +321,7 @@ Out.ar(outbus,IFFT(chain));
       <param id="decay" name="Decay" defaultmin="0.03" defaultmax="5" defaultval="0.2" scale="log"/>
       <param id="sustain" name="Sustain" defaultmin="0" defaultmax="1" defaultval="0.5"/>
       <param id="release" name="Release" defaultmin="0.03" defaultmax="5" defaultval="0.5" scale="log"/>
-      <param id="gate" name="Gate input" defaultmin="0" defaultmax="1" defaultval="0"/>
+      <param id="gate" name="Gate input" defaultmin="0" defaultmax="1" defaultval="0" step="1"/>
       <param id="val" mode="output" name="Value" defaultmin="0.0" defaultmax="1.0" action="none"/>
       <reply id="val_reply" param="val"/>
       <outlet id="outbus" name="envelope out"/>
