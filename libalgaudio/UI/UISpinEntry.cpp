@@ -56,6 +56,9 @@ void UISpinEntry::Init(std::string name, int v){
   subscriptions += child_entry->on_edit_complete.Subscribe([this](){
     FinalizeEdit();
   });
+  subscriptions += child_entry->on_edit_exitted.Subscribe([this](){
+    FinalizeEdit();
+  });
   subscriptions += child_button_up->on_clicked.Subscribe([this](){
     SetValue(value + 1);
   });

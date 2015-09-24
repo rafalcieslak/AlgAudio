@@ -100,8 +100,10 @@ void ParamController::SetRelative(float q){
 
 float ParamController::GetRelative() const {
   if(templ->scale == ParamTemplate::ParamScale::Linear){
+    if(range_max - range_min < 0.00000f) return 0.0f;
     return (current_val - range_min)/(range_max - range_min);
   }else if(templ->scale == ParamTemplate::ParamScale::Logarithmic){
+    if(range_max / range_min < 0.00000f) return 0.0f;
     return log(current_val / range_min) / log(range_max / range_min);
   }else{
     return 0.0; // ??? Will not happen.

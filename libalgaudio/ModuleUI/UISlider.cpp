@@ -49,12 +49,29 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
     text_textures_invalid = true;
     SetNeedsRedrawing();
   });
+  subscriptions += controller->on_range_min_set.Subscribe([this](float v){
+    current_range_min = v;
+    text_textures_invalid = true;
+    SetNeedsRedrawing();
+  });
+  subscriptions += controller->on_range_max_set.Subscribe([this](float v){
+    current_range_max = v;
+    text_textures_invalid = true;
+    SetNeedsRedrawing();
+  });
   
   edit_box = UIHBox::Create(window);
   edit_box->SetPadding(2);
   edit_entry_min = UITextEntry::Create(window);
   edit_entry_val = UITextEntry::Create(window);
   edit_entry_max = UITextEntry::Create(window);
+  edit_entry_min->SetDigitsOnly(true);
+  edit_entry_val->SetDigitsOnly(true);
+  edit_entry_max->SetDigitsOnly(true);
+  
+  subscriptions += edit_entry_val->on_edit_complete.Subscribe([this](){ ApplyEdittedValues(); });
+  subscriptions += edit_entry_min->on_edit_complete.Subscribe([this](){ ApplyEdittedValues(); });
+  subscriptions += edit_entry_max->on_edit_complete.Subscribe([this](){ ApplyEdittedValues(); });
   
   edit_box->parent = shared_from_this();
   edit_box->Insert(edit_entry_min, UIBox::PackMode::WIDE);
@@ -62,6 +79,33 @@ void UISlider::Init(std::shared_ptr<ParamController> controller){
   edit_box->Insert(edit_entry_max, UIBox::PackMode::WIDE);
   
   child = edit_box;
+}
+
+void UISlider::ApplyEdittedValues(){
+  // TODO: Some graphical display notifying the user that something is wrong with the value they entered
+  
+  std::string text_min = edit_entry_min->GetText();
+  std::string text_val = edit_entry_val->GetText();
+  std::string text_max = edit_entry_max->GetText();
+  try{
+    float v = std::stof(text_min);
+    controller.lock()->SetRangeMin(v);
+  }
+  catch(std::invalid_argument){}
+  catch(std::out_of_range){}
+  try{
+    float v = std::stof(text_max);
+    controller.lock()->SetRangeMax(v);
+  }
+  catch(std::invalid_argument){}
+  catch(std::out_of_range){}
+  try{
+    float v = std::stof(text_val);
+    controller.lock()->Set(v);
+  }
+  catch(std::invalid_argument){}
+  catch(std::out_of_range){}
+  SetEditMode(false);
 }
 
 void UISlider::SetName(std::string name){
@@ -98,7 +142,7 @@ Rect UISlider::GetRelativeOutputRect() const{
 }
 Rect UISlider::GetBodyRect() const{
   return (mode == Mode::Display) ?
-    Rect(Point2D(0 , 0), Size2D(current_size.width - 12, current_size.height)) :
+    Rect(Point2D(0 , 0), Size2D(current_size.width - 24, current_size.height)) :
     Rect(Point2D(12, 0), Size2D(current_size.width - 24, current_size.height));
 }
 
@@ -277,14 +321,13 @@ void UISlider::DragEnd(){
 void UISlider::SetEditMode(bool e){
   editted = e;
   if(editted){
-    std::cout << "Start slider edit" << std::endl;
     edit_entry_min->SetText(Utilities::PrettyFloat(current_range_min));
     edit_entry_val->SetText(Utilities::PrettyFloat(current_value));
     edit_entry_max->SetText(Utilities::PrettyFloat(current_range_max));
     
     edit_entry_val->RequestFocus();
   }else{
-    std::cout << "End slider edit" << std::endl;
+    
   }
   SetNeedsRedrawing();
 }

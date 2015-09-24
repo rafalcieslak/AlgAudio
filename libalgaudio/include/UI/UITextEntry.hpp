@@ -27,7 +27,8 @@ class UITextEntry : public UIWidget{
 public:
   static std::shared_ptr<UITextEntry> Create(std::weak_ptr<Window> parent_window, std::string text = "");
   virtual void CustomDraw(DrawContext& c) override;
-  Signal<> on_edit_complete; /**< Triggered when the Return key is pressed while entering text, or when focus is lost after user edited text. */
+  Signal<> on_edit_complete; /**< Triggered when the Return key is pressed while entering text. */
+  Signal<> on_edit_exitted; /**< Triggered when focus is lost after user edited text. */
   Signal<> on_edited; /**< Triggered when user does any change to the text. */
   void SetText(std::string text);
   void SetFontSize(int size);

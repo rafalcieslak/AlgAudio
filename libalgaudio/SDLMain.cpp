@@ -173,10 +173,8 @@ void SDLMain::UnregisterAll(){
 
 void SDLMain::SetTextInput(bool b){
   if(b){
-    std::cout << "Starting text input" << std::endl;
     SDL_StartTextInput();
   }else{
-    std::cout << "Ending text input" << std::endl;
     SDL_StopTextInput();
   }
 }

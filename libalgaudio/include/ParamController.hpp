@@ -43,8 +43,16 @@ public:
   void Reset();
   inline float Get() const {return current_val;}
   float GetRelative() const;
-  inline void SetRangeMin(float v) {range_min = v; }
-  inline void SetRangeMax(float v) {range_max = v; }
+  inline void SetRangeMin(float v) {
+    range_min = v;
+    on_range_min_set.Happen(v);
+    //Set(current_val); // Will re-trigger set events with new relative value
+  }
+  inline void SetRangeMax(float v) {
+    range_max = v;
+    on_range_max_set.Happen(v);
+    //Set(current_val); // Will re-trigger set events with new relative value
+  }
   inline float GetRangeMin() const {return range_min;}
   inline float GetRangeMax() const {return range_max;}
 
@@ -55,6 +63,10 @@ public:
   Signal<float, float> on_set;
   /** Passing values to other controllers should be done once this controller has it value set. */
   Signal<float, float> after_set;
+  
+  Signal<float> on_range_min_set;
+  Signal<float> on_range_max_set;
+  
   const std::shared_ptr<ParamTemplate> templ;
 private:
   ParamController(std::shared_ptr<Module> m, const std::shared_ptr<ParamTemplate> t);

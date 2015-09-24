@@ -78,7 +78,6 @@ void UITextEntry::OnKeyboard(KeyData k){
     
     if(max_length == -1 || text.length() < (unsigned int)max_length){
       text += k.symbol;
-      std::cout << text << std::endl;
       on_edited.Happen();
       was_edited_since_received_focus = true;
       UpdateText();
@@ -97,14 +96,12 @@ void UITextEntry::OnKeyboard(KeyData k){
 
 void UITextEntry::OnFocusChanged(bool has_focus){
   if(has_focus){
-    //std::cout << "GOT  FOCUS " << text << std::endl;
     SDLMain::SetTextInput(true);
     was_edited_since_received_focus = false;
   }else{
-    //std::cout << "LOST FOCUS " << text << std::endl;
     SDLMain::SetTextInput(false);
     if(was_edited_since_received_focus){
-      on_edit_complete.Happen();
+      on_edit_exitted.Happen();
     }
   }
   if(text == "") UpdateText();

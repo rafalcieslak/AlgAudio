@@ -94,6 +94,7 @@ private:
   std::shared_ptr<UITextEntry> edit_entry_max;
   /** This is toggled, among others, by right clicking the slider. */
   void SetEditMode(bool enabled);
+  void ApplyEdittedValues();
 };
 
 
