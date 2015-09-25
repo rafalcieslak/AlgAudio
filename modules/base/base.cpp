@@ -96,6 +96,17 @@ public:
   
 };
 
+class DataSum : public Module{
+  void on_param_set(std::string, float){
+    float v  = GetParamControllerByID("i1")->Get();
+          v += GetParamControllerByID("i2")->Get();
+          v += GetParamControllerByID("i3")->Get();
+          v += GetParamControllerByID("i4")->Get();
+    GetParamControllerByID("out")->Set(v);
+  }
+};
+
+
 extern "C"{
 void delete_instance(void* obj){
   delete reinterpret_cast<AlgAudio::Module*>(obj);
@@ -105,6 +116,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"MIDINote")==0) return new MIDINote();
   if(strcmp(name,"DataLin")==0) return new DataLin();
   if(strcmp(name,"Seq8")==0) return new Seq8();
+  if(strcmp(name,"DataSum")==0) return new DataSum();
   return nullptr;
 }
 

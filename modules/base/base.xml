@@ -425,5 +425,18 @@ Out.ar(outbus,mix);
     </sc>
     <gui type="standard auto"/>
   </module>
-
+  
+  <module id="datasum" name="Slider sum">
+    <class name="DataSum"/>
+    <params>
+      <param id="i1" name="A" defaultmin="0.0" defaultmax="1.0" defaultval="0" action="custom"/>
+      <param id="i2" name="B" defaultmin="0.0" defaultmax="1.0" defaultval="0" action="custom"/>
+      <param id="i3" name="C" defaultmin="0.0" defaultmax="1.0" defaultval="0" action="custom"/>
+      <param id="i4" name="D" defaultmin="0.0" defaultmax="1.0" defaultval="0" action="custom"/>
+      <param id="out" name="A+B+C+D" mode="output" defaultmin="0.0" defaultmax="4.0" defaultval="0"/>
+    </params>
+    <description> Sums values from 4 slider inputs. </description>
+    <gui type="standard auto"/>
+  </module>
+  
 </collection>
