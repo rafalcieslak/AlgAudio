@@ -29,6 +29,21 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
 endif()
 
+add_definitions(
+  -Wall
+  -Wextra
+)
+
+# Enable optimisations
+if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+  add_definitions(
+    -flto
+    -O3
+  )
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
+endif(${CMAKE_BUILD_TYPE} MATCHES "Release")
 
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -gdwarf-2")
