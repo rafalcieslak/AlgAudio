@@ -27,16 +27,13 @@ int OSC::msg_id = 0;
 #define PROTO LO_UDP
 
 OSC::OSC(std::string address, std::string port) : addr(""){
-  //TODO: Search for an available port in a larger range (100 ports?)
-  server = std::make_unique<lo::ServerThread>(2542, PROTO, nullptr);
+  
+  // 0 lets the system choose a port.
+  // TODO: Due to a bug in liblo, this will segfault when server creation fails (regardless of the handler).
+  // It may be necesarry to start the server using C api to detect errors.
+  server = std::make_unique<lo::ServerThread>(0, PROTO, nullptr);
   if(!server->is_valid()){
-    server = std::make_unique<lo::ServerThread>(2543, PROTO, nullptr);
-    if(!server->is_valid()){
-      server = std::make_unique<lo::ServerThread>(2544, PROTO, nullptr);
-      if(!server->is_valid()){
-        throw Exceptions::OSCException("OSC server failed to bind to a socket");
-      }
-    }
+    throw Exceptions::OSCException("OSC server failed to bind to a socket");
   }
 
   server->add_method("/algaudio/reply", NULL, [&](lo_message msg){
