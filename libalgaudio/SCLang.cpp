@@ -280,7 +280,7 @@ void SCLang::ProcessMIDIInput(lo::Message msg){
     m.channel = msg.argv()[1]->i32;
     m.number = msg.argv()[2]->i32;
     m.velocity = msg.argv()[3]->i32;
-    m.velocity = 0;
+    m.value = 0;
   }else if(t == 3){
     m.type = MidiMessage::Type::Control;
     m.channel = msg.argv()[1]->i32;
