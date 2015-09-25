@@ -133,6 +133,16 @@ Out.ar(outbus, In.ar(portalbus));
     <gui type="standard auto"/>
   </module>
   
+  <module id="const" name="Const">
+    <class name="Const"/>
+    <params>
+      <param id="value" name="Value" defaultmin="0.0" defaultmax="1.0" defaultval="0.0" action="custom"/>
+      <param id="output" name="Output" mode="output" defaultmin="0.0" defaultmax="1.0" defaultval="0.0"/>
+    </params>
+    <description> This module holds a single value. </description>
+    <gui type="standard auto"/>
+  </module>
+  
   <module id="qtest" name="Quad test">
     <description> Test for quad output. </description>
     <sc>

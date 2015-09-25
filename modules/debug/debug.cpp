@@ -188,6 +188,13 @@ void PortalBase::OnBusReady(std::shared_ptr<AlgAudio::Bus> b, int channel){
 std::map<int, std::pair<std::shared_ptr<AlgAudio::Bus>, std::list<std::shared_ptr<PortalBase>>> > PortalBase::channels;
 
 
+class Const : public AlgAudio::Module{
+  void on_param_set(std::string, float v){
+    GetParamControllerByID("output")->Set(v);
+  }
+};
+
+
 extern "C"{
 void delete_instance(void* obj){
   delete reinterpret_cast<AlgAudio::Module*>(obj);
@@ -199,6 +206,7 @@ void* create_instance(const char* name){
   if(strcmp(name,"GUIDemo")==0) return new GUIDemo();
   if(strcmp(name,"PortalBase")==0) return new PortalBase();
   if(strcmp(name,"SimpleSeq")==0) return new SimpleSeq();
+  if(strcmp(name,"Const")==0) return new Const();
   else return nullptr;
 }
 } // extern C
