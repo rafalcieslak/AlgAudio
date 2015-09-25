@@ -13,6 +13,7 @@ cp modules/*.xml $DIR/modules/.
 cp modules/*.aa.dll $DIR/modules/.
 cp sc/*.sc $DIR/sc/.
 cp -r ../examples $DIR 
+cp ../COPYING ../COPYING.LESSER $DIR 
 
 # Copy all necessary dlls
 ldd $DIR/*.dll | grep mingw | cut -d ' ' -f 3 | xargs -i cp {} $DIR/.

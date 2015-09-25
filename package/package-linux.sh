@@ -13,3 +13,4 @@ cp modules/*.xml $DIR/modules/.
 cp modules/*.aa.so $DIR/modules/.
 cp sc/*.sc $DIR/sc/.
 cp -r ../examples $DIR 
+cp ../COPYING ../COPYING.LESSER $DIR 
