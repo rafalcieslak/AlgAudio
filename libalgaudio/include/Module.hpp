@@ -26,6 +26,10 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "Utilities.hpp"
 #include "LateReturn.hpp"
 #include "Timer.hpp"
+// Not really needed here, but all collections need that for strcmp in 
+// create instance, so including this is convinient, as all collections include
+// at least Module.hpp
+#include <cstring>
 
 // Forward declaration to strip rapidxml header dependecncy
 namespace rapidxml{

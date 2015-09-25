@@ -43,6 +43,7 @@ public:
    *  \param w Initial window width.
    *  \param h Initial window height.
    *  \param centered If true, window will be placed on the center of the screen.
+   *  \param resizable If false, the user will not be able to manually change the dimentions of the window.
    *        Otherwise, the initial window position is undefined. */
   static std::shared_ptr<Window> Create(std::string title = "AlgAudio", int w = 350, int h = 300, bool centered = true, bool resizable = true);
   ~Window();
