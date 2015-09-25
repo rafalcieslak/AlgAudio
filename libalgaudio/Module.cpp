@@ -87,6 +87,7 @@ LateReturn<std::shared_ptr<Module::Inlet>> Module::Inlet::Create(std::string id,
 int x = 0;
 LateReturn<> Module::Outlet::ConnectToInlet(std::shared_ptr<Module::Inlet> i){
   buses.push_back(i->bus);
+  x++;
   //std::cout << "outlet " << mod.sc_id << "/" << id << " connecting to bus " << i->bus->GetID() << " AT " << ++x << std::endl;
   return SendConnections();
 }
