@@ -1,0 +1,9 @@
+/** \mainpage AlgAudio API documentation
+
+This documentation contains API reference for libAlgAudio @ALGAUDIO_VERSION@.
+
+Below is included a conceptual diagram of libAlgAudio architecture.
+
+\image html arch.svg
+
+*/

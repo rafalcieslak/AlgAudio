@@ -110,6 +110,7 @@ if(DOXYGEN_FOUND)
 	        	${CMAKE_COMMAND} -E copy_directory "${CMAKE_BINARY_DIR}/doc/html" "${CMAKE_BINARY_DIR}/SDK/doc"
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/libalgaudio${CMAKE_SHARED_LIBRARY_SUFFIX}" "${CMAKE_BINARY_DIR}/SDK/."
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package/buildexample.sh" "${CMAKE_BINARY_DIR}/SDK/."
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/doc/modules.md" "${CMAKE_BINARY_DIR}/SDK/."
     COMMENT "Gathering SDK files"
 		DEPENDS doc sdk_hpp libalgaudio
 	)
@@ -118,6 +119,7 @@ else(DOXYGEN_FOUND)
 		        ${CMAKE_COMMAND} -E echo "SDK generated without docs, because doxygen was not found."
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/libalgaudio${CMAKE_SHARED_LIBRARY_SUFFIX}" "${CMAKE_BINARY_DIR}/SDK/."
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package/buildexample.sh" "${CMAKE_BINARY_DIR}/SDK/."
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/doc/modules.md" "${CMAKE_BINARY_DIR}/SDK/."
     COMMENT "Gathering SDK files"
 		DEPENDS sdk_hpp libalgaudio
 	)
