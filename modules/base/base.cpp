@@ -96,7 +96,7 @@ public:
   
 };
 
-class DataSum : public Module{
+class DataSum : public AlgAudio::Module{
   void on_param_set(std::string, float){
     float v  = GetParamControllerByID("i1")->Get();
           v += GetParamControllerByID("i2")->Get();
