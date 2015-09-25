@@ -34,16 +34,14 @@ add_definitions(
   -Wextra
 )
 
+add_definitions( -O3 )
 # Enable optimisations
-if(${CMAKE_BUILD_TYPE} MATCHES "Release")
-  add_definitions(
-    -flto
-    -O3
-  )
+if((${CMAKE_BUILD_TYPE} MATCHES "Release") AND ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux"))
+  add_definitions( -flto )
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -flto")
-endif(${CMAKE_BUILD_TYPE} MATCHES "Release")
+endif()
 
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -gdwarf-2")
