@@ -81,18 +81,18 @@ add_subdirectory(doc)
 
 # ----- PACKAGE TARGETS -----
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-  set(${PACKAGING_SCRIPT} "${PROJECT_SOURCE_DIR}/package/package-windows.sh")
+  set(PACKAGING_SCRIPT "${PROJECT_SOURCE_DIR}/package/package-windows.sh")
 endif("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-  set(${PACKAGING_SCRIPT} "${PROJECT_SOURCE_DIR}/package/package-linux.sh")
+  set(PACKAGING_SCRIPT "${PROJECT_SOURCE_DIR}/package/package-linux.sh")
 endif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
 
 add_custom_target(
-  package
+  pkg
   COMMAND sh ${PACKAGING_SCRIPT}
 )
 add_dependencies(
-  package
+  pkg
   libalgaudio
   liblo
   modules_base

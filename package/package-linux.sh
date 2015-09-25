@@ -2,7 +2,7 @@
 
 # Run this package inside the build dir once everything has been compiled
 
-DIR=package
+DIR=pkg
 
 mkdir -p $DIR
 cp algaudio.bin libalgaudio.so $DIR

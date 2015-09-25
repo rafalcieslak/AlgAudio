@@ -57,7 +57,7 @@ In project directory, run:
 
 When ready, run `./algaudio.exe` to launch the application.
 
-If you would like to create a standalone redistributable version, pass `-DCMAKE_BUILD_TYPE=Release` to `cmake`. After complete build, use `make package-windows` to collect all files (including dll dependencies needed to redistribute AlgAudio) into  `package-windows` directory.
+If you would like to create a standalone redistributable version, pass `-DCMAKE_BUILD_TYPE=Release` to `cmake`. After complete build, use `make pkg` to collect all files (including dll dependencies needed to redistribute AlgAudio) into `package` directory.
 
 ## On other systems
 
