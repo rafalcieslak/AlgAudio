@@ -29,35 +29,9 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace AlgAudio;
 
-Relay<int> r;
-/*
-LateReturn<int> CheckFunc(){
-  r.LateThrow<Exceptions::Unimplemented>("Blah.");
-  return r;
-}
-
-LateReturn<int> CheckFuncB(){
-  Relay<int> a;
-  CheckFunc().Then([a](auto i){
-    a.Return(i);
-  }).Catch(a);
-  return a;
-}
-
-void LRCatchCheck(){
-  CheckFuncB().Then([](int x){
-    std::cout << x << std::endl;
-  }).Catch<Exceptions::Unimplemented>([](auto ex){
-    std::cout << "EXCEPTION " << ex->what() << std::endl;
-  });
-  r.Return(5);
-};
-*/
 int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
-  
-  //LRCatchCheck(); return 0;
 
   std::cout << "Algaudio " << ALGAUDIO_VERSION << " starting." << std::endl;
 
