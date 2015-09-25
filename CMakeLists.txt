@@ -61,13 +61,14 @@ endif()
 
 # Version information
 execute_process(
-	COMMAND git describe --tags --long --dirty --always
+	COMMAND git describe --tags --dirty --always
 	OUTPUT_VARIABLE ALGAUDIO_VERSION
 )
 if(${CMAKE_BUILD_TYPE} MATCHES "Debug")
   string(CONCAT ALGAUDIO_VERSION ${ALGAUDIO_VERSION} "-debug")
 endif(${CMAKE_BUILD_TYPE} MATCHES "Debug")
 string(REGEX REPLACE "\n" "" ALGAUDIO_VERSION ${ALGAUDIO_VERSION})
+message(STATUS "Version: ${ALGAUDIO_VERSION}")
 
 # The libs subdir has to be processed first as it sets some vars for other subdirs
 add_subdirectory(libs)
