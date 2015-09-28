@@ -1,0 +1,536 @@
+<algaudio version="1">
+	<module saveid="1" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.560000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="1.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="587.041321" min="-1.000000" max="1.000000"/>
+		<gui x="53" y="-243"/>
+	</module>
+	<module saveid="2" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.900000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="12.214285" min="-1.000000" max="1.000000"/>
+		<gui x="201" y="-240"/>
+	</module>
+	<module saveid="3" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.350000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="4.750000" min="-1.000000" max="1.000000"/>
+		<gui x="671" y="35"/>
+	</module>
+	<module saveid="4" template="debug/const">
+		<param id="value" value="13.571428" min="0.000000" max="15.000000"/>
+		<param id="output" value="13.571428" min="0.000000" max="1.000000"/>
+		<gui x="-36" y="-413"/>
+	</module>
+	<module saveid="5" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.560000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="586.041321" min="-1.000000" max="1.000000"/>
+		<gui x="-415" y="-249"/>
+	</module>
+	<module saveid="6" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.200000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="2.714286" min="-1.000000" max="1.000000"/>
+		<gui x="194" y="297"/>
+	</module>
+	<module saveid="7" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="1.000000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="13.571428" min="-1.000000" max="1.000000"/>
+		<gui x="-276" y="-249"/>
+	</module>
+	<module saveid="8" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="2.035714" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="816" y="303"/>
+	</module>
+	<module saveid="9" template="base/sine">
+		<param id="freq" value="3139.506836" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.330000" min="0.000000" max="1.000000"/>
+		<gui x="524" y="421"/>
+	</module>
+	<module saveid="10" template="base/mult">
+		<gui x="690" y="451"/>
+	</module>
+	<module saveid="11" template="base/mult">
+		<gui x="736" y="451"/>
+	</module>
+	<module saveid="12" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="1.357143" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-135" y="547"/>
+	</module>
+	<module saveid="13" template="base/sine">
+		<param id="freq" value="3913.918701" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
+		<gui x="-424" y="660"/>
+	</module>
+	<module saveid="14" template="base/mult">
+		<gui x="-257" y="679"/>
+	</module>
+	<module saveid="15" template="base/mult">
+		<gui x="-207" y="678"/>
+	</module>
+	<module saveid="16" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="1.017857" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="338" y="549"/>
+	</module>
+	<module saveid="17" template="base/sine">
+		<param id="freq" value="4259.264648" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.330000" min="0.000000" max="1.000000"/>
+		<gui x="51" y="668"/>
+	</module>
+	<module saveid="18" template="base/mult">
+		<gui x="220" y="697"/>
+	</module>
+	<module saveid="19" template="base/mult">
+		<gui x="266" y="696"/>
+	</module>
+	<module saveid="20" template="builtin/pipe">
+		<gui x="1103" y="29"/>
+	</module>
+	<module saveid="21" template="builtin/pipe">
+		<gui x="1099" y="297"/>
+	</module>
+	<module saveid="22" template="base/midiin-note">
+		<param id="note" value="1046.502319" min="8.170000" max="12544.000000"/>
+		<param id="velocity" value="61.000000" min="0.000000" max="127.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-905" y="3"/>
+	</module>
+	<module saveid="23" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="1.700000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="1779.053955" min="-1.000000" max="1.000000"/>
+		<gui x="528" y="35"/>
+	</module>
+	<module saveid="24" template="base/mult">
+		<gui x="267" y="453"/>
+	</module>
+	<module saveid="25" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="12.214285" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="351" y="-240"/>
+	</module>
+	<module saveid="26" template="base/sine">
+		<param id="freq" value="587.041321" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="0.670000" min="0.000000" max="1.000000"/>
+		<gui x="53" y="-128"/>
+	</module>
+	<module saveid="27" template="base/mult">
+		<gui x="220" y="453"/>
+	</module>
+	<module saveid="28" template="base/mult">
+		<gui x="-208" y="-113"/>
+	</module>
+	<module saveid="29" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="13.571428" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.558148" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-136" y="-247"/>
+	</module>
+	<module saveid="30" template="base/mult">
+		<gui x="-252" y="-114"/>
+	</module>
+	<module saveid="31" template="base/mult">
+		<gui x="265" y="-99"/>
+	</module>
+	<module saveid="32" template="base/sine">
+		<param id="freq" value="586.041321" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
+		<gui x="-416" y="-132"/>
+	</module>
+	<module saveid="33" template="base/mult">
+		<gui x="219" y="-98"/>
+	</module>
+	<module saveid="34" template="builtin/pipe">
+		<gui x="1103" y="565"/>
+	</module>
+	<module saveid="35" template="builtin/pipe">
+		<gui x="1104" y="804"/>
+	</module>
+	<module saveid="36" template="builtin/pipe">
+		<gui x="1291" y="806"/>
+	</module>
+	<module saveid="37" template="base/stereoout">
+		<param id="db" value="74.285721" min="0.000000" max="100.000000"/>
+		<param id="measure" value="-339.793396" min="0.000000" max="100.000000"/>
+		<gui x="1245" y="946"/>
+	</module>
+	<module saveid="38" template="base/sine">
+		<param id="freq" value="962.782166" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
+		<gui x="526" y="-124"/>
+	</module>
+	<module saveid="39" template="base/mult">
+		<gui x="691" y="-91"/>
+	</module>
+	<module saveid="40" template="base/mult">
+		<gui x="736" y="-91"/>
+	</module>
+	<module saveid="41" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="13.571428" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="816" y="-235"/>
+	</module>
+	<module saveid="42" template="base/mult">
+		<gui x="-208" y="432"/>
+	</module>
+	<module saveid="43" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="7.464286" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-138" y="24"/>
+	</module>
+	<module saveid="44" template="base/sine">
+		<param id="freq" value="964.482178" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.800000" min="0.000000" max="1.000000"/>
+		<gui x="-420" y="140"/>
+	</module>
+	<module saveid="45" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="3.392857" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-140" y="292"/>
+	</module>
+	<module saveid="46" template="base/mult">
+		<gui x="-255" y="178"/>
+	</module>
+	<module saveid="47" template="base/mult">
+		<gui x="-207" y="178"/>
+	</module>
+	<module saveid="48" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="4.410714" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="341" y="28"/>
+	</module>
+	<module saveid="49" template="base/sine">
+		<param id="freq" value="1245.337769" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="2.670000" min="0.000000" max="1.000000"/>
+		<gui x="54" y="145"/>
+	</module>
+	<module saveid="50" template="base/sine">
+		<param id="freq" value="2093.004639" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.460000" min="0.000000" max="1.000000"/>
+		<gui x="-423" y="410"/>
+	</module>
+	<module saveid="51" template="base/mult">
+		<gui x="224" y="179"/>
+	</module>
+	<module saveid="52" template="base/mult">
+		<gui x="270" y="177"/>
+	</module>
+	<module saveid="53" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="4.750000" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="815" y="38"/>
+	</module>
+	<module saveid="54" template="base/sine">
+		<param id="freq" value="1779.053955" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.670000" min="0.000000" max="1.000000"/>
+		<gui x="529" y="151"/>
+	</module>
+	<module saveid="55" template="base/mult">
+		<gui x="688" y="182"/>
+	</module>
+	<module saveid="56" template="base/mult">
+		<gui x="732" y="180"/>
+	</module>
+	<module saveid="57" template="base/mult">
+		<gui x="-254" y="434"/>
+	</module>
+	<module saveid="58" template="base/sine">
+		<param id="freq" value="2867.416260" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="1.330000" min="0.000000" max="1.000000"/>
+		<gui x="52" y="418"/>
+	</module>
+	<module saveid="59" template="base/adsr1">
+		<param id="attack" value="0.005000" min="0.030000" max="5.000000"/>
+		<param id="decay" value="2.714286" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.030000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="336" y="298"/>
+	</module>
+	<module saveid="60" template="base/exrev1">
+		<gui x="1262" y="876"/>
+	</module>
+	<module saveid="61" template="debug/const">
+		<param id="value" value="1046.502319" min="0.000000" max="1.000000"/>
+		<param id="output" value="1046.502319" min="0.000000" max="1.000000"/>
+		<gui x="-685" y="-92"/>
+	</module>
+	<module saveid="62" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="3.000000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="3139.506836" min="-1.000000" max="1.000000"/>
+		<gui x="524" y="304"/>
+	</module>
+	<module saveid="63" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.150000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="2.035714" min="-1.000000" max="1.000000"/>
+		<gui x="669" y="303"/>
+	</module>
+	<module saveid="64" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="3.740000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="3913.918701" min="-1.000000" max="1.000000"/>
+		<gui x="-423" y="548"/>
+	</module>
+	<module saveid="65" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.100000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="1.357143" min="-1.000000" max="1.000000"/>
+		<gui x="-278" y="548"/>
+	</module>
+	<module saveid="66" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="4.070000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="4259.264648" min="-1.000000" max="1.000000"/>
+		<gui x="52" y="551"/>
+	</module>
+	<module saveid="67" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.075000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="1.017857" min="-1.000000" max="1.000000"/>
+		<gui x="195" y="551"/>
+	</module>
+	<module saveid="68" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="1.000000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="13.571428" min="-1.000000" max="1.000000"/>
+		<gui x="671" y="-237"/>
+	</module>
+	<module saveid="69" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.920000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="1.700000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="964.482178" min="-1.000000" max="1.000000"/>
+		<gui x="-418" y="21"/>
+	</module>
+	<module saveid="70" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="2.000000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="2093.004639" min="-1.000000" max="1.000000"/>
+		<gui x="-424" y="293"/>
+	</module>
+	<module saveid="71" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.250000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="3.392857" min="-1.000000" max="1.000000"/>
+		<gui x="-282" y="292"/>
+	</module>
+	<module saveid="72" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="2.740000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="2867.416260" min="-1.000000" max="1.000000"/>
+		<gui x="53" y="297"/>
+	</module>
+	<module saveid="73" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.550000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="7.464286" min="-1.000000" max="1.000000"/>
+		<gui x="-279" y="20"/>
+	</module>
+	<module saveid="74" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.920000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="962.782166" min="-1.000000" max="1.000000"/>
+		<gui x="525" y="-238"/>
+	</module>
+	<module saveid="75" template="base/datalin">
+		<param id="a" value="1046.502319" min="-1.000000" max="1.000000"/>
+		<param id="b" value="1.190000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="1245.337769" min="-1.000000" max="1.000000"/>
+		<gui x="55" y="27"/>
+	</module>
+	<module saveid="76" template="base/datalin">
+		<param id="a" value="13.571428" min="-1.000000" max="1.000000"/>
+		<param id="b" value="0.325000" min="-10.000000" max="10.000000"/>
+		<param id="c" value="0.000000" min="-5.000000" max="5.000000"/>
+		<param id="d" value="4.410714" min="-1.000000" max="1.000000"/>
+		<gui x="197" y="28"/>
+	</module>
+	<audioconn frommodule="8" tomodule="11" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="8" tomodule="11" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="9" tomodule="10" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="10" tomodule="34" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="11" tomodule="10" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="12" tomodule="15" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="12" tomodule="15" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="13" tomodule="14" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="14" tomodule="35" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="15" tomodule="14" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="16" tomodule="19" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="16" tomodule="19" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="17" tomodule="18" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="18" tomodule="35" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="19" tomodule="18" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="20" tomodule="36" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="21" tomodule="36" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="24" tomodule="27" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="25" tomodule="31" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="25" tomodule="31" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="26" tomodule="33" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="27" tomodule="34" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="28" tomodule="30" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="29" tomodule="28" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="29" tomodule="28" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="30" tomodule="20" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="31" tomodule="33" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="32" tomodule="30" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="33" tomodule="20" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="34" tomodule="36" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="35" tomodule="36" fromioletid="outbus" toioletid="inbus"/>
+	<audioconn frommodule="36" tomodule="60" fromioletid="outbus" toioletid="inbus1"/>
+	<audioconn frommodule="36" tomodule="60" fromioletid="outbus" toioletid="inbus2"/>
+	<audioconn frommodule="38" tomodule="39" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="39" tomodule="20" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="40" tomodule="39" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="41" tomodule="40" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="41" tomodule="40" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="42" tomodule="57" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="43" tomodule="47" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="43" tomodule="47" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="44" tomodule="46" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="45" tomodule="42" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="45" tomodule="42" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="46" tomodule="21" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="47" tomodule="46" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="48" tomodule="52" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="48" tomodule="52" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="49" tomodule="51" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="50" tomodule="57" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="51" tomodule="21" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="52" tomodule="51" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="53" tomodule="56" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="53" tomodule="56" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="54" tomodule="55" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="55" tomodule="21" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="56" tomodule="55" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="57" tomodule="34" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="58" tomodule="27" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="59" tomodule="24" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="59" tomodule="24" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="60" tomodule="37" fromioletid="outbus1" toioletid="inbus1"/>
+	<audioconn frommodule="60" tomodule="37" fromioletid="outbus2" toioletid="inbus2"/>
+	<dataconn frommodule="1" tomodule="74" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="1" tomodule="26" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="2" tomodule="76" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="2" tomodule="25" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="3" tomodule="63" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="3" tomodule="53" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="4" tomodule="7" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="4" tomodule="2" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="4" tomodule="68" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="5" tomodule="1" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="5" tomodule="32" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="6" tomodule="67" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="6" tomodule="59" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="7" tomodule="73" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="7" tomodule="29" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="12" tomodule="16" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="22" tomodule="29" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="22" tomodule="43" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="22" tomodule="45" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="22" tomodule="12" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="22" tomodule="61" fromparamid="note" toparamid="value" mode="absolute"/>
+	<dataconn frommodule="23" tomodule="54" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="25" tomodule="41" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="29" tomodule="25" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="43" tomodule="48" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="45" tomodule="59" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="48" tomodule="53" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="59" tomodule="8" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="61" tomodule="5" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="61" tomodule="69" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="61" tomodule="70" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="61" tomodule="64" fromparamid="output" toparamid="a" mode="absolute"/>
+	<dataconn frommodule="62" tomodule="9" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="63" tomodule="8" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="64" tomodule="66" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="64" tomodule="13" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="65" tomodule="12" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="66" tomodule="17" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="67" tomodule="16" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="68" tomodule="3" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="68" tomodule="41" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="69" tomodule="75" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="69" tomodule="44" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="70" tomodule="72" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="70" tomodule="50" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="71" tomodule="65" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="71" tomodule="45" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="72" tomodule="62" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="72" tomodule="58" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="73" tomodule="71" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="73" tomodule="43" fromparamid="d" toparamid="decay" mode="absolute"/>
+	<dataconn frommodule="74" tomodule="38" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="75" tomodule="23" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="75" tomodule="49" fromparamid="d" toparamid="freq" mode="absolute"/>
+	<dataconn frommodule="76" tomodule="6" fromparamid="a" toparamid="a" mode="relative"/>
+	<dataconn frommodule="76" tomodule="48" fromparamid="d" toparamid="decay" mode="absolute"/>
+</algaudio>
+
+
