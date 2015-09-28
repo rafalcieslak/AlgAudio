@@ -20,6 +20,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include <cstring>
 #include "ModuleTemplate.hpp"
 #include "Theme.hpp"
+#include "Config.hpp"
 #include "TextRenderer.hpp"
 #include "ParamController.hpp"
 #include "rapidxml/rapidxml.hpp"
@@ -245,12 +246,15 @@ void StandardModuleGUI::CustomDraw(DrawContext& c){
   main_margin->Draw(c);
   c.Pop();
 
-  auto m = module.lock();
-  if(m){
-    std::string idn = std::to_string(m->sc_id);
-    // TODO: Cache the rendered text!
-    if(!id_texture) id_texture = TextRenderer::Render(window, FontParams("Dosis-Bold",8), idn.c_str());
-    c.DrawText(id_texture, Theme::Get("standardbox-border"), Point2D(3,1));
+  if(Config::Global().debug){
+    // Module's ID
+    auto m = module.lock();
+    if(m){
+      std::string idn = std::to_string(m->sc_id);
+      // TODO: Cache the rendered text!
+      if(!id_texture) id_texture = TextRenderer::Render(window, FontParams("Dosis-Bold",8), idn.c_str());
+      c.DrawText(id_texture, Theme::Get("standardbox-border"), Point2D(3,1));
+    }
   }
 }
 
