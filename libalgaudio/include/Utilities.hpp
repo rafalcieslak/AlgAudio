@@ -165,7 +165,8 @@ struct KeyData{
     Backspace, Delete,
     Return,
     Shift, Ctrl, Alt,
-    Escape
+    Escape,
+    Space
   };
   KeyData(const SDL_KeyboardEvent&);
   /** This constructor creates a Text key data (See SDL's TextInput) */

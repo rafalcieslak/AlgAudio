@@ -267,6 +267,20 @@ void MainWindow::ProcessCloseEvent(){
 
 void MainWindow::ProcessKeyboardEvent(KeyData data){
   // Pass all key events to the canvasview.
+  if(data.ctrl && data.type == KeyData::KeyType::Letter && data.symbol == "s" && data.IsTrig()){
+    Save(); return;
+  }
+  if(data.ctrl && data.type == KeyData::KeyType::Letter && data.symbol == "n" && data.IsTrig()){
+    New(); return;
+  }
+  if(data.ctrl && data.type == KeyData::KeyType::Letter && data.symbol == "o" && data.IsTrig()){
+    Open(); return;
+  }
+  if(data.type == KeyData::KeyType::Space && data.IsTrig()){
+    if(selector->IsExposed()) selector->Hide();
+    else                      selector->Expose();
+    return;
+  }
   canvasview->OnKeyboard(data);
 }
 
