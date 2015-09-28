@@ -21,6 +21,7 @@ along with AlgAudio.  If not, see <http://www.gnu.org/licenses/>.
 #include "nfd.h"
 #include "CanvasXML.hpp"
 #include "SCLang.hpp"
+#include "Config.hpp"
 
 #undef ERROR
 
@@ -117,7 +118,8 @@ void MainWindow::init(){
   toolbarbox->Insert(saveasbutton, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(toolbar_separator2, UIBox::PackMode::TIGHT);
   toolbar_separator2->SetCustomSize(Size2D(30,0));
-  toolbarbox->Insert(allnodes, UIBox::PackMode::TIGHT);
+  if(Config::Global().debug)
+    toolbarbox->Insert(allnodes, UIBox::PackMode::TIGHT);
   toolbarbox->Insert(toolbar_separator3, UIBox::PackMode::WIDE);
   toolbarbox->Insert(quitbutton, UIBox::PackMode::TIGHT);
   mainvbox->Insert(toolbarbox, UIBox::PackMode::TIGHT);
