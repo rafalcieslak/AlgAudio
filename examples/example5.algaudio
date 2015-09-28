@@ -1,34 +1,89 @@
 <algaudio version="1">
 	<module saveid="1" template="base/saw">
-		<param id="freq" value="363.619781" min="40.000000" max="5000.000000"/>
-		<param id="amp" value="0.780952" min="0.000000" max="1.000000"/>
-		<gui x="-181" y="-87"/>
+		<param id="freq" value="329.627563" min="40.000000" max="5000.000000"/>
+		<param id="amp" value="0.980952" min="0.000000" max="1.000000"/>
+		<gui x="-102" y="-154"/>
 	</module>
 	<module saveid="2" template="base/saw">
-		<param id="freq" value="181.809891" min="20.000000" max="2500.000000"/>
+		<param id="freq" value="164.813782" min="20.000000" max="2500.000000"/>
 		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
-		<gui x="-329" y="-87"/>
+		<gui x="-252" y="-154"/>
 	</module>
 	<module saveid="3" template="base/saw">
-		<param id="freq" value="727.239563" min="80.000000" max="10000.000000"/>
-		<param id="amp" value="0.542857" min="0.000000" max="1.000000"/>
-		<gui x="-37" y="-87"/>
+		<param id="freq" value="659.255127" min="80.000000" max="10000.000000"/>
+		<param id="amp" value="0.438095" min="0.000000" max="1.000000"/>
+		<gui x="43" y="-154"/>
 	</module>
 	<module saveid="4" template="base/stereoout">
 		<param id="db" value="85.000000" min="0.000000" max="100.000000"/>
-		<param id="measure" value="70.797729" min="0.000000" max="100.000000"/>
-		<gui x="-187" y="144"/>
+		<param id="measure" value="-727.166809" min="0.000000" max="100.000000"/>
+		<gui x="-116" y="284"/>
 	</module>
 	<module saveid="5" template="base/exrev1">
-		<gui x="-164" y="63"/>
+		<gui x="-102" y="201"/>
 	</module>
-	<audioconn frommodule="1" tomodule="5" fromioletid="outbus" toioletid="inbus2"/>
-	<audioconn frommodule="2" tomodule="5" fromioletid="outbus" toioletid="inbus1"/>
-	<audioconn frommodule="3" tomodule="5" fromioletid="outbus" toioletid="inbus1"/>
+	<module saveid="6" template="base/adsr1">
+		<param id="attack" value="0.129400" min="0.030000" max="5.000000"/>
+		<param id="decay" value="0.200000" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.500000" min="0.000000" max="1.000000"/>
+		<param id="release" value="2.183947" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-353" y="-16"/>
+	</module>
+	<module saveid="7" template="base/adsr1">
+		<param id="attack" value="0.038276" min="0.030000" max="5.000000"/>
+		<param id="decay" value="0.200000" min="0.030000" max="5.000000"/>
+		<param id="sustain" value="0.076190" min="0.000000" max="1.000000"/>
+		<param id="release" value="0.500000" min="0.030000" max="5.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<param id="val" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-499" y="-17"/>
+	</module>
+	<module saveid="8" template="base/mult">
+		<gui x="-99" y="121"/>
+	</module>
+	<module saveid="9" template="base/mult">
+		<gui x="-50" y="118"/>
+	</module>
+	<module saveid="10" template="base/midiin-note">
+		<param id="note" value="164.813782" min="8.170000" max="12544.000000"/>
+		<param id="velocity" value="61.000000" min="0.000000" max="127.000000"/>
+		<param id="gate" value="0.000000" min="0.000000" max="1.000000"/>
+		<gui x="-662" y="-156"/>
+	</module>
+	<module saveid="11" template="base/exvco">
+		<param id="base" value="329.627563" min="40.000000" max="5000.000000"/>
+		<param id="amt" value="0.833333" min="0.000000" max="100.000000"/>
+		<gui x="182" y="-23"/>
+	</module>
+	<module saveid="12" template="base/lfsine1">
+		<param id="freq" value="3.000000" min="0.100000" max="10.000000"/>
+		<param id="amp" value="1.000000" min="0.000000" max="1.000000"/>
+		<gui x="187" y="-266"/>
+	</module>
+	<module saveid="13" template="base/mult">
+		<gui x="136" y="-60"/>
+	</module>
+	<audioconn frommodule="1" tomodule="9" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="2" tomodule="8" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="3" tomodule="13" fromioletid="outbus" toioletid="in1"/>
 	<audioconn frommodule="5" tomodule="4" fromioletid="outbus1" toioletid="inbus1"/>
 	<audioconn frommodule="5" tomodule="4" fromioletid="outbus2" toioletid="inbus2"/>
+	<audioconn frommodule="6" tomodule="9" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="7" tomodule="8" fromioletid="outbus" toioletid="in1"/>
+	<audioconn frommodule="8" tomodule="5" fromioletid="out" toioletid="inbus1"/>
+	<audioconn frommodule="9" tomodule="5" fromioletid="out" toioletid="inbus2"/>
+	<audioconn frommodule="11" tomodule="9" fromioletid="outbus" toioletid="in2"/>
+	<audioconn frommodule="12" tomodule="11" fromioletid="out" toioletid="inbus"/>
+	<audioconn frommodule="12" tomodule="13" fromioletid="out" toioletid="in2"/>
+	<audioconn frommodule="13" tomodule="8" fromioletid="out" toioletid="in2"/>
 	<dataconn frommodule="1" tomodule="3" fromparamid="freq" toparamid="freq" mode="relative"/>
 	<dataconn frommodule="2" tomodule="1" fromparamid="freq" toparamid="freq" mode="relative"/>
+	<dataconn frommodule="2" tomodule="11" fromparamid="freq" toparamid="base" mode="relative"/>
+	<dataconn frommodule="7" tomodule="6" fromparamid="gate" toparamid="gate" mode="relative"/>
+	<dataconn frommodule="10" tomodule="7" fromparamid="gate" toparamid="gate" mode="absolute"/>
+	<dataconn frommodule="10" tomodule="2" fromparamid="note" toparamid="freq" mode="absolute"/>
 </algaudio>
 
 
