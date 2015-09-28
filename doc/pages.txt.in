@@ -1,6 +1,6 @@
 /** \mainpage AlgAudio API documentation
 
-This documentation contains API reference for libAlgAudio @ALGAUDIO_VERSION@.
+This documentation contains API reference for libAlgAudio @ALGAUDIO_VERSION_SHORT@.
 
 Below is included a conceptual diagram of libAlgAudio architecture.
 

@@ -93,7 +93,7 @@ void LaunchConfigWindow::init(){
     "      https://www.gnu.org/licenses/lgpl.txt"
     ,12);
   about_text->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
-  version_label = UILabel::Create(w, ALGAUDIO_VERSION, 16);
+  version_label = UILabel::Create(w, ALGAUDIO_VERSION_SHORT, 16);
   version_label->SetAlignment(HorizAlignment_CENTERED, VertAlignment_TOP);
   config_separator = UISeparator::Create(w);
   config_separator->SetCustomSize(Size2D(0,20));

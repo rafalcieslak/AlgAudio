@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
   (void)argc;
   (void)argv;
 
-  std::cout << "Algaudio " << ALGAUDIO_VERSION << " starting." << std::endl;
+  std::cout << "Algaudio " << ALGAUDIO_VERSION_LONG << " starting." << std::endl;
 
   try{
     Theme::Init();
