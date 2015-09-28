@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
     SDLMain::Init();
     
     // Explicitly load default config.
-    Config::GlobalWriteable() = Config::Default();
+     // Config::GlobalWriteable() = Config::Default(); // Not needed. Currently all configs are the default one.
 
     // TODO: Load modules later, with SC start.
     ModuleCollectionBase::InstallDir("modules");
