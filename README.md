@@ -1,16 +1,18 @@
 # AlgAudio
 
-AlgAudio is an audio processing framework, designed to be easy to learn and use at live performances.
+AlgAudio is an audio processing framework, designed to be easy to learn and use both at live performances. The user defines a network of signal operations by creating a dataflow diagram. AlgAudio comes with a collection of building blocks, and is easily expandable with custom external modules.
 
 ![screenshot](http://i.imgur.com/JQU8xWD.png)
+
+- v1.99.1 binaries are [available for download here](https://github.com/rafalcieslak/AlgAudio/releases/tag/v1.99.1).
+
+- API documentation is [available online](http://cielak.org/algaudio/doc).
+
+- External module specification is available in `./doc/modules.md` ([see it here](https://github.com/rafalcieslak/AlgAudio/blob/master/doc/modules.md)).
 
 Copyright (C) 2015 CeTA - Audiovisual Technology Center
 
 Algaudio is released under the terms of the GNU Lesser General Public License version 3, see COPYING and COPYING.LESSER for details.
-
-Module specification draft is available in `./doc/modules.md` ([see it here](https://github.com/rafalcieslak/AlgAudio/blob/master/doc/modules.md)).
-
-The API documentation can be built with `make doc`, [or browsed online](http://cielak.org/algaudio/doc).
 
 # Building and running
 
@@ -26,6 +28,8 @@ To build, you will need CMake 3.0 or newer, scons, git, and development headers 
 To launch, you will also need sclang (SuperCollider). Execute [from `build` directory]:
 
 	./algaudio.bin
+	
+The API documentation can be built with `make doc`.
 
 ## On Windows
 
