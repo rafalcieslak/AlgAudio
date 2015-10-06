@@ -14,3 +14,5 @@ cp modules/*.aa.so $DIR/modules/.
 cp sc/*.sc $DIR/sc/.
 cp -r ../examples $DIR 
 cp ../COPYING ../COPYING.LESSER $DIR 
+cp ../package/linux_launcher.sh $DIR/run.sh
+chmod +x $DIR/run.sh

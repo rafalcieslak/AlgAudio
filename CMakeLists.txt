@@ -32,6 +32,7 @@ endif()
 add_definitions(
   -Wall
   -Wextra
+  -Wno-unused-result
 )
 
 add_definitions( -O3 )
